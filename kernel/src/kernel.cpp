@@ -9,7 +9,7 @@
 #include "memory.h" 
 #include "PageFrameAllocator.h" 
 //#include "bitmap.h"
-
+ 
 extern "C" void _start(BootInfo* bootInfo)
 {
    BasicRenderer temp = BasicRenderer(bootInfo->framebuffer, bootInfo->psf1_font);
