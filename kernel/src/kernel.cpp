@@ -7,7 +7,8 @@
 #include "cstr.h" 
 #include "efiMemory.h"
 #include "memory.h"  
-#include "PageFrameAllocator.h"  
+#include "paging/PageFrameAllocator.h"  
+#include "paging/PageMapIndexer.h"
 //#include "bitmap.h"
  
 
@@ -38,11 +39,30 @@ extern "C" void _start(BootInfo* bootInfo)
     uint64_t kernelSize = (((uint64_t)&_KernelEnd) - ((uint64_t)&_KernelStart));
     uint64_t kernelPages = ((uint64_t)kernelSize / 4096) + 1;
 
-    temp.Println("Size: {} Pages.", to_string(kernelPages));
+    
 
     newAllocator.LockPages(&_KernelStart, kernelPages);
 
  
+    PageMapIndexer pageIndexer = PageMapIndexer(0x1000 * 52 + 0x50000 * 7);
+
+    temp.Println("P_i: {}", to_string(pageIndexer.P_i));
+    temp.Println("PT_i: {}", to_string(pageIndexer.PT_i));
+    temp.Println("PD_i: {}", to_string(pageIndexer.PD_i));
+    temp.Println("PDP_i: {}", to_string(pageIndexer.PDP_i));
+
+
+    return;
+}
+
+
+
+
+
+
+/*
+
+    temp.Println("Size: {} Pages.", to_string(kernelPages));
 
     temp.Println("Free RAM:     {} KB", to_string(newAllocator.GetFreeRAM() / 1024));
     temp.Println("Used RAM:     {} KB", to_string(newAllocator.GetUsedRAM() / 1024));
@@ -57,19 +77,6 @@ extern "C" void _start(BootInfo* bootInfo)
         void* adress = newAllocator.RequestPage();
         temp.Println("Received Page address: {}", ConvertHexToString((uint64_t)adress));
     }
-
-
-
-    return;
-}
-
-
-
-
-
-
-/*
-
 
 
     temp.Println("Total RAM:    {} KB", to_string(GetMemorySize(bootInfo->mMap, (bootInfo->mMapSize / bootInfo->mMapDescSize), bootInfo->mMapDescSize)/ 1024));
