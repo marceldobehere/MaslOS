@@ -4,12 +4,15 @@
 #include "../bitmap.h"
 #include "../memory.h"
 
+
+
 class PageFrameAllocator{
     private:
     uint64_t freeMemory;
     uint64_t reservedMemory;
     uint64_t usedMemory;
     bool Initialized = false;
+    
     void InitBitmap(size_t bitmapSize, void* bufferAddress)
     {
         PageBitMap.Size = bitmapSize;
@@ -156,5 +159,5 @@ class PageFrameAllocator{
       
 };
 
-
+PageFrameAllocator GlobalAllocator;
 
