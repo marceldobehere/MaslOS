@@ -16,7 +16,7 @@ extern "C" void _start(BootInfo* bootInfo)
    
     temp.Println("Hello, World!");
 
-    temp.Println("Hello, \\CFF0000World!\\CFFFFFF");
+    temp.Println("Hello, \\CFF00FFWorld!\\CFFFFFF");
  
     temp.Print("Memory Size: ");
     temp.Print(to_string(GetMemorySize(bootInfo->mMap, (bootInfo->mMapSize / bootInfo->mMapDescSize), bootInfo->mMapDescSize)));
