@@ -10,6 +10,10 @@
 #include "PageFrameAllocator.h"  
 //#include "bitmap.h"
  
+
+extern uint64_t _KernelStart;
+extern uint64_t _KernelEnd;
+
 extern "C" void _start(BootInfo* bootInfo)
 {
    BasicRenderer temp = BasicRenderer(bootInfo->framebuffer, bootInfo->psf1_font);
@@ -27,17 +31,34 @@ extern "C" void _start(BootInfo* bootInfo)
     //     const char* a[] = {to_string(-7.5, 1), to_string((int64_t)-10000)};
     //     temp.Println("The values are: {} and {}.", (const char**)a);
     // }
- 
+    
     PageFrameAllocator newAllocator; 
     newAllocator.ReadEFIMemoryMap(bootInfo->mMap, bootInfo->mMapSize, bootInfo->mMapDescSize); 
     
-    
+    uint64_t kernelSize = (((uint64_t)&_KernelEnd) - ((uint64_t)&_KernelStart));
+    uint64_t kernelPages = ((uint64_t)kernelSize / 4096) + 1;
+
+    temp.Println("Size: {} Pages.", to_string(kernelPages));
+
+    newAllocator.LockPages(&_KernelStart, kernelPages);
+
+ 
 
     temp.Println("Free RAM:     {} KB", to_string(newAllocator.GetFreeRAM() / 1024));
     temp.Println("Used RAM:     {} KB", to_string(newAllocator.GetUsedRAM() / 1024));
     temp.Println("Reserved RAM: {} KB", to_string(newAllocator.GetReservedRAM() / 1024));
     temp.Println();
     temp.Println("Total RAM:    {} KB", to_string((newAllocator.GetFreeRAM() + newAllocator.GetUsedRAM() + newAllocator.GetReservedRAM()) / 1024));
+    temp.Println();
+
+
+    for (int t = 0; t < 20; t++)
+    {
+        void* adress = newAllocator.RequestPage();
+        temp.Println("Received Page address: {}", ConvertHexToString((uint64_t)adress));
+    }
+
+
 
     return;
 }
