@@ -9,7 +9,9 @@
 #include "memory.h"  
 #include "paging/PageFrameAllocator.h"  
 #include "paging/PageMapIndexer.h"
-//#include "bitmap.h"
+#include "paging/paging.h"
+#include "paging/PageTableManager.h"
+//#include "bitmap.h" 
  
 
 extern uint64_t _KernelStart;
@@ -33,23 +35,47 @@ extern "C" void _start(BootInfo* bootInfo)
     //     temp.Println("The values are: {} and {}.", (const char**)a);
     // }
     
-    PageFrameAllocator newAllocator; 
-    newAllocator.ReadEFIMemoryMap(bootInfo->mMap, bootInfo->mMapSize, bootInfo->mMapDescSize); 
+    uint64_t mMapEntries = (bootInfo->mMapSize / bootInfo->mMapDescSize);
+
+    GlobalAllocator = PageFrameAllocator();
+    GlobalAllocator.ReadEFIMemoryMap(bootInfo->mMap, bootInfo->mMapSize, bootInfo->mMapDescSize); 
     
     uint64_t kernelSize = (((uint64_t)&_KernelEnd) - ((uint64_t)&_KernelStart));
     uint64_t kernelPages = ((uint64_t)kernelSize / 4096) + 1;
 
     
 
-    newAllocator.LockPages(&_KernelStart, kernelPages);
+    GlobalAllocator.LockPages(&_KernelStart, kernelPages);
 
- 
-    PageMapIndexer pageIndexer = PageMapIndexer(0x1000 * 52 + 0x50000 * 7);
+    PageTable* PML4 = (PageTable*)GlobalAllocator.RequestPage();
+    memset(PML4, 0, 0x1000);
+    PageTableManager pageTableManager = PageTableManager(PML4);
 
-    temp.Println("P_i: {}", to_string(pageIndexer.P_i));
-    temp.Println("PT_i: {}", to_string(pageIndexer.PT_i));
-    temp.Println("PD_i: {}", to_string(pageIndexer.PD_i));
-    temp.Println("PDP_i: {}", to_string(pageIndexer.PDP_i));
+    for (uint64_t i = 0; i < GetMemorySize(bootInfo->mMap, mMapEntries, bootInfo->mMapDescSize); i+=0x1000)
+        pageTableManager.MapMemory((void*)i, (void*)i);
+    
+    uint64_t fbBase = (uint64_t)bootInfo->framebuffer->BaseAddress;
+    uint64_t fbSize = (uint64_t)bootInfo->framebuffer->BufferSize + 0x1000;
+    
+    for (uint64_t i = fbBase; i < fbBase + fbSize; i+=4096)
+        pageTableManager.MapMemory((void*)i, (void*)i);
+
+
+    asm("mov %0, %%cr3" : : "r" (PML4) );
+
+    temp.Println("New Page Map loaded!");
+
+    pageTableManager.MapMemory((void*)0x600000000, (void*)0x80000);
+
+    uint64_t* test = (uint64_t*)0x600000000;
+
+    *test = 26;
+
+    temp.Println("Testing virtual Memory Adress: {}", to_string(*test));
+
+    
+         
+
 
 
     return;
@@ -62,6 +88,13 @@ extern "C" void _start(BootInfo* bootInfo)
 
 /*
 
+
+    PageMapIndexer pageIndexer = PageMapIndexer(0x1000 * 52 + 0x50000 * 7);
+
+    temp.Println("P_i: {}", to_string(pageIndexer.P_i));
+    temp.Println("PT_i: {}", to_string(pageIndexer.PT_i));
+    temp.Println("PD_i: {}", to_string(pageIndexer.PD_i));
+    temp.Println("PDP_i: {}", to_string(pageIndexer.PDP_i));
     temp.Println("Size: {} Pages.", to_string(kernelPages));
 
     temp.Println("Free RAM:     {} KB", to_string(newAllocator.GetFreeRAM() / 1024));
