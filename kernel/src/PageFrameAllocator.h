@@ -49,7 +49,6 @@ class PageFrameAllocator{
     }
 
 
-
     public:
 
     uint64_t GetFreeRAM()
@@ -63,6 +62,19 @@ class PageFrameAllocator{
     uint64_t GetReservedRAM()
     {
         return reservedMemory;
+    }
+
+    void* RequestPage()
+    {
+        for (uint64_t index = 0; index < PageBitMap.Size * 8; index++)
+        {
+            if (PageBitMap[index])
+                continue;
+            LockPage((void*)(index * 4096));
+            return(void*)(index * 4096);
+        }
+        
+        return NULL; // Page Frame Swap to file
     }
 
     void FreePage(void* address)

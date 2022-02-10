@@ -4,7 +4,7 @@
 
 #include "BasicRenderer.h"
 #include <stddef.h>
-#include "cstr.h"
+#include "cstr.h" 
 #include "efiMemory.h"
 #include "memory.h"  
 #include "PageFrameAllocator.h"  
@@ -30,14 +30,15 @@ extern "C" void _start(BootInfo* bootInfo)
  
     PageFrameAllocator newAllocator; 
     newAllocator.ReadEFIMemoryMap(bootInfo->mMap, bootInfo->mMapSize, bootInfo->mMapDescSize); 
-   
+    
+    
 
     temp.Println("Free RAM:     {} KB", to_string(newAllocator.GetFreeRAM() / 1024));
     temp.Println("Used RAM:     {} KB", to_string(newAllocator.GetUsedRAM() / 1024));
     temp.Println("Reserved RAM: {} KB", to_string(newAllocator.GetReservedRAM() / 1024));
     temp.Println();
     temp.Println("Total RAM:    {} KB", to_string((newAllocator.GetFreeRAM() + newAllocator.GetUsedRAM() + newAllocator.GetReservedRAM()) / 1024));
-    
+
     return;
 }
 
