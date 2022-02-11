@@ -46,3 +46,4 @@ GDT DefaultGDT =
 
 };
 
+extern "C" void LoadGDT(GDTDescriptor* gdtDescritpor);

@@ -21,6 +21,14 @@ extern "C" void _start(BootInfo* bootInfo)
 
 
 /*
+
+    for (unsigned int y = 10; y < bootInfo->framebuffer->Height / 4; y++)
+    {
+        for (unsigned int x = 0; x < bootInfo->framebuffer->Width / 2 * 4; x+=4)
+        {
+            *(unsigned int*)(x + (y * (bootInfo->framebuffer->PixelsPerScanLine * 4) + bootInfo->framebuffer->BaseAddress)) = 0xff00ffff;
+        }
+    }
  
     temp.Print("Memory Size: ");
     temp.Print(to_string(GetMemorySize(bootInfo->mMap, (bootInfo->mMapSize / bootInfo->mMapDescSize), bootInfo->mMapDescSize)));
