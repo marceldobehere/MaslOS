@@ -17,13 +17,17 @@ class BasicRenderer
         unsigned int color;
         void putChar(char chr, unsigned int xoff, unsigned int yoff);
         void putStr(const char* chrs, unsigned int xoff, unsigned int yoff);
+
         void printStr(const char* chrs);
+        void printStr(const char* chrs, const char* var);
+
+        void Println();
+
         void Print(const char* chrs);
         void Println(const char* chrs);
         void Print(const char* chrs, const char* var);
         void Println(const char* chrs, const char* var);
-        void Println();
-        void printStr(const char* chrs, const char* var);
+
 
         enum Colors
         { 
@@ -41,6 +45,13 @@ class BasicRenderer
             brown =  0xffA52A2A,
             blue =   0xff000080,
         };
+
+        void Print(const char* chrs, Colors col);
+        void Println(const char* chrs, Colors col);
+        void Print(const char* chrs, const char* var, Colors col);
+        void Println(const char* chrs, const char* var, Colors col);
+
+
 
 
         BasicRenderer(Framebuffer* framebuffer, PSF1_FONT* psf1_font)

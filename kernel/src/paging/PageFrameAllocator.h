@@ -36,7 +36,8 @@ class PageFrameAllocator{
         uint64_t index = (uint64_t)address / 4096;
         if (!PageBitMap[index])
             return;
-        PageBitMap.Set(index, false);
+        if(!PageBitMap.Set(index, false))
+            return;
         freeMemory += 4096;
         reservedMemory -= 4096;
     }
@@ -85,7 +86,8 @@ class PageFrameAllocator{
         uint64_t index = (uint64_t)address / 4096;
         if (!PageBitMap[index])
             return;
-        PageBitMap.Set(index, false);
+        if(!PageBitMap.Set(index, false))
+            return;
         freeMemory += 4096;
         usedMemory -= 4096;
     }
@@ -94,7 +96,8 @@ class PageFrameAllocator{
         uint64_t index = (uint64_t)address / 4096;
         if (PageBitMap[index])
             return;
-        PageBitMap.Set(index, true);
+        if(!PageBitMap.Set(index, true))
+            return;
         freeMemory -= 4096;
         usedMemory += 4096;
     }

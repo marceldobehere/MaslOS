@@ -115,6 +115,12 @@ void BasicRenderer::printStr(const char* chrs, const char* var)
     }
 }
 
+
+void BasicRenderer::Println()
+{
+    BasicRenderer::printStr("\n\r");
+}
+
 void BasicRenderer::Print(const char* chrs)
 {
     BasicRenderer::printStr(chrs);
@@ -138,8 +144,46 @@ void BasicRenderer::Println(const char* chrs, const char* var)
     BasicRenderer::printStr("\n\r");
 }
 
-
-void BasicRenderer::Println()
+void BasicRenderer::Print(const char* chrs, Colors col)
 {
-    BasicRenderer::printStr("\n\r");
+    uint64_t tempcol = color;
+    color = col;
+
+    BasicRenderer::printStr(chrs);
+
+    color = tempcol;
 }
+
+void BasicRenderer::Println(const char* chrs, Colors col)
+{
+    uint64_t tempcol = color;
+    color = col;
+
+
+    BasicRenderer::printStr(chrs);
+    BasicRenderer::printStr("\n\r");
+
+    color = tempcol;
+}
+
+void BasicRenderer::Print(const char* chrs, const char* var, Colors col)
+{
+    uint64_t tempcol = color;
+    color = col;
+
+    BasicRenderer::printStr(chrs, var);
+
+    color = tempcol;
+}
+
+void BasicRenderer::Println(const char* chrs, const char* var, Colors col)
+{
+    uint64_t tempcol = color;
+    color = col;
+
+    BasicRenderer::printStr(chrs, var);
+    BasicRenderer::printStr("\n\r");
+
+    color = tempcol;
+}
+

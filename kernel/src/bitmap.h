@@ -9,14 +9,18 @@ class Bitmap
 
         bool operator[](uint64_t index)
         {
+            if (index > Size * 8)
+                return false;
             uint8_t temp = Buffer[index / 8];
             temp = (temp << (index % 8));
             temp = (temp >> 7);
             return temp != 0;
         }
 
-        void Set(uint64_t index, bool value)
+        bool Set(uint64_t index, bool value)
         {
+            if (index > Size * 8)
+                return false;
             uint64_t index2 = index / 8;
             
             uint8_t bitIndexer = 0b10000000;
@@ -25,5 +29,6 @@ class Bitmap
 
             if (value)
                 Buffer[index2] = Buffer[index2] | bitIndexer;
+            return true;
         }
 };
