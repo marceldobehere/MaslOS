@@ -7,8 +7,9 @@ extern "C" void _start(BootInfo* bootInfo)
     BasicRenderer temp = BasicRenderer(bootInfo->framebuffer, bootInfo->psf1_font);
    
     temp.Println("Kernel Initialised Successfully!", BasicRenderer::Colors::yellow);
-    
 
+    
+    
 
     while(true);
 

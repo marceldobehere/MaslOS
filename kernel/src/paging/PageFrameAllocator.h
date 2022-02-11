@@ -38,6 +38,8 @@ class PageFrameAllocator{
             return;
         if(!PageBitMap.Set(index, false))
             return;
+        if (pageBitmapIndex > index)
+            pageBitmapIndex = index;
         freeMemory += 4096;
         reservedMemory -= 4096;
     }
@@ -68,14 +70,15 @@ class PageFrameAllocator{
         return reservedMemory;
     }
 
+    uint64_t pageBitmapIndex = 0;
     void* RequestPage()
     {
-        for (uint64_t index = 0; index < PageBitMap.Size * 8; index++)
+        for (; pageBitmapIndex < PageBitMap.Size * 8; pageBitmapIndex++)
         {
-            if (PageBitMap[index])
+            if (PageBitMap[pageBitmapIndex])
                 continue;
-            LockPage((void*)(index * 4096));
-            return(void*)(index * 4096);
+            LockPage((void*)(pageBitmapIndex * 4096));
+            return(void*)(pageBitmapIndex * 4096);
         }
         
         return NULL; // Page Frame Swap to file
@@ -88,6 +91,8 @@ class PageFrameAllocator{
             return;
         if(!PageBitMap.Set(index, false))
             return;
+        if (pageBitmapIndex > index)
+            pageBitmapIndex = index;
         freeMemory += 4096;
         usedMemory -= 4096;
     }
