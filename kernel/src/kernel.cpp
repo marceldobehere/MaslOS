@@ -1,84 +1,17 @@
-
-
-//typedef unsigned long long size_t;
-
-#include "BasicRenderer.h"
-#include <stddef.h>
-#include "cstr.h" 
-#include "efiMemory.h"
-#include "memory.h"  
-#include "paging/PageFrameAllocator.h"  
-#include "paging/PageMapIndexer.h"
-#include "paging/paging.h"
-#include "paging/PageTableManager.h"
-//#include "bitmap.h" 
- 
-
-extern uint64_t _KernelStart;
-extern uint64_t _KernelEnd;
+#include "kernelUtil.h"
 
 extern "C" void _start(BootInfo* bootInfo)
-{
-   BasicRenderer temp = BasicRenderer(bootInfo->framebuffer, bootInfo->psf1_font);
+{  
+    KernelInfo kernelInfo = InitializeKernel(bootInfo);
+    PageTableManager* pageTableManager = kernelInfo.pageTableManager;
+    BasicRenderer temp = BasicRenderer(bootInfo->framebuffer, bootInfo->psf1_font);
    
-    temp.Println("Hello, World!");
-
-    temp.Println("Hello, \\CFF00FFWorld!\\CFFFFFF");
- 
-    temp.Print("Memory Size: ");
-    temp.Print(to_string(GetMemorySize(bootInfo->mMap, (bootInfo->mMapSize / bootInfo->mMapDescSize), bootInfo->mMapDescSize)));
-    temp.Println(" Bytes.");
-    temp.Println("");
-    
-    // {
-    //     const char* a[] = {to_string(-7.5, 1), to_string((int64_t)-10000)};
-    //     temp.Println("The values are: {} and {}.", (const char**)a);
-    // }
-    
-    uint64_t mMapEntries = (bootInfo->mMapSize / bootInfo->mMapDescSize);
-
-    GlobalAllocator = PageFrameAllocator();
-    GlobalAllocator.ReadEFIMemoryMap(bootInfo->mMap, bootInfo->mMapSize, bootInfo->mMapDescSize); 
-    
-    uint64_t kernelSize = (((uint64_t)&_KernelEnd) - ((uint64_t)&_KernelStart));
-    uint64_t kernelPages = ((uint64_t)kernelSize / 4096) + 1;
-
+    temp.Println("Kernel Initialised Successfully!", BasicRenderer::Colors::yellow);
     
 
-    GlobalAllocator.LockPages(&_KernelStart, kernelPages);
 
-    PageTable* PML4 = (PageTable*)GlobalAllocator.RequestPage();
-    memset(PML4, 0, 0x1000);
-    PageTableManager pageTableManager = PageTableManager(PML4);
+    while(true);
 
-    for (uint64_t i = 0; i < GetMemorySize(bootInfo->mMap, mMapEntries, bootInfo->mMapDescSize); i+=0x1000)
-        pageTableManager.MapMemory((void*)i, (void*)i);
-    
-    uint64_t fbBase = (uint64_t)bootInfo->framebuffer->BaseAddress;
-    uint64_t fbSize = (uint64_t)bootInfo->framebuffer->BufferSize + 0x1000;
-    
-    for (uint64_t i = fbBase; i < fbBase + fbSize; i+=4096)
-        pageTableManager.MapMemory((void*)i, (void*)i);
-
-
-    asm("mov %0, %%cr3" : : "r" (PML4) );
-
-    temp.Println("New Page Map loaded!");
-
-    pageTableManager.MapMemory((void*)0x600000000, (void*)0x80000);
-
-    uint64_t* test = (uint64_t*)0x600000000;
-
-    *test = 26;
-
-    temp.Println("Testing virtual Memory Adress: {}", to_string(*test));
-
-    
-         
-
-
-
-    return;
 }
 
 
@@ -87,8 +20,31 @@ extern "C" void _start(BootInfo* bootInfo)
 
 
 /*
+ 
+    temp.Print("Memory Size: ");
+    temp.Print(to_string(GetMemorySize(bootInfo->mMap, (bootInfo->mMapSize / bootInfo->mMapDescSize), bootInfo->mMapDescSize)));
+    temp.Println(" Bytes.");
+    temp.Println("");
 
 
+    // {
+    //     const char* a[] = {to_string(-7.5, 1), to_string((int64_t)-10000)};
+    //     temp.Println("The values are: {} and {}.", (const char**)a);
+    // }
+
+    temp.Println("New Page Map loaded!");
+
+    pageTableManager->MapMemory((void*)0x600000000, (void*)0x80000);
+
+    uint64_t* test = (uint64_t*)0x600000000;
+
+    *test = 26;
+
+    temp.Println("Testing virtual Memory Adress: {}", to_string(*test));
+
+
+
+    //temp.Println("Hello, \\CFF00FFWorld!\\CFFFFFF");
     PageMapIndexer pageIndexer = PageMapIndexer(0x1000 * 52 + 0x50000 * 7);
 
     temp.Println("P_i: {}", to_string(pageIndexer.P_i));
