@@ -92,5 +92,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     
     PrepareMemory(bootInfo);
 
+    PrepareInterrupts();
+
     return kernelInfo;
 }

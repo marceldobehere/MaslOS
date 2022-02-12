@@ -7,6 +7,7 @@ extern "C" void _start(BootInfo* bootInfo)
 
     GlobalRenderer->Println("Kernel Initialised Successfully!", BasicRenderer::Colors::yellow);
 
+    //asm("int $0x0e");
     
     
 
