@@ -4,9 +4,8 @@ extern "C" void _start(BootInfo* bootInfo)
 {  
     KernelInfo kernelInfo = InitializeKernel(bootInfo);
     PageTableManager* pageTableManager = kernelInfo.pageTableManager;
-    BasicRenderer temp = BasicRenderer(bootInfo->framebuffer, bootInfo->psf1_font);
-   
-    temp.Println("Kernel Initialised Successfully!", BasicRenderer::Colors::yellow);
+
+    GlobalRenderer->Println("Kernel Initialised Successfully!", BasicRenderer::Colors::yellow);
 
     
     

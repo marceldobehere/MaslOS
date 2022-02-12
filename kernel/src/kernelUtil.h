@@ -10,8 +10,8 @@
 #include "paging/paging.h"
 #include "paging/PageTableManager.h"
 #include "gdt/gdt.h"
-//#include "bitmap.h" 
- 
+#include "interrupts/IDT.h"
+#include "interrupts/interrupts.h"
 
 extern uint64_t _KernelStart;
 extern uint64_t _KernelEnd;
@@ -60,9 +60,29 @@ void PrepareMemory(BootInfo* bootInfo)
     kernelInfo.pageTableManager = &pageTableManager;
 }
 
+IDTR idtr;
+void PrepareInterrupts()
+{  
+    idtr.Limit = 0x0FFF;
+    idtr.Offset = (uint64_t)GlobalAllocator.RequestPage();
 
+    IDTDescEntry* int_PageFault = (IDTDescEntry*)(idtr.Offset + 0xE * sizeof(IDTDescEntry));
+    int_PageFault->SetOffset((uint64_t)PageFault_handler);
+    int_PageFault->type_attr = IDT_TA_InterruptGate;
+    int_PageFault->selector = 0x08;
+    
+    asm("lidt %0" : : "m" (idtr));
+}
+
+
+
+
+BasicRenderer r = BasicRenderer(NULL, NULL);
 KernelInfo InitializeKernel(BootInfo* bootInfo)
 {
+    r = BasicRenderer(bootInfo->framebuffer, bootInfo->psf1_font);
+    GlobalRenderer = &r;
+
     GDTDescriptor gdtDescriptor;
     gdtDescriptor.Size = sizeof(GDT) - 1;
     gdtDescriptor.Offset = (uint64_t)&DefaultGDT;

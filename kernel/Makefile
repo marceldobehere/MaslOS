@@ -26,7 +26,13 @@ OBJS += $(patsubst $(SRCDIR)/%.asm, $(OBJDIR)/%_asm.o, $(ASMSRC))
 DIRS = $(wildcard $(SRCDIR)/*)
 
 
+$(OBJDIR)/interrupts/interrupts.o: $(SRCDIR)/interrupts/interrupts.h
+	@ echo !==== COMPILING AAAAAAa $^
+	@ mkdir -p $(@D)
+	$(CC) -mno-red-zone -mgeneral-regs-only -ffreestanding -c $^ -o $@
+
 kernel: $(OBJS) link
+
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@ echo !==== COMPILING $^

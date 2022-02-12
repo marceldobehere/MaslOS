@@ -62,4 +62,7 @@ class BasicRenderer
             this->psf1_font = psf1_font;
         }
 
+        
 };
+
+extern BasicRenderer* GlobalRenderer;

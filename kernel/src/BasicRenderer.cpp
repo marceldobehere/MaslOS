@@ -3,6 +3,8 @@
 #include "cstr.h"
 #include <stdint.h> 
 
+BasicRenderer* GlobalRenderer;
+
 
 void BasicRenderer::putChar(char chr, unsigned int xoff, unsigned int yoff)
 {
