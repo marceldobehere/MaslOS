@@ -12,6 +12,7 @@
 #include "gdt/gdt.h"
 #include "interrupts/IDT.h"
 #include "interrupts/interrupts.h"
+#include "Cols.h"
 
 extern uint64_t _KernelStart;
 extern uint64_t _KernelEnd;

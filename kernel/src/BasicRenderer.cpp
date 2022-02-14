@@ -6,6 +6,8 @@
 BasicRenderer* GlobalRenderer;
 
 
+
+
 void BasicRenderer::putChar(char chr, unsigned int xoff, unsigned int yoff)
 {
     unsigned int *pixPtr = (unsigned int*)framebuffer->BaseAddress;
@@ -146,7 +148,7 @@ void BasicRenderer::Println(const char* chrs, const char* var)
     BasicRenderer::printStr("\n\r");
 }
 
-void BasicRenderer::Print(const char* chrs, Colors col)
+void BasicRenderer::Print(const char* chrs, uint32_t col)
 {
     uint64_t tempcol = color;
     color = col;
@@ -156,7 +158,7 @@ void BasicRenderer::Print(const char* chrs, Colors col)
     color = tempcol;
 }
 
-void BasicRenderer::Println(const char* chrs, Colors col)
+void BasicRenderer::Println(const char* chrs, uint32_t col)
 {
     uint64_t tempcol = color;
     color = col;
@@ -168,7 +170,7 @@ void BasicRenderer::Println(const char* chrs, Colors col)
     color = tempcol;
 }
 
-void BasicRenderer::Print(const char* chrs, const char* var, Colors col)
+void BasicRenderer::Print(const char* chrs, const char* var, uint32_t col)
 {
     uint64_t tempcol = color;
     color = col;
@@ -178,7 +180,7 @@ void BasicRenderer::Print(const char* chrs, const char* var, Colors col)
     color = tempcol;
 }
 
-void BasicRenderer::Println(const char* chrs, const char* var, Colors col)
+void BasicRenderer::Println(const char* chrs, const char* var, uint32_t col)
 {
     uint64_t tempcol = color;
     color = col;
@@ -189,3 +191,27 @@ void BasicRenderer::Println(const char* chrs, const char* var, Colors col)
     color = tempcol;
 }
 
+void BasicRenderer::Clear(uint32_t col, bool resetCursor)
+{
+    uint64_t fbBase = (uint64_t)framebuffer->BaseAddress;
+    uint64_t bytesPerScanline = framebuffer->PixelsPerScanLine * 4;
+    uint64_t fbHeight = framebuffer->Height;
+    uint64_t fbSize = framebuffer->BufferSize;
+
+    for (uint64_t verticalScanline = 0; verticalScanline < fbHeight; verticalScanline++)
+    {
+        uint64_t pixPtrBase = fbBase + (bytesPerScanline * verticalScanline);
+        for (uint32_t* pixPtr = (uint32_t*)pixPtrBase; pixPtr < (uint32_t*)(pixPtrBase + bytesPerScanline); pixPtr++)
+            *pixPtr = col;
+    }
+
+    
+    if (resetCursor)
+        CursorPosition = {0, 0};
+}
+
+void BasicRenderer::Clear(uint32_t col)
+{
+    BasicRenderer::Clear(col, true);
+
+}

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../BasicRenderer.h"
+#include "../panic.h"
 
 
 struct interrupt_frame;
