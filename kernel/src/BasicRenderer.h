@@ -16,11 +16,13 @@ class BasicRenderer
         PSF1_FONT* psf1_font;
         unsigned int color;
         void putChar(char chr, unsigned int xoff, unsigned int yoff);
+        void delChar(unsigned int xoff, unsigned int yoff, uint32_t col);
+        void delChar(unsigned int xoff, unsigned int yoff);
         void putStr(const char* chrs, unsigned int xoff, unsigned int yoff);
 
         void printStr(const char* chrs);
         void printStr(const char* chrs, const char* var);
-
+ 
         void Println();
 
         void Print(char chr);

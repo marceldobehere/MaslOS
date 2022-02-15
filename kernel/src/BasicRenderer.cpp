@@ -28,6 +28,21 @@ void BasicRenderer::putChar(char chr, unsigned int xoff, unsigned int yoff)
 
 }
 
+void BasicRenderer::delChar(unsigned int xoff, unsigned int yoff, uint32_t col)
+{
+    unsigned int *pixPtr = (unsigned int*)framebuffer->BaseAddress;
+
+    for (unsigned long y = yoff; y < yoff + 16; y++)
+        for (unsigned long x = xoff; x < xoff + 8; x++)
+            *(unsigned int*)(pixPtr + x + (y * framebuffer->PixelsPerScanLine)) = col;
+}
+
+void BasicRenderer::delChar(unsigned int xoff, unsigned int yoff)
+{
+    BasicRenderer::delChar(xoff, yoff, 0x00000000);
+}
+
+
 void BasicRenderer::putStr(const char* chrs, unsigned int xoff, unsigned int yoff)
 {
     for (unsigned int x = 0; chrs[x] != 0; x++)
@@ -57,9 +72,9 @@ void BasicRenderer::printStr(const char* chrs, const char* var)
             CursorPosition.y += 16;
         }
         else if (chrs[index] == '\r')
-        {
+        { 
             CursorPosition.x = 0;
-        }
+        } 
         else if (chrs[index] == '{')
         {
             if (chrs[index + 1] == '}')

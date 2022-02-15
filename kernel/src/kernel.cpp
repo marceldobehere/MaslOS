@@ -8,15 +8,17 @@ extern "C" void _start(BootInfo* bootInfo)
 
     GlobalRenderer->Println("Kernel Initialised Successfully!!", Colors.yellow);
 
-    //Panic("Panic go brrrt");
+    //GlobalRenderer->delChar(0, 0);
+
+    //Panic("Panic go brrrt"); 
     //asm("int $0x0e");
+   
   
- 
- 
-    while(true);
+   
+    while(true); 
 
 }
-
+ 
 
  
 
