@@ -19,7 +19,7 @@ __attribute__((interrupt)) void GPFault_handler(struct interrupt_frame* frame)
 {
     Panic("General Protection Fault Detected!");
 }
-
+ 
 __attribute__((interrupt)) void KeyboardInt_handler(struct interrupt_frame* frame)
 { 
     uint8_t scancode = inb(0x60);

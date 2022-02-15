@@ -13,7 +13,7 @@
 #include "interrupts/IDT.h"
 #include "interrupts/interrupts.h"
 #include "Cols.h"
-#include "panic.h"  
+#include "panic.h"   
 #include "IO.h"
   
 extern uint64_t _KernelStart;

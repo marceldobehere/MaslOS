@@ -24,7 +24,10 @@ void HandleKeyboard(uint8_t scancode)
         if (GlobalRenderer->CursorPosition.x >= 8)
             GlobalRenderer->CursorPosition.x -= 8; 
         else if (GlobalRenderer->CursorPosition.y >= 16)
+        {
             GlobalRenderer->CursorPosition.y -= 16;
+            GlobalRenderer->CursorPosition.x = GlobalRenderer->framebuffer->Width;
+        }
         GlobalRenderer->delChar(GlobalRenderer->CursorPosition.x, GlobalRenderer->CursorPosition.y);
     } 
     else if (scancode == ARR_UP)
@@ -35,11 +38,14 @@ void HandleKeyboard(uint8_t scancode)
     else if (scancode == ARR_DOWN) 
     GlobalRenderer->CursorPosition.y += 16;
     else if (scancode == ARR_LEFT)
-    { 
+    {  
         if (GlobalRenderer->CursorPosition.x >= 8)
             GlobalRenderer->CursorPosition.x -= 8; 
         else if (GlobalRenderer->CursorPosition.y >= 16)
+        {
             GlobalRenderer->CursorPosition.y -= 16;
+            GlobalRenderer->CursorPosition.x = GlobalRenderer->framebuffer->Width;
+        }
     }
     else if (scancode == ARR_RIGHT)
     GlobalRenderer->CursorPosition.x += 8; 
