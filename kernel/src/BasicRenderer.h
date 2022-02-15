@@ -23,6 +23,7 @@ class BasicRenderer
 
         void Println();
 
+        void Print(char chr);
         void Print(const char* chrs);
         void Println(const char* chrs);
         void Print(const char* chrs, const char* var);

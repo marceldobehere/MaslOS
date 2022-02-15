@@ -120,9 +120,18 @@ void BasicRenderer::printStr(const char* chrs, const char* var)
 }
 
 
+
+
 void BasicRenderer::Println()
 {
     BasicRenderer::printStr("\n\r");
+}
+
+void BasicRenderer::Print(char chr)
+{
+    char temp[] = {chr, 0};
+
+    BasicRenderer::Print((const char*)temp);
 }
 
 void BasicRenderer::Print(const char* chrs)
