@@ -2,7 +2,6 @@
 
 #include <stdint.h>
 #include "kbScancodeTranslation.h"
-#include "../BasicRenderer.h"
 
 bool lshift = false;
 bool rshift = false;
