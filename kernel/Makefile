@@ -28,10 +28,15 @@ DIRS = $(wildcard $(SRCDIR)/*)
 
 
 
+kernel: $(OBJS) link
+
 $(OBJDIR)/interrupts/interrupts.o: $(SRCDIR)/interrupts/interrupts.cpp
 	@ echo !==== COMPILING AAAAAAa $^
 	@ mkdir -p $(@D)
 	$(CC) -mno-red-zone -mgeneral-regs-only -ffreestanding -c $^ -o $@
+
+
+
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@ echo !==== COMPILING $^
@@ -41,12 +46,13 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 
 
 
+
+
 $(OBJDIR)/%_asm.o: $(SRCDIR)/%.asm
 	@ echo !==== COMPILING $^
 	@ mkdir -p $(@D)
 	$(ASMC) $(ASMFLAGS) $^ -f elf64 -o $@
 
-kernel: $(OBJS) link
 
 
 

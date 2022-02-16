@@ -1,5 +1,8 @@
 #pragma once
 #include  "../IO.h"
+#include "../math.h"
+#include "../BasicRenderer.h"
+
 
 #define PS2XSign 0b00010000
 #define PS2YSign 0b00100000

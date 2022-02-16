@@ -8,6 +8,8 @@
 #include "efiMemory.h"
 #include "memory.h" 
 
+//#include "userinput/mouse.h"
+
 #include "paging/PageFrameAllocator.h"  
 #include "paging/PageMapIndexer.h"
 #include "paging/paging.h" 
@@ -15,13 +17,15 @@
 
 #include "gdt/gdt.h" 
 
-#include "userinput/mouse.h"
 
 #include "interrupts/IDT.h"
 #include "interrupts/interrupts.h"
 
 #include "panic.h"   
 #include "IO.h"
+
+//#include "userinput/keyboard.h"
+//#include "userinput/mouse.h"
 
 
 extern uint64_t _KernelStart;
@@ -119,7 +123,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     PrepareInterrupts();
 
-    InitPS2Mouse();
+    //InitPS2Mouse();
 
 
     outb(PIC1_DATA, 0b11111001);
