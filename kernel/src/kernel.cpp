@@ -13,7 +13,10 @@ extern "C" void _start(BootInfo* bootInfo)
     //Panic("Panic go brrrt"); 
     //asm("int $0x0e");
    
-    
+    while(true)
+    {
+        ProcessMousePacket();
+    }
     
     while(true); 
 

@@ -2,6 +2,7 @@
 #include "../panic.h"
 #include "../IO.h"
 #include "../userinput/keyboard.h"
+#include "../userinput/mouse.h"
 
 
 __attribute__((interrupt)) void PageFault_handler(struct interrupt_frame* frame)
@@ -34,7 +35,7 @@ __attribute__((interrupt)) void MouseInt_handler(interrupt_frame* frame)
 { 
     uint8_t mousedata = inb(0x60);
 
-    GlobalRenderer->Print("A");
+    HandlePS2Mouse(mousedata);
 
     PIC_EndSlave();
 }
