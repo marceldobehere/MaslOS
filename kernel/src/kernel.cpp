@@ -5,23 +5,35 @@ extern "C" void _start(BootInfo* bootInfo)
     KernelInfo kernelInfo = InitializeKernel(bootInfo);
     PageTableManager* pageTableManager = kernelInfo.pageTableManager;
 
-    GlobalRenderer->Println("Kernel Initialised Successfully!", BasicRenderer::Colors::yellow);
 
+    GlobalRenderer->Println("Kernel Initialised Successfully!!", Colors.yellow);
+
+    //GlobalRenderer->delChar(0, 0);
+
+    //Panic("Panic go brrrt"); 
     //asm("int $0x0e");
+   
+  
     
-    
-
-    while(true);
+    while(true); 
 
 }
+ 
 
-
-
+ 
 
 
 
 /*
 
+
+    GlobalRenderer->Println("Test 1: {}", to_string((uint64_t)100));
+    GlobalRenderer->Println("Test 2: {}", to_string(100.5, 2));
+    GlobalRenderer->Clear(Colors.orange);
+    
+    
+    asm("int $0x0e");
+    
     for (unsigned int y = 10; y < bootInfo->framebuffer->Height / 4; y++)
     {
         for (unsigned int x = 0; x < bootInfo->framebuffer->Width / 2 * 4; x+=4)

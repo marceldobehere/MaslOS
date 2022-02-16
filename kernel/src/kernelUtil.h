@@ -9,10 +9,13 @@
 #include "paging/PageMapIndexer.h"
 #include "paging/paging.h"
 #include "paging/PageTableManager.h"
-#include "gdt/gdt.h"
+#include "gdt/gdt.h" 
 #include "interrupts/IDT.h"
 #include "interrupts/interrupts.h"
-
+#include "Cols.h"
+#include "panic.h"   
+#include "IO.h"
+  
 extern uint64_t _KernelStart;
 extern uint64_t _KernelEnd;
 
@@ -70,8 +73,32 @@ void PrepareInterrupts()
     int_PageFault->SetOffset((uint64_t)PageFault_handler);
     int_PageFault->type_attr = IDT_TA_InterruptGate;
     int_PageFault->selector = 0x08;
+
+    IDTDescEntry* int_DoubleFault = (IDTDescEntry*)(idtr.Offset + 0x8 * sizeof(IDTDescEntry));
+    int_DoubleFault->SetOffset((uint64_t)DoubleFault_handler);
+    int_DoubleFault->type_attr = IDT_TA_InterruptGate;
+    int_DoubleFault->selector = 0x08;
+
+    IDTDescEntry* int_GPFault = (IDTDescEntry*)(idtr.Offset + 0xD * sizeof(IDTDescEntry));
+    int_GPFault->SetOffset((uint64_t)GPFault_handler);
+    int_GPFault->type_attr = IDT_TA_InterruptGate;
+    int_GPFault->selector = 0x08;
+
+    IDTDescEntry* int_Keyboard = (IDTDescEntry*)(idtr.Offset + 0x21 * sizeof(IDTDescEntry));
+    int_Keyboard->SetOffset((uint64_t)KeyboardInt_handler);
+    int_Keyboard->type_attr = IDT_TA_InterruptGate;
+    int_Keyboard->selector = 0x08;
     
+
     asm("lidt %0" : : "m" (idtr));
+
+    RemapPIC();
+
+
+    outb(PIC1_DATA, 0b11111101);
+    outb(PIC2_DATA, 0b11111111);
+
+    asm ("sti");
 }
 
 

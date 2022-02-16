@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include "cstr.h"
 #include "efiMemory.h"
+#include "Cols.h"
 
 struct BootInfo
 {
@@ -44,10 +45,10 @@ static void PrintEFIMemData(EFI_MEMORY_DESCRIPTOR* mMap, uint64_t mMapEntries, u
             EFI_MEMORY_DESCRIPTOR* desc = (EFI_MEMORY_DESCRIPTOR*)((uint64_t)mMap + (i * mMapDescSize));
             temp->Print(EFI_MEMORY_TYPE_STRINGS[desc->type]);
             temp->Print(" - "); 
-            temp->color = BasicRenderer::Colors::cyan;
+            temp->color = Colors.cyan;
             temp->Print(to_string(desc->numPages * 4096 / 1024)); 
             temp->Print(" KB"); 
-            temp->color = BasicRenderer::Colors::white;
+            temp->color = Colors.white;
             temp->Println("."); 
         }
 
