@@ -1,6 +1,5 @@
 #pragma once
 #include  "../IO.h"
-#include "../BasicRenderer.h"
 
 #define PS2XSign 0b00010000
 #define PS2YSign 0b00100000
@@ -143,6 +142,7 @@ void ProcessMousePacket()
     }
     else
     {
+        MousePacket[1] = 256 - MousePacket[1];
         MousePosition.x -= MousePacket[1];
         if (xOverflow)
             MousePosition.x -= 255;
@@ -150,6 +150,7 @@ void ProcessMousePacket()
 
     if (!yNegative)
     {
+        MousePacket[2] = 256 - MousePacket[2];
         MousePosition.y -= MousePacket[2];
         if (yOverflow)
             MousePosition.y -= 255;

@@ -1,9 +1,10 @@
 #include "interrupts.h"
-#include "../panic.h"
-#include "../IO.h"
+
+#include "../BasicRenderer.h"
 #include "../userinput/keyboard.h"
 #include "../userinput/mouse.h"
-
+#include "../panic.h"
+#include "../IO.h"
 
 __attribute__((interrupt)) void PageFault_handler(struct interrupt_frame* frame)
 {

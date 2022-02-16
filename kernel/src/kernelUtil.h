@@ -1,22 +1,29 @@
 #pragma once
 
-#include "BasicRenderer.h"
 #include <stddef.h>
+#include "BasicRenderer.h"
+#include "Cols.h"
 #include "cstr.h" 
+
 #include "efiMemory.h"
-#include "memory.h"  
+#include "memory.h" 
+
 #include "paging/PageFrameAllocator.h"  
 #include "paging/PageMapIndexer.h"
-#include "paging/paging.h"
+#include "paging/paging.h" 
 #include "paging/PageTableManager.h"
+
 #include "gdt/gdt.h" 
+
+#include "userinput/mouse.h"
+
 #include "interrupts/IDT.h"
 #include "interrupts/interrupts.h"
-#include "Cols.h"
+
 #include "panic.h"   
 #include "IO.h"
-#include "userinput/mouse.h"
-  
+
+
 extern uint64_t _KernelStart;
 extern uint64_t _KernelEnd;
 
