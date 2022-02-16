@@ -25,7 +25,7 @@
 #include "IO.h"
 
 //#include "userinput/keyboard.h"
-//#include "userinput/mouse.h"
+#include "userinput/mouse.h"
 
 
 extern uint64_t _KernelStart;
@@ -123,7 +123,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     PrepareInterrupts();
 
-    //InitPS2Mouse();
+    InitPS2Mouse();
 
 
     outb(PIC1_DATA, 0b11111001);

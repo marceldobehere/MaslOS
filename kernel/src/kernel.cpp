@@ -16,7 +16,7 @@ extern "C" void _start(BootInfo* bootInfo)
    
     while(true)
     {
-        //ProcessMousePacket();
+        ProcessMousePacket();
     }
     
     while(true); 
