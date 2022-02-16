@@ -26,7 +26,7 @@ void HandleKeyboard(uint8_t scancode)
         else if (GlobalRenderer->CursorPosition.y >= 16)
         {
             GlobalRenderer->CursorPosition.y -= 16;
-            GlobalRenderer->CursorPosition.x = GlobalRenderer->framebuffer->Width;
+            GlobalRenderer->CursorPosition.x = GlobalRenderer->framebuffer->Width - 8;
         }
         GlobalRenderer->delChar(GlobalRenderer->CursorPosition.x, GlobalRenderer->CursorPosition.y);
     } 
@@ -36,7 +36,7 @@ void HandleKeyboard(uint8_t scancode)
             GlobalRenderer->CursorPosition.y -= 16;
     }
     else if (scancode == ARR_DOWN) 
-    GlobalRenderer->CursorPosition.y += 16;
+        GlobalRenderer->CursorPosition.y += 16;
     else if (scancode == ARR_LEFT)
     {  
         if (GlobalRenderer->CursorPosition.x >= 8)
@@ -44,11 +44,11 @@ void HandleKeyboard(uint8_t scancode)
         else if (GlobalRenderer->CursorPosition.y >= 16)
         {
             GlobalRenderer->CursorPosition.y -= 16;
-            GlobalRenderer->CursorPosition.x = GlobalRenderer->framebuffer->Width;
+            GlobalRenderer->CursorPosition.x = GlobalRenderer->framebuffer->Width - 8;
         }
     }
     else if (scancode == ARR_RIGHT)
-    GlobalRenderer->CursorPosition.x += 8; 
+        GlobalRenderer->CursorPosition.x += 8; 
     else
     {
         char ascii = QWERTYKeyboard::Translate(scancode, lshift || rshift);

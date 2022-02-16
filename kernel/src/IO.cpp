@@ -17,4 +17,4 @@ uint8_t inb(uint16_t port)
 void io_wait()
 {
     asm volatile ("outb %%al, $0x80" : : "a"(0));
-}
+} 

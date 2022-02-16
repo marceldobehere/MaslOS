@@ -6,14 +6,14 @@ extern "C" void _start(BootInfo* bootInfo)
     PageTableManager* pageTableManager = kernelInfo.pageTableManager;
 
 
-    GlobalRenderer->Println("Kernel Initialised Successfully!!", Colors.yellow);
+    GlobalRenderer->Println("Kernel Initialised Successfully!", Colors.yellow);
 
     //GlobalRenderer->delChar(0, 0);
 
     //Panic("Panic go brrrt"); 
     //asm("int $0x0e");
    
-  
+    
     
     while(true); 
 
@@ -22,7 +22,7 @@ extern "C" void _start(BootInfo* bootInfo)
 
  
 
-
+ 
 
 /*
 

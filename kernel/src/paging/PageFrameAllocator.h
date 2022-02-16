@@ -151,7 +151,7 @@ class PageFrameAllocator{
         
         InitBitmap(bitmapSize, largestFreeMemSeg);
 
-        LockPages(&PageBitMap, (PageBitMap.Size / 4096) + 1);
+        LockPages(PageBitMap.Buffer, (PageBitMap.Size / 4096) + 1);
 
         for (int i = 0; i < mMapEntries; i++)
         {

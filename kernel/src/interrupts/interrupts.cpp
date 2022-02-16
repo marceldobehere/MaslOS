@@ -3,24 +3,25 @@
 #include "../IO.h"
 #include "../userinput/keyboard.h"
 
+
 __attribute__((interrupt)) void PageFault_handler(struct interrupt_frame* frame)
 {
     Panic("Page Fault Detected!");
 }
 
 
-__attribute__((interrupt)) void DoubleFault_handler(struct interrupt_frame* frame)
+__attribute__((interrupt)) void DoubleFault_handler(interrupt_frame* frame)
 {
     Panic("Double Fault Detected!");
 }
 
 
-__attribute__((interrupt)) void GPFault_handler(struct interrupt_frame* frame)
+__attribute__((interrupt)) void GPFault_handler(interrupt_frame* frame)
 {
     Panic("General Protection Fault Detected!");
 }
  
-__attribute__((interrupt)) void KeyboardInt_handler(struct interrupt_frame* frame)
+__attribute__((interrupt)) void KeyboardInt_handler(interrupt_frame* frame)
 { 
     uint8_t scancode = inb(0x60);
     //GlobalRenderer->Println("Pressed: {}", to_string((uint64_t)scancode));
@@ -28,6 +29,16 @@ __attribute__((interrupt)) void KeyboardInt_handler(struct interrupt_frame* fram
     PIC_EndMaster();
 
 }
+
+__attribute__((interrupt)) void MouseInt_handler(interrupt_frame* frame)
+{ 
+    uint8_t mousedata = inb(0x60);
+
+    GlobalRenderer->Print("A");
+
+    PIC_EndSlave();
+}
+
 
 void RemapPIC() 
 {

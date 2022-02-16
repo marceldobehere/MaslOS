@@ -35,7 +35,7 @@ void BasicRenderer::delChar(unsigned int xoff, unsigned int yoff, uint32_t col)
     for (unsigned long y = yoff; y < yoff + 16; y++)
         for (unsigned long x = xoff; x < xoff + 8; x++)
             *(unsigned int*)(pixPtr + x + (y * framebuffer->PixelsPerScanLine)) = col;
-}
+} 
 
 void BasicRenderer::delChar(unsigned int xoff, unsigned int yoff)
 {
@@ -190,7 +190,7 @@ void BasicRenderer::Println(const char* chrs, uint32_t col)
 
     BasicRenderer::printStr(chrs);
     BasicRenderer::printStr("\n\r");
-
+ 
     color = tempcol;
 }
 
