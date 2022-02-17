@@ -7,11 +7,13 @@ BasicRenderer* GlobalRenderer;
 
 
 
-
 void BasicRenderer::putChar(char chr, unsigned int xoff, unsigned int yoff)
 {
     unsigned int *pixPtr = (unsigned int*)framebuffer->BaseAddress;
     char* fontPtr = ((char*)psf1_font->glyphBuffer) + (chr * psf1_font->psf1_Header->charsize);
+
+    if(overwrite)
+        BasicRenderer::delChar(xoff, yoff);
 
     for (unsigned long y = yoff; y < yoff + 16; y++)
     {
