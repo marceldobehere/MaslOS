@@ -24,13 +24,11 @@ extern "C" void _start(BootInfo* bootInfo)
 }
  
 
- 
 
- 
+
+
 
 /*
-
-
     GlobalRenderer->Println("Test 1: {}", to_string((uint64_t)100));
     GlobalRenderer->Println("Test 2: {}", to_string(100.5, 2));
     GlobalRenderer->Clear(Colors.orange);
