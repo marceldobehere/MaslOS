@@ -10,7 +10,123 @@
 #define PS2MiddleButton 0b00000100
 #define PS2RightButton  0b00000010
 
+
+uint8_t MouseBitmap[] =
+{
+    0b11111111, 0b10000000,
+    0b11111111, 0b00000000,
+    0b11111110, 0b00000000,
+    0b11111100, 0b00000000,
+    0b11111000, 0b00000000,
+    0b11110000, 0b00000000,
+    0b11100000, 0b10000000,
+    0b11000000, 0b11000000,
+
+    0b10000011, 0b11100000,
+    0b00000001, 0b11110000,
+    0b00000000, 0b11111000,
+    0b00000000, 0b01111000,
+    0b00000000, 0b00111000,
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000
+};
+
+uint8_t MouseTempBitmap[] =
+{
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000,
+
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000,
+    0b00000000, 0b00000000
+};
+
+
+
+MPoint oldMousePosition;
 MPoint MousePosition;
+
+void SaveIntoBuffer(MPoint point)
+{
+    unsigned int *pixPtr = (unsigned int*)GlobalRenderer->framebuffer->BaseAddress;
+
+    unsigned long xoff = point.x;
+    unsigned long yoff = point.y;
+
+    uint8_t pps = GlobalRenderer->framebuffer->PixelsPerScanLine;
+
+    unsigned long index = 0;
+
+    for (unsigned long y = yoff; y < yoff + 16; y++)
+        for (unsigned long x = xoff; x < xoff + 16; x++)
+        {
+            MouseTempBitmap[index] = *(unsigned int*)(pixPtr + x + (y * pps));
+            index++;
+        }
+}
+
+void LoadFromBuffer(MPoint point)
+{
+    unsigned int *pixPtr = (unsigned int*)GlobalRenderer->framebuffer->BaseAddress;
+
+    unsigned long xoff = point.x;
+    unsigned long yoff = point.y;
+
+    uint8_t pps = GlobalRenderer->framebuffer->PixelsPerScanLine;
+
+    unsigned long index = 0;
+
+    for (unsigned long y = yoff; y < yoff + 16; y++)
+        for (unsigned long x = xoff; x < xoff + 16; x++)
+        {
+            *(unsigned int*)(pixPtr + x + (y * pps)) = MouseTempBitmap[index];
+            index++;
+        }
+}
+
+void DrawMouseBuffer(MPoint point)
+{
+    unsigned int *pixPtr = (unsigned int*)GlobalRenderer->framebuffer->BaseAddress;
+
+    unsigned long xoff = point.x;
+    unsigned long yoff = point.y;
+    
+    uint8_t pps = GlobalRenderer->framebuffer->PixelsPerScanLine;
+
+    unsigned long index = 0;
+
+    for (unsigned long y = yoff; y < yoff + 16; y++)
+        for (unsigned long x = xoff; x < xoff + 16; x++)
+        {
+            if(MouseBitmap[index] != 0)
+                *(unsigned int*)(pixPtr + x + (y * pps)) = MouseBitmap[index];
+            index++;
+        }
+}
+
+
+void DrawMousePointer()
+{
+    LoadFromBuffer(oldMousePosition);
+    SaveIntoBuffer(MousePosition);
+    DrawMouseBuffer(MousePosition);
+    oldMousePosition.x = MousePosition.x;
+    oldMousePosition.y = MousePosition.y;
+}
+
+
 
 void Mousewait()
 {
@@ -46,8 +162,12 @@ uint8_t MouseRead()
 
 void InitPS2Mouse()
 {
-    MousePosition.x = 50;
-    MousePosition.y = 50;
+    MousePosition.x = 100;
+    MousePosition.y = 100;
+    oldMousePosition.x = 100;
+    oldMousePosition.y = 100;
+    SaveIntoBuffer(MousePosition);
+    DrawMousePointer();
     outb(0x64, 0xA8);
     Mousewait();
     outb(0x64, 0x20);
@@ -71,6 +191,8 @@ void InitPS2Mouse()
 uint8_t MouseCycle = 0;
 uint8_t MousePacket[4];
 bool MousePacketReady = false;
+
+
 
 void HandlePS2Mouse(uint8_t data)
 {
@@ -102,6 +224,7 @@ void HandlePS2Mouse(uint8_t data)
         }
     }
 }
+
 
 
 
@@ -202,6 +325,7 @@ void ProcessMousePacket()
         MousePosition.y = GlobalRenderer->framebuffer->Height - 16;
 
 
+    DrawMousePointer();
 
 
     if (leftButton)
