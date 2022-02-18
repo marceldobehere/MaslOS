@@ -1,16 +1,16 @@
 #include "mouse.h"
   
 
-#define PS2XSign 0b00010000
-#define PS2YSign 0b00100000
-#define PS2XOverflow 0b01000000
-#define PS2YOverflow 0b10000000
+#define PS2XSign        0b00010000
+#define PS2YSign        0b00100000
+#define PS2XOverflow    0b01000000
+#define PS2YOverflow    0b10000000
 
 #define PS2LeftButton   0b00000001
-#define PS2MiddleButton 0b00000010
-#define PS2RightButton  0b00000100
+#define PS2MiddleButton 0b00000100
+#define PS2RightButton  0b00000010
 
-Point MousePosition;
+MPoint MousePosition;
 
 void Mousewait()
 {
@@ -63,14 +63,14 @@ void InitPS2Mouse()
     MouseWrite(0xF6);
     MouseRead();
 
+
     MouseWrite(0xF4);
     MouseRead();
-
 }
 
 uint8_t MouseCycle = 0;
 uint8_t MousePacket[4];
-bool MousePacketReady = 0;
+bool MousePacketReady = false;
 
 void HandlePS2Mouse(uint8_t data)
 {
@@ -80,7 +80,7 @@ void HandlePS2Mouse(uint8_t data)
         {
             if(MousePacketReady)
                 break;
-            if (data &0b00001000 == 0)
+            if (data & 0b00001000 == 0)
                 break;
 
             MousePacket[0] = data;
@@ -102,6 +102,10 @@ void HandlePS2Mouse(uint8_t data)
         }
     }
 }
+
+
+
+
 
 void ProcessMousePacket()
 {
@@ -150,7 +154,6 @@ void ProcessMousePacket()
         middleButton = false;
 
 
-
     if (!xNegative)
     {
         MousePosition.x += MousePacket[1];
@@ -165,25 +168,28 @@ void ProcessMousePacket()
             MousePosition.x -= 255;
     }
 
-    if (!yNegative)
+    if (yNegative)
     {
         MousePacket[2] = 256 - MousePacket[2];
-        MousePosition.y -= MousePacket[2];
-        if (yOverflow)
-            MousePosition.y -= 255;
-    }
-    else
-    {
         MousePosition.y += MousePacket[2];
         if (yOverflow)
             MousePosition.y += 255;
     }
+    else
+    {
+        //MousePacket[2] = 256 - MousePacket[2];
+        MousePosition.y -= MousePacket[2];
+        if (yOverflow)
+            MousePosition.y -= 255;
+    }
 
-    GlobalRenderer->CursorPosition.x = 0;
-    GlobalRenderer->CursorPosition.y = 32;
-    GlobalRenderer->overwrite = true;
-    GlobalRenderer->Println("X: {}        ", to_string((uint64_t)MousePosition.x));
-    GlobalRenderer->Println("Y: {}        ", to_string((uint64_t)MousePosition.y));
+    //GlobalRenderer->overwrite = true;
+
+    // GlobalRenderer->CursorPosition.x = 0;
+    // GlobalRenderer->CursorPosition.y = 32;
+    // GlobalRenderer->Println("X: {}        ", to_string((int64_t)MousePosition.x));
+    // GlobalRenderer->Println("Y: {}        ", to_string((int64_t)MousePosition.y));
+
 
     if(MousePosition.x < 0)
         MousePosition.x = 0;
@@ -198,8 +204,9 @@ void ProcessMousePacket()
 
 
 
-    GlobalRenderer->putChar('A', MousePosition.x, MousePosition.y);    
-    GlobalRenderer->overwrite = false;
-
-
+    if (leftButton)
+        GlobalRenderer->delChar(MousePosition.x, MousePosition.y, Colors.white);
+    if (rightButton)
+        GlobalRenderer->delChar(MousePosition.x, MousePosition.y, Colors.black);
+    
 }

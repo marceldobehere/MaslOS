@@ -4,6 +4,7 @@
 #include "../math.h"
 #include "../BasicRenderer.h"
 #include "../cstr.h"
+#include "../Cols.h"
   
 
 #define PS2XSign 0b00010000
