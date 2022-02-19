@@ -11,25 +11,45 @@
 #define PS2RightButton  0b00000010
 
 
-uint8_t MouseBitmap[] =
+uint32_t MouseDataMap[] =
 {
-    0b11111111, 0b10000000,
-    0b11111111, 0b00000000,
-    0b11111110, 0b00000000,
-    0b11111100, 0b00000000,
-    0b11111110, 0b00000000,
-    0b11111111, 0b00000000,
-    0b11100111, 0b10000000,
-    0b11000111, 0b11000000,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 14738687, 11714047, 11714047, 8163583, 8163583, 8163583, 4020991, 2508543, 2508543, 1851135, 1851135, 9983, 0, 0, 0, 
+0, 11714047, 11714047, 8163583, 8163583, 4020991, 2508543, 2508543, 2508543, 2508543, 1851135, 9983, 0, 0, 0, 0,
+0, 11714047, 8163583, 4020991, 4020991, 2508543, 2508543, 2508543, 1851135, 1851135, 1851135, 0, 0, 0, 0, 0,
+0, 8163583, 8163583, 4020991, 2508543, 2508543, 2508543, 1851135, 1851135, 1851135, 0, 0, 0, 0, 0, 0,
+0, 8163583, 4020991, 2508543, 2508543, 2508543, 1851135, 1851135, 1851135, 0, 0, 0, 0, 0, 0, 0,
+0, 8163583, 2508543, 2508543, 2508543, 1851135, 1851135, 1851135, 470271, 470271, 0, 0, 0, 0, 0, 0,
+0, 4020991, 2508543, 1851135, 1851135, 9983, 470271, 470007, 470007, 9197, 9197, 0, 0, 0, 0, 0,
+0, 2508543, 2508543, 1851135, 470271, 470271, 470271, 470007, 470007, 9197, 9197, 9197, 0, 0, 0, 0,
+0, 1851135, 1851135, 1851135, 470271, 0, 470007, 470007, 9197, 9197, 9197, 8408, 8408, 0, 0, 0,
+0, 470271, 470271, 470271, 0, 0, 0, 9197, 9197, 9197, 8408, 8408, 8408, 6829, 0, 0,
+0, 470271, 470271, 0, 0, 0, 0, 0, 9983, 8408, 8408, 8408, 6829, 6829, 4991, 0,
+0, 470271, 0, 0, 0, 0, 0, 0, 0, 8408, 8408, 6829, 6829, 4991, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6829, 6829, 4991, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4991, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+};
 
-    0b10000011, 0b11100000,
-    0b00000001, 0b11110000,
-    0b00000000, 0b11111000,
-    0b00000000, 0b01111000,
-    0b00000000, 0b00111000,
-    0b00000000, 0b00000000,
-    0b00000000, 0b00000000,
-    0b00000000, 0b00000000
+
+uint8_t MouseShowBitmap[] =
+{
+    0b11111111, 0b11111110,
+    0b11111111, 0b11111100,
+    0b11111111, 0b11111000,
+    0b11111111, 0b11110000,
+    0b11111111, 0b11100000,
+    0b11111111, 0b11000000,
+    0b11111111, 0b11100000,
+    0b11111111, 0b11110000,
+    0b11111111, 0b11111000,
+    0b11111111, 0b11111100,
+    0b11111011, 0b11111110,
+    0b11110001, 0b11111111,
+    0b11100000, 0b11111110,
+    0b11000000, 0b01111100,
+    0b10000000, 0b00111000,
+    0b00000000, 0b00010000
 };
 
 uint32_t MouseTempBitmap[] =
@@ -102,24 +122,29 @@ void DrawMouseBuffer(MPoint point)
     unsigned long yoff = point.y;
 
     unsigned long index = 0;
-
+    unsigned long index_x = 0;
+    unsigned long index_x2 = 0;
     for (unsigned long y = yoff; y < yoff + 16; y++)
     {
-        unsigned short index_x = 0;
+        index_x = 0;
         for (unsigned long x = xoff; x < xoff + 8; x++)
         {
-            if((uint8_t)((uint8_t)(MouseBitmap[index] << index_x) >> 7) != 0)
-                *(unsigned int*)(pixPtr + x + (y * pps)) = Colors.white;
+            if((uint8_t)((uint8_t)(MouseShowBitmap[index] << index_x) >> 7) != 0)
+                *(unsigned int*)(pixPtr + x + (y * pps)) = MouseDataMap[index_x2];
+                
             index_x++;
+            index_x2++;
         }
         index++;
 
         index_x = 0;
         for (unsigned long x = xoff + 8; x < xoff + 16; x++)
         {
-            if((uint8_t)((uint8_t)(MouseBitmap[index] << index_x) >> 7) != 0)
-                *(unsigned int*)(pixPtr + x + (y * pps)) = Colors.white;
+            if((uint8_t)((uint8_t)(MouseShowBitmap[index] << index_x) >> 7) != 0)
+                *(unsigned int*)(pixPtr + x + (y * pps)) = MouseDataMap[index_x2];
+                
             index_x++;
+            index_x2++;
         }
         index++;
     }
@@ -335,12 +360,21 @@ void ProcessMousePacket()
         MousePosition.y = GlobalRenderer->framebuffer->Height - 16;
 
 
-    DrawMousePointer();
+    //DrawMousePointer();
 
 
-    if (leftButton)
-        GlobalRenderer->delChar(MousePosition.x, MousePosition.y, Colors.white);
-    if (rightButton)
-        GlobalRenderer->delChar(MousePosition.x, MousePosition.y, Colors.black);
+    {
+        LoadFromBuffer(oldMousePosition);
+        if (leftButton)
+            GlobalRenderer->delChar(MousePosition.x, MousePosition.y, Colors.white);
+        if (rightButton)
+            GlobalRenderer->delChar(MousePosition.x, MousePosition.y, Colors.black);
+        SaveIntoBuffer(MousePosition);
+        DrawMouseBuffer(MousePosition);
+        oldMousePosition.x = MousePosition.x;
+        oldMousePosition.y = MousePosition.y;
+    }
+
+
     
 }
