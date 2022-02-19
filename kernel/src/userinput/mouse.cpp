@@ -17,10 +17,10 @@ uint8_t MouseBitmap[] =
     0b11111111, 0b00000000,
     0b11111110, 0b00000000,
     0b11111100, 0b00000000,
-    0b11111000, 0b00000000,
-    0b11110000, 0b00000000,
-    0b11100000, 0b10000000,
-    0b11000000, 0b11000000,
+    0b11111110, 0b00000000,
+    0b11111111, 0b00000000,
+    0b11100111, 0b10000000,
+    0b11000111, 0b11000000,
 
     0b10000011, 0b11100000,
     0b00000001, 0b11110000,
@@ -32,25 +32,24 @@ uint8_t MouseBitmap[] =
     0b00000000, 0b00000000
 };
 
-uint8_t MouseTempBitmap[] =
+uint32_t MouseTempBitmap[] =
 {
-    0b00000000, 0b00000000,
-    0b00000000, 0b00000000,
-    0b00000000, 0b00000000,
-    0b00000000, 0b00000000,
-    0b00000000, 0b00000000,
-    0b00000000, 0b00000000,
-    0b00000000, 0b00000000,
-    0b00000000, 0b00000000,
-
-    0b00000000, 0b00000000,
-    0b00000000, 0b00000000,
-    0b00000000, 0b00000000,
-    0b00000000, 0b00000000,
-    0b00000000, 0b00000000,
-    0b00000000, 0b00000000,
-    0b00000000, 0b00000000,
-    0b00000000, 0b00000000
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 
@@ -61,11 +60,10 @@ MPoint MousePosition;
 void SaveIntoBuffer(MPoint point)
 {
     unsigned int *pixPtr = (unsigned int*)GlobalRenderer->framebuffer->BaseAddress;
+    unsigned int pps = GlobalRenderer->framebuffer->PixelsPerScanLine;
 
     unsigned long xoff = point.x;
     unsigned long yoff = point.y;
-
-    uint8_t pps = GlobalRenderer->framebuffer->PixelsPerScanLine;
 
     unsigned long index = 0;
 
@@ -80,11 +78,10 @@ void SaveIntoBuffer(MPoint point)
 void LoadFromBuffer(MPoint point)
 {
     unsigned int *pixPtr = (unsigned int*)GlobalRenderer->framebuffer->BaseAddress;
+    unsigned int pps = GlobalRenderer->framebuffer->PixelsPerScanLine;
 
     unsigned long xoff = point.x;
     unsigned long yoff = point.y;
-
-    uint8_t pps = GlobalRenderer->framebuffer->PixelsPerScanLine;
 
     unsigned long index = 0;
 
@@ -99,21 +96,34 @@ void LoadFromBuffer(MPoint point)
 void DrawMouseBuffer(MPoint point)
 {
     unsigned int *pixPtr = (unsigned int*)GlobalRenderer->framebuffer->BaseAddress;
+    unsigned int pps = GlobalRenderer->framebuffer->PixelsPerScanLine;
 
     unsigned long xoff = point.x;
     unsigned long yoff = point.y;
-    
-    uint8_t pps = GlobalRenderer->framebuffer->PixelsPerScanLine;
 
     unsigned long index = 0;
 
     for (unsigned long y = yoff; y < yoff + 16; y++)
-        for (unsigned long x = xoff; x < xoff + 16; x++)
+    {
+        unsigned short index_x = 0;
+        for (unsigned long x = xoff; x < xoff + 8; x++)
         {
-            if(MouseBitmap[index] != 0)
-                *(unsigned int*)(pixPtr + x + (y * pps)) = MouseBitmap[index];
-            index++;
+            if((uint8_t)((uint8_t)(MouseBitmap[index] << index_x) >> 7) != 0)
+                *(unsigned int*)(pixPtr + x + (y * pps)) = Colors.white;
+            index_x++;
         }
+        index++;
+
+        index_x = 0;
+        for (unsigned long x = xoff + 8; x < xoff + 16; x++)
+        {
+            if((uint8_t)((uint8_t)(MouseBitmap[index] << index_x) >> 7) != 0)
+                *(unsigned int*)(pixPtr + x + (y * pps)) = Colors.white;
+            index_x++;
+        }
+        index++;
+    }
+
 }
 
 
