@@ -27,7 +27,7 @@ class PageTableManager
         PageTable* PDP;
         if (!PDE.GetFlag(PT_Flag::Present))
         {
-            PDP = (PageTable*)GlobalAllocator.RequestPage();
+            PDP = (PageTable*)GlobalAllocator->RequestPage();
             memset(PDP, 0, 0x1000);
             PDE.SetAddress((uint64_t)PDP >> 12);
             PDE.SetFlag(PT_Flag::Present, true);
@@ -44,7 +44,7 @@ class PageTableManager
         PageTable* PD;
         if (!PDE.GetFlag(PT_Flag::Present))
         {
-            PD = (PageTable*)GlobalAllocator.RequestPage();
+            PD = (PageTable*)GlobalAllocator->RequestPage();
             memset(PD, 0, 0x1000);
             PDE.SetAddress((uint64_t)PD >> 12);
             PDE.SetFlag(PT_Flag::Present, true);
@@ -61,7 +61,7 @@ class PageTableManager
         PageTable* PT;
         if (!PDE.GetFlag(PT_Flag::Present))
         {
-            PT = (PageTable*)GlobalAllocator.RequestPage();
+            PT = (PageTable*)GlobalAllocator->RequestPage();
             memset(PT, 0, 0x1000);
             PDE.SetAddress((uint64_t)PT >> 12);
             PDE.SetFlag(PT_Flag::Present, true);

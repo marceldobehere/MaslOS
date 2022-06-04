@@ -6,8 +6,6 @@
 
 BasicRenderer* GlobalRenderer;
 
-
-
 void BasicRenderer::putChar(char chr, unsigned int xoff, unsigned int yoff)
 {
     unsigned int *pixPtr = (unsigned int*)framebuffer->BaseAddress;

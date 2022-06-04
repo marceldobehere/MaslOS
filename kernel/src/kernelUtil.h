@@ -41,22 +41,22 @@ struct KernelInfo
 
 KernelInfo kernelInfo;
 PageTableManager pageTableManager = NULL;
-
+PageFrameAllocator t = PageFrameAllocator();
 void PrepareMemory(BootInfo* bootInfo)
 {
     uint64_t mMapEntries = (bootInfo->mMapSize / bootInfo->mMapDescSize);
 
-    GlobalAllocator = PageFrameAllocator();
-    GlobalAllocator.ReadEFIMemoryMap(bootInfo->mMap, bootInfo->mMapSize, bootInfo->mMapDescSize); 
+    GlobalAllocator = &t;
+    GlobalAllocator->ReadEFIMemoryMap(bootInfo->mMap, bootInfo->mMapSize, bootInfo->mMapDescSize); 
     
     uint64_t kernelSize = (((uint64_t)&_KernelEnd) - ((uint64_t)&_KernelStart));
     uint64_t kernelPages = ((uint64_t)kernelSize / 4096) + 1;
 
     
 
-    GlobalAllocator.LockPages(&_KernelStart, kernelPages);
+    GlobalAllocator->LockPages(&_KernelStart, kernelPages);
 
-    PageTable* PML4 = (PageTable*)GlobalAllocator.RequestPage();
+    PageTable* PML4 = (PageTable*)GlobalAllocator->RequestPage();
     memset(PML4, 0, 0x1000);
     pageTableManager = PageTableManager(PML4);
 
@@ -65,7 +65,7 @@ void PrepareMemory(BootInfo* bootInfo)
     
     uint64_t fbBase = (uint64_t)bootInfo->framebuffer->BaseAddress;
     uint64_t fbSize = (uint64_t)bootInfo->framebuffer->BufferSize + 0x1000;
-    GlobalAllocator.LockPages((void*)fbBase, fbSize / 0x1000);
+    GlobalAllocator->LockPages((void*)fbBase, fbSize / 0x1000);
     
     for (uint64_t i = fbBase; i < fbBase + fbSize; i+=4096)
         pageTableManager.MapMemory((void*)i, (void*)i);
@@ -89,7 +89,7 @@ void SetIDTGate(void* handler, uint8_t entryOffset, uint8_t type_attr, uint8_t s
 void PrepareInterrupts()
 {  
     idtr.Limit = 0x0FFF;
-    idtr.Offset = (uint64_t)GlobalAllocator.RequestPage();
+    idtr.Offset = (uint64_t)GlobalAllocator->RequestPage();
 
     SetIDTGate((void*)PageFault_handler, 0xE, IDT_TA_InterruptGate, 0x08);
     SetIDTGate((void*)DoubleFault_handler, 0x8, IDT_TA_InterruptGate, 0x08);

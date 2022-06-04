@@ -11,14 +11,23 @@ void ParseCommand(char* input)
     if (StrEquals(input, "cls"))
         GlobalRenderer->Cls();
 
-    char** splitLine = SplitLine(input);
+    //GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.pink);
+    StringArrData* data = SplitLine(input);
+    //GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.pink);
+
+
+    GlobalRenderer->Println("Parts:");
+    for (int i = 0; i < data->len; i++)
+        GlobalRenderer->Println(" - \"{}\"", data->data[i]);
 
 
     //free(splitLine);
-    GlobalAllocator.FreePage((void*)splitLine);
+    GlobalAllocator->FreePage(data);
+    //GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.pink);
+
 }
 
-char** SplitLine(char* input)
+StringArrData* SplitLine(char* input)
 {
     int index = 0;
     int parts[100];
@@ -45,7 +54,15 @@ char** SplitLine(char* input)
 
     int partCount = partIndex + 1;
 
-    char** splitLine = (char**) GlobalAllocator.RequestPage(); //(char**)calloc(partCount, sizeof(char*));
+    StringArrData* data = (StringArrData*) GlobalAllocator->RequestPage();
+
+    //char** splitLine = (char**) GlobalAllocator->RequestPage(); //(char**)calloc(partCount, sizeof(char*));
+
+    data->data = (char**)((char*)data+sizeof(StringArrData));
+
+    char** splitLine = data->data;
+    data->len = partCount;
+
     int splitIndex = 0;
     for (int i = 0; i < partCount; i++)
     {
@@ -84,5 +101,5 @@ char** SplitLine(char* input)
     
 
 
-    return splitLine;
+    return data;
 }
