@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include "cstr.h"
 #include "efiMemory.h"
+#include "Cols.h"
 
 struct BootInfo
 {
@@ -12,7 +13,6 @@ struct BootInfo
 	EFI_MEMORY_DESCRIPTOR* mMap;
 	uint64_t mMapSize;
 	uint64_t mMapDescSize;
-
 };
 
 static uint64_t GetMemorySize(EFI_MEMORY_DESCRIPTOR* mMap, uint64_t mMapEntries, uint64_t mMapDescSize)
@@ -45,13 +45,20 @@ static void PrintEFIMemData(EFI_MEMORY_DESCRIPTOR* mMap, uint64_t mMapEntries, u
             EFI_MEMORY_DESCRIPTOR* desc = (EFI_MEMORY_DESCRIPTOR*)((uint64_t)mMap + (i * mMapDescSize));
             temp->Print(EFI_MEMORY_TYPE_STRINGS[desc->type]);
             temp->Print(" - "); 
-            temp->color = BasicRenderer::Colors::cyan;
+            temp->color = Colors.cyan;
             temp->Print(to_string(desc->numPages * 4096 / 1024)); 
             temp->Print(" KB"); 
-            temp->color = BasicRenderer::Colors::white;
+            temp->color = Colors.white;
             temp->Println("."); 
         }
 
 
     }
+}
+
+
+static void memset(void* start, uint8_t value, uint64_t num)
+{
+    for (uint64_t i = 0; i < num; i++)
+        *(uint8_t*)((uint64_t)start + i) = value;
 }

@@ -1,48 +1,80 @@
+#include "kernelUtil.h"
 
-
-//typedef unsigned long long size_t;
-
-#include "BasicRenderer.h"
-#include <stddef.h>
-#include "cstr.h" 
-#include "efiMemory.h"
-#include "memory.h"  
-#include "PageFrameAllocator.h"  
-//#include "bitmap.h"
- 
-
-extern uint64_t _KernelStart;
-extern uint64_t _KernelEnd;
 
 extern "C" void _start(BootInfo* bootInfo)
-{
-   BasicRenderer temp = BasicRenderer(bootInfo->framebuffer, bootInfo->psf1_font);
-   
-    temp.Println("Hello, World!");
+{  
+    KernelInfo kernelInfo = InitializeKernel(bootInfo);
+    PageTableManager* pageTableManager = kernelInfo.pageTableManager;
 
-    temp.Println("Hello, \\CFF00FFWorld!\\CFFFFFF");
+
+    GlobalRenderer->Println("Kernel Initialised Successfully!", Colors.yellow);
+
+    //GlobalRenderer->delChar(0, 0);
+ 
+    //Panic("Panic go brrrt"); 
+    //asm("int $0x0e");
+   
+    while(true)
+    {
+        ProcessMousePacket();
+    }
+    
+    while(true); 
+
+}
+ 
+
+
+
+
+
+/*
+    GlobalRenderer->Println("Test 1: {}", to_string((uint64_t)100));
+    GlobalRenderer->Println("Test 2: {}", to_string(100.5, 2));
+    GlobalRenderer->Clear(Colors.orange);
+    
+    
+    asm("int $0x0e");
+    
+    for (unsigned int y = 10; y < bootInfo->framebuffer->Height / 4; y++)
+    {
+        for (unsigned int x = 0; x < bootInfo->framebuffer->Width / 2 * 4; x+=4)
+        {
+            *(unsigned int*)(x + (y * (bootInfo->framebuffer->PixelsPerScanLine * 4) + bootInfo->framebuffer->BaseAddress)) = 0xff00ffff;
+        }
+    }
  
     temp.Print("Memory Size: ");
     temp.Print(to_string(GetMemorySize(bootInfo->mMap, (bootInfo->mMapSize / bootInfo->mMapDescSize), bootInfo->mMapDescSize)));
     temp.Println(" Bytes.");
     temp.Println("");
-    
+
+
     // {
     //     const char* a[] = {to_string(-7.5, 1), to_string((int64_t)-10000)};
     //     temp.Println("The values are: {} and {}.", (const char**)a);
     // }
-    
-    PageFrameAllocator newAllocator; 
-    newAllocator.ReadEFIMemoryMap(bootInfo->mMap, bootInfo->mMapSize, bootInfo->mMapDescSize); 
-    
-    uint64_t kernelSize = (((uint64_t)&_KernelEnd) - ((uint64_t)&_KernelStart));
-    uint64_t kernelPages = ((uint64_t)kernelSize / 4096) + 1;
 
+    temp.Println("New Page Map loaded!");
+
+    pageTableManager->MapMemory((void*)0x600000000, (void*)0x80000);
+
+    uint64_t* test = (uint64_t*)0x600000000;
+
+    *test = 26;
+
+    temp.Println("Testing virtual Memory Adress: {}", to_string(*test));
+
+
+
+    //temp.Println("Hello, \\CFF00FFWorld!\\CFFFFFF");
+    PageMapIndexer pageIndexer = PageMapIndexer(0x1000 * 52 + 0x50000 * 7);
+
+    temp.Println("P_i: {}", to_string(pageIndexer.P_i));
+    temp.Println("PT_i: {}", to_string(pageIndexer.PT_i));
+    temp.Println("PD_i: {}", to_string(pageIndexer.PD_i));
+    temp.Println("PDP_i: {}", to_string(pageIndexer.PDP_i));
     temp.Println("Size: {} Pages.", to_string(kernelPages));
-
-    newAllocator.LockPages(&_KernelStart, kernelPages);
-
- 
 
     temp.Println("Free RAM:     {} KB", to_string(newAllocator.GetFreeRAM() / 1024));
     temp.Println("Used RAM:     {} KB", to_string(newAllocator.GetUsedRAM() / 1024));
@@ -57,19 +89,6 @@ extern "C" void _start(BootInfo* bootInfo)
         void* adress = newAllocator.RequestPage();
         temp.Println("Received Page address: {}", ConvertHexToString((uint64_t)adress));
     }
-
-
-
-    return;
-}
-
-
-
-
-
-
-/*
-
 
 
     temp.Println("Total RAM:    {} KB", to_string(GetMemorySize(bootInfo->mMap, (bootInfo->mMapSize / bootInfo->mMapDescSize), bootInfo->mMapDescSize)/ 1024));

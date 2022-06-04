@@ -2,6 +2,10 @@
 
 dir
 
+cd kernel
+rm -rf lib
+cd ..
+
 cd gnu-efi
 make bootloader
 cd ..

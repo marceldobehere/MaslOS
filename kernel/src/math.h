@@ -6,3 +6,10 @@ struct Point
     unsigned int y;
 };
 
+
+struct MPoint
+{
+    int x;
+    int y;
+};
+
