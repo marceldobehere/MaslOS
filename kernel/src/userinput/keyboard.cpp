@@ -29,9 +29,9 @@ void HandleEnter()
         ParseCommand(userData);
         //GlobalRenderer->Print("> ");
         //GlobalRenderer->Println(userData);
-        GlobalRenderer->Println();
-        PrintUser();
     }
+    GlobalRenderer->Println();
+    PrintUser();
     ClearInput();
 }
 

@@ -3,6 +3,7 @@
 #include "cstrTools.h"
 #include "../Cols.h"
 #include <stdlib.h>
+#include "../paging/PageFrameAllocator.h"
 
 void ParseCommand(char* input)
 {
@@ -13,7 +14,8 @@ void ParseCommand(char* input)
     char** splitLine = SplitLine(input);
 
 
-    free(splitLine);
+    //free(splitLine);
+    GlobalAllocator.FreePage((void*)splitLine);
 }
 
 char** SplitLine(char* input)
@@ -27,52 +29,60 @@ char** SplitLine(char* input)
 
     bool inString = false;
 
-    while (input[index] != 0)
+    for (; input[index] != 0; index++)
     {
         if (input[index] == '\"')
             inString = !inString;
-        else if (input[index] == '\\')
+        else if (!inString && input[index] == ' ')
+            partIndex++;
+        else 
         {
             parts[partIndex]++;
-            index++;
+            if (input[index] == '\\')
+                index++;
         }
-        else if (input[index] == ' ' && !inString)
-            partIndex++;
-        else
-            parts[partIndex]++;
-
-        index++;
     }
 
     int partCount = partIndex + 1;
 
-    char** splitLine = (char**)calloc(partCount, sizeof(char*));
+    char** splitLine = (char**) GlobalAllocator.RequestPage(); //(char**)calloc(partCount, sizeof(char*));
+    int splitIndex = 0;
     for (int i = 0; i < partCount; i++)
-        splitLine[i] = (char*)calloc(parts[partCount], sizeof(char));
+    {
+        splitLine[i] = (char*)((char*)splitLine + splitIndex);
+        splitIndex += parts[i];
+    }
     
-
-    // -----------------------------------------------------------------------
-
-    index = 0;
-    
+    // ---------------------------------------------------------------------------------------------------------------------------------
 
     inString = false;
+    partIndex = 0;
+    index = 0;
 
-    while (input[index] != 0)
+    for (int i = 0; i < 100; i++)
+        parts[i] = 0;
+
+    for (; input[index] != 0; index++)
     {
         if (input[index] == '\"')
             inString = !inString;
-        else if (input[index] == '\\')
-        {
-            parts[partIndex]++;
-            index++;
-        }
-        else if (input[index] == ' ' && !inString)
+        else if (!inString && input[index] == ' ')
             partIndex++;
-        else
+        else 
+        {
+            if (input[index] == '\\')
+            {
+                index++;
+                splitLine[partIndex][parts[partIndex]] = input[index];
+            }
+            else
+                splitLine[partIndex][parts[partIndex]] = input[index];
+            
             parts[partIndex]++;
-
-        index++;
+        }
     }
+    
 
+
+    return splitLine;
 }

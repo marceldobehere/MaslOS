@@ -12,8 +12,9 @@ extern "C" void _start(BootInfo* bootInfo)
     //asm("int $0x0e");
    
     GlobalRenderer->Cls();
-    
+
     GlobalRenderer->Println("Kernel Initialised Successfully!", Colors.yellow);
+
 
     KeyboardPrintStart();
 
@@ -26,7 +27,21 @@ extern "C" void _start(BootInfo* bootInfo)
 
 }
  
+/*
+    GlobalRenderer->Print("Memory Size: ");
+    GlobalRenderer->Print(to_string(GetMemorySize(bootInfo->mMap, (bootInfo->mMapSize / bootInfo->mMapDescSize), bootInfo->mMapDescSize)));
+    GlobalRenderer->Println(" Bytes.");
+    GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator.GetFreeRAM()), Colors.bgreen);
+    GlobalRenderer->Println("");
 
+    int* arr = (int*)GlobalAllocator.RequestPage();
+
+    GlobalRenderer->Print("Memory Size: ");
+    GlobalRenderer->Print(to_string(GetMemorySize(bootInfo->mMap, (bootInfo->mMapSize / bootInfo->mMapDescSize), bootInfo->mMapDescSize)));
+    GlobalRenderer->Println(" Bytes.");
+    GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator.GetFreeRAM()), Colors.bgreen);
+    GlobalRenderer->Println("");
+*/
 
 
 
