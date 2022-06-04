@@ -24,9 +24,10 @@
 #include "panic.h"   
 #include "IO.h"
 
-//#include "userinput/keyboard.h"
+#include "userinput/keyboard.h"
 #include "userinput/mouse.h"
  
+ #include "cmdParsing/cmdParser.h"
 
 extern uint64_t _KernelStart;
 extern uint64_t _KernelEnd;
@@ -124,6 +125,8 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     PrepareInterrupts();
 
     InitPS2Mouse();
+
+    InitKeyboard();
 
 
     outb(PIC1_DATA, 0b11111001);

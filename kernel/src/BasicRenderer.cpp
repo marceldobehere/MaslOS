@@ -2,6 +2,7 @@
 #include "BasicRenderer.h"
 #include "cstr.h"
 #include <stdint.h> 
+#include "Cols.h"
 
 BasicRenderer* GlobalRenderer;
 
@@ -240,4 +241,12 @@ void BasicRenderer::Clear(uint32_t col)
 {
     BasicRenderer::Clear(col, true);
 
+}
+
+void BasicRenderer::Cls()
+{
+    BasicRenderer::Clear(0);
+    BasicRenderer::Println("Masl OS v0.06", Colors.green);
+    BasicRenderer::Println("-------------", Colors.green);
+    BasicRenderer::Println();
 }

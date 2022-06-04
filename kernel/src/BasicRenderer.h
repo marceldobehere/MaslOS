@@ -41,6 +41,8 @@ class BasicRenderer
         void Clear(uint32_t col);
         void Clear(uint32_t col, bool resetCursor);
 
+        void Cls();
+
 
         BasicRenderer(Framebuffer* framebuffer, PSF1_FONT* psf1_font)
         {
