@@ -9,4 +9,5 @@ MaslOS is love, MaslOS is life.
 
 ## How to try
 for now just download the whole repo and run the JUST RUN OS file.
+
 ya need qemu tho.
