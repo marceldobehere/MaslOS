@@ -15,3 +15,6 @@ void PrintUser();
 void HandleKeyboard(uint8_t scancode);
 
 
+extern uint32_t userCol;
+
+extern const char* userName;

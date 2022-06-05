@@ -124,6 +124,11 @@ void BasicRenderer::printStr(const char* chrs, const char* var)
                     index += 5;
                 }
             }
+            else
+            {
+                putChar(chrs[index], CursorPosition.x, CursorPosition.y);
+                CursorPosition.x += 8;
+            }
         }
         else
         {

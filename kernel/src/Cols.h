@@ -4,7 +4,8 @@
 
     static struct col
     { 
-        uint32_t white =  0xffffffff,
+        static const uint32_t 
+        white =  0xffffffff,
         silver = 0xffc0c0c0,
         gray =   0xff808080,
         black =  0xff000000,
@@ -21,3 +22,51 @@
         bblue =  0xff0000FF,
         bgreen = 0xff00FF00;
     } Colors;
+    
+    static const int colCount = 19;
+
+    static const char* colNames[colCount] =
+    {
+        "white",
+        "silver",
+        "gray",
+        "black",
+        "pink",
+        "green",
+        "red",
+        "purple",
+        "orange",
+        "cyan",
+        "yellow",
+        "brown",
+        "blue",
+        "bred",
+        "bblue",
+        "bgreen",
+        "bright red",
+        "bright blue",
+        "bright green"
+    };
+
+    static uint32_t colValues[colCount] = 
+    {
+        Colors.white,
+        Colors.silver,
+        Colors.gray,
+        Colors.black,
+        Colors.pink,
+        Colors.green,
+        Colors.red,
+        Colors.purple,
+        Colors.orange,
+        Colors.cyan,
+        Colors.yellow,
+        Colors.brown,
+        Colors.blue,
+        Colors.bred,
+        Colors.bblue,
+        Colors.bgreen,
+        Colors.bred,
+        Colors.bblue,
+        Colors.bgreen
+    };

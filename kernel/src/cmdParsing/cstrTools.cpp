@@ -1,4 +1,5 @@
 #include "cstrTools.h"
+#include "../paging/PageFrameAllocator.h"
 
 bool StrEquals(const char* a, const char* b)
 {
@@ -13,3 +14,10 @@ bool StrEquals(const char* a, const char* b)
     return true;
 }
 
+char* StrCopy(const char* og)
+{
+    char* newStr = (char*)GlobalAllocator->RequestPage();
+    for (int i = 0; og[i] != 0; i++)
+        newStr[i] = og[i];
+    return newStr;
+}

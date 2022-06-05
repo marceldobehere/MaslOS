@@ -12,6 +12,9 @@ char userData[256];
 int userLen = 0;
 bool allowArrows = false;
 
+uint32_t userCol = Colors.bgreen;
+const char* userName = "User";
+
 void ClearInput()
 {
     for (int i = 0; i < 256; i++)
@@ -37,6 +40,7 @@ void HandleEnter()
 
 void InitKeyboard()
 {
+    userCol = Colors.bgreen;
     ClearInput();
 }
 
@@ -48,7 +52,7 @@ void KeyboardPrintStart()
 
 void PrintUser()
 {
-    GlobalRenderer->Print("User", Colors.bgreen);
+    GlobalRenderer->Print(userName, userCol);
     GlobalRenderer->Print("> ");
 }
 

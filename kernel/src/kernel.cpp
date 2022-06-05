@@ -15,6 +15,19 @@ extern "C" void _start(BootInfo* bootInfo)
 
     GlobalRenderer->Println("Kernel Initialised Successfully!!", Colors.yellow);
 
+    KeyboardPrintStart();
+
+    while(true)
+    {
+        ProcessMousePacket();
+    }
+    
+    while(true); 
+
+}
+
+
+/*
     GlobalRenderer->Print("Memory Size: ");
     GlobalRenderer->Print(to_string(GetMemorySize(bootInfo->mMap, (bootInfo->mMapSize / bootInfo->mMapDescSize), bootInfo->mMapDescSize)));
     GlobalRenderer->Println(" Bytes.");
@@ -39,16 +52,7 @@ extern "C" void _start(BootInfo* bootInfo)
     GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
     GlobalRenderer->Println("");
 
-    KeyboardPrintStart();
-
-    while(true)
-    {
-        ProcessMousePacket();
-    }
-    
-    while(true); 
-
-}
+*/
  
 /*
     GlobalRenderer->Print("Memory Size: ");
