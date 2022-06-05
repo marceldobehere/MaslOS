@@ -7,7 +7,7 @@
 
 
 KernelInfo kernelInfo;
-PageFrameAllocator t = PageFrameAllocator();
+static PageFrameAllocator t = PageFrameAllocator();
 
 void PrepareMemory(BootInfo* bootInfo)
 {
@@ -18,8 +18,6 @@ void PrepareMemory(BootInfo* bootInfo)
     
     uint64_t kernelSize = (((uint64_t)&_KernelEnd) - ((uint64_t)&_KernelStart));
     uint64_t kernelPages = ((uint64_t)kernelSize / 4096) + 1;
-
-    
 
     GlobalAllocator->LockPages(&_KernelStart, kernelPages);
 

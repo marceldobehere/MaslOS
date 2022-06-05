@@ -26,4 +26,6 @@ void LogInvalidArgumentCount(int expected, int found);
 
 void SetCmd(const char* name, const char* val);
 
+void GetCmd(const char* name);
+
 ParsedColData ParseColor(const char* col);

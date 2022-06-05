@@ -197,14 +197,17 @@ uint8_t MouseRead()
 
 void InitPS2Mouse()
 {
-    MousePosition.x = 100;
-    MousePosition.y = 100;
-    oldMousePosition.x = 100;
-    oldMousePosition.y = 100;
-    SaveIntoBuffer(MousePosition);
-    DrawMousePointer();
     outb(0x64, 0xA8);
     Mousewait();
+
+    MousePosition.x = 50;
+    MousePosition.y = 50;
+    oldMousePosition.x = 50;
+    oldMousePosition.y = 50;
+    SaveIntoBuffer(MousePosition);
+    DrawMousePointer();
+
+
     outb(0x64, 0x20);
     MousewaitInput();
 
@@ -231,12 +234,21 @@ bool MousePacketReady = false;
 
 void HandlePS2Mouse(uint8_t data)
 {
+    ProcessMousePacket();
+    static bool skip = true;
+    if (skip)
+    {
+        skip = false;
+        MouseCycle = 2;
+        return;
+    }
+
     switch(MouseCycle)
     {
         case 0:
         {
-            if(MousePacketReady)
-                break;
+            // if(MousePacketReady)
+            //     break;
             if (data & 0b00001000 == 0)
                 break;
 
@@ -269,7 +281,7 @@ void ProcessMousePacket()
 {
     if(!MousePacketReady)
         return;
-    MousePacketReady = false;
+    //MousePacketReady = false;
 
     //GlobalRenderer->Print("A");
 
@@ -362,6 +374,7 @@ void ProcessMousePacket()
 
     //DrawMousePointer();
 
+    MousePacketReady = false;
 
     {
         LoadFromBuffer(oldMousePosition);

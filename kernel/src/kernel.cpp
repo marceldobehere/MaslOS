@@ -14,18 +14,56 @@ extern "C" void _start(BootInfo* bootInfo)
     //Panic("Panic go brrrt"); 
     //asm("int $0x0e");
    
-    //GlobalRenderer->Cls();
+    GlobalRenderer->Cls();
 
     GlobalRenderer->Println("Kernel Initialised Successfully!!", Colors.yellow);
 
-    GlobalRenderer->Println("ADDR OF NEW DATA: {}", ConvertHexToString((uint64_t)malloc(0x100)), Colors.silver);
+    // GlobalRenderer->Print("Memory Size: ");
+    // GlobalRenderer->Print(to_string(GetMemorySize(bootInfo->mMap, (bootInfo->mMapSize / bootInfo->mMapDescSize), bootInfo->mMapDescSize)));
+    // GlobalRenderer->Println(" Bytes.");
+    // GlobalRenderer->Println();
+
+
+    // GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
+    // GlobalRenderer->Println("");
+
+    // int* arr[100];// = (int*)GlobalAllocator->RequestPage();
+    // for (int i = 0; i < 100; i++)
+    //     arr[i] = (int*)GlobalAllocator->RequestPage();
+
+    // GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
+    // GlobalRenderer->Println("");
+
+    // arr[0][1] = 100;
+
+
+    // for (int i = 0; i < 100; i++)
+    //     GlobalAllocator->FreePage(arr[i]);
+
+    // GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
+    // GlobalRenderer->Println("");
+ 
+    // GlobalRenderer->Println("ADDR OF VRAM:       {}", ConvertHexToString((uint64_t)GlobalRenderer->framebuffer->BaseAddress), Colors.bgreen);
+    // GlobalRenderer->Println("ADDR OF NEW DATA 1: {}", ConvertHexToString((uint64_t)heapStart), Colors.silver);
+    // GlobalRenderer->Println("ADDR OF NEW DATA:   {}", ConvertHexToString((uint64_t)malloc(0x100)), Colors.silver);
+    // GlobalRenderer->Println("ADDR OF NEW DATA:   {}", ConvertHexToString((uint64_t)malloc(0x100)), Colors.silver);
+    // GlobalRenderer->Println("ADDR OF NEW DATA:   {}", ConvertHexToString((uint64_t)malloc(0x100)), Colors.silver);
+    // GlobalRenderer->Println("");
+
+    GlobalRenderer->Println("ADDR OF VRAM:       {}", ConvertHexToString((uint64_t)GlobalRenderer->framebuffer->BaseAddress), Colors.bgreen);
+    GlobalRenderer->Println("ADDR OF NEW DATA 1: {}", ConvertHexToString((uint64_t)heapStart), Colors.silver);
+    GlobalRenderer->Println("ADDR OF NEW DATA:   {}", ConvertHexToString((uint64_t)malloc(0x8000)), Colors.silver);
+    GlobalRenderer->Println("ADDR OF NEW DATA:   {}", ConvertHexToString((uint64_t)malloc(0x8000)), Colors.silver);
+    GlobalRenderer->Println("ADDR OF NEW DATA:   {}", ConvertHexToString((uint64_t)malloc(0x100)), Colors.silver);
+    GlobalRenderer->Println("ADDR OF NEW DATA:   {}", ConvertHexToString((uint64_t)malloc(0x100)), Colors.silver);
+    GlobalRenderer->Println("");
 
 
     KeyboardPrintStart();
 
     while(!osData.exit)
     {
-        ProcessMousePacket();
+        
     }
 
     GlobalRenderer->Clear(Colors.black);
@@ -34,6 +72,38 @@ extern "C" void _start(BootInfo* bootInfo)
 
 }
 
+
+/*
+   //GlobalRenderer->Println("ADDR OF NEW DATA: {}", ConvertHexToString((uint64_t)malloc(0x100)), Colors.silver);
+
+    GlobalRenderer->Println();
+
+    GlobalRenderer->Print("Memory Size: ");
+    GlobalRenderer->Print(to_string(GetMemorySize(bootInfo->mMap, (bootInfo->mMapSize / bootInfo->mMapDescSize), bootInfo->mMapDescSize)));
+    GlobalRenderer->Println(" Bytes.");
+    GlobalRenderer->Println();
+
+    GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
+    GlobalRenderer->Println("");
+
+    int* arr = (int*)GlobalAllocator->RequestPage();
+
+    GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
+    GlobalRenderer->Println("");
+
+    arr[0] = 100;
+
+    GlobalAllocator->FreePage(arr);
+
+    GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
+    GlobalRenderer->Println("");
+
+
+    GlobalRenderer->Println("ADDR OF NEW DATA: {}", ConvertHexToString((uint64_t)malloc(0x100)), Colors.silver);
+
+    GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
+    GlobalRenderer->Println("");
+*/
 
 /*
     GlobalRenderer->Print("Memory Size: ");

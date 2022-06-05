@@ -145,16 +145,19 @@ void PageFrameAllocator::ReadEFIMemoryMap(EFI_MEMORY_DESCRIPTOR* mMap, size_t mM
     
     InitBitmap(bitmapSize, largestFreeMemSeg);
 
-    LockPages(PageBitMap.Buffer, (PageBitMap.Size / 4096) + 1);
+    //LockPages(PageBitMap.Buffer, (PageBitMap.Size / 4096) + 1);
+
+    ReservePages(0, memorySize / 4096 + 1);
 
     for (int i = 0; i < mMapEntries; i++)
     {
         EFI_MEMORY_DESCRIPTOR* desc = (EFI_MEMORY_DESCRIPTOR*)((uint64_t)mMap + (i * mMapDescSize));
 
-        if (desc->type != 7)
-            ReservePages(desc->physAddr, desc->numPages);
+        if (desc->type == 7)
+            UnreservePages(desc->physAddr, desc->numPages);
     }
-
+    ReservePages(0, 0x100);
+    LockPages(PageBitMap.Buffer, (PageBitMap.Size / 4096) + 1);
 
     //reservedMemory = data;
 }

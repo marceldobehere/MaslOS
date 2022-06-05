@@ -2,29 +2,62 @@
 #include "../paging/PageTableManager.h"
 #include "../paging/PageFrameAllocator.h"
 
+void* heapStart;
+void* heapEnd;
+HeapSegHdr* lastHdr;
+
 void HeapSegHdr::CombineForward()
 {
+    if (next == NULL)
+        return;
+    if (!next->free)
+        return;
+    
+    if (next == lastHdr) 
+        lastHdr = this;
+
+    if (next->next != NULL)
+    {
+        next->next->last = this;
+    }
+
+    length = length + next->length + sizeof(HeapSegHdr);
+
 
 }
 
 void HeapSegHdr::CombineBackward()
 {
-
+    if (last != NULL && last->free)
+        last->CombineForward();
 }
 
 HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
 {
+    if (splitLength < 0x10)
+        return NULL;
 
+    int64_t splitSegLength = length - splitLength - sizeof(HeapSegHdr);
 
+    if (splitSegLength < 0x10)
+        return NULL;
 
+    HeapSegHdr* newSplitHdr = (HeapSegHdr*)((size_t)this + splitLength + sizeof(HeapSegHdr));
 
+    next->last = newSplitHdr;
+    newSplitHdr->next = next;
+    next = newSplitHdr;
+    newSplitHdr->last = this;
+    newSplitHdr->length = splitSegLength;
+    newSplitHdr->free = free;
+    length = splitLength;
 
-    return NULL;
+    if (lastHdr == this) lastHdr = newSplitHdr;
+
+    return newSplitHdr;
 }
 
-void* heapStart;
-void* heapEnd;
-HeapSegHdr* lastHdr;
+
 
 void InitializeHeap(void* heapAddress, size_t pageCount)
 {
@@ -41,19 +74,19 @@ void InitializeHeap(void* heapAddress, size_t pageCount)
 
     size_t heapLength = pageCount * 0x1000;
 
-    // heapStart = heapAddress;
-    // heapEnd = (void*)((size_t)heapStart + heapLength);
-    // HeapSegHdr* startSeg = (HeapSegHdr*)heapAddress;
-    // startSeg->length = heapLength - sizeof(HeapSegHdr);
-    // startSeg->next = NULL;
-    // startSeg->last = NULL;
-    // startSeg->free = true;
-    // lastHdr = startSeg;
+    heapStart = heapAddress;
+    heapEnd = (void*)((size_t)heapStart + heapLength);
+    HeapSegHdr* startSeg = (HeapSegHdr*)heapAddress;
+    startSeg->length = heapLength - sizeof(HeapSegHdr);
+    startSeg->next = NULL;
+    startSeg->last = NULL;
+    startSeg->free = true;
+    lastHdr = startSeg;
 }
 
 void* malloc(size_t size)
 {
-    if (size & 0x10 > 0)
+    if (size % 0x10 > 0)
     {
         size -= (size % 0x10);
         size += 0x10;
@@ -79,7 +112,7 @@ void* malloc(size_t size)
                 return (void*)((uint64_t)current + sizeof(HeapSegHdr));
             }
         }
-        if (current->next)
+        if (current->next == NULL)
             break;
         current = current->next;
     }
@@ -95,5 +128,27 @@ void free(void* address)
 
 void ExpandHeap(size_t length)
 {
+    if (length % 0x1000)
+    {
+        length -= (length % 0x1000);
+        length += 0x1000;
+    }
 
+    size_t pageCount = length / 0x1000;
+    HeapSegHdr* newSegment = (HeapSegHdr*) heapEnd;
+
+    for (size_t i = 0; i < pageCount; i++)
+    {
+        GlobalPageTableManager.MapMemory(heapEnd, GlobalAllocator->RequestPage());
+        heapEnd = (void*)((size_t)heapEnd + 0x1000);
+    }
+
+    newSegment->free = true;
+    newSegment->last = lastHdr;
+    lastHdr->next = newSegment;
+    lastHdr = newSegment;
+
+    newSegment->next = NULL;
+    newSegment->length = length - sizeof(HeapSegHdr);
+    newSegment->CombineBackward();
 }

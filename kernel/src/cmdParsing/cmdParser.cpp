@@ -37,6 +37,7 @@ void ParseCommand(char* input)
         return;
     }
 
+    //return;
 
     StringArrData* data = SplitLine(input);
 
@@ -81,6 +82,17 @@ void ParseCommand(char* input)
             SetCmd(data->data[1], data->data[2]);
         else
             LogInvalidArgumentCount(2, data->len-1);
+        
+        GlobalAllocator->FreePage(data);
+        return;
+    }
+
+    if (StrEquals(data->data[0], "get"))
+    {
+        if (data->len == 2)
+            GetCmd(data->data[1]);
+        else
+            LogInvalidArgumentCount(1, data->len-1);
         
         GlobalAllocator->FreePage(data);
         return;
@@ -137,6 +149,20 @@ void SetCmd(const char* name, const char* val)
     }
 }
 
+void GetCmd(const char* name)
+{
+    if (StrEquals(name, "free ram"))
+    {
+        GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
+    }
+    else
+    {
+        LogError("Parameter \"{}\" does not exist.", name);
+    }
+
+    // GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
+    // GlobalRenderer->Println("");
+}
 
 ParsedColData ParseColor(const char* col)
 {

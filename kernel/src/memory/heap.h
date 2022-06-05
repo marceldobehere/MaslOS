@@ -21,3 +21,5 @@ void* malloc(size_t size);
 void free(void* address);
 
 void ExpandHeap(size_t length);
+
+extern void* heapStart;
