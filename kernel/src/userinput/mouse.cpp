@@ -72,7 +72,7 @@ uint32_t MouseTempBitmap[] =
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-
+extern uint32_t mouseColFront = Colors.white, mouseColBack = Colors.black;
 
 MPoint oldMousePosition;
 MPoint MousePosition;
@@ -366,9 +366,9 @@ void ProcessMousePacket()
     {
         LoadFromBuffer(oldMousePosition);
         if (leftButton)
-            GlobalRenderer->delChar(MousePosition.x, MousePosition.y, Colors.white);
+            GlobalRenderer->delChar(MousePosition.x, MousePosition.y, mouseColFront);
         if (rightButton)
-            GlobalRenderer->delChar(MousePosition.x, MousePosition.y, Colors.black);
+            GlobalRenderer->delChar(MousePosition.x, MousePosition.y, mouseColBack);
         SaveIntoBuffer(MousePosition);
         DrawMouseBuffer(MousePosition);
         oldMousePosition.x = MousePosition.x;

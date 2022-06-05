@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include "../paging/PageFrameAllocator.h"
 #include "../userinput/keyboard.h"
+#include "../userinput/mouse.h"
 
 void LogError(const char* msg)
 {
@@ -99,6 +100,22 @@ void SetCmd(const char* name, const char* val)
     {
         userName = StrCopy(val);
     }
+    else if (StrEquals(name, "mouse color front"))
+    {
+        ParsedColData data = ParseColor(val);
+        if (data.parseSuccess)
+            mouseColFront = data.col;
+        else
+            LogError("Color \"{}\" could not be Parsed!", val);
+    }
+    else if (StrEquals(name, "mouse color back"))
+    {
+        ParsedColData data = ParseColor(val);
+        if (data.parseSuccess)
+            mouseColBack = data.col;
+        else
+            LogError("Color \"{}\" could not be Parsed!", val);
+    }
     else
     {
         LogError("Parameter \"{}\" does not exist.", name);
@@ -111,6 +128,19 @@ ParsedColData ParseColor(const char* col)
     ParsedColData data = ParsedColData();
     data.parseSuccess = false;
     data.col = 0;
+
+    //GlobalRenderer->Println("Col: \"{}\" (", col, Colors.orange);
+    //GlobalRenderer->Print(col[0]);
+    //GlobalRenderer->Println(")", Colors.orange);
+
+    if (col[0] == '#')
+    {
+        const char* subStr = StrSubstr(col, 1);
+        //GlobalRenderer->Println("Col: \"{}\"", subStr, Colors.cyan);
+        data.col = ConvertStringToHex(subStr);
+        data.parseSuccess = true;
+        return data;
+    }
 
     for (int i = 0; i < colCount; i++)
         if (StrEquals(col, colNames[i]))

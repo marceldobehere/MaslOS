@@ -21,3 +21,30 @@ char* StrCopy(const char* og)
         newStr[i] = og[i];
     return newStr;
 }
+
+char* StrSubstr(const char* og, int index, int len)
+{
+    char* newStr = (char*)GlobalAllocator->RequestPage();
+    for (int i = 0; i < len; i++)
+        newStr[i] = og[i+index];
+    return newStr;
+}
+
+char* StrSubstr(const char* og, int index)
+{
+    int len;
+    for (len = 0; og[len] != 0; len++);
+    len++;
+
+    //GlobalRenderer->Println("LEN: {}", to_string((uint64_t)len), Colors.white);
+
+    if (index >= len)
+        index = len - 1;
+
+    len -= index;
+
+    //GlobalRenderer->Println("LEN: {}", to_string((uint64_t)len), Colors.white);
+
+    return StrSubstr(og, index, len);
+}
+

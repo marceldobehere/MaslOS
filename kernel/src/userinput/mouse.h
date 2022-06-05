@@ -29,3 +29,5 @@ void DrawMousePointer();
 void LoadFromBuffer(MPoint point);
 void SaveIntoBuffer(MPoint point);
 void DrawMouseBuffer(MPoint point);
+
+extern uint32_t mouseColFront, mouseColBack;

@@ -52,11 +52,20 @@ void BasicRenderer::putStr(const char* chrs, unsigned int xoff, unsigned int yof
 
 void BasicRenderer::printStr(const char* chrs)
 {
-    printStr(chrs, NULL);
+    printStr(chrs, NULL, true);
 }
 
+void BasicRenderer::printStr(const char* chrs, bool allowEscape)
+{
+    printStr(chrs, NULL, allowEscape);
+}
 
 void BasicRenderer::printStr(const char* chrs, const char* var)
+{
+    printStr(chrs, var, true);
+}
+
+void BasicRenderer::printStr(const char* chrs, const char* var, bool allowEscape)
 {
     unsigned int index = 0;
     while (chrs[index] != 0)   
@@ -76,7 +85,7 @@ void BasicRenderer::printStr(const char* chrs, const char* var)
         { 
             CursorPosition.x = 0;
         } 
-        else if (chrs[index] == '{')
+        else if (chrs[index] == '{' && allowEscape)
         {
             if (chrs[index + 1] == '}')
             {
@@ -84,7 +93,7 @@ void BasicRenderer::printStr(const char* chrs, const char* var)
                 index++;
             }
         }
-        else if (chrs[index] == '\\')
+        else if (chrs[index] == '\\' && allowEscape)
         {
             if (chrs[index + 1] == '\\')
             {
@@ -152,12 +161,17 @@ void BasicRenderer::Print(char chr)
 {
     char temp[] = {chr, 0};
 
-    BasicRenderer::Print((const char*)temp);
+    BasicRenderer::Print((const char*)temp, false);
 }
 
 void BasicRenderer::Print(const char* chrs)
 {
     BasicRenderer::printStr(chrs);
+}
+
+void BasicRenderer::Print(const char* chrs, bool allowEscape)
+{
+    BasicRenderer::printStr(chrs, allowEscape);
 }
 
 void BasicRenderer::Println(const char* chrs)
