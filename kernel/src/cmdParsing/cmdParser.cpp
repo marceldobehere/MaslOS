@@ -7,6 +7,7 @@
 #include "../paging/PageFrameAllocator.h"
 #include "../userinput/keyboard.h"
 #include "../userinput/mouse.h"
+#include "../OSDATA/osdata.h"
 
 void LogError(const char* msg)
 {
@@ -55,6 +56,20 @@ void ParseCommand(char* input)
             GlobalRenderer->Println(data->data[1]);
         else
             LogInvalidArgumentCount(1, data->len-1);
+        
+        GlobalAllocator->FreePage(data);
+        return;
+    }
+
+    if (StrEquals(data->data[0], "exit"))
+    {
+        if (data->len == 1)
+        {
+            GlobalRenderer->Println("Exiting...");
+            osData.exit = true;
+        }
+        else
+            LogInvalidArgumentCount(0, data->len-1);
         
         GlobalAllocator->FreePage(data);
         return;
@@ -232,7 +247,7 @@ StringArrData* SplitLine(char* input)
     {
         //GlobalRenderer->Println("INDEX  {}", to_string((uint64_t)splitIndex), Colors.cyan); 
         //GlobalRenderer->Println("Count: {}", to_string((uint64_t)parts[i]), Colors.cyan);
-        splitLine[i] = (char*)(data->addrOfData + splitIndex);
+        splitLine[i] = (char*)((uint64_t)data->addrOfData + splitIndex);
         //GlobalRenderer->Println("ADDR 1: {}", ConvertHexToString((uint64_t)&splitLine[i][0]), Colors.yellow);
 
         for (int i2 = 0; i2 < parts[i] + 1; i2++)

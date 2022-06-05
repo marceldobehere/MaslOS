@@ -6,23 +6,31 @@ extern "C" void _start(BootInfo* bootInfo)
     KernelInfo kernelInfo = InitializeKernel(bootInfo);
     PageTableManager* pageTableManager = kernelInfo.pageTableManager;
 
+    osData.kernelInfo = &kernelInfo;
+    osData.exit = false;
+
     //GlobalRenderer->delChar(0, 0);
  
     //Panic("Panic go brrrt"); 
     //asm("int $0x0e");
    
-    GlobalRenderer->Cls();
+    //GlobalRenderer->Cls();
 
     GlobalRenderer->Println("Kernel Initialised Successfully!!", Colors.yellow);
 
+    GlobalRenderer->Println("ADDR OF NEW DATA: {}", ConvertHexToString((uint64_t)malloc(0x100)), Colors.silver);
+
+
     KeyboardPrintStart();
 
-    while(true)
+    while(!osData.exit)
     {
         ProcessMousePacket();
     }
-    
-    while(true); 
+
+    GlobalRenderer->Clear(Colors.black);
+    GlobalRenderer->Println("Goodbye.");
+    while(!osData.exit || true); 
 
 }
 
