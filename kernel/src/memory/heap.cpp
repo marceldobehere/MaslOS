@@ -123,7 +123,10 @@ void* malloc(size_t size)
 
 void free(void* address)
 {
-
+    HeapSegHdr* segment = (HeapSegHdr*)address - 1;
+    segment->free = true;
+    segment->CombineForward();
+    segment->CombineBackward();
 }
 
 void ExpandHeap(size_t length)

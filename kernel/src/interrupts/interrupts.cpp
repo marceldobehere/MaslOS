@@ -8,8 +8,54 @@
 
 __attribute__((interrupt)) void PageFault_handler(struct interrupt_frame* frame)
 {
-    Panic("Page Fault Detected!");
+    Panic("Page Fault Detected!", false);
+    uint64_t Register = 0;
     //Panic("Page Fault Detected! {}", to_string(*((uint64_t*)frame)), true);
+    GlobalRenderer->Println();
+	GlobalRenderer->Println("Register dump: ");
+    GlobalRenderer->Println();
+	GlobalRenderer->Print("rax: ");
+	asm volatile("mov %%rax, %0" : "=r"(Register));
+	GlobalRenderer->Print("0x");
+	GlobalRenderer->Print(ConvertHexToString(Register));
+	GlobalRenderer->Print("  ");
+	GlobalRenderer->Print("rcx: ");
+	asm volatile("mov %%rcx, %0" : "=r"(Register));
+	GlobalRenderer->Print("0x");
+	GlobalRenderer->Print(ConvertHexToString(Register));
+	GlobalRenderer->Print("  ");
+	GlobalRenderer->Print("rdx: ");
+	asm volatile("mov %%rdx, %0" : "=r"(Register));
+	GlobalRenderer->Print("0x");
+	GlobalRenderer->Print(ConvertHexToString(Register));
+	GlobalRenderer->Print("  ");
+	GlobalRenderer->Print("rbx: ");
+	asm volatile("mov %%rbx, %0" : "=r"(Register));
+	GlobalRenderer->Print("0x");
+	GlobalRenderer->Print(ConvertHexToString(Register));
+	GlobalRenderer->Print("  ");
+    GlobalRenderer->Println();
+	GlobalRenderer->Print("rsp: ");
+	asm volatile("mov %%rsp, %0" : "=r"(Register));
+	GlobalRenderer->Print("0x");
+	GlobalRenderer->Print(ConvertHexToString(Register));
+	GlobalRenderer->Print("  ");
+	GlobalRenderer->Print("rbp: ");
+	asm volatile("mov %%rbp, %0" : "=r"(Register));
+	GlobalRenderer->Print("0x");
+	GlobalRenderer->Print(ConvertHexToString(Register));
+	GlobalRenderer->Print("  ");
+	GlobalRenderer->Print("rsi: ");
+	asm volatile("mov %%rsi, %0" : "=r"(Register));
+	GlobalRenderer->Print("0x");
+	GlobalRenderer->Print(ConvertHexToString(Register));
+	GlobalRenderer->Print("  ");
+	GlobalRenderer->Print("rdi: ");
+	asm volatile("mov %%rdi, %0" : "=r"(Register));
+	GlobalRenderer->Print("0x");
+	GlobalRenderer->Print(ConvertHexToString(Register));
+    GlobalRenderer->Println();
+	asm("hlt");
 }
 
 __attribute__((interrupt)) void DoubleFault_handler(interrupt_frame* frame)
