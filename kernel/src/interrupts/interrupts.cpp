@@ -9,18 +9,18 @@
 __attribute__((interrupt)) void PageFault_handler(struct interrupt_frame* frame)
 {
     Panic("Page Fault Detected!");
+    //Panic("Page Fault Detected! {}", to_string(*((uint64_t*)frame)), true);
 }
-
 
 __attribute__((interrupt)) void DoubleFault_handler(interrupt_frame* frame)
 {
     Panic("Double Fault Detected!");
 }
 
-
 __attribute__((interrupt)) void GPFault_handler(interrupt_frame* frame)
 {
     Panic("General Protection Fault Detected!");
+    //Panic("General Protection Fault Detected! {}", to_string(*((uint64_t*)frame)), true);
 }
  
 __attribute__((interrupt)) void KeyboardInt_handler(interrupt_frame* frame)
