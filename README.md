@@ -14,7 +14,10 @@ ya need qemu tho.
 
 ## How to build
 install qemu if ya haven't
+
 install cmake if ya haven't
+
 install nasm if ya haven't
+
 
 Go into the MaslOS Folder and run ./RUN.sh
