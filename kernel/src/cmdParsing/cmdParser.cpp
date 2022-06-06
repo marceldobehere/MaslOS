@@ -8,6 +8,7 @@
 #include "../userinput/keyboard.h"
 #include "../userinput/mouse.h"
 #include "../OSDATA/osdata.h"
+#include "../memory/heap.h"
 
 void LogError(const char* msg)
 {
@@ -43,7 +44,7 @@ void ParseCommand(char* input)
 
     if (data->len == 0)
     {
-        GlobalAllocator->FreePage(data);
+        free(data);
         return;
     }
 
@@ -58,7 +59,7 @@ void ParseCommand(char* input)
         else
             LogInvalidArgumentCount(1, data->len-1);
         
-        GlobalAllocator->FreePage(data);
+        free(data);
         return;
     }
 
@@ -72,7 +73,7 @@ void ParseCommand(char* input)
         else
             LogInvalidArgumentCount(0, data->len-1);
         
-        GlobalAllocator->FreePage(data);
+        free(data);
         return;
     }
 
@@ -83,7 +84,7 @@ void ParseCommand(char* input)
         else
             LogInvalidArgumentCount(2, data->len-1);
         
-        GlobalAllocator->FreePage(data);
+        free(data);
         return;
     }
 
@@ -94,13 +95,13 @@ void ParseCommand(char* input)
         else
             LogInvalidArgumentCount(1, data->len-1);
         
-        GlobalAllocator->FreePage(data);
+        free(data);
         return;
     }
 
 
     LogError("Unknown command \"{}\"!", data->data[0]);
-    GlobalAllocator->FreePage(data);
+    free(data);
     return;
 }
 
@@ -241,7 +242,14 @@ StringArrData* SplitLine(char* input)
 
     int partCount = partIndex + 1;
 
-    uint64_t datAddr = (uint64_t) GlobalAllocator->RequestPage();
+    int totalsize = sizeof(StringArrData);
+    for (int i = 0; i < partCount; i++)
+    {
+        totalsize += parts[i] + 1 + sizeof(char*);
+    }
+
+    //uint64_t datAddr = (uint64_t) GlobalAllocator->RequestPage();
+    int64_t datAddr = (uint64_t) malloc(totalsize);
     StringArrData* data = (StringArrData*) datAddr;
 
     //char** splitLine = (char**) GlobalAllocator->RequestPage(); //(char**)calloc(partCount, sizeof(char*));
