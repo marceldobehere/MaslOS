@@ -40,9 +40,9 @@ struct KernelInfo
 #include "userinput/keyboard.h"
 #include "userinput/mouse.h"
  
+#include "memory/heap.h"
 #include "cmdParsing/cmdParser.h"
 
-#include "memory/heap.h"
 
 //extern KernelInfo kernelInfo;
 //extern PageTableManager pageTableManager;
