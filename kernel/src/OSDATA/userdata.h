@@ -17,4 +17,6 @@ struct OSUser
 };
 
 
-extern OSUser admin;
+extern OSUser adminUser;
+
+extern OSUser* currentUser;

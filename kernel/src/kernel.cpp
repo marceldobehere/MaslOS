@@ -49,16 +49,16 @@ extern "C" void _start(BootInfo* bootInfo)
     // GlobalRenderer->Println("ADDR OF NEW DATA:   {}", ConvertHexToString((uint64_t)malloc(0x100)), Colors.silver);
     // GlobalRenderer->Println("");
 
-    GlobalRenderer->Println("ADDR OF VRAM:       {}", ConvertHexToString((uint64_t)GlobalRenderer->framebuffer->BaseAddress), Colors.bgreen);
-    GlobalRenderer->Println("ADDR OF NEW DATA 1: {}", ConvertHexToString((uint64_t)heapStart), Colors.silver);
-    GlobalRenderer->Println("ADDR OF NEW DATA:   {}", ConvertHexToString((uint64_t)malloc(0x10)), Colors.silver);
-    GlobalRenderer->Println("ADDR OF NEW DATA:   {}", ConvertHexToString((uint64_t)malloc(0x20)), Colors.silver);
-    GlobalRenderer->Println("ADDR OF NEW DATA:   {}", ConvertHexToString((uint64_t)malloc(0x30)), Colors.silver);
-    GlobalRenderer->Println("ADDR OF NEW DATA:   {}", ConvertHexToString((uint64_t)malloc(0x40)), Colors.silver);
-    GlobalRenderer->Println("");
+    //GlobalRenderer->Println("ADDR OF VRAM:       {}", ConvertHexToString((uint64_t)GlobalRenderer->framebuffer->BaseAddress), Colors.bgreen);
+    //GlobalRenderer->Println("ADDR OF NEW DATA 1: {}", ConvertHexToString((uint64_t)heapStart), Colors.silver);
+    //GlobalRenderer->Println("ADDR OF NEW DATA:   {}", ConvertHexToString((uint64_t)malloc(0x10)), Colors.silver);
+    //GlobalRenderer->Println("ADDR OF NEW DATA:   {}", ConvertHexToString((uint64_t)malloc(0x20)), Colors.silver);
+    //GlobalRenderer->Println("ADDR OF NEW DATA:   {}", ConvertHexToString((uint64_t)malloc(0x30)), Colors.silver);
+    //GlobalRenderer->Println("ADDR OF NEW DATA:   {}", ConvertHexToString((uint64_t)malloc(0x40)), Colors.silver);
+    //GlobalRenderer->Println("");
 
     
-
+    
     KeyboardPrintStart();
 
     while(!osData.exit)

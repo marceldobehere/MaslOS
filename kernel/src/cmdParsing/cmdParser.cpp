@@ -28,12 +28,25 @@ void LogInvalidArgumentCount(int expected, int found)
 
 
 
-void ParseCommand(char* input)
+void ParseCommand(char* input, OSUser* user)
 {
     //GlobalRenderer->Println("This is test out!");
     if (StrEquals(input, "cls"))
     {
         GlobalRenderer->Cls();
+        return;
+    }
+
+    if (StrEquals(input, "malloc"))
+    {
+        malloc(0x5000);
+        return;
+    }
+
+    if (StrEquals(input, "exit"))
+    {
+        GlobalRenderer->Println("Exiting...");
+        osData.exit = true;
         return;
     }
 
@@ -62,24 +75,10 @@ void ParseCommand(char* input)
         return;
     }
 
-    if (StrEquals(data->data[0], "exit"))
-    {
-        if (data->len == 1)
-        {
-            GlobalRenderer->Println("Exiting...");
-            osData.exit = true;
-        }
-        else
-            LogInvalidArgumentCount(0, data->len-1);
-        
-        free(data);
-        return;
-    }
-
     if (StrEquals(data->data[0], "set"))
     {
         if (data->len == 3)
-            SetCmd(data->data[1], data->data[2]);
+            SetCmd(data->data[1], data->data[2], user);
         else
             LogInvalidArgumentCount(2, data->len-1);
         
@@ -90,7 +89,7 @@ void ParseCommand(char* input)
     if (StrEquals(data->data[0], "get"))
     {
         if (data->len == 2)
-            GetCmd(data->data[1]);
+            GetCmd(data->data[1], user);
         else
             LogInvalidArgumentCount(1, data->len-1);
         
@@ -105,7 +104,7 @@ void ParseCommand(char* input)
 }
 
 
-void SetCmd(const char* name, const char* val)
+void SetCmd(const char* name, const char* val, OSUser* user)
 {
     if (StrEquals(name, "user color"))
     {
@@ -149,7 +148,7 @@ void SetCmd(const char* name, const char* val)
     }
 }
 
-void GetCmd(const char* name)
+void GetCmd(const char* name, OSUser* user)
 {
     if (StrEquals(name, "free ram"))
     {

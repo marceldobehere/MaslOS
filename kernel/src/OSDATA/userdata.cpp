@@ -1,10 +1,12 @@
 #include "userdata.h"
 
-OSUser admin = OSUser 
+OSUser adminUser = OSUser 
 {
-    admin.userName = "admin",
-    admin.permLevel = 100,
-    admin.colData.arrowColor = Colors.white,
-    admin.colData.defaultTextColor = Colors.white,
-    admin.colData.userColor = Colors.bgreen,
+    adminUser.userName = "admin",
+    adminUser.permLevel = 100,
+    adminUser.colData.arrowColor = Colors.white,
+    adminUser.colData.defaultTextColor = Colors.white,
+    adminUser.colData.userColor = Colors.bgreen,
 };
+
+OSUser* currentUser = &adminUser;
