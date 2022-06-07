@@ -63,7 +63,23 @@ extern "C" void _start(BootInfo* bootInfo)
 
     //GlobalRenderer->Println("Username: {}", adminUser.userName);
     //GlobalRenderer->Println("Username: {}", currentUser->userName);
-    
+    GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
+    GlobalRenderer->Println("Free Page Count: {} pages.", to_string(GlobalAllocator->GetFreePageCount()), Colors.bgreen);
+
+    for (int i = 0; i < 20; i++)
+    {
+        GlobalRenderer->Println("ADDR OF NEW DATA: {}", ConvertHexToString((uint64_t)malloc(0xF00)), Colors.silver);
+        GlobalRenderer->Println("Free Page Count: {} pages.", to_string(GlobalAllocator->GetFreePageCount()), Colors.bgreen);
+        //GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
+        //GlobalRenderer->Println("");
+    }
+
+    GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
+    GlobalRenderer->Println("Free Page Count: {} pages.", to_string(GlobalAllocator->GetFreePageCount()), Colors.bgreen);
+    GlobalRenderer->Println("Done.");
+
+
+
     KeyboardPrintStart();
 
     while(!osData.exit)
