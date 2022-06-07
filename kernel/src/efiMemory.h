@@ -1,5 +1,6 @@
 #pragma once
 #include <stddef.h>
+#include <stdint.h>
 
 struct EFI_MEMORY_DESCRIPTOR
 {
@@ -10,7 +11,7 @@ struct EFI_MEMORY_DESCRIPTOR
     uint64_t attribs;
 };
 
-const char* EFI_MEMORY_TYPE_STRINGS[]
+static const char* EFI_MEMORY_TYPE_STRINGS[]
 {
     "EfiReservedMemoryType",
     "EfiLoaderCode",
