@@ -116,14 +116,14 @@ void* malloc(size_t size)
             break;
         current = current->next;
     }
-
+    GlobalRenderer->Println("Requesting more RAM.");
     ExpandHeap(size);
-    return malloc(size);
+    return NULL;//malloc(size);
 }
 
 void free(void* address)
 {
-    HeapSegHdr* segment = (HeapSegHdr*)address - 1;
+    HeapSegHdr* segment = (HeapSegHdr*)((uint64_t)address - sizeof(HeapSegHdr));
     segment->free = true;
     segment->CombineForward();
     segment->CombineBackward();
@@ -140,18 +140,23 @@ void ExpandHeap(size_t length)
     size_t pageCount = length / 0x1000;
     HeapSegHdr* newSegment = (HeapSegHdr*) heapEnd;
 
+    GlobalRenderer->Println("Page Count  {}", to_string(pageCount), Colors.white);
+    GlobalRenderer->Println("free RAM 1: {}", to_string(GlobalAllocator->GetFreeRAM()), Colors.white);
+
     for (size_t i = 0; i < pageCount; i++)
     {
         GlobalPageTableManager.MapMemory(heapEnd, GlobalAllocator->RequestPage());
         heapEnd = (void*)((size_t)heapEnd + 0x1000);
     }
 
-    newSegment->free = true;
-    newSegment->last = lastHdr;
-    lastHdr->next = newSegment;
-    lastHdr = newSegment;
+    GlobalRenderer->Println("free RAM 2: {}", to_string(GlobalAllocator->GetFreeRAM()), Colors.white);
+    
+    // newSegment->free = true;
+    // newSegment->last = lastHdr;
+    // lastHdr->next = newSegment;
+    // lastHdr = newSegment;
 
-    newSegment->next = NULL;
-    newSegment->length = length - sizeof(HeapSegHdr);
-    newSegment->CombineBackward();
+    // newSegment->next = NULL;
+    // newSegment->length = length - sizeof(HeapSegHdr);
+    // newSegment->CombineBackward();
 }

@@ -13,6 +13,10 @@ extern "C" void _start(BootInfo* bootInfo)
     //Panic("Panic go brrrt"); 
     //asm("int $0x0e");
    
+    currentUser = &adminUser;
+
+
+
     GlobalRenderer->Cls();
 
     GlobalRenderer->Println("Kernel Initialised Successfully!!", Colors.yellow);
@@ -57,7 +61,8 @@ extern "C" void _start(BootInfo* bootInfo)
     //GlobalRenderer->Println("ADDR OF NEW DATA:   {}", ConvertHexToString((uint64_t)malloc(0x40)), Colors.silver);
     //GlobalRenderer->Println("");
 
-    
+    //GlobalRenderer->Println("Username: {}", adminUser.userName);
+    //GlobalRenderer->Println("Username: {}", currentUser->userName);
     
     KeyboardPrintStart();
 

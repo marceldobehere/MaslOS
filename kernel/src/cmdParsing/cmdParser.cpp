@@ -110,7 +110,7 @@ void SetCmd(const char* name, const char* val, OSUser* user)
     {
         ParsedColData data = ParseColor(val);
         if (data.parseSuccess)
-            userCol = data.col;
+            user->colData.userColor = data.col;
         else
             LogError("Color \"{}\" could not be Parsed!", val);
     }
@@ -124,7 +124,7 @@ void SetCmd(const char* name, const char* val, OSUser* user)
     }
     else if (StrEquals(name, "username"))
     {
-        userName = StrCopy(val);
+        user->userName = StrCopy(val);
     }
     else if (StrEquals(name, "mouse color front"))
     {

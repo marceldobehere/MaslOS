@@ -95,6 +95,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     InitKeyboard();
 
+    initUsers();
 
     outb(PIC1_DATA, 0b11111001);
     outb(PIC2_DATA, 0b11101111);

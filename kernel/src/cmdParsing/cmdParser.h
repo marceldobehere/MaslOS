@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include "../OSDATA/userdata.h"
 
 struct StringArrData
 {
@@ -16,7 +17,7 @@ struct ParsedColData
 
 StringArrData* SplitLine(char* input);
 
-void ParseCommand(char* input);
+void ParseCommand(char* input, OSUser* user);
 
 void LogError(const char* msg);
 
@@ -24,8 +25,8 @@ void LogError(const char* msg, const char* var);
 
 void LogInvalidArgumentCount(int expected, int found);
 
-void SetCmd(const char* name, const char* val);
+void SetCmd(const char* name, const char* val, OSUser* user);
 
-void GetCmd(const char* name);
+void GetCmd(const char* name, OSUser* user);
 
 ParsedColData ParseColor(const char* col);

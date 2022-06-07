@@ -56,6 +56,7 @@ __attribute__((interrupt)) void PageFault_handler(struct interrupt_frame* frame)
 	GlobalRenderer->Print(ConvertHexToString(Register));
     GlobalRenderer->Println();
 	asm("hlt");
+    while(true);
 }
 
 __attribute__((interrupt)) void DoubleFault_handler(interrupt_frame* frame)

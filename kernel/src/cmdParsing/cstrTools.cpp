@@ -1,5 +1,6 @@
 #include "cstrTools.h"
 #include "../paging/PageFrameAllocator.h"
+#include "../memory/heap.h"
 
 bool StrEquals(const char* a, const char* b)
 {
@@ -16,7 +17,11 @@ bool StrEquals(const char* a, const char* b)
 
 char* StrCopy(const char* og)
 {
-    char* newStr = (char*)GlobalAllocator->RequestPage();
+    int size = 0;
+    for (int i = 0; og[i] != 0; i++)
+        size++;
+    char* newStr = (char*)malloc(size);
+
     for (int i = 0; og[i] != 0; i++)
         newStr[i] = og[i];
     return newStr;
@@ -24,7 +29,7 @@ char* StrCopy(const char* og)
 
 char* StrSubstr(const char* og, int index, int len)
 {
-    char* newStr = (char*)GlobalAllocator->RequestPage();
+    char* newStr = (char*)malloc(len);
     for (int i = 0; i < len; i++)
         newStr[i] = og[i+index];
     return newStr;

@@ -5,6 +5,7 @@
 #include "../BasicRenderer.h"
 #include "../cmdParsing/cmdParser.h"
 #include "../Cols.h"
+#include "../OSDATA/userdata.h"
 
 bool lshift = false;
 bool rshift = false;
@@ -29,12 +30,12 @@ void HandleEnter()
 {
     if (userLen > 0)
     {
-        ParseCommand(userData);
+        ParseCommand(userData, currentUser);
         //GlobalRenderer->Print("> ");
         //GlobalRenderer->Println(userData);
     }
     GlobalRenderer->Println();
-    PrintUser();
+    PrintUser(currentUser);
     ClearInput();
 }
 
@@ -47,12 +48,12 @@ void InitKeyboard()
 void KeyboardPrintStart()
 {
     GlobalRenderer->CursorPosition.y += 16;
-    PrintUser();
+    PrintUser(currentUser);
 }
 
-void PrintUser()
+void PrintUser(OSUser* user)
 {
-    GlobalRenderer->Print(userName, userCol);
+    GlobalRenderer->Print(user->userName, user->colData.userColor);
     GlobalRenderer->Print("> ");
 }
 

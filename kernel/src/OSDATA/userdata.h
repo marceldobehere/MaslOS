@@ -20,3 +20,6 @@ struct OSUser
 extern OSUser adminUser;
 
 extern OSUser* currentUser;
+
+
+void initUsers();

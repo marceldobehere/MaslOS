@@ -1,6 +1,6 @@
 #pragma once
 #include <stdint.h>
-
+#include "../OSDATA/userdata.h"
 
 void ClearInput();
 
@@ -10,11 +10,6 @@ void InitKeyboard();
 
 void KeyboardPrintStart();
 
-void PrintUser();
+void PrintUser(OSUser* user);
 
 void HandleKeyboard(uint8_t scancode);
-
-
-extern uint32_t userCol;
-
-extern const char* userName;
