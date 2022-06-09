@@ -118,7 +118,7 @@ void* malloc(size_t size)
     }
     GlobalRenderer->Println("Requesting more RAM.");
     ExpandHeap(size);
-    return NULL;//malloc(size);
+    return malloc(size);
 }
 
 void free(void* address)
@@ -151,12 +151,12 @@ void ExpandHeap(size_t length)
 
     GlobalRenderer->Println("free RAM 2: {}", to_string(GlobalAllocator->GetFreeRAM()), Colors.white);
     
-    // newSegment->free = true;
-    // newSegment->last = lastHdr;
-    // lastHdr->next = newSegment;
-    // lastHdr = newSegment;
+    newSegment->free = true;
+    newSegment->last = lastHdr;
+    lastHdr->next = newSegment;
+    lastHdr = newSegment;
 
-    // newSegment->next = NULL;
-    // newSegment->length = length - sizeof(HeapSegHdr);
-    // newSegment->CombineBackward();
+    newSegment->next = NULL;
+    newSegment->length = length - sizeof(HeapSegHdr);
+    newSegment->CombineBackward();
 }

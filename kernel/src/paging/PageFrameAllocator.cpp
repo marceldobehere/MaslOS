@@ -73,6 +73,10 @@ void* PageFrameAllocator::RequestPage()
         return(void*)(pageBitmapIndex * 4096);
     }
     
+    GlobalRenderer->Println("ERROR: NO MORE RAM AVAIABLE!", Colors.red);
+
+    while (true);
+
     return NULL; // Page Frame Swap to file
 }
 
@@ -142,8 +146,15 @@ void PageFrameAllocator::ReadEFIMemoryMap(EFI_MEMORY_DESCRIPTOR* mMap, size_t mM
     reservedMemory = 0;
     usedMemory = 0;
     uint64_t bitmapSize =  (memorySize / 4096 / 8) + 1;
-    
+
+
+    GlobalRenderer->Println("Largest Mem Size: {} Bytes.", to_string(largestFreeMemSegSize), Colors.yellow);
+    GlobalRenderer->Println("Bitmap Size:      {} Bytes.", to_string(bitmapSize + sizeof(Bitmap)), Colors.yellow);
+
+    //while(true);
+
     InitBitmap(bitmapSize, largestFreeMemSeg);
+
 
     //LockPages(PageBitMap.Buffer, (PageBitMap.Size / 4096) + 1);
 
@@ -156,8 +167,23 @@ void PageFrameAllocator::ReadEFIMemoryMap(EFI_MEMORY_DESCRIPTOR* mMap, size_t mM
         if (desc->type == 7)
             UnreservePages(desc->physAddr, desc->numPages);
     }
-    ReservePages(0, 0x100);
+    ReservePages(0, 0x200);
     LockPages(PageBitMap.Buffer, (PageBitMap.Size / 4096) + 1);
 
+
+    GlobalRenderer->Println("Bitmap ADDR:      {}", ConvertHexToString((uint64_t)PageBitMap.Buffer), Colors.yellow);
     //reservedMemory = data;
+
+    //while(true);
+}
+
+uint64_t PageFrameAllocator::GetFreePageCount()
+{
+    uint64_t count = 0;
+    for (uint64_t index = 0; index < PageBitMap.Size * 8; index++)
+    {
+        if (!PageBitMap[index])
+            count++;
+    }
+    return count;
 }

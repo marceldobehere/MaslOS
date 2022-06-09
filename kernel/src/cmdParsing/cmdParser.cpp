@@ -154,6 +154,10 @@ void GetCmd(const char* name, OSUser* user)
     {
         GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
     }
+    else if (StrEquals(name, "free pages"))
+    {
+        GlobalRenderer->Println("Free Page Count: {} pages.", to_string(GlobalAllocator->GetFreePageCount()), Colors.bgreen);
+    }
     else
     {
         LogError("Parameter \"{}\" does not exist.", name);

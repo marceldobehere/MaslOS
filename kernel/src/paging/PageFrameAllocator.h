@@ -29,6 +29,8 @@ class PageFrameAllocator{
 
     uint64_t GetFreeRAM();
 
+    uint64_t GetFreePageCount();
+
     uint64_t GetUsedRAM();
 
     uint64_t GetReservedRAM();
