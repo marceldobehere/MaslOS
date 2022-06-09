@@ -190,7 +190,7 @@ uint64_t PageFrameAllocator::GetFreePageCount()
         
         GlobalRenderer->Print("Page: {}    ", to_string(index), Colors.black);
         GlobalRenderer->CursorPosition.x = 0;
-        GlobalRenderer->Print("Page: {}    ", to_string(index+1), Colors.yellow);
+        GlobalRenderer->Print("Page: {}    ", to_string(index+1), Colors.silver);
     }
 
     //GlobalRenderer->CursorPosition.x = 0;
