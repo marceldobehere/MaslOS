@@ -21,6 +21,25 @@ extern "C" void _start(BootInfo* bootInfo)
 
     GlobalRenderer->Println("Kernel Initialised Successfully!!", Colors.yellow);
 
+
+
+    KeyboardPrintStart();
+
+    while(!osData.exit)
+    {
+        
+    }
+
+    GlobalRenderer->Clear(Colors.black);
+    GlobalRenderer->Println("Goodbye.");
+    while(!osData.exit || true); 
+
+}
+
+
+
+/*
+
     // GlobalRenderer->Print("Memory Size: ");
     // GlobalRenderer->Print(to_string(GetMemorySize(bootInfo->mMap, (bootInfo->mMapSize / bootInfo->mMapDescSize), bootInfo->mMapDescSize)));
     // GlobalRenderer->Println(" Bytes.");
@@ -64,36 +83,23 @@ extern "C" void _start(BootInfo* bootInfo)
     //GlobalRenderer->Println("Username: {}", adminUser.userName);
     //GlobalRenderer->Println("Username: {}", currentUser->userName);
 
-    GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
-    GlobalRenderer->Println("Free Page Count: {} pages.", to_string(GlobalAllocator->GetFreePageCount()), Colors.bgreen);
+    // GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
+    // GlobalRenderer->Println("Free Page Count: {} pages.", to_string(GlobalAllocator->GetFreePageCount()), Colors.bgreen);
 
-    for (int i = 0; i < 20; i++)
-    {
-        //GlobalAllocator->RequestPage(); //works
-        GlobalRenderer->Println("ADDR OF NEW DATA: {}", ConvertHexToString((uint64_t)malloc(0x1000)), Colors.silver); // makes the page count function crash
-        GlobalRenderer->Println("Free Page Count: {} pages.", to_string(GlobalAllocator->GetFreePageCount()), Colors.bgreen);
-        //GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
-        //GlobalRenderer->Println("");
-    }
+    // for (int i = 0; i < 5; i++)
+    // {
+    //     //GlobalAllocator->RequestPage(); //works
+    //     GlobalRenderer->Println("ADDR OF NEW DATA: {}", ConvertHexToString((uint64_t)malloc(0x1000)), Colors.silver); // makes the page count function crash
+    //     GlobalRenderer->Println("Free Page Count: {} pages.", to_string(GlobalAllocator->GetFreePageCount()), Colors.bgreen);
+    //     //GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
+    //     //GlobalRenderer->Println("");
+    // }
 
-    GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
-    GlobalRenderer->Println("Free Page Count: {} pages.", to_string(GlobalAllocator->GetFreePageCount()), Colors.bgreen);
-    GlobalRenderer->Println("Done.");
+    // GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
+    // GlobalRenderer->Println("Free Page Count: {} pages.", to_string(GlobalAllocator->GetFreePageCount()), Colors.bgreen);
+    // GlobalRenderer->Println("Done.");
 
-
-
-    KeyboardPrintStart();
-
-    while(!osData.exit)
-    {
-        
-    }
-
-    GlobalRenderer->Clear(Colors.black);
-    GlobalRenderer->Println("Goodbye.");
-    while(!osData.exit || true); 
-
-}
+*/
 
 
 /*
