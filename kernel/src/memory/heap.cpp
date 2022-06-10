@@ -37,14 +37,18 @@ HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
     if (splitLength < 0x10)
         return NULL;
 
-    int64_t splitSegLength = length - splitLength - sizeof(HeapSegHdr);
-
+    //GlobalRenderer->Println("this len: {}", to_string(length), Colors.bgreen);
+    int64_t splitSegLength = (length - splitLength) - sizeof(HeapSegHdr);
+    //GlobalRenderer->Println("Splitseg len: {}", to_string(splitSegLength), Colors.bgreen);
     if (splitSegLength < 0x10)
         return NULL;
 
     HeapSegHdr* newSplitHdr = (HeapSegHdr*)((size_t)this + splitLength + sizeof(HeapSegHdr));
 
-    next->last = newSplitHdr;
+    //GlobalRenderer->Println("Splitheader addr: {}", ConvertHexToString((uint64_t)newSplitHdr), Colors.bgreen);
+
+    if (next != NULL)
+        next->last = newSplitHdr;
     newSplitHdr->next = next;
     next = newSplitHdr;
     newSplitHdr->last = this;
@@ -52,7 +56,12 @@ HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
     newSplitHdr->free = free;
     length = splitLength;
 
-    if (lastHdr == this) lastHdr = newSplitHdr;
+    //GlobalRenderer->Println("this len: {}", to_string(length), Colors.bgreen);
+
+    if (lastHdr == this) 
+        lastHdr = newSplitHdr;
+
+    //GlobalRenderer->Println("Split successful!");
 
     return newSplitHdr;
 }
@@ -116,7 +125,7 @@ void* malloc(size_t size)
             break;
         current = current->next;
     }
-    GlobalRenderer->Println("Requesting more RAM.");
+    //GlobalRenderer->Println("Requesting more RAM.");
     ExpandHeap(size);
     return malloc(size);
 }
@@ -140,8 +149,8 @@ void ExpandHeap(size_t length)
     size_t pageCount = length / 0x1000;
     HeapSegHdr* newSegment = (HeapSegHdr*) heapEnd;
 
-    GlobalRenderer->Println("Page Count  {}", to_string(pageCount), Colors.white);
-    GlobalRenderer->Println("free RAM 1: {}", to_string(GlobalAllocator->GetFreeRAM()), Colors.white);
+    //GlobalRenderer->Println("Page Count  {}", to_string(pageCount), Colors.white);
+    //GlobalRenderer->Println("free RAM 1: {}", to_string(GlobalAllocator->GetFreeRAM()), Colors.white);
 
     for (size_t i = 0; i < pageCount; i++)
     {
@@ -149,7 +158,7 @@ void ExpandHeap(size_t length)
         heapEnd = (void*)((size_t)heapEnd + 0x1000);
     }
 
-    GlobalRenderer->Println("free RAM 2: {}", to_string(GlobalAllocator->GetFreeRAM()), Colors.white);
+    //GlobalRenderer->Println("free RAM 2: {}", to_string(GlobalAllocator->GetFreeRAM()), Colors.white);
     
     newSegment->free = true;
     newSegment->last = lastHdr;

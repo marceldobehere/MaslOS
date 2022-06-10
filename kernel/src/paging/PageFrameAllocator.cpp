@@ -179,25 +179,25 @@ void PageFrameAllocator::ReadEFIMemoryMap(EFI_MEMORY_DESCRIPTOR* mMap, size_t mM
 
 uint64_t PageFrameAllocator::GetFreePageCount()
 {
-    GlobalRenderer->Println("Size: {}", to_string(PageBitMap.Size * 8), Colors.yellow);
-    GlobalRenderer->Print("Page: 0", Colors.yellow);
+    //GlobalRenderer->Println("Size: {}", to_string(PageBitMap.Size * 8), Colors.yellow);
+    //GlobalRenderer->Print("Page: 0", Colors.yellow);
     uint64_t count = 0;
     for (uint64_t index = 0; index < PageBitMap.Size * 8; index++)
     {
         if (!PageBitMap[index])
             count++;
-        GlobalRenderer->CursorPosition.x = 0;
+        //GlobalRenderer->CursorPosition.x = 0;
         
-        GlobalRenderer->Print("Page: {}    ", to_string(index), Colors.black);
-        GlobalRenderer->CursorPosition.x = 0;
-        GlobalRenderer->Print("Page: {}    ", to_string(index+1), Colors.silver);
+        //GlobalRenderer->Print("Page: {}    ", to_string(index), Colors.black);
+        //GlobalRenderer->CursorPosition.x = 0;
+        //GlobalRenderer->Print("Page: {}    ", to_string(index+1), Colors.silver);
     }
 
     //GlobalRenderer->CursorPosition.x = 0;
     //GlobalRenderer->Print("Page: {}    ", to_string(PageBitMap.Size * 8), Colors.black);
     //GlobalRenderer->CursorPosition.x = 0;
 
-    GlobalRenderer->Println();
+    //GlobalRenderer->Println();
 
     return count;
 }
