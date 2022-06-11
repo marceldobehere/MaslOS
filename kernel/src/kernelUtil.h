@@ -43,8 +43,11 @@ struct KernelInfo
 #include "memory/heap.h"
 #include "cmdParsing/cmdParser.h"
 
+#include "scheduling-pit/pit.h"
+
 #include "customClasses/array.h"
 #include "customClasses/list.h"
+
 
 //extern KernelInfo kernelInfo;
 //extern PageTableManager pageTableManager;

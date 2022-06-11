@@ -93,14 +93,14 @@ const char* to_string(double value, uint8_t places)
         size += places + 1;
 
 
-        uint64_t temp = 1;
+        double temp = 1;
 
         for (int i = 0; i < places; i++)
             temp *= 10;
 
-        uint64_t value3 = (uint64_t)((value - ((uint64_t)value))*temp); 
+        uint64_t value3 = (uint64_t)((value - ((uint64_t)value)) * temp); 
 
-        while (value3 > 0)
+        for (int i = 0; i < places; i++)
         {        
             uint8_t remainder = value3 % 10;
             value3 /= 10;
@@ -115,14 +115,17 @@ const char* to_string(double value, uint8_t places)
 
 
     uint64_t value2 = (int64_t)value;
-    while (value2 > 0)
-    {        
-        uint8_t remainder = value2 % 10;
-        value2 /= 10;
-        doubleTo_stringOutput[size - index] = remainder + '0';
-        index++;
-    }
-
+    if (value2 == 0)
+        doubleTo_stringOutput[size - index] = '0';
+    else
+        while (value2 > 0)
+        {        
+            uint8_t remainder = value2 % 10;
+            value2 /= 10;
+            doubleTo_stringOutput[size - index] = remainder + '0';
+            index++;
+        }
+    
 
     
 

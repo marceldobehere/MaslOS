@@ -61,7 +61,7 @@ void PrepareInterrupts()
     SetIDTGate((void*)GPFault_handler, 0xD, IDT_TA_InterruptGate, 0x08);
     SetIDTGate((void*)KeyboardInt_handler, 0x21, IDT_TA_InterruptGate, 0x08);
     SetIDTGate((void*)MouseInt_handler, 0x2C, IDT_TA_InterruptGate, 0x08);
-
+    SetIDTGate((void*)PITInt_handler, 0x20, IDT_TA_InterruptGate, 0x08);
     
 
     asm("lidt %0" : : "m" (idtr));
@@ -89,6 +89,8 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     InitializeHeap((void*)0x0000100000000000, 0x10);
 
+    PIT::InitPIT();
+
     PrepareInterrupts();
 
     InitPS2Mouse();
@@ -97,7 +99,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     initUsers();
 
-    outb(PIC1_DATA, 0b11111001);
+    outb(PIC1_DATA, 0b11111000);
     outb(PIC2_DATA, 0b11101111);
 
     asm ("sti");

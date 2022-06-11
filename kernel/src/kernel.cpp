@@ -7,25 +7,42 @@ extern "C" void _start(BootInfo* bootInfo)
 
     osData.kernelInfo = &kernelInfo;
     osData.exit = false;
-
-    //GlobalRenderer->delChar(0, 0);
- 
-    //Panic("Panic go brrrt"); 
-    //asm("int $0x0e");
    
     currentUser = &adminUser;
 
-    GlobalRenderer->Cls();
 
+    GlobalRenderer->Cls();
 
     GlobalRenderer->Println("Kernel Initialised Successfully!!", Colors.yellow);
 
+    GlobalRenderer->Println("TIME: {} s", to_string(PIT::TimeSinceBoot), Colors.bred);
+    GlobalRenderer->Println("TIME: {} ms", to_string((int)(PIT::TimeSinceBoot*1000)), Colors.bred);
+    GlobalRenderer->Println("DIV:  {}", to_string(PIT::Divisor), Colors.bred);
+    GlobalRenderer->Println("FREQ: {} Hz", to_string(PIT::freq), Colors.bred);
+
+    GlobalRenderer->Println();
+
+    for (int i = 0; i < 20; i++)
+    {
+        GlobalRenderer->Print("hoi! ");
+        PIT::Sleep(100);
+    }
+
+    GlobalRenderer->Println();
+    GlobalRenderer->Println();
+
+    GlobalRenderer->Println("TIME: {} s", to_string(PIT::TimeSinceBoot), Colors.bred);
+    GlobalRenderer->Println("TIME: {} ms", to_string((int)(PIT::TimeSinceBoot*1000)), Colors.bred);
+    GlobalRenderer->Println("DIV:  {}", to_string(PIT::Divisor), Colors.bred);
+    GlobalRenderer->Println("FREQ: {} Hz", to_string(PIT::freq), Colors.bred);
+
+    
 
     KeyboardPrintStart();
 
     while(!osData.exit)
     {
-        
+        asm("hlt");
     }
 
     GlobalRenderer->Clear(Colors.black);
@@ -33,6 +50,8 @@ extern "C" void _start(BootInfo* bootInfo)
     while(!osData.exit || true); 
 
 }
+
+
 
 
 /*
@@ -50,6 +69,74 @@ extern "C" void _start(BootInfo* bootInfo)
         GlobalRenderer->Println("This is a {0}! Also {2}+2={1}.", vars);
     }
 
+*/
+
+/*
+    //PIT::SetDivisor(65535);
+
+    //GlobalRenderer->delChar(0, 0);
+ 
+    //Panic("Panic go brrrt"); 
+    //asm("int $0x0e");
+
+*/
+
+/*
+    GlobalRenderer->Println("TIME: {} s", to_string(PIT::TimeSinceBoot), Colors.bred);
+    GlobalRenderer->Println("TIME: {} ms", to_string((int)(PIT::TimeSinceBoot*1000)), Colors.bred);
+    GlobalRenderer->Println("DIV:  {}", to_string(PIT::Divisor), Colors.bred);
+    GlobalRenderer->Println("FREQ: {} Hz", to_string(PIT::freq), Colors.bred);
+
+    GlobalRenderer->Println();
+
+    for (int i = 0; i < 20; i++)
+    {
+        GlobalRenderer->Print("hoi! ");
+        PIT::Sleep(100);
+    }
+
+    GlobalRenderer->Println();
+    GlobalRenderer->Println();
+
+    GlobalRenderer->Println("TIME: {} s", to_string(PIT::TimeSinceBoot), Colors.bred);
+    GlobalRenderer->Println("TIME: {} ms", to_string((int)(PIT::TimeSinceBoot*1000)), Colors.bred);
+    GlobalRenderer->Println("DIV:  {}", to_string(PIT::Divisor), Colors.bred);
+    GlobalRenderer->Println("FREQ: {} Hz", to_string(PIT::freq), Colors.bred);
+
+*/
+
+
+/*
+
+    GlobalRenderer->Println("TEST: {}", to_string(0.0), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(0.123), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(0.12345), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(10.0), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(10.123), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(10.12345), Colors.bred);
+    GlobalRenderer->Println();
+    GlobalRenderer->Println("TEST: {}", to_string(-0.0), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(-0.123), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(-0.12345), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(-10.0), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(-10.123), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(-10.12345), Colors.bred);
+    GlobalRenderer->Println();
+
+    GlobalRenderer->Println("TEST: {}", to_string(0.0, 4), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(0.123, 4), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(0.12345, 4), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(10.0, 4), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(10.123, 4), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(10.12345, 4), Colors.bred);
+    GlobalRenderer->Println();
+    GlobalRenderer->Println("TEST: {}", to_string(-0.0, 4), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(-0.123, 4), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(-0.12345, 4), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(-10.0, 4), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(-10.123, 4), Colors.bred);
+    GlobalRenderer->Println("TEST: {}", to_string(-10.12345, 4), Colors.bred);
+    GlobalRenderer->Println();
 */
 
 

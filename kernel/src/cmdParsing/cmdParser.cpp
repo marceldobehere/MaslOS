@@ -8,6 +8,7 @@
 #include "../userinput/keyboard.h"
 #include "../userinput/mouse.h"
 #include "../OSDATA/osdata.h"
+#include "../scheduling-pit/pit.h"
 
 void LogError(const char* msg)
 {
@@ -111,6 +112,53 @@ void ParseCommand(char* input, char* oldInput, OSUser** user)
     {
         if (data->len == 2)
             GlobalRenderer->Println(data->data[1]);
+        else
+            LogInvalidArgumentCount(1, data->len-1);
+        
+        free(data);
+        return;
+    }
+
+    if (StrEquals(data->data[0], "sleep"))
+    {
+        if (data->len == 2)
+        {
+            int64_t time = to_int(data->data[1]);
+            if (time > 0)
+            {
+                GlobalRenderer->Println("Sleeping for {} ms...", to_string(time), Colors.yellow);
+                //PIT::Sleep((uint64_t)time);
+                {
+
+    GlobalRenderer->Println("TIME: {} s", to_string(PIT::TimeSinceBoot), Colors.bred);
+    GlobalRenderer->Println("TIME: {} ms", to_string((int)(PIT::TimeSinceBoot*1000)), Colors.bred);
+    GlobalRenderer->Println("DIV:  {}", to_string(PIT::Divisor), Colors.bred);
+    GlobalRenderer->Println("FREQ: {} Hz", to_string(PIT::freq), Colors.bred);
+
+    GlobalRenderer->Println();
+
+    for (int i = 0; i < 20; i++)
+    {
+        GlobalRenderer->Print("hoi! ");
+        PIT::Sleep(100);
+    }
+
+    GlobalRenderer->Println();
+    GlobalRenderer->Println();
+
+    GlobalRenderer->Println("TIME: {} s", to_string(PIT::TimeSinceBoot), Colors.bred);
+    GlobalRenderer->Println("TIME: {} ms", to_string((int)(PIT::TimeSinceBoot*1000)), Colors.bred);
+    GlobalRenderer->Println("DIV:  {}", to_string(PIT::Divisor), Colors.bred);
+    GlobalRenderer->Println("FREQ: {} Hz", to_string(PIT::freq), Colors.bred);
+
+
+
+
+                }
+            }
+            else
+                LogError("You cannot sleep less than 0ms!");
+        }
         else
             LogInvalidArgumentCount(1, data->len-1);
         

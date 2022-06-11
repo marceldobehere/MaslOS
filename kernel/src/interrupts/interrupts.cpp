@@ -5,6 +5,7 @@
 #include "../userinput/mouse.h"
 #include "../panic.h"
 #include "../IO.h"
+#include "../scheduling-pit/pit.h"
 
 __attribute__((interrupt)) void PageFault_handler(struct interrupt_frame* frame)
 {
@@ -86,6 +87,12 @@ __attribute__((interrupt)) void MouseInt_handler(interrupt_frame* frame)
     HandlePS2Mouse(mousedata);
 
     PIC_EndSlave();
+}
+
+__attribute__((interrupt)) void PITInt_handler(interrupt_frame* frame)
+{ 
+    PIC_EndMaster();
+    PIT::Tick();
 }
 
 
