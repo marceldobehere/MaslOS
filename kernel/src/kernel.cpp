@@ -15,21 +15,8 @@ extern "C" void _start(BootInfo* bootInfo)
    
     currentUser = &adminUser;
 
-
     GlobalRenderer->Cls();
 
-    //GlobalRenderer->Println("TEST: {}", to_string(to_int("1024")), Colors.bblue);
-    //GlobalRenderer->Println("TEST: {}", to_string(to_int("-1024")), Colors.bblue);
-
-    {
-        dispVar vars[] = {dispVar("test"), dispVar(2), dispVar(0)};
-        GlobalRenderer->Println("This is a {0}! Also {2}+2={1}.", vars);
-    }
-
-    {
-        dispVar vars[] = {dispVar("cool thing"), dispVar(4), dispVar(2)};
-        GlobalRenderer->Println("This is a {0}! Also {2}+2={1}.", vars);
-    }
 
     GlobalRenderer->Println("Kernel Initialised Successfully!!", Colors.yellow);
 
@@ -46,6 +33,24 @@ extern "C" void _start(BootInfo* bootInfo)
     while(!osData.exit || true); 
 
 }
+
+
+/*
+
+    //GlobalRenderer->Println("TEST: {}", to_string(to_int("1024")), Colors.bblue);
+    //GlobalRenderer->Println("TEST: {}", to_string(to_int("-1024")), Colors.bblue);
+
+    {
+        dispVar vars[] = {dispVar("test"), dispVar(2), dispVar(0)};
+        GlobalRenderer->Println("This is a {0}! Also {2}+2={1}.", vars);
+    }
+
+    {
+        dispVar vars[] = {dispVar("cool thing"), dispVar(4), dispVar(2)};
+        GlobalRenderer->Println("This is a {0}! Also {2}+2={1}.", vars);
+    }
+
+*/
 
 
 /*
