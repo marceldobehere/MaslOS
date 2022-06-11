@@ -1,11 +1,11 @@
 #pragma once
 #include "stdint.h"
+#include "../WindowStuff/Window/window.h"
 
 template <typename T> class Array
 {
     private:
     T* arr;
-    T def = T();
     bool freed;
     uint64_t size;
 
@@ -21,3 +21,4 @@ template <typename T> class Array
 };
 
 template class Array<int>;
+template class Array<Window*>;

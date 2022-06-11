@@ -8,28 +8,40 @@ HeapSegHdr* lastHdr;
 
 void HeapSegHdr::CombineForward()
 {
+    //GlobalRenderer->Print("B");
+    //GlobalRenderer->Print("[{}]", ConvertHexToString((uint64_t)this), Colors.yellow);
     if (next == NULL)
         return;
+    //GlobalRenderer->Print("[{}]", ConvertHexToString((uint64_t)next), Colors.yellow);
     if (!next->free)
         return;
+    //GlobalRenderer->Print("B2");
     
+    //GlobalRenderer->Print("<");
     if (next == lastHdr) 
         lastHdr = this;
-
+    //GlobalRenderer->Print("-");
     if (next->next != NULL)
     {
         next->next->last = this;
     }
-
+    //GlobalRenderer->Print("-");
     length = length + next->length + sizeof(HeapSegHdr);
-
+    //GlobalRenderer->Print("-");
     next = next->next;
+    //GlobalRenderer->Print(">");
 }
 
 void HeapSegHdr::CombineBackward()
 {
-    if (last != NULL && last->free)
-        last->CombineForward();
+    //GlobalRenderer->Print("C");
+    if (last != NULL)
+        if (last->free)
+            {
+                //GlobalRenderer->Print("<");
+                last->CombineForward();
+                //GlobalRenderer->Print(">");
+            }
 }
 
 HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
@@ -132,10 +144,14 @@ void* malloc(size_t size)
 
 void free(void* address)
 {
-    HeapSegHdr* segment = (HeapSegHdr*)((uint64_t)address - sizeof(HeapSegHdr));
+    HeapSegHdr* segment = (HeapSegHdr*)address - 1;
     segment->free = true;
+    //GlobalRenderer->Print("A");
+    //GlobalRenderer->Print("<");
     segment->CombineForward();
+    //GlobalRenderer->Print("-");
     segment->CombineBackward();
+    //GlobalRenderer->Print(">");
 }
 
 void* _malloc(size_t size)

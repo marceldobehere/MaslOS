@@ -318,11 +318,15 @@ void BasicRenderer::Print(const char* chrs, dispVar vars[])
             if (chrs[index] == '}')
             {
                 char* sub = StrSubstr(chrs, start+1, index-(start+1));
+                //GlobalRenderer->Print("[{}]", to_string(index-(start+1)), Colors.yellow);
                 //GlobalRenderer->Print("<");
                 //GlobalRenderer->Print(sub);
                 //GlobalRenderer->Print(">");
                 uint64_t indx = to_int(sub);
+                //GlobalRenderer->Print("[{}]", to_string(indx), Colors.yellow);
                 free(sub);
+                //GlobalRenderer->Print("[{}]", to_string(indx), Colors.yellow);
+                
                 if (chrs[index] == '}')
                 {
                     PrintArg(vars[indx]);
@@ -385,4 +389,15 @@ void BasicRenderer::Print(const char* chrs, dispVar vars[])
 
         index++;
     }
+}
+
+
+
+BasicRenderer::BasicRenderer(Framebuffer* framebuffer, PSF1_FONT* psf1_font)
+
+{
+    color = 0xffffffff;
+    CursorPosition = {0, 0};
+    this->framebuffer = framebuffer;
+    this->psf1_font = psf1_font;
 }

@@ -1,8 +1,0 @@
-#pragma once
-
-class TerminalInstance
-{
-
-
-
-};

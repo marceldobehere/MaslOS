@@ -20,18 +20,20 @@ char* StrCopy(const char* og)
     int size = 0;
     for (int i = 0; og[i] != 0; i++)
         size++;
-    char* newStr = (char*)malloc(size);
+    char* newStr = (char*)malloc(size + 1);
 
     for (int i = 0; og[i] != 0; i++)
         newStr[i] = og[i];
+    newStr[size] = 0;
     return newStr;
 }
 
 char* StrSubstr(const char* og, int index, int len)
 {
-    char* newStr = (char*)malloc(len);
+    char* newStr = (char*)malloc(len + 1);
     for (int i = 0; i < len; i++)
         newStr[i] = og[i+index];
+    newStr[len] = 0;
     return newStr;
 }
 

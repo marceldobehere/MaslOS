@@ -72,7 +72,7 @@ void PrepareInterrupts()
 
 
 
-BasicRenderer r = BasicRenderer(NULL, NULL);
+BasicRenderer r = *((BasicRenderer*)NULL);
 KernelInfo InitializeKernel(BootInfo* bootInfo)
 {
     r = BasicRenderer(bootInfo->framebuffer, bootInfo->psf1_font);

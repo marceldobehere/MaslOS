@@ -50,13 +50,7 @@ class BasicRenderer
         void Cls();
 
 
-        BasicRenderer(Framebuffer* framebuffer, PSF1_FONT* psf1_font)
-        {
-            color = 0xffffffff;
-            CursorPosition = {0, 0};
-            this->framebuffer = framebuffer;
-            this->psf1_font = psf1_font;
-        }
+        BasicRenderer(Framebuffer* framebuffer, PSF1_FONT* psf1_font);
 
         
 };

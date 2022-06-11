@@ -70,7 +70,7 @@ template <typename T> void List<T>::add(T item)
 template <typename T> void List<T>::clear()
 {
     for (uint64_t i = 0; i < count; i++)
-        arr[i] = T();
+        arr[i] = *((T*)NULL);
 
     count = 0;
 }
@@ -84,7 +84,7 @@ template <typename T> void List<T>::removeAt(uint64_t index)
     {
         arr[i - 1] = arr[i];
     }
-    arr[count] = T();
+    arr[count] = *((T*)NULL);
 
     count--;
 }

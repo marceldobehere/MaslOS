@@ -5,49 +5,131 @@ extern "C" void _start(BootInfo* bootInfo)
     KernelInfo kernelInfo = InitializeKernel(bootInfo);
     PageTableManager* pageTableManager = kernelInfo.pageTableManager;
 
-    osData.kernelInfo = &kernelInfo;
-    osData.exit = false;
-   
     currentUser = &adminUser;
 
+    osData.kernelInfo = &kernelInfo;
+    osData.exit = false;
+    osData.windows = List<Window*>();
 
     GlobalRenderer->Cls();
 
-    GlobalRenderer->Println("Kernel Initialised Successfully!!", Colors.yellow);
+    GlobalRenderer->Println("Kernel Initialised Successfully!", Colors.yellow);
 
-    GlobalRenderer->Println("TIME: {} s", to_string(PIT::TimeSinceBoot), Colors.bred);
-    GlobalRenderer->Println("TIME: {} ms", to_string((int)(PIT::TimeSinceBoot*1000)), Colors.bred);
-    GlobalRenderer->Println("DIV:  {}", to_string(PIT::Divisor), Colors.bred);
-    GlobalRenderer->Println("FREQ: {} Hz", to_string(PIT::freq), Colors.bred);
 
-    GlobalRenderer->Println();
+    // GlobalRenderer->Print("Memory Size: ");
+    // GlobalRenderer->Print(to_string(GetMemorySize(bootInfo->mMap, (bootInfo->mMapSize / bootInfo->mMapDescSize), bootInfo->mMapDescSize)));
+    // GlobalRenderer->Println(" Bytes.");
+    // GlobalRenderer->Println();
 
-    for (int i = 0; i < 20; i++)
+
+    // GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
+    // GlobalRenderer->Println("");
+
+    Window* mainWindow;
     {
-        GlobalRenderer->Print("hoi! ");
-        PIT::Sleep(100);
+        mainWindow = (Window*)malloc(sizeof(Window));
+        TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
+        *terminal = TerminalInstance(currentUser);
+        *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(0, 0), GlobalRenderer->framebuffer);
+        osData.windows.add(mainWindow);
+
+        //GlobalRenderer->Println("ADDR Window:   {}", ConvertHexToString((uint64_t)window), Colors.bgreen);
+        //GlobalRenderer->Println("ADDR Terminal: {}", ConvertHexToString((uint64_t)terminal), Colors.bgreen);
+        activeWindow = mainWindow;
     }
 
-    GlobalRenderer->Println();
-    GlobalRenderer->Println();
 
-    GlobalRenderer->Println("TIME: {} s", to_string(PIT::TimeSinceBoot), Colors.bred);
-    GlobalRenderer->Println("TIME: {} ms", to_string((int)(PIT::TimeSinceBoot*1000)), Colors.bred);
-    GlobalRenderer->Println("DIV:  {}", to_string(PIT::Divisor), Colors.bred);
-    GlobalRenderer->Println("FREQ: {} Hz", to_string(PIT::freq), Colors.bred);
+    {
+        Window* window = (Window*)malloc(sizeof(Window));
+        TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
+        *terminal = TerminalInstance(currentUser);
+        *(window) = Window((DefaultInstance*)terminal, Size(480, 360), Position(100, 20), GlobalRenderer->framebuffer);
+        osData.windows.add(window);
 
+        //GlobalRenderer->Println("ADDR Window:   {}", ConvertHexToString((uint64_t)window), Colors.bgreen);
+        //GlobalRenderer->Println("ADDR Terminal: {}", ConvertHexToString((uint64_t)terminal), Colors.bgreen);
+    }
+
+
+    {
+        Window* window = (Window*)malloc(sizeof(Window));
+        TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
+        *terminal = TerminalInstance(currentUser);
+        *(window) = Window((DefaultInstance*)terminal, Size(480, 360), Position(400, 60), GlobalRenderer->framebuffer);
+        osData.windows.add(window);
+    }
+
+
+    //GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
+    //GlobalRenderer->Println("");
+    //GlobalRenderer->Println("");
+
+    // {
+    //     dispVar vars[] = 
+    //     {
+    //         dispVar((uint64_t)GlobalRenderer->framebuffer->Width), 
+    //         dispVar((uint64_t)GlobalRenderer->framebuffer->PixelsPerScanLine),
+    //         dispVar((uint64_t)GlobalRenderer->framebuffer->Height), 
+    //         dispVar((uint64_t)(GlobalRenderer->framebuffer->Width*GlobalRenderer->framebuffer->Height)), 
+    //         dispVar((uint64_t)GlobalRenderer->framebuffer->BufferSize), 
+    //     };
+    //     GlobalRenderer->Println("Width:  {0}, PPS: {1}.", vars);
+    //     GlobalRenderer->Println("Height: {2}.", vars);
+    //     GlobalRenderer->Println("H * W:  {3}.", vars);
+    //     GlobalRenderer->Println("Size:   {4}.", vars);
+    //     GlobalRenderer->Println();
+    // }
+    
+    // {
+    //     Window* window = osData.windows[0];
+    //     dispVar vars[] = 
+    //     {
+    //         dispVar((uint64_t)window->framebuffer->Width), 
+    //         dispVar((uint64_t)window->framebuffer->PixelsPerScanLine),
+    //         dispVar((uint64_t)window->framebuffer->Height), 
+    //         dispVar((uint64_t)(window->framebuffer->Width * window->framebuffer->Height)), 
+    //         dispVar((uint64_t)window->framebuffer->BufferSize), 
+    //     };
+    //     GlobalRenderer->Println("Width:  {0}, PPS: {1}.", vars);
+    //     GlobalRenderer->Println("Height: {2}.", vars);
+    //     GlobalRenderer->Println("H * W:  {3}.", vars);
+    //     GlobalRenderer->Println("Size:   {4}.", vars);
+    //     GlobalRenderer->Println();
+    // }
+
+    // osData.windows[0]->renderer->Clear(Colors.blue);
+    // osData.windows[0]->renderer->color = Colors.white;
+    // osData.windows[0]->renderer->Println("Hello, world!");
+    // osData.windows[0]->Render();
+
+    osData.windows[1]->renderer->Clear(Colors.blue);
+    osData.windows[1]->renderer->color = Colors.white;
+    osData.windows[1]->renderer->Println("Hello, world!");
+    osData.windows[1]->Render();
+
+    osData.windows[2]->renderer->Clear(Colors.green);
+    osData.windows[2]->renderer->color = Colors.white;
+    osData.windows[2]->renderer->Println("Hello, world!");
+    osData.windows[2]->Render();
     
 
     KeyboardPrintStart();
 
     while(!osData.exit)
     {
-        asm("hlt");
+        GlobalRenderer->Clear(Colors.black);
+
+        for (int i = 1; i < osData.windows.getCount(); i++)
+            osData.windows[i]->Render();
+
+        PIT::Sleep(1000);
+        //asm("hlt");
     }
 
     GlobalRenderer->Clear(Colors.black);
+    GlobalRenderer->color = Colors.white;
     GlobalRenderer->Println("Goodbye.");
-    while(!osData.exit || true); 
+    PIT::Sleep(1000);
 
 }
 

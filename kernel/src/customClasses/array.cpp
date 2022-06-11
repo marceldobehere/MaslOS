@@ -19,7 +19,7 @@ template <typename T> void Array<T>::reInit(uint64_t size)
 template <typename T> T& Array<T>::operator[](uint64_t index)
 {
     if (index >= this->size)
-        return this->def;
+        return *((T*)NULL);
 
     return arr[index];
 }

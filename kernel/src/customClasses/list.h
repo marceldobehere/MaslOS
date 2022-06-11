@@ -2,6 +2,7 @@
 #include "stdint.h"
 #include "array.h"
 
+
 template <typename T> class List
 {
     private:
@@ -26,6 +27,7 @@ template <typename T> class List
 };
 
 template class List<int>;
+template class List<Window*>;
 
 /*
 template <typename T> class Array
