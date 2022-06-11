@@ -5,7 +5,7 @@
 #include "Framebuffer.h"
 #include "S-Font.h"
 #include <stdint.h> 
-
+#include "dispTypes/dispTypes.h"
 
 class BasicRenderer
 {
@@ -34,7 +34,10 @@ class BasicRenderer
         void Println(const char* chrs);
         void Print(const char* chrs, const char* var);
         void Println(const char* chrs, const char* var);
-        
+
+        void Print(const char* chrs, dispVar vars[]); 
+        void Println(const char* chrs, dispVar vars[]);
+        void PrintArg(dispVar var);
 
         void Print(const char* chrs, uint32_t col);
         void Println(const char* chrs, uint32_t col);

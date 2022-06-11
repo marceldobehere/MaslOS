@@ -9,6 +9,7 @@
 
 bool lshift = false;
 bool rshift = false;
+char lastUserData[256];
 char userData[256];
 int userLen = 0;
 bool allowArrows = false;
@@ -20,6 +21,7 @@ void ClearInput()
 {
     for (int i = 0; i < 256; i++)
     {
+        lastUserData[i] = userData[i];
         userData[i] = 0;
     }
     userLen = 0;
@@ -30,7 +32,7 @@ void HandleEnter()
 {
     if (userLen > 0)
     {
-        ParseCommand(userData, currentUser);
+        ParseCommand(userData, lastUserData, &currentUser);
         //GlobalRenderer->Print("> ");
         //GlobalRenderer->Println(userData);
     }
@@ -123,7 +125,14 @@ void HandleKeyboard(uint8_t scancode)
 
         if (ascii != 0)
         {
-            GlobalRenderer->Print(ascii);
+            
+            if (currentUser->mode == commandMode::none)
+                GlobalRenderer->Print(ascii);
+            else if (currentUser->mode == commandMode::enterText)
+                GlobalRenderer->Print(ascii);
+            else if (currentUser->mode == commandMode::enterPassword)
+                GlobalRenderer->Print("*");
+
             if (userLen < 255)
             {
                 userData[userLen] = ascii;

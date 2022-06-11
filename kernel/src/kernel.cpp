@@ -16,11 +16,22 @@ extern "C" void _start(BootInfo* bootInfo)
     currentUser = &adminUser;
 
 
-
     GlobalRenderer->Cls();
 
-    GlobalRenderer->Println("Kernel Initialised Successfully!!", Colors.yellow);
+    //GlobalRenderer->Println("TEST: {}", to_string(to_int("1024")), Colors.bblue);
+    //GlobalRenderer->Println("TEST: {}", to_string(to_int("-1024")), Colors.bblue);
 
+    {
+        dispVar vars[] = {dispVar("test"), dispVar(2), dispVar(0)};
+        GlobalRenderer->Println("This is a {0}! Also {2}+2={1}.", vars);
+    }
+
+    {
+        dispVar vars[] = {dispVar("cool thing"), dispVar(4), dispVar(2)};
+        GlobalRenderer->Println("This is a {0}! Also {2}+2={1}.", vars);
+    }
+
+    GlobalRenderer->Println("Kernel Initialised Successfully!!", Colors.yellow);
 
 
     KeyboardPrintStart();
@@ -36,6 +47,145 @@ extern "C" void _start(BootInfo* bootInfo)
 
 }
 
+
+/*
+
+
+
+
+
+    Array<int> arr = Array<int>(10);
+
+    arr[0] = 5; 
+    GlobalRenderer->Println("ARR 1:");
+    GlobalRenderer->Println("Size:  {}", to_string(arr.getSize()), Colors.silver);
+    GlobalRenderer->Println("Value: {}", to_string((uint64_t)arr[0]), Colors.silver);
+    GlobalRenderer->Println("Value: {}", to_string((uint64_t)arr[2]), Colors.silver);
+    GlobalRenderer->Println();
+
+
+    arr.free();
+
+    List<int> list = List<int>();
+    GlobalRenderer->Println("Size:  {}", to_string(list.getCount()), Colors.silver);
+    GlobalRenderer->Println("Cap:   {}", to_string(list.getCapacity()), Colors.silver);
+    
+    GlobalRenderer->Println("Items:", Colors.silver);
+    for (uint64_t i = 0; i < list.getCount(); i++)
+        GlobalRenderer->Println(" - {}", to_string(list[i]), Colors.silver);
+    GlobalRenderer->Println();
+
+    list.add(10);
+    list.add(20);
+    list.add(5);
+    list.add(8);
+    list.add(99);
+    list.add(1000);
+    list.add(1);
+    list.add(151);
+    list.add(7);
+
+
+    GlobalRenderer->Println("Size:  {}", to_string(list.getCount()), Colors.silver);
+    GlobalRenderer->Println("Cap:   {}", to_string(list.getCapacity()), Colors.silver);
+
+    GlobalRenderer->Println("Items:", Colors.silver);
+    for (uint64_t i = 0; i < list.getCount(); i++)
+        GlobalRenderer->Println(" - {}", to_string(list[i]), Colors.silver);
+    GlobalRenderer->Println();
+
+    list[3] = 1000000;
+
+
+    list.removeAt(4);
+
+
+
+    GlobalRenderer->Println("Size:  {}", to_string(list.getCount()), Colors.silver);
+    GlobalRenderer->Println("Cap:   {}", to_string(list.getCapacity()), Colors.silver);
+
+    GlobalRenderer->Println("Items:", Colors.silver);
+    for (uint64_t i = 0; i < list.getCount(); i++)
+        GlobalRenderer->Println(" - {}", to_string(list[i]), Colors.silver);
+    GlobalRenderer->Println();
+    GlobalRenderer->Println();
+
+    List<int> list2 = list.clone();
+    list.clear();
+
+    GlobalRenderer->Println("Size:  {}", to_string(list.getCount()), Colors.silver);
+    GlobalRenderer->Println("Cap:   {}", to_string(list.getCapacity()), Colors.silver);
+
+    GlobalRenderer->Println("Items:", Colors.silver);
+    for (uint64_t i = 0; i < list.getCount(); i++)
+        GlobalRenderer->Println(" - {}", to_string(list[i]), Colors.silver);
+    GlobalRenderer->Println();
+    GlobalRenderer->Println();
+
+
+    GlobalRenderer->Println("Size:  {}", to_string(list2.getCount()), Colors.silver);
+    GlobalRenderer->Println("Cap:   {}", to_string(list2.getCapacity()), Colors.silver);
+
+    GlobalRenderer->Println("Items:", Colors.silver);
+    for (uint64_t i = 0; i < list2.getCount(); i++)
+        GlobalRenderer->Println(" - {}", to_string(list2[i]), Colors.silver);
+    GlobalRenderer->Println();
+
+
+*/
+
+
+/*
+
+    Array<int> arr = Array<int>(10);
+
+    arr[0] = 5;
+    GlobalRenderer->Println("ARR 1:");
+    GlobalRenderer->Println("Size:  {}", to_string(arr.size), Colors.silver);
+    GlobalRenderer->Println("Value: {}", to_string((uint64_t)arr[0]), Colors.silver);
+    GlobalRenderer->Println("Value: {}", to_string((uint64_t)arr[2]), Colors.silver);
+    GlobalRenderer->Println("Freed: {}", to_string(arr.freed), Colors.silver);
+    GlobalRenderer->Println();
+
+    // arr.free();
+    
+    // GlobalRenderer->Println("Size:  {}", to_string(arr.size), Colors.silver);
+    // GlobalRenderer->Println("Value: {}", to_string((uint64_t)arr[0]), Colors.silver);
+    // GlobalRenderer->Println("Value: {}", to_string((uint64_t)arr[2]), Colors.silver);
+    // GlobalRenderer->Println("Value: {}", to_string((uint64_t)arr[11]), Colors.silver);
+    // GlobalRenderer->Println("Freed: {}", to_string(arr.freed), Colors.silver);
+
+    Array<int> arr2 = arr.clone();
+
+    arr[0] = 15;
+    GlobalRenderer->Println("ARR 1:");
+    GlobalRenderer->Println("Size:  {}", to_string(arr.size), Colors.silver);
+    GlobalRenderer->Println("Value: {}", to_string((uint64_t)arr[0]), Colors.silver);
+    GlobalRenderer->Println("Value: {}", to_string((uint64_t)arr[2]), Colors.silver);
+    GlobalRenderer->Println("Freed: {}", to_string(arr.freed), Colors.silver);
+
+    GlobalRenderer->Println("ARR 2:");
+    GlobalRenderer->Println("Size:  {}", to_string(arr2.size), Colors.silver);
+    GlobalRenderer->Println("Value: {}", to_string((uint64_t)arr2[0]), Colors.silver);
+    GlobalRenderer->Println("Value: {}", to_string((uint64_t)arr2[2]), Colors.silver);
+    GlobalRenderer->Println("Freed: {}", to_string(arr2.freed), Colors.silver);
+    GlobalRenderer->Println();
+
+    arr.free();
+
+    GlobalRenderer->Println("ARR 1:");
+    GlobalRenderer->Println("Size:  {}", to_string(arr.size), Colors.silver);
+    GlobalRenderer->Println("Value: {}", to_string((uint64_t)arr[0]), Colors.silver);
+    GlobalRenderer->Println("Value: {}", to_string((uint64_t)arr[2]), Colors.silver);
+    GlobalRenderer->Println("Freed: {}", to_string(arr.freed), Colors.silver);
+
+    GlobalRenderer->Println("ARR 2:");
+    GlobalRenderer->Println("Size:  {}", to_string(arr2.size), Colors.silver);
+    GlobalRenderer->Println("Value: {}", to_string((uint64_t)arr2[0]), Colors.silver);
+    GlobalRenderer->Println("Value: {}", to_string((uint64_t)arr2[2]), Colors.silver);
+    GlobalRenderer->Println("Freed: {}", to_string(arr2.freed), Colors.silver);
+    GlobalRenderer->Println();
+*/
 
 
 /*

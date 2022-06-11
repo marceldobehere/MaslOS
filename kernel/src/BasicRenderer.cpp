@@ -3,6 +3,8 @@
 #include "cstr.h"
 #include <stdint.h>
 #include "Cols.h"
+#include "cmdParsing/cstrTools.h"
+#include "memory/heap.h"
 
 BasicRenderer *GlobalRenderer;
 
@@ -256,4 +258,131 @@ void BasicRenderer::Cls()
     BasicRenderer::Println("Masl OS v0.06", Colors.green);
     BasicRenderer::Println("-------------", Colors.green);
     BasicRenderer::Println();
+}
+
+
+
+void BasicRenderer::Println(const char* chrs, dispVar vars[])
+{
+    Print(chrs, vars);
+    Println();
+}
+ 
+ 
+
+void BasicRenderer::PrintArg(dispVar var)
+{
+    const char* toPrint = "<IDK>";
+    if (var.type == varType::_bool)
+        toPrint = to_string(var._bool);
+    else if (var.type == varType::_int)
+        toPrint = to_string(var._int);
+    else if (var.type == varType::_int64)
+        toPrint = to_string(var._int64);
+    else if (var.type == varType::_uint64)
+        toPrint = to_string(var._uint64);
+    else if (var.type == varType::_double)
+        toPrint = to_string(var._double);
+    else if (var.type == varType::_charPointer)
+        toPrint = var._charPointer;
+
+    GlobalRenderer->Print(toPrint);
+}
+
+
+void BasicRenderer::Print(const char* chrs, dispVar vars[])
+{
+    bool allowEscape = true;
+    unsigned int index = 0;
+    while (chrs[index] != 0)
+    {
+        if (CursorPosition.x >= framebuffer->Width)
+        {
+            CursorPosition.x = 0;
+            CursorPosition.y += 16;
+        }
+
+        if (chrs[index] == '\n')
+        {
+            CursorPosition.y += 16;
+        }
+        else if (chrs[index] == '\r')
+        {
+            CursorPosition.x = 0;
+        }
+        else if (chrs[index] == '{' && allowEscape && vars != NULL)
+        {
+            uint64_t start = index;
+            while (chrs[index] != 0 && chrs[index] != '}')
+                index++;
+            if (chrs[index] == '}')
+            {
+                char* sub = StrSubstr(chrs, start+1, index-(start+1));
+                //GlobalRenderer->Print("<");
+                //GlobalRenderer->Print(sub);
+                //GlobalRenderer->Print(">");
+                uint64_t indx = to_int(sub);
+                free(sub);
+                if (chrs[index] == '}')
+                {
+                    PrintArg(vars[indx]);
+                    index++;
+                }
+            }
+            index--;
+        }
+        else if (chrs[index] == '\\' && allowEscape)
+        {
+            if (chrs[index + 1] == '\\')
+            {
+                index++;
+                putChar(chrs[index], CursorPosition.x, CursorPosition.y);
+                CursorPosition.x += 8;
+            }
+            else if (chrs[index + 1] == '%')
+            {
+                index++;
+                putChar('%', CursorPosition.x, CursorPosition.y);
+                CursorPosition.x += 8;
+            }
+            else if (chrs[index + 1] == '{')
+            {
+                index++;
+                putChar('{', CursorPosition.x, CursorPosition.y);
+                CursorPosition.x += 8;
+            }
+            else if (chrs[index + 1] == '}')
+            {
+                index++;
+                putChar('{', CursorPosition.x, CursorPosition.y);
+                CursorPosition.x += 8;
+            }
+            else if (chrs[index + 1] == 'C')
+            {
+                index++;
+                if (chrs[index + 1] == 0 || chrs[index + 2] == 0 || chrs[index + 3] == 0 || chrs[index + 4] == 0 || chrs[index + 5] == 0 || chrs[index + 6] == 0)
+                {
+                    putChar('?', CursorPosition.x, CursorPosition.y);
+                }
+                else
+                {
+                    index++;
+                    color = ConvertStringToHex(&chrs[index]);
+                    index += 5;
+                }
+            }
+            else
+            {
+                putChar(chrs[index], CursorPosition.x, CursorPosition.y);
+                CursorPosition.x += 8;
+            }
+        }
+        else
+        {
+            putChar(chrs[index], CursorPosition.x, CursorPosition.y);
+            CursorPosition.x += 8;
+        }
+
+        index++;
+    }
 }

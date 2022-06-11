@@ -6,10 +6,15 @@ const char* to_string(uint64_t value);
 
 const char* to_string(int64_t value);
 
+const char* to_string(int value);
 
 const char* to_string(double value, uint8_t places);
 
 const char* to_string(double value);
+
+const char* to_string(bool value);
+
+int64_t to_int(const char* string);
 
 unsigned int ConvertStringToHex(const char* data);
 

@@ -138,6 +138,16 @@ void free(void* address)
     segment->CombineBackward();
 }
 
+void* _malloc(size_t size)
+{
+    return malloc(size);
+}
+
+void _free(void* address)
+{
+    free(address);
+}
+
 void ExpandHeap(size_t length)
 {
     if (length % 0x1000)

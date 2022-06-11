@@ -28,7 +28,7 @@ void LogInvalidArgumentCount(int expected, int found)
 
 
 
-void ParseCommand(char* input, OSUser* user)
+void ParseCommand(char* input, char* oldInput, OSUser** user)
 {
     //GlobalRenderer->Println("This is test out!");
     if (StrEquals(input, "cls"))
@@ -52,7 +52,50 @@ void ParseCommand(char* input, OSUser* user)
 
     //return;
 
-    StringArrData* data = SplitLine(input);
+    StringArrData* data = SplitLine(oldInput);
+
+    if (StrEquals(data->data[0], "login") && (*user)->mode == commandMode::enterPassword)
+    {
+        (*user)->mode = commandMode::none;
+        StringArrData* data2 = SplitLine(input);
+        if (data->len == 2)
+        {
+            if (data2->len == 1)
+                login(data->data[1], data2->data[0], user);
+            else
+                LogError("Password can only be one Argument long!");
+        }
+        
+        free(data);
+        free(data2);
+        return;
+    }
+
+    if (StrEquals(data->data[0], "set") && (*user)->mode == commandMode::enterPassword)
+    {
+        (*user)->mode = commandMode::none;
+        StringArrData* data2 = SplitLine(input);
+        if (data->len == 2 || data->len == 3)
+        {
+            if (StrEquals(data->data[1], "password"))
+            {
+                if (data2->len == 1)
+                {
+                    (*user)->password = StrCopy(data2->data[0]);
+                    //GlobalRenderer->Println("Password is now \"{}\".", (*user)->password, Colors.yellow);
+                }
+                else
+                    LogError("Password can only be one Argument long!");
+            }
+        }
+        
+        free(data);
+        free(data2);
+        return;
+    }
+
+    free(data);
+    data = SplitLine(input);
 
     if (data->len == 0)
     {
@@ -79,6 +122,8 @@ void ParseCommand(char* input, OSUser* user)
     {
         if (data->len == 3)
             SetCmd(data->data[1], data->data[2], user);
+        else if (data->len == 2 && StrEquals(data->data[1], "password"))
+            SetCmd(data->data[1], "", user);
         else
             LogInvalidArgumentCount(2, data->len-1);
         
@@ -89,7 +134,19 @@ void ParseCommand(char* input, OSUser* user)
     if (StrEquals(data->data[0], "get"))
     {
         if (data->len == 2)
-            GetCmd(data->data[1], user);
+            GetCmd(data->data[1], *user);
+        else
+            LogInvalidArgumentCount(1, data->len-1);
+        
+        free(data);
+        return;
+    }
+
+
+    if (StrEquals(data->data[0], "login"))
+    {
+        if (data->len == 2)
+            login(data->data[1], user);
         else
             LogInvalidArgumentCount(1, data->len-1);
         
@@ -103,14 +160,48 @@ void ParseCommand(char* input, OSUser* user)
     return;
 }
 
+void login(const char* name, OSUser** user)
+{
+    OSUser* usr = getUser(name);
+    if (usr == 0)
+    {
+        LogError("User \"{}\" was not found!", name);
+        return;
+    }
 
-void SetCmd(const char* name, const char* val, OSUser* user)
+    if (StrEquals(usr->password, ""))
+        *user = usr;
+    else
+    {
+        GlobalRenderer->Println("Please enter the password down below:");
+        (*user)->mode = commandMode::enterPassword;
+    }
+}
+
+void login(const char* name, const char* pass, OSUser** user)
+{
+    (*user)->mode = commandMode::none;
+
+    OSUser* usr = getUser(name);
+    if (usr == 0)
+    {
+        LogError("User \"{}\" was not found!", name);
+        return;
+    }
+
+    if (StrEquals(usr->password, pass))
+        *user = usr;
+    else
+        LogError("Password is incorrect!", name); 
+}
+
+void SetCmd(const char* name, const char* val, OSUser** user)
 {
     if (StrEquals(name, "user color"))
     {
         ParsedColData data = ParseColor(val);
         if (data.parseSuccess)
-            user->colData.userColor = data.col;
+            (*user)->colData.userColor = data.col;
         else
             LogError("Color \"{}\" could not be Parsed!", val);
     }
@@ -124,7 +215,12 @@ void SetCmd(const char* name, const char* val, OSUser* user)
     }
     else if (StrEquals(name, "username"))
     {
-        user->userName = StrCopy(val);
+        (*user)->userName = StrCopy(val);
+    }
+    else if (StrEquals(name, "password"))
+    {
+        (*user)->mode = commandMode::enterPassword;
+        GlobalRenderer->Println("Please enter the new password down below:");
     }
     else if (StrEquals(name, "mouse color front"))
     {
@@ -147,6 +243,8 @@ void SetCmd(const char* name, const char* val, OSUser* user)
         LogError("Parameter \"{}\" does not exist.", name);
     }
 }
+
+
 
 void GetCmd(const char* name, OSUser* user)
 {
