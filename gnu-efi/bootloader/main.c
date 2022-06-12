@@ -113,45 +113,58 @@ PSF1_FONT* LoadPSF1Font(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandl
 ImageFile* LoadImage(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable)
 {
 	return NULL;
-	// 	EFI_FILE* img = LoadFile(Directory, Path, ImageHandle, SystemTable);
-
-	// 	if (font == NULL)
-	// 		return NULL;
-
-	// 	ImageFile* image;
-	// 	SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(ImageFile), (void**)&image);
-		
-	// 	PSF1_HEADER* fontHeader;
-	// 	SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(PSF1_HEADER), (void**)&fontHeader);
-		
-	// 	UINTN size = sizeof(PSF1_HEADER);
-	// 	font->Read(font, &size, fontHeader);
-
-	// 	if (fontHeader->magic[0] != PSF1_MAGIC0 || fontHeader->magic[1] != PSF1_MAGIC1)
-	// 		return NULL;
-		
-	// 	UINTN glyphBufferSize = fontHeader->charsize * 256;
-
-	// 	if (fontHeader->mode == 1)
-	// 		glyphBufferSize *= 2;
-		
-	// 	void* glyphBuffer;
-	// 	{
-	// 		font->SetPosition(font, sizeof(PSF1_HEADER));
-	// 		SystemTable->BootServices->AllocatePool(EfiLoaderData, glyphBufferSize, (void**)&glyphBuffer);
-	// 		font->Read(font, &glyphBufferSize, glyphBuffer);
-
-	// 	}
-
-	// 	// PSF1_FONT* finishedFont;
-	// 	// SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(PSF1_FONT), (void**)&finishedFont);
-	// 	// finishedFont->psf1_Header = fontHeader;
-	// 	// finishedFont->glyphBuffer = glyphBuffer;
-
-		
+	EFI_FILE* img = LoadFile(Directory, Path, ImageHandle, SystemTable);
 
 
-		//return image;
+	if (img == NULL)
+		return NULL;
+
+	ImageFile* image;
+	SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(ImageFile), (void**)&image);
+	
+	// PSF1_HEADER* fontHeader;
+	// SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(PSF1_HEADER), (void**)&fontHeader);
+	
+	UINTN size = sizeof(3 * 4);
+	int32_t arr[3] = {0, 0, 0};
+	img->Read(img, &size, arr);
+
+	Print(L"Image:");
+	Print(L" - Width:  %d\n\r", arr[0]);
+	Print(L" - Height: %d\n\r", arr[1]);
+	Print(L" - Size:   %d\n\r", arr[2]);
+
+	image->width = arr[0];
+	image->height = arr[1];
+	
+
+	return image;
+
+	// if (fontHeader->magic[0] != PSF1_MAGIC0 || fontHeader->magic[1] != PSF1_MAGIC1)
+	// 	return NULL;
+	
+	// UINTN glyphBufferSize = fontHeader->charsize * 256;
+
+	// if (fontHeader->mode == 1)
+	// 	glyphBufferSize *= 2;
+	
+	// void* glyphBuffer;
+	// {
+	// 	font->SetPosition(font, sizeof(PSF1_HEADER));
+	// 	SystemTable->BootServices->AllocatePool(EfiLoaderData, glyphBufferSize, (void**)&glyphBuffer);
+	// 	font->Read(font, &glyphBufferSize, glyphBuffer);
+
+	// }
+
+	// // PSF1_FONT* finishedFont;
+	// // SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(PSF1_FONT), (void**)&finishedFont);
+	// // finishedFont->psf1_Header = fontHeader;
+	// // finishedFont->glyphBuffer = glyphBuffer;
+
+	
+
+
+	// return image;
 	}
 
 
@@ -339,13 +352,13 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 
 	ImageFile* image = LoadImage(NULL, L"test.mbif", ImageHandle, SystemTable);
 
-	if (newFont == NULL)
+	if (image == NULL)
 	{
-		Print(L"Font was not loaded!\n\r");
+		Print(L"Image was not loaded!\n\r");
 	}
 	else
 	{
-		Print(L"Font loaded. Char size: %d\n\r", newFont->psf1_Header->charsize);
+		Print(L"Image loaded. Char size: %d\n\r", (image->height*image->width*4));
 	}
 
 	EFI_MEMORY_DESCRIPTOR* Map = NULL;
