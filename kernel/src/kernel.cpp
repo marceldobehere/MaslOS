@@ -62,8 +62,8 @@ extern "C" void _start(BootInfo* bootInfo)
     
     
     //osData.windows[1]->renderer->Clear(Colors.blue);
-    // osData.windows[1]->renderer->color = Colors.white;
-
+    //osData.windows[1]->renderer->color = Colors.white;
+    
     osData.windows[1]->renderer->Cls();  
     osData.windows[1]->renderer->DrawImage(bootInfo->testImage, 150, 0);
     //osData.windows[1]->renderer->Println("Hello, world!");

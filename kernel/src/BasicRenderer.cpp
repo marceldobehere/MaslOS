@@ -417,9 +417,13 @@ void BasicRenderer::DrawImage(ImageFile* image, int64_t x, int64_t y)
         int64_t yp = y1 + y;
         for (int64_t x1 = 0; x1 < image->width; x1++)
         {
-            int64_t xp = x1 + x; 
-            if (xp >= 0 && yp >= 0 && xp < framebuffer->Width && yp < framebuffer->Height)
-                *((uint32_t*)(addr + (4 * xp) + (mult * yp))) = *imgaddr;
+            if (*imgaddr != 0)//((*imgaddr/* | 0xffffff00*/) & (uint32_t)0xff000000 != (uint32_t)0x00000000)
+            {
+                int64_t xp = x1 + x; 
+                if (xp >= 0 && yp >= 0 && xp < framebuffer->Width && yp < framebuffer->Height)
+                    *((uint32_t*)(addr + (4 * xp) + (mult * yp))) = *imgaddr;
+            }
+            
             imgaddr++;
         }
     }
