@@ -35,7 +35,7 @@ extern "C" void _start(BootInfo* bootInfo)
         *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(700, 60), realMainWindow->renderer, "Testing Window");
         osData.windows.add(window);
     }
-
+ 
     
     //osData.windows[1]->renderer->Clear(Colors.blue);
     // osData.windows[1]->renderer->color = Colors.white;
