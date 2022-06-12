@@ -51,6 +51,7 @@ extern "C" void _start(BootInfo* bootInfo)
 
         for (int i = 0; i < osData.windows.getCount(); i++)
             osData.windows[i]->Render();
+        DrawMousePointer();
 
         PIT::Sleep(200);
         //asm("hlt");

@@ -31,3 +31,5 @@ void SaveIntoBuffer(MPoint point);
 void DrawMouseBuffer(MPoint point);
 
 extern uint32_t mouseColFront, mouseColBack;
+
+extern MPoint MousePosition;
