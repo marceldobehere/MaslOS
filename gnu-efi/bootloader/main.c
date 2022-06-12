@@ -112,9 +112,8 @@ PSF1_FONT* LoadPSF1Font(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandl
 
 ImageFile* LoadImage(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable)
 {
-	return NULL;
-	EFI_FILE* img = LoadFile(Directory, Path, ImageHandle, SystemTable);
 
+	EFI_FILE* img = LoadFile(Directory, Path, ImageHandle, SystemTable);
 
 	if (img == NULL)
 		return NULL;
@@ -125,47 +124,37 @@ ImageFile* LoadImage(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, 
 	// PSF1_HEADER* fontHeader;
 	// SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(PSF1_HEADER), (void**)&fontHeader);
 	 
-	UINTN size = sizeof(3 * 4);
-	int32_t arr[3] = {0, 0, 0};
+	UINTN size = 3*4;
+	int32_t arr[3];
 	img->Read(img, &size, arr);
 
-	Print(L"Image:");
+	// int32_t arr2[3] = {0, 0, 0};
+
+	// for (int i = 0; i < 3; i++)
+	// 	arr2[i] = (((uint32_t)arr[(i*4)+3]) << 24) | (((uint32_t)arr[(i*4)+2]) << 16) | (((uint32_t)arr[(i*4)+1]) << 8) | (((uint32_t)arr[(i*4)+0]) << 0);
+
+	Print(L"Image Data:\n\r");
 	Print(L" - Width:  %d\n\r", arr[0]);
 	Print(L" - Height: %d\n\r", arr[1]);
 	Print(L" - Size:   %d\n\r", arr[2]);
 
 	image->width = arr[0];
 	image->height = arr[1];
-	
-
-	return image;
-
-	// if (fontHeader->magic[0] != PSF1_MAGIC0 || fontHeader->magic[1] != PSF1_MAGIC1)
-	// 	return NULL;
-	
-	// UINTN glyphBufferSize = fontHeader->charsize * 256;
-
-	// if (fontHeader->mode == 1)
-	// 	glyphBufferSize *= 2;
-	
-	// void* glyphBuffer;
-	// {
-	// 	font->SetPosition(font, sizeof(PSF1_HEADER));
-	// 	SystemTable->BootServices->AllocatePool(EfiLoaderData, glyphBufferSize, (void**)&glyphBuffer);
-	// 	font->Read(font, &glyphBufferSize, glyphBuffer);
-
-	// }
-
-	// // PSF1_FONT* finishedFont;
-	// // SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(PSF1_FONT), (void**)&finishedFont);
-	// // finishedFont->psf1_Header = fontHeader;
-	// // finishedFont->glyphBuffer = glyphBuffer;
-
-	
 
 
-	// return image;
+	{
+		img->SetPosition(img, 4*3);
+		SystemTable->BootServices->AllocatePool(EfiLoaderData, arr[2], (void**)&image->imageBuffer);
+		size = arr[2];
+		img->Read(img, &size, (char*)image->imageBuffer);
 	}
+
+	// size = 10; //(UINTN)(arr[2] * 0 + 100);
+	// char data[arr[2]];
+	// img->Read(img, &size, data);
+	//Print(L" - First Byte:   %d\n\r", *((char*)image->imageBuffer));
+	return image;
+}
 
 
 
@@ -224,10 +213,10 @@ typedef struct
 {
 	Framebuffer* framebuffer;
 	PSF1_FONT* psf1_font;
+	ImageFile* testImage;
 	EFI_MEMORY_DESCRIPTOR* mMap;
 	UINTN mMapSize;
 	UINTN mMapDescSize;
-	ImageFile* testImage;
 } BootInfo;
 
 
@@ -383,6 +372,7 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 	bootInfo.mMap = Map;
 	bootInfo.mMapSize = MapSize;
 	bootInfo.mMapDescSize = DescriptorSize;
+	bootInfo.testImage = image;
 
 
 	Print(L"Exiting EFI Bootservices...\n\r");

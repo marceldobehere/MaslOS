@@ -2,12 +2,26 @@
 
 extern "C" void _start(BootInfo* bootInfo)
 {  
+    //while(true);
     KernelInfo kernelInfo = InitializeKernel(bootInfo);
     PageTableManager* pageTableManager = kernelInfo.pageTableManager;
 
     osData.kernelInfo = &kernelInfo;
     osData.exit = false;
     osData.windows = List<Window*>();
+
+    // if (bootInfo->testImage != NULL)
+    // {
+    //     dispVar vars[] = {dispVar(bootInfo->testImage->width), dispVar(bootInfo->testImage->height)};
+    //     GlobalRenderer->Println("Image: {0}x{1}", vars);
+    // }
+    // else
+    //     GlobalRenderer->Println("No Image found!");
+
+    //GlobalRenderer->DrawImage(bootInfo->testImage, 100, 10);
+    
+
+    //while(true);
 
 
     Window* realMainWindow;
@@ -41,6 +55,7 @@ extern "C" void _start(BootInfo* bootInfo)
     // osData.windows[1]->renderer->color = Colors.white;
 
     osData.windows[1]->renderer->Cls();  
+    osData.windows[1]->renderer->DrawImage(bootInfo->testImage, 150, 0);
     //osData.windows[1]->renderer->Println("Hello, world!");
     KeyboardPrintStart(osData.windows[1]);
     

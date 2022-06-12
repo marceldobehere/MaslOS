@@ -6,6 +6,7 @@
 #include "S-Font.h"
 #include <stdint.h> 
 #include "dispTypes/dispTypes.h"
+#include "ImageStruct.h"
 
 class BasicRenderer
 {
@@ -48,6 +49,8 @@ class BasicRenderer
         void Clear(uint32_t col);
         void Clear(int64_t x1, int64_t y1, int64_t x2, int64_t y2, uint32_t col);
         void Clear(uint32_t col, bool resetCursor);
+
+        void DrawImage(ImageFile* image, int64_t x, int64_t y);
 
         void Cls();
 

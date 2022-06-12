@@ -5,11 +5,13 @@
 #include "cstr.h"
 #include "efiMemory.h"
 #include "Cols.h"
+#include "ImageStruct.h"
 
 struct BootInfo
 {
 	Framebuffer* framebuffer;
 	PSF1_FONT* psf1_font;
+    ImageFile* testImage;
 	EFI_MEMORY_DESCRIPTOR* mMap;
 	uint64_t mMapSize;
 	uint64_t mMapDescSize;
