@@ -32,6 +32,10 @@ void HandleEnter()
         TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
         if (instance->userlen > 0)
         {
+            if (instance->userlen > 255)
+                instance->userlen = 255;
+                
+            instance->terminalInput[instance->userlen] = 0;
             ParseCommand(instance->terminalInput, instance->lastTerminalInput, &instance->currentUser, activeWindow);
             //GlobalRenderer->Print("> ");
             //GlobalRenderer->Println(userData);

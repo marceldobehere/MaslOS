@@ -304,6 +304,16 @@ void GetCmd(const char* name, OSUser* user, Window* window)
     {
         window->renderer->Println("Free Page Count: {} pages.", to_string(GlobalAllocator->GetFreePageCount()), Colors.bgreen);
     }
+    else if (StrEquals(name, "window resolution"))
+    {
+        dispVar vars[] = {dispVar(window->size.width), dispVar(window->size.height)};
+        window->renderer->Println("Window Resolution: {0}x{1}.", vars);
+    }
+    else if (StrEquals(name, "screen resolution"))
+    {
+        dispVar vars[] = {dispVar(osData.realMainWindow->size.width), dispVar(osData.realMainWindow->size.height)};
+        window->renderer->Println("Screen Resolution: {0}x{1}.", vars);
+    }
     else
     {
         LogError("Parameter \"{}\" does not exist.", name, window);

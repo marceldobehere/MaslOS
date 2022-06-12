@@ -9,11 +9,14 @@ Window::Window(DefaultInstance* instance, Size size, Position position, BasicRen
     this->instance = instance;
     this->position = position;
     this->size = size;
+    this->newPosition = position;
+    this->newSize = size;
     this->parentRenderer = parentRenderer;
     this->parentFrameBuffer = parentRenderer->framebuffer;
     this->borderColor = Colors.gray;
     allowKeyboardDrawing = true;
     this->title = title;
+    moveToFront = false;
 
     {
         framebuffer = (Framebuffer*)malloc(sizeof(Framebuffer));
@@ -41,14 +44,20 @@ void Window::Free()
 
 void Window::Render()
 {
+    uint32_t* pointerC = (uint32_t*)framebuffer->BaseAddress;
     for (int64_t y = 0; y < framebuffer->Height; y++)
     {
+        int64_t newY = y + position.y;
+        uint32_t* pointerP = (uint32_t*)(parentFrameBuffer->BaseAddress + ((position.x + (newY * parentFrameBuffer->Width)) * 4));
         for (int64_t x = 0; x < framebuffer->Width; x++)
         {
             int64_t newX = x + position.x;
-            int64_t newY = y + position.y;
             if (newX >= 0 && newY >= 0 && newX < parentFrameBuffer->Width && newY < parentFrameBuffer->Height)
-                *(uint32_t*)(parentFrameBuffer->BaseAddress + ((newX + (newY * parentFrameBuffer->Width)) * 4)) = *(uint32_t*)(framebuffer->BaseAddress + ((x + (y * framebuffer->Width)) * 4));
+                if (*pointerC != *pointerP)
+                    *pointerP = *pointerC;
+                
+            pointerC++;
+            pointerP++;
         }
     }
 
@@ -59,7 +68,10 @@ void Window::Render()
         parentRenderer->Clear(x,y,position.x + size.width-1,position.y-2, Colors.dgray);
 
         const char* stitle = StrSubstr(title, 0, size.width / 10);
-        parentRenderer->putStr(stitle, x, y, Colors.white);
+        if (activeWindow == this)
+            parentRenderer->putStr(stitle, x, y, Colors.white);
+        else
+            parentRenderer->putStr(stitle, x, y, Colors.bgray);
     }
     
 

@@ -77,6 +77,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 {
     r = BasicRenderer(bootInfo->framebuffer, bootInfo->psf1_font);
     GlobalRenderer = &r;
+    //osData.realMainWindow->framebuffer = r.framebuffer;
 
     GDTDescriptor gdtDescriptor;
     gdtDescriptor.Size = sizeof(GDT) - 1;

@@ -9,12 +9,20 @@ extern "C" void _start(BootInfo* bootInfo)
     osData.exit = false;
     osData.windows = List<Window*>();
 
+
+    Window* realMainWindow;
+    {
+        realMainWindow = (Window*)malloc(sizeof(Window));
+        *(realMainWindow) = Window(NULL, Size(GlobalRenderer->framebuffer->Width, GlobalRenderer->framebuffer->Height), Position(0, 0), GlobalRenderer, "Real Main Window");
+        osData.realMainWindow = realMainWindow;
+    }
+
     Window* mainWindow;
     {
         mainWindow = (Window*)malloc(sizeof(Window));
         TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
         *terminal = TerminalInstance(&adminUser);
-        *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(5, 30), GlobalRenderer, "Main Window");
+        *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(5, 30), realMainWindow->renderer, "Main Window");
         osData.windows.add(mainWindow);
 
         activeWindow = mainWindow;
@@ -24,7 +32,7 @@ extern "C" void _start(BootInfo* bootInfo)
         Window* window = (Window*)malloc(sizeof(Window));
         TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
         *terminal = TerminalInstance(&guestUser);
-        *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(100, 60), GlobalRenderer, "Testing Window");
+        *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(700, 60), realMainWindow->renderer, "Testing Window");
         osData.windows.add(window);
     }
 
@@ -48,14 +56,41 @@ extern "C" void _start(BootInfo* bootInfo)
 
     while(!osData.exit)
     {
-        GlobalRenderer->Clear(Colors.black);
+        realMainWindow->renderer->Clear(Colors.dblue);
 
-        DrawMousePointer1();
+        if (activeWindow != NULL)
+        {
+            if (activeWindow->moveToFront)
+            {
+                activeWindow->moveToFront = false;
+                int index = osData.windows.getIndexOf(activeWindow);
+                if (index != -1)
+                {
+                    osData.windows.removeAt(index);
+                    osData.windows.add(activeWindow);
+                }
+            }
+        }
+
+        //DrawMousePointer1(realMainWindow->framebuffer);
         for (int i = 0; i < osData.windows.getCount(); i++)
-            osData.windows[i]->Render();
-        DrawMousePointer2();
+        {            
+            Window* window = osData.windows[i];
+            window->position = window->newPosition;
+            if (window->size != window->newSize)
+            {
+                window->size = window->newSize;
+            }
+            window->Render();
+        }
+        DrawMousePointer2(realMainWindow->framebuffer);
 
-        PIT::Sleep(200);
+        realMainWindow->Render();
+        
+
+
+
+        PIT::Sleep(50);
         //asm("hlt");
     }
 
@@ -63,6 +98,7 @@ extern "C" void _start(BootInfo* bootInfo)
     GlobalRenderer->color = Colors.white;
     GlobalRenderer->Println("Goodbye.");
     PIT::Sleep(1000);
+    GlobalRenderer->Clear(Colors.black);
 }
 
 

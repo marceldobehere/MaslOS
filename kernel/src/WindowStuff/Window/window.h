@@ -16,6 +16,16 @@ struct Size
         this->height = 0;
         this->width = 0;
     }
+
+    bool operator== (Size other)
+    {
+        return (height == other.height) && (width == other.width);
+    }
+
+    bool operator!= (Size other)
+    {
+        return (height != other.height) || (width != other.width);
+    }
 };
 
 struct Position
@@ -43,10 +53,13 @@ class Window
     bool allowKeyboardDrawing;
     Size size;
     Position position;
+    Size newSize;
+    Position newPosition;
     BasicRenderer* renderer;
     Framebuffer* framebuffer;
     Framebuffer* parentFrameBuffer;
     uint32_t borderColor;
+    bool moveToFront;
     const char* title;
     Window(DefaultInstance* instance, Size size, Position position, BasicRenderer* parentRenderer, const char* title);
 

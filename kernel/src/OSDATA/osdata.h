@@ -8,6 +8,7 @@ struct OSData
     bool exit;
     KernelInfo* kernelInfo;
     List<Window*> windows;
+    Window* realMainWindow;
 };
 
 extern OSData osData;

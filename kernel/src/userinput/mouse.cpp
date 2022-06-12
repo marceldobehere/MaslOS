@@ -88,10 +88,10 @@ double clickTimes[3] = {0, 0, 0};
 
 MPoint MousePosition;
 
-void SaveIntoBuffer(MPoint point)
+void SaveIntoBuffer(MPoint point, Framebuffer* framebuffer)
 {
-    unsigned int *pixPtr = (unsigned int*)GlobalRenderer->framebuffer->BaseAddress;
-    unsigned int pps = GlobalRenderer->framebuffer->PixelsPerScanLine;
+    unsigned int *pixPtr = (unsigned int*)framebuffer->BaseAddress;
+    unsigned int pps = framebuffer->PixelsPerScanLine;
 
     unsigned long xoff = point.x;
     unsigned long yoff = point.y;
@@ -106,10 +106,10 @@ void SaveIntoBuffer(MPoint point)
         }
 }
 
-void LoadFromBuffer(MPoint point)
+void LoadFromBuffer(MPoint point, Framebuffer* framebuffer)
 {
-    unsigned int *pixPtr = (unsigned int*)GlobalRenderer->framebuffer->BaseAddress;
-    unsigned int pps = GlobalRenderer->framebuffer->PixelsPerScanLine;
+    unsigned int *pixPtr = (unsigned int*)framebuffer->BaseAddress;
+    unsigned int pps = framebuffer->PixelsPerScanLine;
 
     unsigned long xoff = point.x;
     unsigned long yoff = point.y;
@@ -124,10 +124,10 @@ void LoadFromBuffer(MPoint point)
         }
 }
 
-void DrawMouseBuffer(MPoint point)
+void DrawMouseBuffer(MPoint point, Framebuffer* framebuffer)
 {
-    unsigned int *pixPtr = (unsigned int*)GlobalRenderer->framebuffer->BaseAddress;
-    unsigned int pps = GlobalRenderer->framebuffer->PixelsPerScanLine;
+    unsigned int *pixPtr = (unsigned int*)framebuffer->BaseAddress;
+    unsigned int pps = framebuffer->PixelsPerScanLine;
 
     unsigned long xoff = point.x;
     unsigned long yoff = point.y;
@@ -168,15 +168,15 @@ void DrawMousePointer()
     //DrawMousePointer2();
 }
 
-void DrawMousePointer1()
+void DrawMousePointer1(Framebuffer* framebuffer)
 {
-    LoadFromBuffer(oldMousePosition);
+    LoadFromBuffer(oldMousePosition, framebuffer);
 }
 
-void DrawMousePointer2()
+void DrawMousePointer2(Framebuffer* framebuffer)
 {
-    SaveIntoBuffer(MousePosition);
-    DrawMouseBuffer(MousePosition);
+    //SaveIntoBuffer(MousePosition, framebuffer);
+    DrawMouseBuffer(MousePosition, framebuffer);
     oldMousePosition.x = MousePosition.x;
     oldMousePosition.y = MousePosition.y;
 }
@@ -238,7 +238,7 @@ void InitPS2Mouse()
     MousePosition.y = 50;
     oldMousePosition.x = 50;
     oldMousePosition.y = 50;
-    SaveIntoBuffer(MousePosition);
+    SaveIntoBuffer(MousePosition, GlobalRenderer->framebuffer);
     DrawMousePointer();
 
 
@@ -315,6 +315,12 @@ void HandleClick(bool L, bool R, bool M)
         activeWindow = window;
         dragWindow = window;
         startDrag = false;
+        if (window != NULL)
+        {
+            diff.x = MousePosition.x - window->position.x;
+            diff.y = MousePosition.y - window->position.y;
+            window->moveToFront = true;
+        }
     }   
 }
 
@@ -329,13 +335,11 @@ void HandleHold(bool L, bool R, bool M)
             if (!startDrag)
             {
                 startDrag = true;
-                diff.x = MousePosition.x - window->position.x;
-                diff.y = MousePosition.y - window->position.y;
             }
             else
             {
-                window->position.x = MousePosition.x - diff.x;
-                window->position.y = MousePosition.y - diff.y;
+                window->newPosition.x = MousePosition.x - diff.x;
+                window->newPosition.y = MousePosition.y - diff.y;
             }
         }
 
@@ -435,8 +439,8 @@ void ProcessMousePacket()
 
     if(MousePosition.x < 0)
         MousePosition.x = 0;
-    else if(MousePosition.x > GlobalRenderer->framebuffer->Width - 8)
-        MousePosition.x = GlobalRenderer->framebuffer->Width - 8;
+    else if(MousePosition.x > GlobalRenderer->framebuffer->Width - 16)
+        MousePosition.x = GlobalRenderer->framebuffer->Width - 16;
 
     if(MousePosition.y < 0)
         MousePosition.y = 0;

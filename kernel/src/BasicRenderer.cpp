@@ -307,7 +307,7 @@ void BasicRenderer::PrintArg(dispVar var)
     else if (var.type == varType::_charPointer)
         toPrint = var._charPointer;
 
-    GlobalRenderer->Print(toPrint);
+    Print(toPrint);
 }
 
 
@@ -344,15 +344,12 @@ void BasicRenderer::Print(const char* chrs, dispVar vars[])
                 //GlobalRenderer->Print(sub);
                 //GlobalRenderer->Print(">");
                 uint64_t indx = to_int(sub);
-                //GlobalRenderer->Print("[{}]", to_string(indx), Colors.yellow);
+                //Print("[{}]", to_string(indx), Colors.yellow);
                 free(sub);
                 //GlobalRenderer->Print("[{}]", to_string(indx), Colors.yellow);
                 
-                if (chrs[index] == '}')
-                {
-                    PrintArg(vars[indx]);
-                    index++;
-                }
+                PrintArg(vars[indx]);
+                index++;
             }
             index--;
         }
