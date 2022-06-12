@@ -11,6 +11,7 @@ struct BootInfo
 {
 	Framebuffer* framebuffer;
 	PSF1_FONT* psf1_font;
+    ImageFile* bgImage;
     ImageFile* testImage;
 	EFI_MEMORY_DESCRIPTOR* mMap;
 	uint64_t mMapSize;

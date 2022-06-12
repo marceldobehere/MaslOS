@@ -270,6 +270,7 @@ typedef struct
 {
 	Framebuffer* framebuffer;
 	PSF1_FONT* psf1_font;
+	ImageFile* bgImage;
 	ImageFile* testImage;
 	EFI_MEMORY_DESCRIPTOR* mMap;
 	UINTN mMapSize;
@@ -407,6 +408,17 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 		Print(L"Image loaded. Char size: %d\n\r", (image->height*image->width*4));
 	}
 
+	ImageFile* bgImage = LoadImage(NULL, L"bg.mbif", ImageHandle, SystemTable);
+
+	if (bgImage == NULL)
+	{
+		Print(L"Image was not loaded!\n\r");
+	}
+	else
+	{
+		Print(L"Image loaded. Char size: %d\n\r", (image->height*image->width*4));
+	}
+
 	EFI_MEMORY_DESCRIPTOR* Map = NULL;
 	UINTN MapSize, MapKey;
 	UINTN DescriptorSize;
@@ -430,6 +442,7 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 	bootInfo.mMapSize = MapSize;
 	bootInfo.mMapDescSize = DescriptorSize;
 	bootInfo.testImage = image;
+	bootInfo.bgImage = bgImage;
 
 
 	Print(L"Exiting EFI Bootservices...\n\r");
