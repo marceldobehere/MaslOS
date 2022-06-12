@@ -5,15 +5,65 @@ extern "C" void _start(BootInfo* bootInfo)
     KernelInfo kernelInfo = InitializeKernel(bootInfo);
     PageTableManager* pageTableManager = kernelInfo.pageTableManager;
 
-    currentUser = &adminUser;
-
     osData.kernelInfo = &kernelInfo;
     osData.exit = false;
     osData.windows = List<Window*>();
 
-    GlobalRenderer->Cls();
+    Window* mainWindow;
+    {
+        mainWindow = (Window*)malloc(sizeof(Window));
+        TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
+        *terminal = TerminalInstance(&adminUser);
+        *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(0, 0), GlobalRenderer->framebuffer);
+        osData.windows.add(mainWindow);
 
-    GlobalRenderer->Println("Kernel Initialised Successfully!", Colors.yellow);
+        activeWindow = mainWindow;
+    }
+
+    {
+        Window* window = (Window*)malloc(sizeof(Window));
+        TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
+        *terminal = TerminalInstance(&guestUser);
+        *(window) = Window((DefaultInstance*)terminal, Size(480, 360), Position(400, 60), GlobalRenderer->framebuffer);
+        osData.windows.add(window);
+    }
+
+
+
+    osData.windows[1]->renderer->Clear(Colors.black);
+    osData.windows[1]->renderer->color = Colors.white;
+    osData.windows[1]->renderer->Println("Hello, world!");
+    KeyboardPrintStart(osData.windows[1]);
+
+    
+
+
+    activeWindow->renderer->Cls();
+    activeWindow->renderer->Println("Kernel Initialised Successfully!", Colors.yellow);
+    KeyboardPrintStart(mainWindow);
+    mainWindow->Render();
+
+    while(!osData.exit)
+    {
+        //GlobalRenderer->Clear(Colors.black);
+
+        for (int i = 0; i < osData.windows.getCount(); i++)
+            osData.windows[i]->Render();
+
+        PIT::Sleep(200);
+        //asm("hlt");
+    }
+
+    GlobalRenderer->Clear(Colors.black);
+    GlobalRenderer->color = Colors.white;
+    GlobalRenderer->Println("Goodbye.");
+    PIT::Sleep(1000);
+
+}
+
+
+/*
+
 
 
     // GlobalRenderer->Print("Memory Size: ");
@@ -25,39 +75,19 @@ extern "C" void _start(BootInfo* bootInfo)
     // GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
     // GlobalRenderer->Println("");
 
-    Window* mainWindow;
-    {
-        mainWindow = (Window*)malloc(sizeof(Window));
-        TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
-        *terminal = TerminalInstance(currentUser);
-        *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(0, 0), GlobalRenderer->framebuffer);
-        osData.windows.add(mainWindow);
-
         //GlobalRenderer->Println("ADDR Window:   {}", ConvertHexToString((uint64_t)window), Colors.bgreen);
         //GlobalRenderer->Println("ADDR Terminal: {}", ConvertHexToString((uint64_t)terminal), Colors.bgreen);
-        activeWindow = mainWindow;
-    }
 
+    // {
+    //     Window* window = (Window*)malloc(sizeof(Window));
+    //     TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
+    //     *terminal = TerminalInstance(&guestUser);
+    //     *(window) = Window((DefaultInstance*)terminal, Size(480, 360), Position(100, 20), GlobalRenderer->framebuffer);
+    //     osData.windows.add(window);
 
-    {
-        Window* window = (Window*)malloc(sizeof(Window));
-        TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
-        *terminal = TerminalInstance(currentUser);
-        *(window) = Window((DefaultInstance*)terminal, Size(480, 360), Position(100, 20), GlobalRenderer->framebuffer);
-        osData.windows.add(window);
-
-        //GlobalRenderer->Println("ADDR Window:   {}", ConvertHexToString((uint64_t)window), Colors.bgreen);
-        //GlobalRenderer->Println("ADDR Terminal: {}", ConvertHexToString((uint64_t)terminal), Colors.bgreen);
-    }
-
-
-    {
-        Window* window = (Window*)malloc(sizeof(Window));
-        TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
-        *terminal = TerminalInstance(currentUser);
-        *(window) = Window((DefaultInstance*)terminal, Size(480, 360), Position(400, 60), GlobalRenderer->framebuffer);
-        osData.windows.add(window);
-    }
+    //     //GlobalRenderer->Println("ADDR Window:   {}", ConvertHexToString((uint64_t)window), Colors.bgreen);
+    //     //GlobalRenderer->Println("ADDR Terminal: {}", ConvertHexToString((uint64_t)terminal), Colors.bgreen);
+    // }
 
 
     //GlobalRenderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
@@ -102,37 +132,13 @@ extern "C" void _start(BootInfo* bootInfo)
     // osData.windows[0]->renderer->Println("Hello, world!");
     // osData.windows[0]->Render();
 
-    osData.windows[1]->renderer->Clear(Colors.blue);
-    osData.windows[1]->renderer->color = Colors.white;
-    osData.windows[1]->renderer->Println("Hello, world!");
-    osData.windows[1]->Render();
+    //osData.windows[1]->Render();
 
-    osData.windows[2]->renderer->Clear(Colors.green);
-    osData.windows[2]->renderer->color = Colors.white;
-    osData.windows[2]->renderer->Println("Hello, world!");
-    osData.windows[2]->Render();
-    
-
-    KeyboardPrintStart();
-
-    while(!osData.exit)
-    {
-        GlobalRenderer->Clear(Colors.black);
-
-        for (int i = 1; i < osData.windows.getCount(); i++)
-            osData.windows[i]->Render();
-
-        PIT::Sleep(1000);
-        //asm("hlt");
-    }
-
-    GlobalRenderer->Clear(Colors.black);
-    GlobalRenderer->color = Colors.white;
-    GlobalRenderer->Println("Goodbye.");
-    PIT::Sleep(1000);
-
-}
-
+    // osData.windows[2]->renderer->Clear(Colors.green);
+    // osData.windows[2]->renderer->color = Colors.white;
+    // osData.windows[2]->renderer->Println("Hello, world!");
+    // //osData.windows[2]->Render();
+*/
 
 
 

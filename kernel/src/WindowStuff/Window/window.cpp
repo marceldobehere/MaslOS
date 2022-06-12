@@ -9,7 +9,8 @@ Window::Window(DefaultInstance* instance, Size size, Position position, Framebuf
     this->position = position;
     this->size = size;
     this->parentFrameBuffer = parentFrameBuffer;
-    this->borderColor = Colors.orange;
+    this->borderColor = Colors.gray;
+    allowKeyboardDrawing = true;
 
     {
         framebuffer = (Framebuffer*)malloc(sizeof(Framebuffer));

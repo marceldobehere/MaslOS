@@ -4,7 +4,7 @@
 OSUser adminUser;
 OSUser guestUser;
 
-OSUser* currentUser = &adminUser;
+//OSUser* currentUser = &adminUser;
 
 void initUsers()
 {

@@ -30,7 +30,7 @@ struct OSUser
 extern OSUser adminUser;
 extern OSUser guestUser;
 
-extern OSUser* currentUser;
+//extern OSUser* currentUser;
 
 OSUser* getUser(const char* name);
 

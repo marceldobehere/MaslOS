@@ -1,15 +1,16 @@
 #pragma once
 #include <stdint.h>
 #include "../OSDATA/userdata.h"
+#include "../WindowStuff/Window/window.h"
 
-void ClearInput();
+void ClearInput(TerminalInstance* instance);
 
 void HandleEnter();
 
 void InitKeyboard();
 
-void KeyboardPrintStart();
+void KeyboardPrintStart(Window* window);
 
-void PrintUser(OSUser* user);
+void PrintUser(Window* window, OSUser* user);
 
 void HandleKeyboard(uint8_t scancode);

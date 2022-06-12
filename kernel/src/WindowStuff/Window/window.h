@@ -36,9 +36,10 @@ struct Position
 class Window
 {
     private:
-    DefaultInstance* instance;
-
+    
     public:
+    DefaultInstance* instance;
+    bool allowKeyboardDrawing;
     Size size;
     Position position;
     BasicRenderer* renderer;
