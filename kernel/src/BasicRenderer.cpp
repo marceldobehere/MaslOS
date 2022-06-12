@@ -242,8 +242,6 @@ void BasicRenderer::Println(const char *chrs, const char *var, uint32_t col)
 void BasicRenderer::Clear(uint32_t col, bool resetCursor)
 {
     uint64_t fbBase = (uint64_t)framebuffer->BaseAddress;
-    uint64_t bytesPerScanline = framebuffer->PixelsPerScanLine * 4;
-    uint64_t fbHeight = framebuffer->Height;
     uint64_t fbSize = framebuffer->BufferSize;
     uint32_t* end = (uint32_t*)(fbBase + fbSize);
   

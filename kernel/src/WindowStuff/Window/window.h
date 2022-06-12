@@ -69,3 +69,8 @@ class Window
 
 
 extern Window* activeWindow;
+
+
+void CopyFrameBuffer(Framebuffer* a, Framebuffer* b);
+
+void CopyFrameBuffer(Framebuffer* a, Framebuffer* a2, Framebuffer* b);

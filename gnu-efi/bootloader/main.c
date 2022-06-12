@@ -180,6 +180,63 @@ ImageFile* LoadImage(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, 
 			Print(L"GOP Located.\n\r");
 		}
 
+		EFI_GRAPHICS_OUTPUT_MODE_INFORMATION* info;
+		UINTN SizeOfInfo, numModes, nativeMode;
+
+		status = uefi_call_wrapper(gop->QueryMode, 4, gop, gop->Mode==NULL?0:gop->Mode->Mode, &SizeOfInfo, &info);
+
+		numModes = 0;
+
+		if (status == EFI_NOT_STARTED)
+			status = uefi_call_wrapper(gop->SetMode, 2, gop, 0);
+		if (EFI_ERROR(status))
+			Print(L"Unable to get native resolution mode!\n\r");
+		else
+		{
+			nativeMode = gop->Mode->Mode;
+			numModes = gop->Mode->MaxMode;
+		}
+		UINTN MODE = nativeMode;
+		for (UINTN i = 0; i < numModes; i++)
+		{
+			status = uefi_call_wrapper(gop->QueryMode, 4, gop, i, &SizeOfInfo, &info);
+			Print(L"mode %03d width %d height %d format %x %s.\n\r",
+				i,
+				info->HorizontalResolution,
+				info->VerticalResolution,
+				info->PixelFormat,
+				i == nativeMode ? "(current)" : ""			
+			);
+			if (info->HorizontalResolution == 1280 && info->VerticalResolution == 720)
+				MODE = i;
+		}
+
+
+
+		if (EFI_ERROR(status))
+		{
+			Print(L"Unable to locate GOP!!!\n\r");
+			return NULL;
+		}
+		else
+		{
+			Print(L"GOP Located.\n\r");
+		}
+
+
+
+		status = uefi_call_wrapper(gop->SetMode, 2, gop, MODE);
+
+		if (EFI_ERROR(status))
+		{
+			Print(L"Unable to set mode %03d\n\r", 0);
+			return NULL;
+		}
+		else
+		{
+			Print(L"GOP Located.\n\r");
+		}
+
 		framebuffer.BaseAddress = (void*)gop->Mode->FrameBufferBase;
 		framebuffer.BufferSize = gop->Mode->FrameBufferSize;
 		framebuffer.Width = gop->Mode->Info->HorizontalResolution;

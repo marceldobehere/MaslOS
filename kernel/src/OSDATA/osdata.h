@@ -9,6 +9,8 @@ struct OSData
     KernelInfo* kernelInfo;
     List<Window*> windows;
     Window* realMainWindow;
+    Window* realMainWindow2;
+    Window* mainTerminalWindow;
 };
 
 extern OSData osData;

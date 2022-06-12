@@ -2,7 +2,6 @@
 
 extern "C" void _start(BootInfo* bootInfo)
 {  
-    //while(true);
     KernelInfo kernelInfo = InitializeKernel(bootInfo);
     PageTableManager* pageTableManager = kernelInfo.pageTableManager;
 
@@ -31,6 +30,15 @@ extern "C" void _start(BootInfo* bootInfo)
         osData.realMainWindow = realMainWindow;
     }
 
+    Window* realMainWindow2;
+    {
+        realMainWindow2 = (Window*)malloc(sizeof(Window));
+        *(realMainWindow2) = Window(NULL, Size(GlobalRenderer->framebuffer->Width, GlobalRenderer->framebuffer->Height), Position(0, 0), GlobalRenderer, "Real Main Window - Buffer 2");
+        osData.realMainWindow2 = realMainWindow2;
+    }
+
+    CopyFrameBuffer(realMainWindow->framebuffer, realMainWindow2->framebuffer);
+
     Window* mainWindow;
     {
         mainWindow = (Window*)malloc(sizeof(Window));
@@ -40,6 +48,7 @@ extern "C" void _start(BootInfo* bootInfo)
         osData.windows.add(mainWindow);
 
         activeWindow = mainWindow;
+        osData.mainTerminalWindow = mainWindow;
     }
 
     {
@@ -50,6 +59,7 @@ extern "C" void _start(BootInfo* bootInfo)
         osData.windows.add(window);
     }
  
+    
     
     //osData.windows[1]->renderer->Clear(Colors.blue);
     // osData.windows[1]->renderer->color = Colors.white;
@@ -68,6 +78,16 @@ extern "C" void _start(BootInfo* bootInfo)
     activeWindow->renderer->Println("Kernel Initialised Successfully!", Colors.yellow);
     KeyboardPrintStart(mainWindow);
     mainWindow->Render();
+
+    // {
+    //     char* test = (char*)malloc(5);
+    //     test[0] = 'H';
+    //     test[1] = 'O';
+    //     test[2] = 'I';
+    //     test[3] = '!';
+    //     test[4] = 0;
+    //     mainWindow->title = test;
+    // }
 
     while(!osData.exit)
     {
@@ -100,7 +120,10 @@ extern "C" void _start(BootInfo* bootInfo)
         }
         DrawMousePointer2(realMainWindow->framebuffer);
 
-        realMainWindow->Render();
+
+        CopyFrameBuffer(realMainWindow->framebuffer, realMainWindow2->framebuffer, GlobalRenderer->framebuffer);
+        //CopyFrameBuffer(realMainWindow->framebuffer, realMainWindow2->framebuffer);
+        //realMainWindow->Render();
         
 
 

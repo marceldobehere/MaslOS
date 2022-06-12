@@ -1,6 +1,7 @@
 #include "window.h"
 #include "../../memory/heap.h"
 #include "../../cmdParsing/cstrTools.h"
+#include "../../OSDATA/osdata.h"
 
 Window* activeWindow = NULL;
 
@@ -114,4 +115,37 @@ void Window::Render()
         counter++;
     } 
     
+}
+
+
+
+void CopyFrameBuffer(Framebuffer* a, Framebuffer* b)
+{
+    uint32_t* endAddr = (uint32_t*)(a->BaseAddress + a->BufferSize);
+
+    uint32_t* addrB = (uint32_t*)b->BaseAddress;
+    for (uint32_t* addrA = (uint32_t*)a->BaseAddress; addrA < endAddr; addrA++, addrB++)
+        *addrB = *addrA; 
+}
+
+void CopyFrameBuffer(Framebuffer* a, Framebuffer* a2, Framebuffer* b)
+{
+    uint32_t* endAddr = (uint32_t*)(a->BaseAddress + a->BufferSize);
+
+    uint32_t* addrA2 = (uint32_t*)a2->BaseAddress;
+    uint32_t* addrB = (uint32_t*)b->BaseAddress;
+    //uint64_t counter = 0;
+
+    for (uint32_t* addrA = (uint32_t*)a->BaseAddress; addrA < endAddr; addrA++, addrA2++, addrB++)
+        if (*addrA2 != *addrA)
+        {
+            *addrB = *addrA;//Colors.bred;//*addrA; 
+            *addrA2 = *addrA; 
+            //counter++;
+        }
+        //else
+        //    *addrB = *addrA;
+
+    //free((void*)osData.mainTerminalWindow->title);
+    //osData.mainTerminalWindow->title = StrCopy(to_string(counter));
 }

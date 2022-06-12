@@ -54,7 +54,6 @@ class BasicRenderer
 
         void Cls();
 
-
         BasicRenderer(Framebuffer* framebuffer, PSF1_FONT* psf1_font);
 
         
