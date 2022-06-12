@@ -124,7 +124,7 @@ ImageFile* LoadImage(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, 
 	
 	// PSF1_HEADER* fontHeader;
 	// SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(PSF1_HEADER), (void**)&fontHeader);
-	
+	 
 	UINTN size = sizeof(3 * 4);
 	int32_t arr[3] = {0, 0, 0};
 	img->Read(img, &size, arr);
