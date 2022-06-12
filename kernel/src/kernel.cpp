@@ -14,7 +14,7 @@ extern "C" void _start(BootInfo* bootInfo)
         mainWindow = (Window*)malloc(sizeof(Window));
         TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
         *terminal = TerminalInstance(&adminUser);
-        *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(0, 0), GlobalRenderer->framebuffer);
+        *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(10, 10), GlobalRenderer->framebuffer);
         osData.windows.add(mainWindow);
 
         activeWindow = mainWindow;
@@ -29,13 +29,15 @@ extern "C" void _start(BootInfo* bootInfo)
     }
 
 
+    // osData.windows[1]->renderer->Clear(Colors.black);
+    // osData.windows[1]->renderer->color = Colors.white;
 
-    osData.windows[1]->renderer->Clear(Colors.black);
-    osData.windows[1]->renderer->color = Colors.white;
+    osData.windows[1]->renderer->Cls();    
     osData.windows[1]->renderer->Println("Hello, world!");
     KeyboardPrintStart(osData.windows[1]);
-
     
+
+    //activeWindow = osData.windows[1];
 
 
     activeWindow->renderer->Cls();

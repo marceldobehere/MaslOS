@@ -49,18 +49,23 @@ void Window::Render()
         }
     }
 
+
+    uint32_t cBorder = borderColor;
+    if (activeWindow == this)
+        cBorder = Colors.bgreen;
+
     uint8_t counter = 0;
     for (int64_t x = -1; x < framebuffer->Width + 1; x++)
     {
         int64_t newX = x + position.x;
         int64_t newY = -1 + position.y;
         if (newX >= 0 && newY >= 0 && newX < parentFrameBuffer->Width && newY < parentFrameBuffer->Height && (counter % 2) == 0)
-            *(uint32_t*)(parentFrameBuffer->BaseAddress + ((newX + (newY * parentFrameBuffer->Width)) * 4)) = borderColor;
+            *(uint32_t*)(parentFrameBuffer->BaseAddress + ((newX + (newY * parentFrameBuffer->Width)) * 4)) = cBorder;
         counter++;
         
         newY = framebuffer->Height + position.y;
         if (newX >= 0 && newY >= 0 && newX < parentFrameBuffer->Width && newY < parentFrameBuffer->Height && (counter % 2) == 0)
-            *(uint32_t*)(parentFrameBuffer->BaseAddress + ((newX + (newY * parentFrameBuffer->Width)) * 4)) = borderColor;
+            *(uint32_t*)(parentFrameBuffer->BaseAddress + ((newX + (newY * parentFrameBuffer->Width)) * 4)) = cBorder;
     }
 
     counter = 0;
@@ -69,12 +74,12 @@ void Window::Render()
         int64_t newX = framebuffer->Width + position.x;
         int64_t newY = y + position.y;
         if (newX >= 0 && newY >= 0 && newX < parentFrameBuffer->Width && newY < parentFrameBuffer->Height && (counter % 2) == 0)
-            *(uint32_t*)(parentFrameBuffer->BaseAddress + ((newX + (newY * parentFrameBuffer->Width)) * 4)) = borderColor;
+            *(uint32_t*)(parentFrameBuffer->BaseAddress + ((newX + (newY * parentFrameBuffer->Width)) * 4)) = cBorder;
         counter++;
         
         newX = -1 + position.x;
         if (newX >= 0 && newY >= 0 && newX < parentFrameBuffer->Width && newY < parentFrameBuffer->Height && (counter % 2) == 0)
-            *(uint32_t*)(parentFrameBuffer->BaseAddress + ((newX + (newY * parentFrameBuffer->Width)) * 4)) = borderColor;
+            *(uint32_t*)(parentFrameBuffer->BaseAddress + ((newX + (newY * parentFrameBuffer->Width)) * 4)) = cBorder;
     } 
     
 }

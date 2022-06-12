@@ -255,7 +255,7 @@ void BasicRenderer::Clear(uint32_t col)
 void BasicRenderer::Cls()
 {
     BasicRenderer::Clear(0);
-    BasicRenderer::Println("Masl OS v0.06", Colors.green);
+    BasicRenderer::Println("Masl OS v0.07", Colors.green);
     BasicRenderer::Println("-------------", Colors.green);
     BasicRenderer::Println();
 }

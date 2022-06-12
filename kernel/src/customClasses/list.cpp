@@ -58,6 +58,15 @@ template <typename T> uint64_t List<T>::getCapacity()
     return cap;
 }
 
+
+template <typename T> int64_t List<T>::getIndexOf(T item)
+{
+    for (uint64_t index = 0; index < count; index++)
+        if (arr[index] == item)
+            return index;
+    return -1;
+}
+
 template <typename T> void List<T>::add(T item)
 {
     if (count + 1 > cap)

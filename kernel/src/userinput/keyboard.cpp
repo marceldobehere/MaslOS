@@ -6,6 +6,7 @@
 #include "../cmdParsing/cmdParser.h"
 #include "../Cols.h"
 #include "../OSDATA/userdata.h"
+#include "../OSDATA/osdata.h"
 
 
 bool lshift = false;
@@ -60,10 +61,10 @@ void KeyboardPrintStart(Window* window)
     if (!window->allowKeyboardDrawing)
         return;
 
-    if (activeWindow->instance->instanceType == InstanceType::Terminal)
+    if (window->instance->instanceType == InstanceType::Terminal)
     {
         window->renderer->CursorPosition.y += 16;
-        TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
+        TerminalInstance* instance = (TerminalInstance*)window->instance;
         PrintUser(window, instance->currentUser);
     }
 }
@@ -79,6 +80,18 @@ void PrintUser(Window* window, OSUser* user)
 
 void HandleKeyboard(uint8_t scancode)
 {
+    if (scancode == ARR_LEFT)
+    {  
+        int64_t index = osData.windows.getIndexOf(activeWindow);
+        index = (index - 1 + osData.windows.getCount()) % osData.windows.getCount();
+        activeWindow = osData.windows[index];
+    }
+    else if (scancode == ARR_RIGHT)
+    {
+        int64_t index = osData.windows.getIndexOf(activeWindow);
+        index = (index + 1) % osData.windows.getCount();
+        activeWindow = osData.windows[index];
+    }
 
 
 
