@@ -31,6 +31,11 @@ typedef struct
 	void* glyphBuffer;
 } PSF1_FONT;
 
+typedef struct
+{
+	int64_t width, height;
+	void* imageBuffer;
+} ImageFile;
 
 
 
@@ -105,37 +110,82 @@ PSF1_FONT* LoadPSF1Font(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandl
 }
 
 
-
-
-
-Framebuffer framebuffer;
-
-Framebuffer* InitializeGOP()
+ImageFile* LoadImage(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable)
 {
-	EFI_GUID gopGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
-	EFI_GRAPHICS_OUTPUT_PROTOCOL* gop;
-	EFI_STATUS status;
+	return NULL;
+	// 	EFI_FILE* img = LoadFile(Directory, Path, ImageHandle, SystemTable);
 
-	status = uefi_call_wrapper(BS->LocateProtocol, 3, &gopGuid, NULL, (void**)&gop);
+	// 	if (font == NULL)
+	// 		return NULL;
 
-	if (EFI_ERROR(status))
-	{
-		Print(L"Unable to locate GOP!!!\n\r");
-		return NULL;
+	// 	ImageFile* image;
+	// 	SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(ImageFile), (void**)&image);
+		
+	// 	PSF1_HEADER* fontHeader;
+	// 	SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(PSF1_HEADER), (void**)&fontHeader);
+		
+	// 	UINTN size = sizeof(PSF1_HEADER);
+	// 	font->Read(font, &size, fontHeader);
+
+	// 	if (fontHeader->magic[0] != PSF1_MAGIC0 || fontHeader->magic[1] != PSF1_MAGIC1)
+	// 		return NULL;
+		
+	// 	UINTN glyphBufferSize = fontHeader->charsize * 256;
+
+	// 	if (fontHeader->mode == 1)
+	// 		glyphBufferSize *= 2;
+		
+	// 	void* glyphBuffer;
+	// 	{
+	// 		font->SetPosition(font, sizeof(PSF1_HEADER));
+	// 		SystemTable->BootServices->AllocatePool(EfiLoaderData, glyphBufferSize, (void**)&glyphBuffer);
+	// 		font->Read(font, &glyphBufferSize, glyphBuffer);
+
+	// 	}
+
+	// 	// PSF1_FONT* finishedFont;
+	// 	// SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(PSF1_FONT), (void**)&finishedFont);
+	// 	// finishedFont->psf1_Header = fontHeader;
+	// 	// finishedFont->glyphBuffer = glyphBuffer;
+
+		
+
+
+		//return image;
 	}
-	else
+
+
+
+
+
+	Framebuffer framebuffer;
+
+	Framebuffer* InitializeGOP()
 	{
-		Print(L"GOP Located.\n\r");
-	}
+		EFI_GUID gopGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
+		EFI_GRAPHICS_OUTPUT_PROTOCOL* gop;
+		EFI_STATUS status;
 
-	framebuffer.BaseAddress = (void*)gop->Mode->FrameBufferBase;
-	framebuffer.BufferSize = gop->Mode->FrameBufferSize;
-	framebuffer.Width = gop->Mode->Info->HorizontalResolution;
-	framebuffer.Height = gop->Mode->Info->VerticalResolution;
-	framebuffer.PixelsPerScanLine = gop->Mode->Info->PixelsPerScanLine;
+		status = uefi_call_wrapper(BS->LocateProtocol, 3, &gopGuid, NULL, (void**)&gop);
+
+		if (EFI_ERROR(status))
+		{
+			Print(L"Unable to locate GOP!!!\n\r");
+			return NULL;
+		}
+		else
+		{
+			Print(L"GOP Located.\n\r");
+		}
+
+		framebuffer.BaseAddress = (void*)gop->Mode->FrameBufferBase;
+		framebuffer.BufferSize = gop->Mode->FrameBufferSize;
+		framebuffer.Width = gop->Mode->Info->HorizontalResolution;
+		framebuffer.Height = gop->Mode->Info->VerticalResolution;
+		framebuffer.PixelsPerScanLine = gop->Mode->Info->PixelsPerScanLine;
 
 
-	return &framebuffer;
+		return &framebuffer;
 }
 
 
@@ -164,7 +214,7 @@ typedef struct
 	EFI_MEMORY_DESCRIPTOR* mMap;
 	UINTN mMapSize;
 	UINTN mMapDescSize;
-
+	ImageFile* testImage;
 } BootInfo;
 
 
@@ -277,6 +327,17 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 	// );
 
 	PSF1_FONT* newFont = LoadPSF1Font(NULL, L"zap-light16.psf", ImageHandle, SystemTable);
+
+	if (newFont == NULL)
+	{
+		Print(L"Font was not loaded!\n\r");
+	}
+	else
+	{
+		Print(L"Font loaded. Char size: %d\n\r", newFont->psf1_Header->charsize);
+	}
+
+	ImageFile* image = LoadImage(NULL, L"test.mbif", ImageHandle, SystemTable);
 
 	if (newFont == NULL)
 	{
