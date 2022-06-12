@@ -14,7 +14,7 @@ extern "C" void _start(BootInfo* bootInfo)
         mainWindow = (Window*)malloc(sizeof(Window));
         TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
         *terminal = TerminalInstance(&adminUser);
-        *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(10, 10), GlobalRenderer->framebuffer);
+        *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(5, 30), GlobalRenderer, "Main Window");
         osData.windows.add(mainWindow);
 
         activeWindow = mainWindow;
@@ -24,17 +24,18 @@ extern "C" void _start(BootInfo* bootInfo)
         Window* window = (Window*)malloc(sizeof(Window));
         TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
         *terminal = TerminalInstance(&guestUser);
-        *(window) = Window((DefaultInstance*)terminal, Size(480, 360), Position(400, 60), GlobalRenderer->framebuffer);
+        *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(100, 60), GlobalRenderer, "Testing Window");
         osData.windows.add(window);
     }
 
-
-    // osData.windows[1]->renderer->Clear(Colors.black);
+    
+    //osData.windows[1]->renderer->Clear(Colors.blue);
     // osData.windows[1]->renderer->color = Colors.white;
 
-    osData.windows[1]->renderer->Cls();    
-    osData.windows[1]->renderer->Println("Hello, world!");
+    osData.windows[1]->renderer->Cls();  
+    //osData.windows[1]->renderer->Println("Hello, world!");
     KeyboardPrintStart(osData.windows[1]);
+    
     
 
     //activeWindow = osData.windows[1];
@@ -47,11 +48,12 @@ extern "C" void _start(BootInfo* bootInfo)
 
     while(!osData.exit)
     {
-        //GlobalRenderer->Clear(Colors.black);
+        GlobalRenderer->Clear(Colors.black);
 
+        DrawMousePointer1();
         for (int i = 0; i < osData.windows.getCount(); i++)
             osData.windows[i]->Render();
-        DrawMousePointer();
+        DrawMousePointer2();
 
         PIT::Sleep(200);
         //asm("hlt");
@@ -61,8 +63,8 @@ extern "C" void _start(BootInfo* bootInfo)
     GlobalRenderer->color = Colors.white;
     GlobalRenderer->Println("Goodbye.");
     PIT::Sleep(1000);
-
 }
+
 
 
 /*

@@ -25,6 +25,8 @@ void ProcessMousePacket();
 
 
 void DrawMousePointer();
+void DrawMousePointer1();
+void DrawMousePointer2();
 
 void LoadFromBuffer(MPoint point);
 void SaveIntoBuffer(MPoint point);

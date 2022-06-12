@@ -36,6 +36,7 @@ struct Position
 class Window
 {
     private:
+    BasicRenderer* parentRenderer;
     
     public:
     DefaultInstance* instance;
@@ -46,7 +47,8 @@ class Window
     Framebuffer* framebuffer;
     Framebuffer* parentFrameBuffer;
     uint32_t borderColor;
-    Window(DefaultInstance* instance, Size size, Position position, Framebuffer* parentFrameBuffer);
+    const char* title;
+    Window(DefaultInstance* instance, Size size, Position position, BasicRenderer* parentRenderer, const char* title);
 
     void Render();
     void Free();

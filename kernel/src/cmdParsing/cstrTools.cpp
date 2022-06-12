@@ -30,6 +30,13 @@ char* StrCopy(const char* og)
 
 char* StrSubstr(const char* og, int index, int len)
 {
+    int size = 0;
+    for (int i = 0; og[i] != 0; i++)
+        size++;
+
+    if (len > size)
+        len = size;
+
     char* newStr = (char*)malloc(len + 1);
     for (int i = 0; i < len; i++)
         newStr[i] = og[i+index];

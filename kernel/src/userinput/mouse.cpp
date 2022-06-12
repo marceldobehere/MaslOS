@@ -1,5 +1,7 @@
 #include "mouse.h"
-  
+#include "../WindowStuff/Window/window.h"
+#include "../WindowStuff/WindowManager/windowManager.h"
+#include "../scheduling-pit/pit.h"
 
 #define PS2XSign        0b00010000
 #define PS2YSign        0b00100000
@@ -9,6 +11,10 @@
 #define PS2LeftButton   0b00000001
 #define PS2MiddleButton 0b00000100
 #define PS2RightButton  0b00000010
+
+#define MouseLeft   0
+#define MouseRight  1 
+#define MouseMiddle 2
 
 
 uint32_t MouseDataMap[] =
@@ -75,6 +81,11 @@ uint32_t MouseTempBitmap[] =
 extern uint32_t mouseColFront = Colors.white, mouseColBack = Colors.black;
 
 MPoint oldMousePosition;
+
+bool clicks[3] = {false, false, false};
+double clickTimes[3] = {0, 0, 0};
+
+
 MPoint MousePosition;
 
 void SaveIntoBuffer(MPoint point)
@@ -151,10 +162,19 @@ void DrawMouseBuffer(MPoint point)
 
 }
 
-
 void DrawMousePointer()
 {
+    //DrawMousePointer1();
+    //DrawMousePointer2();
+}
+
+void DrawMousePointer1()
+{
     LoadFromBuffer(oldMousePosition);
+}
+
+void DrawMousePointer2()
+{
     SaveIntoBuffer(MousePosition);
     DrawMouseBuffer(MousePosition);
     oldMousePosition.x = MousePosition.x;
@@ -195,10 +215,24 @@ uint8_t MouseRead()
     return inb(0x60);
 }
 
+MPoint diff = MPoint();
+bool startDrag = false;
+Window* dragWindow = NULL;
+
 void InitPS2Mouse()
 {
     outb(0x64, 0xA8);
     Mousewait();
+
+    for (int i = 0; i < 3; i++)
+    {
+        clicks[i] = false;
+        clickTimes[i] = PIT::TimeSinceBoot;
+    }
+
+    diff = MPoint();
+    startDrag = false;
+    dragWindow = NULL;
 
     MousePosition.x = 50;
     MousePosition.y = 50;
@@ -272,6 +306,44 @@ void HandlePS2Mouse(uint8_t data)
     }
 }
 
+void HandleClick(bool L, bool R, bool M)
+{
+    //activeWindow->renderer->Println("Click");
+    if (L)
+    {
+        Window* window = WindowManager::getWindowAtMousePosition();
+        activeWindow = window;
+        dragWindow = window;
+        startDrag = false;
+    }   
+}
+
+
+void HandleHold(bool L, bool R, bool M)
+{
+    if (L)
+    {
+        Window* window = dragWindow;
+        if (window != NULL)
+        {
+            if (!startDrag)
+            {
+                startDrag = true;
+                diff.x = MousePosition.x - window->position.x;
+                diff.y = MousePosition.y - window->position.y;
+            }
+            else
+            {
+                window->position.x = MousePosition.x - diff.x;
+                window->position.y = MousePosition.y - diff.y;
+            }
+        }
+
+
+
+
+    }
+}
 
 
 
@@ -376,18 +448,51 @@ void ProcessMousePacket()
 
     MousePacketReady = false;
 
+    // {
+    //     LoadFromBuffer(oldMousePosition);
+    //     //if (leftButton)
+    //     //    GlobalRenderer->delChar(MousePosition.x, MousePosition.y, mouseColFront);
+    //     //if (rightButton)
+    //     //    GlobalRenderer->delChar(MousePosition.x, MousePosition.y, mouseColBack);
+    //     SaveIntoBuffer(MousePosition);
+    //     DrawMouseBuffer(MousePosition);
+    //     oldMousePosition.x = MousePosition.x;
+    //     oldMousePosition.y = MousePosition.y;
+    // }
+
+    bool cClicks[3] = {leftButton, rightButton, middleButton};
+
+    bool tClicks[3] = {false, false, false};
+    bool tHolds[3] = {false, false, false};
+    for (int i = 0; i < 3; i++)
     {
-        LoadFromBuffer(oldMousePosition);
-        if (leftButton)
-            GlobalRenderer->delChar(MousePosition.x, MousePosition.y, mouseColFront);
-        if (rightButton)
-            GlobalRenderer->delChar(MousePosition.x, MousePosition.y, mouseColBack);
-        SaveIntoBuffer(MousePosition);
-        DrawMouseBuffer(MousePosition);
-        oldMousePosition.x = MousePosition.x;
-        oldMousePosition.y = MousePosition.y;
+        if (!cClicks[i])
+        {
+            if (clicks[i])
+            {  
+                clicks[i] = false; 
+            }
+        }
+        else
+        {
+            if (clicks[i])
+            {   
+                if (PIT::TimeSinceBoot >= clickTimes[i] + 0.2)
+                    tHolds[i] = true;  
+            }
+            else
+            {
+                clicks[i] = true;
+                tClicks[i] = true;
+                clickTimes[i] = PIT::TimeSinceBoot;
+            }
+        }
     }
 
 
-    
+    if(tClicks[0] || tClicks[1] || tClicks[1])
+        HandleClick(tClicks[0], tClicks[1], tClicks[2]);
+
+    if(tHolds[0] || tHolds[1] || tHolds[1])
+        HandleHold(tHolds[0], tHolds[1], tHolds[2]);
 }

@@ -8,7 +8,7 @@
 
 BasicRenderer *GlobalRenderer;
 
-void BasicRenderer::putChar(char chr, unsigned int xoff, unsigned int yoff)
+void BasicRenderer::putChar(char chr, int64_t xoff, int64_t yoff)
 {
     unsigned int *pixPtr = (unsigned int *)framebuffer->BaseAddress;
     char *fontPtr = ((char *)psf1_font->glyphBuffer) + (chr * psf1_font->psf1_Header->charsize);
@@ -16,20 +16,21 @@ void BasicRenderer::putChar(char chr, unsigned int xoff, unsigned int yoff)
     if (overwrite)
         BasicRenderer::delChar(xoff, yoff);
 
-    for (unsigned long y = yoff; y < yoff + 16; y++)
+    for (int64_t y = yoff; y < yoff + 16; y++)
     {
-        for (unsigned long x = xoff; x < xoff + 8; x++)
+        for (int64_t x = xoff; x < xoff + 8; x++)
         {
-            if ((*fontPtr & (0b10000000 >> (x - xoff))) > 0)
-            {
-                *(unsigned int *)(pixPtr + x + (y * framebuffer->PixelsPerScanLine)) = color;
-            }
+            if (x >= 0 && x < framebuffer->Width && y >= 0 && y < framebuffer->Height)
+                if ((*fontPtr & (0b10000000 >> (x - xoff))) > 0)
+                {
+                    *(unsigned int *)(pixPtr + x + (y * framebuffer->PixelsPerScanLine)) = color;
+                }
         }
         fontPtr++;
     }
 }
 
-void BasicRenderer::delChar(unsigned int xoff, unsigned int yoff, uint32_t col)
+void BasicRenderer::delChar(int64_t xoff, int64_t yoff, uint32_t col)
 {
     unsigned int *pixPtr = (unsigned int *)framebuffer->BaseAddress;
 
@@ -38,15 +39,24 @@ void BasicRenderer::delChar(unsigned int xoff, unsigned int yoff, uint32_t col)
             *(unsigned int *)(pixPtr + x + (y * framebuffer->PixelsPerScanLine)) = col;
 }
 
-void BasicRenderer::delChar(unsigned int xoff, unsigned int yoff)
+void BasicRenderer::delChar(int64_t xoff, int64_t yoff)
 {
     BasicRenderer::delChar(xoff, yoff, 0x00000000);
 }
 
-void BasicRenderer::putStr(const char *chrs, unsigned int xoff, unsigned int yoff)
+void BasicRenderer::putStr(const char *chrs, int64_t xoff, int64_t yoff)
 {
     for (unsigned int x = 0; chrs[x] != 0; x++)
         putChar(chrs[x], xoff + (x * 8), yoff);
+}
+
+void BasicRenderer::putStr(const char *chrs, int64_t xoff, int64_t yoff, uint32_t col)
+{
+    uint32_t tcol = color;
+    color = col;
+    for (unsigned int x = 0; chrs[x] != 0; x++)
+        putChar(chrs[x], xoff + (x * 8), yoff);
+    color = tcol;
 }
 
 void BasicRenderer::printStr(const char *chrs)
@@ -235,16 +245,27 @@ void BasicRenderer::Clear(uint32_t col, bool resetCursor)
     uint64_t bytesPerScanline = framebuffer->PixelsPerScanLine * 4;
     uint64_t fbHeight = framebuffer->Height;
     uint64_t fbSize = framebuffer->BufferSize;
-
-    for (uint64_t verticalScanline = 0; verticalScanline < fbHeight; verticalScanline++)
-    {
-        uint64_t pixPtrBase = fbBase + (bytesPerScanline * verticalScanline);
-        for (uint32_t *pixPtr = (uint32_t *)pixPtrBase; pixPtr < (uint32_t *)(pixPtrBase + bytesPerScanline); pixPtr++)
-            *pixPtr = col;
-    }
+    uint32_t* end = (uint32_t*)(fbBase + fbSize);
+  
+    for (uint32_t* addr = (uint32_t*)fbBase; addr < end; addr++)
+        *(addr) = col;
 
     if (resetCursor)
         CursorPosition = {0, 0};
+}
+
+void BasicRenderer::Clear(int64_t x1, int64_t y1, int64_t x2, int64_t y2, uint32_t col)
+{
+    uint64_t fbBase = (uint64_t)framebuffer->BaseAddress;
+    uint64_t bytesPerScanline = framebuffer->PixelsPerScanLine * 4;
+    uint64_t fbHeight = framebuffer->Height;
+
+    for (int64_t x = x1; x <= x2; x++)
+        for (int64_t y = y1; y <= y2; y++)
+        {
+            if (x >= 0 && y >= 0 && x < framebuffer->Width && framebuffer->Height)
+                *((uint32_t*)(fbBase + (4 * x) + (bytesPerScanline * y))) = col;
+        }
 }
 
 void BasicRenderer::Clear(uint32_t col)

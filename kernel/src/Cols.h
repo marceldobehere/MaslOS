@@ -8,6 +8,7 @@
         white =  0xffffffff,
         silver = 0xffc0c0c0,
         gray =   0xff808080,
+        dgray =  0xff404040,
         black =  0xff000000,
         pink =   0xffFF1493,
         green =  0xff008000,
@@ -23,13 +24,14 @@
         bgreen = 0xff00FF00;
     } Colors;
     
-    static const int colCount = 19;
+    static const int colCount = 21;
 
     static const char* colNames[colCount] =
     {
         "white",
         "silver",
         "gray",
+        "dgray",
         "black",
         "pink",
         "green",
@@ -45,7 +47,8 @@
         "bgreen",
         "bright red",
         "bright blue",
-        "bright green"
+        "bright green",
+        "dark gray"
     };
 
     static uint32_t colValues[colCount] = 
@@ -53,6 +56,7 @@
         Colors.white,
         Colors.silver,
         Colors.gray,
+        Colors.dgray,
         Colors.black,
         Colors.pink,
         Colors.green,
@@ -68,5 +72,6 @@
         Colors.bgreen,
         Colors.bred,
         Colors.bblue,
-        Colors.bgreen
+        Colors.bgreen,
+        Colors.gray,
     };
