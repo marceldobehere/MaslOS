@@ -407,24 +407,30 @@ void BasicRenderer::Print(const char* chrs, dispVar vars[])
     }
 }
 
-void BasicRenderer::DrawImage(ImageFile* image, int64_t x, int64_t y)
+void BasicRenderer::DrawImage(ImageFile* image, int64_t x, int64_t y, int64_t sx, int64_t sy)
 {
     uint64_t addr = (uint64_t)framebuffer->BaseAddress;
     uint64_t mult = framebuffer->PixelsPerScanLine*4;
     uint32_t* imgaddr = (uint32_t*)image->imageBuffer;
     for (int64_t y1 = 0; y1 < image->height; y1++)
     {
-        int64_t yp = y1 + y;
         for (int64_t x1 = 0; x1 < image->width; x1++)
         {
             if (*imgaddr != 0)//((*imgaddr/* | 0xffffff00*/) & (uint32_t)0xff000000 != (uint32_t)0x00000000)
             {
-                int64_t xp = x1 + x; 
-                if (xp >= 0 && yp >= 0 && xp < framebuffer->Width && yp < framebuffer->Height)
-                    *((uint32_t*)(addr + (4 * xp) + (mult * yp))) = *imgaddr;
+                for (int iy = 0; iy < sy; iy++)
+                {
+                    int64_t yp = (y1*sy) + iy + y;
+                    for (int ix = 0; ix < sx; ix++)
+                    {
+                        int64_t xp = (x1*sx) + x + ix;
+                        if (xp >= 0 && yp >= 0 && xp < framebuffer->Width && yp < framebuffer->Height)
+                            *((uint32_t*)(addr + (4 * xp) + (mult * yp))) = *imgaddr;
+                    }
+                }
             }
             
-            imgaddr++;
+            imgaddr ++;
         }
     }
 }

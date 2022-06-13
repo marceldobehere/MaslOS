@@ -8,6 +8,7 @@ extern "C" void _start(BootInfo* bootInfo)
     osData.kernelInfo = &kernelInfo;
     osData.exit = false;
     osData.windows = List<Window*>();
+    osData.drawBackground = false;
 
     // if (bootInfo->testImage != NULL)
     // {
@@ -65,7 +66,7 @@ extern "C" void _start(BootInfo* bootInfo)
     //osData.windows[1]->renderer->color = Colors.white;
     
     osData.windows[1]->renderer->Cls();  
-    osData.windows[1]->renderer->DrawImage(bootInfo->testImage, 150, 0);
+    osData.windows[1]->renderer->DrawImage(bootInfo->testImage, 150, 0, 2, 2);
     //osData.windows[1]->renderer->Println("Hello, world!");
     KeyboardPrintStart(osData.windows[1]);
     
@@ -92,6 +93,9 @@ extern "C" void _start(BootInfo* bootInfo)
     while(!osData.exit)
     {
         realMainWindow->renderer->Clear(Colors.dblue);
+        
+        if (osData.drawBackground)
+            realMainWindow->renderer->DrawImage(bootInfo->bgImage, 0, 0, 2, 2);
 
         if (activeWindow != NULL)
         {

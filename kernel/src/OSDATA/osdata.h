@@ -11,6 +11,7 @@ struct OSData
     Window* realMainWindow;
     Window* realMainWindow2;
     Window* mainTerminalWindow;
+    bool drawBackground;
 };
 
 extern OSData osData;
