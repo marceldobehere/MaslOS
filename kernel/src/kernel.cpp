@@ -91,11 +91,11 @@ extern "C" void _start(BootInfo* bootInfo)
     // }
 
     while(!osData.exit)
-    {
-        realMainWindow->renderer->Clear(Colors.dblue);
-        
+    {    
         if (osData.drawBackground)
             realMainWindow->renderer->DrawImage(bootInfo->bgImage, 0, 0, 2, 2);
+        else
+            realMainWindow->renderer->Clear(Colors.dblue);
 
         if (activeWindow != NULL)
         {
