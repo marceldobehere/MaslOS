@@ -5,7 +5,7 @@
 
 static void Panic(const char* panicMessage, const char* var, bool lock)
 {
-    //GlobalRenderer->Clear(Colors.red);
+    GlobalRenderer->Clear(Colors.red);
     GlobalRenderer->Println();
     GlobalRenderer->Println();
     GlobalRenderer->Println("KERNEL PANIC AAAAAAAAAAAAAAAAAAAAAAAAAAA", Colors.white);
