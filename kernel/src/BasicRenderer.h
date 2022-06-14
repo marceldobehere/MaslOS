@@ -39,6 +39,8 @@ class BasicRenderer
 
         void Print(const char* chrs, dispVar vars[]); 
         void Println(const char* chrs, dispVar vars[]);
+        void Println(const char *chrs, dispVar vars[], uint32_t col);
+        void Print(const char *chrs, dispVar vars[], uint32_t col);
         void PrintArg(dispVar var);
 
         void Print(const char* chrs, uint32_t col);

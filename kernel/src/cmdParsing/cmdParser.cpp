@@ -12,18 +12,24 @@
 
 void LogError(const char* msg, Window* window)
 {
+    AddToMStack(MStack("LogError", "cmdParsing/cmdParser.cpp"));
     window->renderer->Println(msg, Colors.bred);
+    RemoveLastMStack();
 }
 
 void LogError(const char* msg, const char* var, Window* window)
 {
+    AddToMStack(MStack("LogError", "cmdParsing/cmdParser.cpp"));
     window->renderer->Println(msg, var, Colors.bred);
+    RemoveLastMStack();
 }
 
 void LogInvalidArgumentCount(int expected, int found, Window* window)
 {
+    AddToMStack(MStack("LogInvalidArgumentCount", "cmdParsing/cmdParser.cpp"));
     window->renderer->Print("Invalid Argument count. Expected {} but got ", to_string((uint64_t)expected), Colors.bred);
     window->renderer->Println("{} instead.", to_string((uint64_t)found), Colors.bred);
+    RemoveLastMStack();
 }
 
 
@@ -31,16 +37,19 @@ void LogInvalidArgumentCount(int expected, int found, Window* window)
 
 void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 {
+    AddToMStack(MStack("ParseCommand", "cmdParsing/cmdParser.cpp"));
     //window->renderer->Println("This is test out!");
     if (StrEquals(input, "cls"))
     {
         window->renderer->Cls();
+        RemoveLastMStack();
         return;
     }
 
     if (StrEquals(input, "malloc"))
     {
         malloc(0x5000);
+        RemoveLastMStack();
         return;
     }
 
@@ -48,6 +57,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     {
         window->renderer->Println("Exiting...");
         osData.exit = true;
+        RemoveLastMStack();
         return;
     }
 
@@ -69,6 +79,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         
         free(data);
         free(data2);
+        RemoveLastMStack();
         return;
     }
 
@@ -92,6 +103,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         
         free(data);
         free(data2);
+        RemoveLastMStack();
         return;
     }
 
@@ -101,6 +113,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     if (data->len == 0)
     {
         free(data);
+        RemoveLastMStack();
         return;
     }
 
@@ -116,6 +129,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             LogInvalidArgumentCount(1, data->len-1, window);
         
         free(data);
+        RemoveLastMStack();
         return;
     }
 
@@ -163,6 +177,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             LogInvalidArgumentCount(1, data->len-1, window);
         
         free(data);
+        RemoveLastMStack();
         return;
     }
 
@@ -176,6 +191,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             LogInvalidArgumentCount(2, data->len-1, window);
         
         free(data);
+        RemoveLastMStack();
         return;
     }
 
@@ -187,6 +203,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             LogInvalidArgumentCount(1, data->len-1, window);
         
         free(data);
+        RemoveLastMStack();
         return;
     }
 
@@ -199,21 +216,25 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             LogInvalidArgumentCount(1, data->len-1, window);
         
         free(data);
+        RemoveLastMStack();
         return;
     }
 
 
     LogError("Unknown command \"{}\"!", data->data[0], window);
     free(data);
+    RemoveLastMStack();
     return;
 }
 
 void login(const char* name, OSUser** user, Window* window)
 {
+    AddToMStack(MStack("login", "cmdParsing/cmdParser.cpp"));
     OSUser* usr = getUser(name);
     if (usr == 0)
     {
         LogError("User \"{}\" was not found!", name, window);
+        RemoveLastMStack();
         return;
     }
 
@@ -224,16 +245,19 @@ void login(const char* name, OSUser** user, Window* window)
         window->renderer->Println("Please enter the password down below:");
         (*user)->mode = commandMode::enterPassword;
     }
+    RemoveLastMStack();
 }
 
 void login(const char* name, const char* pass, OSUser** user, Window* window)
 {
+    AddToMStack(MStack("login", "cmdParsing/cmdParser.cpp"));
     (*user)->mode = commandMode::none;
 
     OSUser* usr = getUser(name);
     if (usr == 0)
     {
         LogError("User \"{}\" was not found!", name, window);
+        RemoveLastMStack();
         return;
     }
 
@@ -241,10 +265,12 @@ void login(const char* name, const char* pass, OSUser** user, Window* window)
         *user = usr;
     else
         LogError("Password is incorrect!", name, window); 
+    RemoveLastMStack();
 }
 
 void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
 {
+    AddToMStack(MStack("SetCmd", "cmdParsing/cmdParser.cpp"));
     if (StrEquals(name, "user color"))
     {
         ParsedColData data = ParseColor(val);
@@ -264,6 +290,15 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
     else if (StrEquals(name, "username"))
     {
         (*user)->userName = StrCopy(val);
+    }
+    else if (StrEquals(name, "background image"))
+    {
+        osData.drawBackground = StrEquals(val, "true") || StrEquals(val, "on");
+        if (!osData.drawBackground)
+        {
+            if (!(StrEquals(val, "false") || StrEquals(val, "off")))
+                LogError("Value \"{}\" has to be \"true\", \"false\", \"on\" or \"off\"!", val, window); 
+        }
     }
     else if (StrEquals(name, "password"))
     {
@@ -290,12 +325,14 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
     {
         LogError("Parameter \"{}\" does not exist.", name, window);
     }
+    RemoveLastMStack();
 }
 
 
 
 void GetCmd(const char* name, OSUser* user, Window* window)
 {
+    AddToMStack(MStack("GetCmd", "cmdParsing/cmdParser.cpp"));
     if (StrEquals(name, "free ram"))
     {
         window->renderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
@@ -314,6 +351,10 @@ void GetCmd(const char* name, OSUser* user, Window* window)
         dispVar vars[] = {dispVar(osData.realMainWindow->size.width), dispVar(osData.realMainWindow->size.height)};
         window->renderer->Println("Screen Resolution: {0}x{1}.", vars);
     }
+    else if (StrEquals(name, "stack trace"))
+    {
+        PrintMStackTrace(osData.stackArr, osData.stackPointer, window->renderer, user->colData.defaultTextColor);
+    }
     else
     {
         LogError("Parameter \"{}\" does not exist.", name, window);
@@ -321,10 +362,12 @@ void GetCmd(const char* name, OSUser* user, Window* window)
 
     // window->renderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
     // window->renderer->Println("");
+    RemoveLastMStack();
 }
 
 ParsedColData ParseColor(const char* col)
 {
+    AddToMStack(MStack("ParseColor", "cmdParsing/cmdParser.cpp"));
     ParsedColData data = ParsedColData();
     data.parseSuccess = false;
     data.col = 0;
@@ -339,6 +382,7 @@ ParsedColData ParseColor(const char* col)
         //window->renderer->Println("Col: \"{}\"", subStr, Colors.cyan);
         data.col = ConvertStringToHex(subStr);
         data.parseSuccess = true;
+        RemoveLastMStack();
         return data;
     }
 
@@ -353,6 +397,7 @@ ParsedColData ParseColor(const char* col)
     
     //window->renderer->Println("Color 2: {}", ConvertHexToString(data.col), Colors.white);
 
+    RemoveLastMStack();
     return data;
 }
 
@@ -374,6 +419,7 @@ ParsedColData ParseColor(const char* col)
 
 StringArrData* SplitLine(char* input)
 {
+    AddToMStack(MStack("SplitLine", "cmdParsing/cmdParser.cpp"));
     uint64_t index = 0;
     uint64_t parts[100];
     uint64_t partIndex = 0;
@@ -507,6 +553,6 @@ StringArrData* SplitLine(char* input)
     // window->renderer->Print(" - \"{}\"", splitLine[partIndex], Colors.yellow);
     // window->renderer->Println(", Count: {}", to_string((uint64_t)parts[partIndex] + 1), Colors.yellow);
 
-
+    RemoveLastMStack();
     return data;
 }

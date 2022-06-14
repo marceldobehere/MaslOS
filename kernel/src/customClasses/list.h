@@ -23,6 +23,8 @@ template <typename T> class List
     int64_t getIndexOf(T item);
     void add(T item);
     void removeAt(uint64_t index);
+    void removeLast();
+    void removeFirst();
     T& operator[](uint64_t index);
     void clear();
 };

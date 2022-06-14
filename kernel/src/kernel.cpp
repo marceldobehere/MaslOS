@@ -1,7 +1,21 @@
 #include "kernelUtil.h"
 
+
+/*
+if (osData.enableStackTrace)
+    osData.stackPointer.add(MStack("_start", "kernel.cpp"));
+if (osData.enableStackTrace)
+    osData.stackPointer.removeLast();
+
+*/
+
 extern "C" void _start(BootInfo* bootInfo)
 {  
+    osData.stackPointer = 0;
+    osData.enableStackTrace = true;
+    AddToMStack(MStack("_start", "kernel.cpp"));
+
+
     KernelInfo kernelInfo = InitializeKernel(bootInfo);
     PageTableManager* pageTableManager = kernelInfo.pageTableManager;
 
@@ -9,6 +23,9 @@ extern "C" void _start(BootInfo* bootInfo)
     osData.exit = false;
     osData.windows = List<Window*>();
     osData.drawBackground = false;
+    
+
+
 
     // if (bootInfo->testImage != NULL)
     // {
@@ -141,6 +158,10 @@ extern "C" void _start(BootInfo* bootInfo)
     GlobalRenderer->Println("Goodbye.");
     PIT::Sleep(1000);
     GlobalRenderer->Clear(Colors.black);
+
+
+    RemoveLastMStack();
+    return;
 }
 
 

@@ -287,6 +287,27 @@ void BasicRenderer::Println(const char* chrs, dispVar vars[])
     Println();
 }
  
+
+void BasicRenderer::Println(const char *chrs, dispVar vars[], uint32_t col)
+{
+    uint64_t tempcol = color;
+    color = col;
+
+    BasicRenderer::Print(chrs, vars);
+    BasicRenderer::printStr("\n\r");
+
+    color = tempcol;
+}
+
+void BasicRenderer::Print(const char *chrs, dispVar vars[], uint32_t col)
+{
+    uint64_t tempcol = color;
+    color = col;
+
+    BasicRenderer::Print(chrs, vars);
+
+    color = tempcol;
+}
  
 
 void BasicRenderer::PrintArg(dispVar var)

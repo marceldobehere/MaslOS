@@ -27,6 +27,7 @@ struct KernelInfo
 
 #include "OSDATA/osdata.h"
 #include "OSDATA/userdata.h"
+#include "OSDATA/MStack/MStackM.h"
 
 #include "gdt/gdt.h" 
 

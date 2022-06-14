@@ -1,6 +1,7 @@
 #pragma once
 #include "stdint.h"
 #include "../WindowStuff/Window/window.h"
+#include "../OSDATA/MStack/MStackS.h"
 
 template <typename T> class Array
 {

@@ -1,6 +1,7 @@
 #include "heap.h"
 #include "../paging/PageTableManager.h"
 #include "../paging/PageFrameAllocator.h"
+#include "../OSDATA/osdata.h"
 
 void* heapStart;
 void* heapEnd;
@@ -8,13 +9,20 @@ HeapSegHdr* lastHdr;
 
 void HeapSegHdr::CombineForward()
 {
+    AddToMStack(MStack("CombineForward", "memory/heap.cpp"));
     //GlobalRenderer->Print("B");
     //GlobalRenderer->Print("[{}]", ConvertHexToString((uint64_t)this), Colors.yellow);
     if (next == NULL)
-        return;
+    {
+        RemoveLastMStack();
+        return;   
+    }
     //GlobalRenderer->Print("[{}]", ConvertHexToString((uint64_t)next), Colors.yellow);
     if (!next->free)
-        return;
+    {
+        RemoveLastMStack();
+        return;   
+    }
     //GlobalRenderer->Print("B2");
     
     //GlobalRenderer->Print("<");
@@ -30,10 +38,12 @@ void HeapSegHdr::CombineForward()
     //GlobalRenderer->Print("-");
     next = next->next;
     //GlobalRenderer->Print(">");
+    RemoveLastMStack();
 }
 
 void HeapSegHdr::CombineBackward()
 {
+    AddToMStack(MStack("CombineBackward", "memory/heap.cpp"));
     //GlobalRenderer->Print("C");
     if (last != NULL)
         if (last->free)
@@ -42,18 +52,26 @@ void HeapSegHdr::CombineBackward()
                 last->CombineForward();
                 //GlobalRenderer->Print(">");
             }
+    RemoveLastMStack();
 }
 
 HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
 {
+    AddToMStack(MStack("Split", "memory/heap.cpp"));
     if (splitLength < 0x10)
+    {
+        RemoveLastMStack();
         return NULL;
+    }
 
     //GlobalRenderer->Println("this len: {}", to_string(length), Colors.bgreen);
     int64_t splitSegLength = (length - splitLength) - sizeof(HeapSegHdr);
     //GlobalRenderer->Println("Splitseg len: {}", to_string(splitSegLength), Colors.bgreen);
     if (splitSegLength < 0x10)
+    {
+        RemoveLastMStack();
         return NULL;
+    }
 
     HeapSegHdr* newSplitHdr = (HeapSegHdr*)((size_t)this + splitLength + sizeof(HeapSegHdr));
 
@@ -75,6 +93,7 @@ HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
 
     //GlobalRenderer->Println("Split successful!");
 
+    RemoveLastMStack();
     return newSplitHdr;
 }
 
@@ -82,6 +101,7 @@ HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
 
 void InitializeHeap(void* heapAddress, size_t pageCount)
 {
+    AddToMStack(MStack("InitializeHeap", "memory/heap.cpp"));
     void* pos = heapAddress;
 
     for (size_t i = 0; i < pageCount; i++)
@@ -103,10 +123,14 @@ void InitializeHeap(void* heapAddress, size_t pageCount)
     startSeg->last = NULL;
     startSeg->free = true;
     lastHdr = startSeg;
+
+    RemoveLastMStack();
 }
 
 void* malloc(size_t size)
 {
+    AddToMStack(MStack("malloc", "memory/heap.cpp"));
+    
     if (size % 0x10 > 0)
     {
         size -= (size % 0x10);
@@ -114,7 +138,10 @@ void* malloc(size_t size)
     }
 
     if (size == 0)
+    {
+        RemoveLastMStack();
         return NULL;
+    }
 
     HeapSegHdr* current = (HeapSegHdr*) heapStart;
     while(true)
@@ -125,11 +152,13 @@ void* malloc(size_t size)
             {
                 current->Split(size);
                 current->free = false;
+                RemoveLastMStack();
                 return (void*)((uint64_t)current + sizeof(HeapSegHdr));
             }
             if (current->length == size)
             {
                 current->free = false;
+                RemoveLastMStack();
                 return (void*)((uint64_t)current + sizeof(HeapSegHdr));
             }
         }
@@ -139,11 +168,14 @@ void* malloc(size_t size)
     }
     //GlobalRenderer->Println("Requesting more RAM.");
     ExpandHeap(size);
-    return malloc(size);
+    void* res = malloc(size);
+    RemoveLastMStack();
+    return res;
 }
 
 void free(void* address)
 {
+    AddToMStack(MStack("free", "memory/heap.cpp"));
     HeapSegHdr* segment = (HeapSegHdr*)address - 1;
     segment->free = true;
     //GlobalRenderer->Print("A");
@@ -152,20 +184,28 @@ void free(void* address)
     //GlobalRenderer->Print("-");
     segment->CombineBackward();
     //GlobalRenderer->Print(">");
+    RemoveLastMStack();
 }
 
 void* _malloc(size_t size)
 {
-    return malloc(size);
+    AddToMStack(MStack("_malloc", "memory/heap.cpp"));
+    void* res = malloc(size);
+
+    RemoveLastMStack();
+    return res;
 }
 
 void _free(void* address)
 {
+    AddToMStack(MStack("_free", "memory/heap.cpp"));
     free(address);
+    RemoveLastMStack();
 }
 
 void ExpandHeap(size_t length)
 {
+    AddToMStack(MStack("ExpandHeap", "memory/heap.cpp"));
     if (length % 0x1000)
     {
         length -= (length % 0x1000);
@@ -194,4 +234,5 @@ void ExpandHeap(size_t length)
     newSegment->next = NULL;
     newSegment->length = length - sizeof(HeapSegHdr);
     newSegment->CombineBackward();
+    RemoveLastMStack();
 }
