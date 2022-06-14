@@ -58,29 +58,41 @@ void HeapSegHdr::CombineBackward()
 HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
 {
     AddToMStack(MStack("Split", "memory/heap.cpp"));
+
+    AddToMStack(MStack("Split 1", "memory/heap.cpp"));
     if (splitLength < 0x10)
     {
+        RemoveLastMStack();
         RemoveLastMStack();
         return NULL;
     }
 
+    AddToMStack(MStack("Split 2", "memory/heap.cpp"));
     //GlobalRenderer->Println("this len: {}", to_string(length), Colors.bgreen);
     int64_t splitSegLength = (length - splitLength) - sizeof(HeapSegHdr);
     //GlobalRenderer->Println("Splitseg len: {}", to_string(splitSegLength), Colors.bgreen);
     if (splitSegLength < 0x10)
     {
         RemoveLastMStack();
+        RemoveLastMStack();
+        RemoveLastMStack();
         return NULL;
     }
 
-    HeapSegHdr* newSplitHdr = (HeapSegHdr*)((size_t)this + splitLength + sizeof(HeapSegHdr));
+    HeapSegHdr* newSplitHdr = (HeapSegHdr*)((uint64_t)this + splitLength + sizeof(HeapSegHdr));
+    AddToMStack(MStack(to_string((uint64_t)newSplitHdr), "memory/heap.cpp"));
+    *newSplitHdr = HeapSegHdr();
 
     //GlobalRenderer->Println("Splitheader addr: {}", ConvertHexToString((uint64_t)newSplitHdr), Colors.bgreen);
-
+    AddToMStack(MStack("Split 3", "memory/heap.cpp"));
     if (next != NULL)
         next->last = newSplitHdr;
+    //AddToMStack(MStack(to_string((uint64_t)newSplitHdr), "memory/heap.cpp"));
+
+    AddToMStack(MStack("Split 4", "memory/heap.cpp"));
     newSplitHdr->next = next;
     next = newSplitHdr;
+    AddToMStack(MStack("Split 5", "memory/heap.cpp"));
     newSplitHdr->last = this;
     newSplitHdr->length = splitSegLength;
     newSplitHdr->free = free;
@@ -88,11 +100,18 @@ HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
 
     //GlobalRenderer->Println("this len: {}", to_string(length), Colors.bgreen);
 
+    AddToMStack(MStack("Split 6", "memory/heap.cpp"));
     if (lastHdr == this) 
         lastHdr = newSplitHdr;
-
     //GlobalRenderer->Println("Split successful!");
 
+    RemoveLastMStack();
+    RemoveLastMStack();
+    RemoveLastMStack();
+    RemoveLastMStack();
+    RemoveLastMStack();
+    RemoveLastMStack();
+    RemoveLastMStack();
     RemoveLastMStack();
     return newSplitHdr;
 }
@@ -150,7 +169,14 @@ void* malloc(size_t size)
         {
             if (current->length > size)
             {
-                current->Split(size);
+                if (current->Split(size) == NULL)
+                {
+                    if (current->next == NULL)
+                        break;
+                        
+                    current = current->next;
+                    continue;
+                }
                 current->free = false;
                 RemoveLastMStack();
                 return (void*)((uint64_t)current + sizeof(HeapSegHdr));

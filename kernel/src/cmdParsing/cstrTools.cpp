@@ -39,12 +39,15 @@ char* StrSubstr(const char* og, int index, int len)
 {
     AddToMStack(MStack("StrSubstr", "cmdParsing/cstrTools.cpp"));
     int size = 0;
-    for (int i = 0; og[i] != 0; i++)
-        size++;
+    for (int size = 0; og[size] != 0; size++);
 
-    if (len > size)
-        len = size;
+    if (index >= size)
+        index = size - 1;
 
+    if (len + index > size)
+        len = size - index;
+
+    //GlobalRenderer->Print("LEN: {}  ", to_string((uint64_t)len), Colors.white);
     char* newStr = (char*)malloc(len + 1);
     for (int i = 0; i < len; i++)
         newStr[i] = og[i+index];
@@ -57,18 +60,20 @@ char* StrSubstr(const char* og, int index)
 {
     AddToMStack(MStack("StrSubstr", "cmdParsing/cstrTools.cpp"));
     int len;
-    for (len = 0; og[len] != 0; len++);
-    len++;
+    for (len = 0; og[len] != 0; len++)GlobalRenderer->Print(og[len]);
 
-    //GlobalRenderer->Println("LEN: {}", to_string((uint64_t)len), Colors.white);
+    GlobalRenderer->Println("\n\rLEN 0: {}", to_string((uint64_t)len), Colors.white);
 
     if (index >= len)
         index = len - 1;
 
     len -= index;
 
-    //GlobalRenderer->Println("LEN: {}", to_string((uint64_t)len), Colors.white);
+    GlobalRenderer->Println("LEN 1: {}", to_string((uint64_t)len), Colors.white);
     char* res = StrSubstr(og, index, len);
+    GlobalRenderer->Println("ADDR: {}", ConvertHexToString((uint64_t)res), Colors.white);
+    for (len = 0; res[len] != 0; len++);
+    GlobalRenderer->Println("LEN 2: {}", to_string((uint64_t)len), Colors.white);
     RemoveLastMStack();
     return res;
 }

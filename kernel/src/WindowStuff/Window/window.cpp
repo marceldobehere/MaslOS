@@ -73,6 +73,7 @@ void Window::Render()
             parentRenderer->putStr(stitle, x, y, Colors.white);
         else
             parentRenderer->putStr(stitle, x, y, Colors.bgray);
+        free((void*)stitle);
     }
     
 
