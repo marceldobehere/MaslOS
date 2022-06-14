@@ -213,7 +213,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         {
             const char* dataa = StrSubstr(data->data[1], to_int(data->data[2]));
             window->renderer->Println("Result: {}", dataa);
-            free((void*)dataa);
+            //free((void*)dataa);
         }
         else
             LogInvalidArgumentCount(2, data->len-1, window);

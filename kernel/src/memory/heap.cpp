@@ -80,7 +80,7 @@ HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
     }
 
     HeapSegHdr* newSplitHdr = (HeapSegHdr*)((uint64_t)this + splitLength + sizeof(HeapSegHdr));
-    AddToMStack(MStack(to_string((uint64_t)newSplitHdr), "memory/heap.cpp"));
+    //AddToMStack(MStack(to_string((uint64_t)newSplitHdr), "memory/heap.cpp"));
     *newSplitHdr = HeapSegHdr();
 
     //GlobalRenderer->Println("Splitheader addr: {}", ConvertHexToString((uint64_t)newSplitHdr), Colors.bgreen);
@@ -109,7 +109,7 @@ HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
     RemoveLastMStack();
     RemoveLastMStack();
     RemoveLastMStack();
-    RemoveLastMStack();
+    //RemoveLastMStack();
     RemoveLastMStack();
     RemoveLastMStack();
     RemoveLastMStack();
@@ -173,7 +173,7 @@ void* malloc(size_t size)
                 {
                     if (current->next == NULL)
                         break;
-                        
+
                     current = current->next;
                     continue;
                 }
@@ -202,7 +202,7 @@ void* malloc(size_t size)
 void free(void* address)
 {
     AddToMStack(MStack("free", "memory/heap.cpp"));
-    HeapSegHdr* segment = (HeapSegHdr*)address - 1;
+    HeapSegHdr* segment = ((HeapSegHdr*)address) - 1;
     segment->free = true;
     //GlobalRenderer->Print("A");
     //GlobalRenderer->Print("<");

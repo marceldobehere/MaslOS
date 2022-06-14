@@ -70,10 +70,26 @@ char* StrSubstr(const char* og, int index)
     len -= index;
 
     GlobalRenderer->Println("LEN 1: {}", to_string((uint64_t)len), Colors.white);
-    char* res = StrSubstr(og, index, len);
+    // char* res = StrSubstr(og, index, len);
+    
+    // for (len = 0; res[len] != 0; len++);
+    // GlobalRenderer->Println("LEN 2: {}", to_string((uint64_t)len), Colors.white);
+
+    char* res = (char*)malloc(len + 1);
+    for (len = 0; og[len] != 0; len++)GlobalRenderer->Print(og[len]);
+    GlobalRenderer->Println();
+
     GlobalRenderer->Println("ADDR: {}", ConvertHexToString((uint64_t)res), Colors.white);
-    for (len = 0; res[len] != 0; len++);
-    GlobalRenderer->Println("LEN 2: {}", to_string((uint64_t)len), Colors.white);
+
+    for (int i = 0; i < len; i++)
+        res[i] = og[i+index];
+    res[len] = 0;
+
+    for (len = 0; res[len] != 0; len++)GlobalRenderer->Print(res[len]);
+    GlobalRenderer->Println();
+
+
+
     RemoveLastMStack();
     return res;
 }
