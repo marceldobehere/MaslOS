@@ -213,7 +213,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         {
             const char* dataa = StrSubstr(data->data[1], to_int(data->data[2]));
             window->renderer->Println("Result: {}", dataa);
-            //free((void*)dataa);
+            free((void*)dataa);
         }
         else
             LogInvalidArgumentCount(2, data->len-1, window);
@@ -437,10 +437,10 @@ StringArrData* SplitLine(char* input)
 {
     AddToMStack(MStack("SplitLine", "cmdParsing/cmdParser.cpp"));
     uint64_t index = 0;
-    uint64_t parts[100];
+    uint64_t parts[256];
     uint64_t partIndex = 0;
 
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 256; i++)
         parts[i] = 0;
 
     bool inString = false;

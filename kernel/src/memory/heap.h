@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
+
 struct HeapSegHdr
 {
     size_t length;
@@ -12,6 +13,7 @@ struct HeapSegHdr
     void CombineForward();
     void CombineBackward();
     HeapSegHdr* Split(size_t splitLength);
+    uint32_t magicNum;
 };
 
 

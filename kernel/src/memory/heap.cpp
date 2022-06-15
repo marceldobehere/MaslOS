@@ -3,9 +3,14 @@
 #include "../paging/PageFrameAllocator.h"
 #include "../OSDATA/osdata.h"
 
+
+const uint32_t HeapMagicNum = 2406789212;
+
 void* heapStart;
 void* heapEnd;
 HeapSegHdr* lastHdr;
+
+
 
 void HeapSegHdr::CombineForward()
 {
@@ -47,11 +52,11 @@ void HeapSegHdr::CombineBackward()
     //GlobalRenderer->Print("C");
     if (last != NULL)
         if (last->free)
-            {
-                //GlobalRenderer->Print("<");
-                last->CombineForward();
-                //GlobalRenderer->Print(">");
-            }
+        {
+            //GlobalRenderer->Print("<");
+            last->CombineForward();
+            //GlobalRenderer->Print(">");
+        }
     RemoveLastMStack();
 }
 
@@ -96,6 +101,7 @@ HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
     newSplitHdr->last = this;
     newSplitHdr->length = splitSegLength;
     newSplitHdr->free = free;
+    newSplitHdr->magicNum = HeapMagicNum;
     length = splitLength;
 
     //GlobalRenderer->Println("this len: {}", to_string(length), Colors.bgreen);
@@ -141,6 +147,7 @@ void InitializeHeap(void* heapAddress, size_t pageCount)
     startSeg->next = NULL;
     startSeg->last = NULL;
     startSeg->free = true;
+    startSeg->magicNum = HeapMagicNum;
     lastHdr = startSeg;
 
     RemoveLastMStack();
@@ -203,13 +210,28 @@ void free(void* address)
 {
     AddToMStack(MStack("free", "memory/heap.cpp"));
     HeapSegHdr* segment = ((HeapSegHdr*)address) - 1;
-    segment->free = true;
-    //GlobalRenderer->Print("A");
-    //GlobalRenderer->Print("<");
-    segment->CombineForward();
-    //GlobalRenderer->Print("-");
-    segment->CombineBackward();
-    //GlobalRenderer->Print(">");
+
+    if (segment->magicNum == HeapMagicNum)
+    {
+        if (!segment->free)
+        {
+            segment->free = true;
+            //GlobalRenderer->Print("A");
+            //GlobalRenderer->Print("<");
+            segment->CombineForward();
+            //GlobalRenderer->Print("-");
+            segment->CombineBackward();
+            //GlobalRenderer->Print(">");
+        }
+        else
+        {
+            Panic("Tried to free already free Segment!");
+        }
+    }
+    else
+    {
+        Panic("Tried to free invalid Segment!");
+    }
     RemoveLastMStack();
 }
 
@@ -256,6 +278,7 @@ void ExpandHeap(size_t length)
     newSegment->last = lastHdr;
     lastHdr->next = newSegment;
     lastHdr = newSegment;
+    newSegment->magicNum = HeapMagicNum;
 
     newSegment->next = NULL;
     newSegment->length = length - sizeof(HeapSegHdr);

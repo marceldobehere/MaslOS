@@ -75,11 +75,14 @@ char* StrSubstr(const char* og, int index)
     // for (len = 0; res[len] != 0; len++);
     // GlobalRenderer->Println("LEN 2: {}", to_string((uint64_t)len), Colors.white);
 
+    GlobalRenderer->Println("ADDR 1: {}", ConvertHexToString((uint64_t)og), Colors.white);
     char* res = (char*)malloc(len + 1);
+    GlobalRenderer->Println("ADDR 2: {}", ConvertHexToString((uint64_t)og), Colors.white);
+    GlobalRenderer->Println("ADDR 3: {}", ConvertHexToString((uint64_t)res), Colors.white);
     for (len = 0; og[len] != 0; len++)GlobalRenderer->Print(og[len]);
     GlobalRenderer->Println();
 
-    GlobalRenderer->Println("ADDR: {}", ConvertHexToString((uint64_t)res), Colors.white);
+    
 
     for (int i = 0; i < len; i++)
         res[i] = og[i+index];

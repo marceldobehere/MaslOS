@@ -16,17 +16,20 @@ bool allowArrows = false;
 
 void ClearInput(TerminalInstance* instance)
 {
+    AddToMStack(MStack("ClearInput", "userinput/keyboard.cpp"));
     for (int i = 0; i < 256; i++)
     {
         instance->lastTerminalInput[i] = instance->terminalInput[i];
         instance->terminalInput[i] = 0;
     }
     instance->userlen = 0;
+    RemoveLastMStack();
 }
 
 
 void HandleEnter()
 {
+    AddToMStack(MStack("HandleEnter", "userinput/keyboard.cpp"));
     if (activeWindow->instance->instanceType == InstanceType::Terminal)
     {
         TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
@@ -50,6 +53,7 @@ void HandleEnter()
             }
         }
     }
+    RemoveLastMStack();
 }
 
 void InitKeyboard()
@@ -59,11 +63,18 @@ void InitKeyboard()
 
 void KeyboardPrintStart(Window* window)
 {
+    AddToMStack(MStack("KeyboardPrintStart", "userinput/keyboard.cpp"));
     if (window == NULL)
+    {
+        RemoveLastMStack();
         return;
+    }
 
     if (!window->allowKeyboardDrawing)
+    {
+        RemoveLastMStack();
         return;
+    }
 
     if (window->instance->instanceType == InstanceType::Terminal)
     {
@@ -71,19 +82,26 @@ void KeyboardPrintStart(Window* window)
         TerminalInstance* instance = (TerminalInstance*)window->instance;
         PrintUser(window, instance->currentUser);
     }
+    RemoveLastMStack();
 }
 
 void PrintUser(Window* window, OSUser* user)
 {
+    AddToMStack(MStack("PrintUser", "userinput/keyboard.cpp"));
     if (window == NULL)
+    {
+        RemoveLastMStack();
         return;
+    }
 
     window->renderer->Print(user->userName, user->colData.userColor);
     window->renderer->Print("> ");
+    RemoveLastMStack();
 }
 
 void HandleKeyboard(uint8_t scancode)
 {
+    AddToMStack(MStack("HandleKeyboard", "userinput/keyboard.cpp"));
     if (scancode == ARR_LEFT)
     {  
         int64_t index = osData.windows.getIndexOf(activeWindow);
@@ -100,7 +118,10 @@ void HandleKeyboard(uint8_t scancode)
 
 
     if (activeWindow == NULL)
+    {
+        RemoveLastMStack();
         return;
+    }
 
 
     if (scancode == LeftShift)
@@ -196,6 +217,8 @@ void HandleKeyboard(uint8_t scancode)
             }
         }
     }
+
+    RemoveLastMStack();
 } 
 
 

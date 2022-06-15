@@ -7,6 +7,7 @@ Window* activeWindow = NULL;
 
 Window::Window(DefaultInstance* instance, Size size, Position position, BasicRenderer* parentRenderer, const char* title)
 {
+    AddToMStack(MStack("Constructor", "WindowStuff/Window/window.cpp"));
     this->instance = instance;
     this->position = position;
     this->size = size;
@@ -33,18 +34,22 @@ Window::Window(DefaultInstance* instance, Size size, Position position, BasicRen
         renderer = (BasicRenderer*)malloc(sizeof(Framebuffer));
         *renderer = BasicRenderer(framebuffer, GlobalRenderer->psf1_font);
     }
+    RemoveLastMStack();
 }
 
 
 void Window::Free()
 {
+    AddToMStack(MStack("Free", "WindowStuff/Window/window.cpp"));
     free(framebuffer->BaseAddress);
     free(framebuffer);
     free(renderer);
+    RemoveLastMStack();
 }
 
 void Window::Render()
 {
+    AddToMStack(MStack("Render", "WindowStuff/Window/window.cpp"));
     uint32_t* pointerC = (uint32_t*)framebuffer->BaseAddress;
     for (int64_t y = 0; y < framebuffer->Height; y++)
     {
@@ -116,21 +121,25 @@ void Window::Render()
         counter++;
     } 
     
+    RemoveLastMStack();
 }
 
 
 
 void CopyFrameBuffer(Framebuffer* a, Framebuffer* b)
 {
+    AddToMStack(MStack("CopyFrameBuffer", "WindowStuff/Window/window.cpp"));
     uint32_t* endAddr = (uint32_t*)(a->BaseAddress + a->BufferSize);
 
     uint32_t* addrB = (uint32_t*)b->BaseAddress;
     for (uint32_t* addrA = (uint32_t*)a->BaseAddress; addrA < endAddr; addrA++, addrB++)
         *addrB = *addrA; 
+    RemoveLastMStack();
 }
 
 void CopyFrameBuffer(Framebuffer* a, Framebuffer* a2, Framebuffer* b)
 {
+    AddToMStack(MStack("CopyFrameBuffer", "WindowStuff/Window/window.cpp"));
     uint32_t* endAddr = (uint32_t*)(a->BaseAddress + a->BufferSize);
 
     uint32_t* addrA2 = (uint32_t*)a2->BaseAddress;
@@ -149,4 +158,5 @@ void CopyFrameBuffer(Framebuffer* a, Framebuffer* a2, Framebuffer* b)
 
     //free((void*)osData.mainTerminalWindow->title);
     //osData.mainTerminalWindow->title = StrCopy(to_string(counter));
+    RemoveLastMStack();
 }
