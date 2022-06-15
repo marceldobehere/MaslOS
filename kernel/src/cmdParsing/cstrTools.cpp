@@ -51,6 +51,9 @@ char* StrSubstr(const char* og, int index, int len)
     if (len + index > size)
         len = size - index;
 
+    if (len < 0)
+        len = 0;
+
     //GlobalRenderer->Print("LEN: {}  ", to_string((uint64_t)len), Colors.white);
     char* newStr = (char*)malloc(len + 1);
     for (int i = 0; i < len; i++)

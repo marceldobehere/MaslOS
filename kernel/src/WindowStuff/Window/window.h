@@ -63,7 +63,9 @@ class Window
     const char* title;
     Window(DefaultInstance* instance, Size size, Position position, BasicRenderer* parentRenderer, const char* title);
 
+    void Resize(Size newSize);
     void Render();
+    void Render(Framebuffer* from, Framebuffer* to, Position pos, Size size, Window* window);
     void Free();
 };
 

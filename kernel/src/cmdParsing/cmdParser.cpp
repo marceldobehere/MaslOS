@@ -341,6 +341,24 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
         else
             LogError("Color \"{}\" could not be Parsed!", val, window);
     }
+    else if (StrEquals(name, "window resolution") || StrEquals(name, "window size"))
+    {
+        StringArrData* split = SplitLine(val);
+        if (split->len == 2)
+        {
+            int x = to_int(split->data[0]);
+            int y = to_int(split->data[1]);
+
+            if (x >= 10 && y >= 10)
+                window->Resize(Size(x, y));
+            else
+                LogError("Invalid size given!", window);
+        }
+        else
+            LogInvalidArgumentCount(2, split->len, window);
+
+        free((void*)split);
+    }
     else
     {
         LogError("Parameter \"{}\" does not exist.", name, window);
@@ -361,7 +379,7 @@ void GetCmd(const char* name, OSUser* user, Window* window)
     {
         window->renderer->Println("Free Page Count: {} pages.", to_string(GlobalAllocator->GetFreePageCount()), Colors.bgreen);
     }
-    else if (StrEquals(name, "window resolution"))
+    else if (StrEquals(name, "window resolution") || StrEquals(name, "window size"))
     {
         dispVar vars[] = {dispVar(window->size.width), dispVar(window->size.height)};
         window->renderer->Println("Window Resolution: {0}x{1}.", vars);
@@ -437,7 +455,7 @@ ParsedColData ParseColor(const char* col)
     //window->renderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.pink);
 */
 
-StringArrData* SplitLine(char* input)
+StringArrData* SplitLine(const char* input)
 {
     AddToMStack(MStack("SplitLine", "cmdParsing/cmdParser.cpp"));
     uint64_t index = 0;

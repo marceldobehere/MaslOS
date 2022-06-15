@@ -16,7 +16,7 @@ struct ParsedColData
     uint32_t col;
 };
 
-StringArrData* SplitLine(char* input);
+StringArrData* SplitLine(const char* input);
 
 void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window);
 

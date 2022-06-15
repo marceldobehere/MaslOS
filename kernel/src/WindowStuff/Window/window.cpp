@@ -47,7 +47,88 @@ void Window::Free()
     RemoveLastMStack();
 }
 
-void Window::Render()
+void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size, Window* window)
+{
+    AddToMStack(MStack("Render", "WindowStuff/Window/window.cpp"));
+    uint32_t* pointerC = (uint32_t*)from->BaseAddress;
+    for (int64_t y = 0; y < from->Height; y++)
+    {
+        int64_t newY = y + pos.y;
+        uint32_t* pointerP = (uint32_t*)(to->BaseAddress + ((pos.x + (newY * to->Width)) * 4));
+        for (int64_t x = 0; x < from->Width; x++)
+        {
+            int64_t newX = x + pos.x;
+            if (newX >= 0 && newY >= 0 && newX < to->Width && newY < to->Height)
+                if (*pointerC != *pointerP)
+                    *pointerP = *pointerC;
+                
+            pointerC++;
+            pointerP++;
+        }
+    }
+
+
+    if (window != NULL)
+    {
+        {
+            int64_t x = pos.x;
+            int64_t y = pos.y- 21;
+            window->parentRenderer->Clear(x,y,pos.x + newSize.width-1, pos.y-2, Colors.dgray);
+
+            const char* stitle = StrSubstr(title, 0, newSize.width / 10);
+            if (activeWindow == this)
+                window->parentRenderer->putStr(stitle, x, y, Colors.white);
+            else
+                window->parentRenderer->putStr(stitle, x, y, Colors.bgray);
+            free((void*)stitle);
+        }
+        
+
+        uint32_t cBorder = borderColor;
+        if (activeWindow == window)
+            cBorder = Colors.bgreen;
+
+        uint8_t counter = 0;
+        for (int64_t x = -1; x < newSize.width + 1; x++)
+        {
+            int64_t newX = x + pos.x;
+            int64_t newY = -1 + pos.y;
+            if (newX >= 0 && newY >= 0 && newX < to->Width && newY < to->Height && (counter % 2) == 1)
+                *(uint32_t*)(to->BaseAddress + ((newX + (newY * to->Width)) * 4)) = cBorder;
+            
+            
+            newY = newSize.height + pos.y;
+            if (newX >= 0 && newY >= 0 && newX < to->Width && newY < to->Height && (counter % 2) == 0)
+                *(uint32_t*)(to->BaseAddress + ((newX + (newY * to->Width)) * 4)) = cBorder;
+
+            newY = -22 + pos.y;
+            if (newX >= 0 && newY >= 0 && newX < to->Width && newY < to->Height && (counter % 2) == 0)
+                *(uint32_t*)(to->BaseAddress + ((newX + (newY * to->Width)) * 4)) = cBorder;
+        
+            counter++;
+        }
+
+        counter = 0;
+        for (int64_t y = -22; y < newSize.height; y++)
+        {
+            int64_t newX = newSize.width + pos.x;
+            int64_t newY = y + pos.y;
+            if (newX >= 0 && newY >= 0 && newX < to->Width && newY < to->Height && (counter % 2) == 1)
+                *(uint32_t*)(to->BaseAddress + ((newX + (newY * to->Width)) * 4)) = cBorder;
+            
+            newX = -1 + pos.x;
+            if (newX >= 0 && newY >= 0 && newX < to->Width && newY < to->Height && (counter % 2) == 0)
+                *(uint32_t*)(to->BaseAddress + ((newX + (newY * to->Width)) * 4)) = cBorder;
+            
+            counter++;
+        } 
+    }
+    
+    RemoveLastMStack();
+}
+
+/*
+void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size)
 {
     AddToMStack(MStack("Render", "WindowStuff/Window/window.cpp"));
     uint32_t* pointerC = (uint32_t*)framebuffer->BaseAddress;
@@ -87,7 +168,7 @@ void Window::Render()
         cBorder = Colors.bgreen;
 
     uint8_t counter = 0;
-    for (int64_t x = -1; x < framebuffer->Width + 1; x++)
+    for (int64_t x = -1; x < size.width + 1; x++)
     {
         int64_t newX = x + position.x;
         int64_t newY = -1 + position.y;
@@ -95,7 +176,7 @@ void Window::Render()
             *(uint32_t*)(parentFrameBuffer->BaseAddress + ((newX + (newY * parentFrameBuffer->Width)) * 4)) = cBorder;
         
         
-        newY = framebuffer->Height + position.y;
+        newY = size.height + position.y;
         if (newX >= 0 && newY >= 0 && newX < parentFrameBuffer->Width && newY < parentFrameBuffer->Height && (counter % 2) == 0)
             *(uint32_t*)(parentFrameBuffer->BaseAddress + ((newX + (newY * parentFrameBuffer->Width)) * 4)) = cBorder;
 
@@ -107,9 +188,9 @@ void Window::Render()
     }
 
     counter = 0;
-    for (int64_t y = -22; y < framebuffer->Height; y++)
+    for (int64_t y = -22; y < size.height; y++)
     {
-        int64_t newX = framebuffer->Width + position.x;
+        int64_t newX = size.width + position.x;
         int64_t newY = y + position.y;
         if (newX >= 0 && newY >= 0 && newX < parentFrameBuffer->Width && newY < parentFrameBuffer->Height && (counter % 2) == 1)
             *(uint32_t*)(parentFrameBuffer->BaseAddress + ((newX + (newY * parentFrameBuffer->Width)) * 4)) = cBorder;
@@ -124,7 +205,55 @@ void Window::Render()
     RemoveLastMStack();
 }
 
+*/
 
+
+void Window::Render()
+{
+    Render(framebuffer, parentFrameBuffer, position, size, this);
+}
+
+
+void Window::Resize(Size newSize)
+{
+    AddToMStack(MStack("Resize", "WindowStuff/Window/window.cpp"));
+    if (newSize.height < 10)
+        newSize.height = 10;
+
+    if (newSize.width < 10)
+        newSize.width = 10;
+
+    this->newSize = newSize;
+
+    {
+        Framebuffer* oldFramebuffer = framebuffer;
+        BasicRenderer* oldRenderer = renderer;
+        {
+            framebuffer = (Framebuffer*)malloc(sizeof(Framebuffer));
+            *framebuffer = Framebuffer();
+            framebuffer->Height = newSize.height;
+            framebuffer->Width = newSize.width;
+            framebuffer->PixelsPerScanLine = newSize.width;
+            framebuffer->BufferSize = newSize.height * newSize.width * 4;
+            framebuffer->BaseAddress = malloc(framebuffer->BufferSize);
+        }
+
+        {
+            renderer = (BasicRenderer*)malloc(sizeof(Framebuffer));
+            *renderer = BasicRenderer(framebuffer, GlobalRenderer->psf1_font);
+        }
+
+        renderer->Clear(Colors.black);
+        renderer->CursorPosition = oldRenderer->CursorPosition;
+        Render(oldFramebuffer, framebuffer, Position(0, 0), size, NULL);
+
+        free((void*)oldFramebuffer->BaseAddress);
+        free((void*)oldFramebuffer);
+        free((void*)oldRenderer);
+    }
+    size = newSize;
+    RemoveLastMStack();
+}
 
 void CopyFrameBuffer(Framebuffer* a, Framebuffer* b)
 {

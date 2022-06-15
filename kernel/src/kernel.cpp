@@ -135,7 +135,7 @@ extern "C" void _start(BootInfo* bootInfo)
             window->position = window->newPosition;
             if (window->size != window->newSize)
             {
-                window->size = window->newSize;
+                window->Resize(window->newSize);
             }
             window->Render();
         }

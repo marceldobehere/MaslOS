@@ -304,6 +304,12 @@ void HandlePS2Mouse(uint8_t data)
             MouseCycle = 0;
             break;
         }
+        default:
+        {
+            MouseCycle = 0;
+            break;
+
+        }
     }
 }
 
