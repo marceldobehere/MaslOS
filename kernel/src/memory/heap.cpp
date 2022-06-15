@@ -172,6 +172,10 @@ void* malloc(size_t size)
     HeapSegHdr* current = (HeapSegHdr*) heapStart;
     while(true)
     {
+        if (current->magicNum != HeapMagicNum)
+        {
+            Panic("Trying to access invalid HeapSegment Header!");
+        }
         if (current->free)
         {
             if (current->length > size)

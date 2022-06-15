@@ -38,11 +38,15 @@ char* StrCopy(const char* og)
 char* StrSubstr(const char* og, int index, int len)
 {
     AddToMStack(MStack("StrSubstr", "cmdParsing/cstrTools.cpp"));
+
+    if (index < 0)
+        index = 0;
+
     int size = 0;
-    for (int size = 0; og[size] != 0; size++);
+    for (size = 0; og[size] != 0; size++);
 
     if (index >= size)
-        index = size - 1;
+        index = size;
 
     if (len + index > size)
         len = size - index;
@@ -58,42 +62,55 @@ char* StrSubstr(const char* og, int index, int len)
 
 char* StrSubstr(const char* og, int index)
 {
-    AddToMStack(MStack("StrSubstr", "cmdParsing/cstrTools.cpp"));
+    //AddToMStack(MStack("StrSubstr", "cmdParsing/cstrTools.cpp"));
     int len;
-    for (len = 0; og[len] != 0; len++)GlobalRenderer->Print(og[len]);
+    for (len = 0; og[len] != 0; len++);//GlobalRenderer->Print(og[len]);
 
-    GlobalRenderer->Println("\n\rLEN 0: {}", to_string((uint64_t)len), Colors.white);
+    //GlobalRenderer->Println("\n\rLEN 0: {}", to_string((uint64_t)len), Colors.white);
+
+    if (index < 0)
+        index = 0;
 
     if (index >= len)
-        index = len - 1;
+        index = len;
 
     len -= index;
 
-    GlobalRenderer->Println("LEN 1: {}", to_string((uint64_t)len), Colors.white);
-    // char* res = StrSubstr(og, index, len);
+    int length = len;
+
+
+    {
+        char* res = StrSubstr(og, index, len);
+        RemoveLastMStack();
+        return res;
+    }
+
+    // GlobalRenderer->Println("LEN 1: {}", to_string((uint64_t)length), Colors.white);
+    // // char* res = StrSubstr(og, index, len);
     
-    // for (len = 0; res[len] != 0; len++);
-    // GlobalRenderer->Println("LEN 2: {}", to_string((uint64_t)len), Colors.white);
+    // // for (len = 0; res[len] != 0; len++);
+    // // GlobalRenderer->Println("LEN 2: {}", to_string((uint64_t)len), Colors.white);
 
-    GlobalRenderer->Println("ADDR 1: {}", ConvertHexToString((uint64_t)og), Colors.white);
-    char* res = (char*)malloc(len + 1);
-    GlobalRenderer->Println("ADDR 2: {}", ConvertHexToString((uint64_t)og), Colors.white);
-    GlobalRenderer->Println("ADDR 3: {}", ConvertHexToString((uint64_t)res), Colors.white);
-    for (len = 0; og[len] != 0; len++)GlobalRenderer->Print(og[len]);
-    GlobalRenderer->Println();
+    // GlobalRenderer->Println("ADDR 1: {}", ConvertHexToString((uint64_t)og), Colors.white);
+    
+    // char* res = (char*)malloc(length + 1);
+    // for (int i = 0; i < length; i++)
+    //     res[i] = og[i+index];
+    // res[length] = 0;
+
+    // GlobalRenderer->Println("ADDR 2: {}", ConvertHexToString((uint64_t)og), Colors.white);
+    // GlobalRenderer->Println("ADDR 3: {}", ConvertHexToString((uint64_t)res), Colors.white);
+    // for (len = 0; og[len] != 0; len++)GlobalRenderer->Print(og[len]);
+    // GlobalRenderer->Println();
 
     
 
-    for (int i = 0; i < len; i++)
-        res[i] = og[i+index];
-    res[len] = 0;
-
-    for (len = 0; res[len] != 0; len++)GlobalRenderer->Print(res[len]);
-    GlobalRenderer->Println();
+    // for (len = 0; res[len] != 0; len++)GlobalRenderer->Print(res[len]);
+    // GlobalRenderer->Println();
 
 
 
-    RemoveLastMStack();
-    return res;
+    // RemoveLastMStack();
+    // return res;
 }
 

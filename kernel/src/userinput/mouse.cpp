@@ -215,12 +215,15 @@ uint8_t MouseRead()
     return inb(0x60);
 }
 
+int mouseCycleSkip = 2;
+
 MPoint diff = MPoint();
 bool startDrag = false;
 Window* dragWindow = NULL;
 
 void InitPS2Mouse()
 {
+    mouseCycleSkip = 2;
     outb(0x64, 0xA8);
     Mousewait();
 
@@ -265,15 +268,13 @@ uint8_t MousePacket[4];
 bool MousePacketReady = false;
 
 
-
 void HandlePS2Mouse(uint8_t data)
 {
     ProcessMousePacket();
-    static bool skip = true;
-    if (skip)
+    if (mouseCycleSkip != 0)
     {
-        skip = false;
-        MouseCycle = 2;
+        MouseCycle = mouseCycleSkip;
+        mouseCycleSkip = 0;
         return;
     }
 

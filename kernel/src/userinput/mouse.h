@@ -5,7 +5,8 @@
 #include "../BasicRenderer.h"
 #include "../cstr.h"
 #include "../Cols.h"
-  
+
+extern int mouseCycleSkip;
 
 void Mousewait();
 

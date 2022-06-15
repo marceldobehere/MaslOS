@@ -316,6 +316,10 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
                 LogError("Value \"{}\" has to be \"true\", \"false\", \"on\" or \"off\"!", val, window); 
         }
     }
+    else if (StrEquals(name, "mouse offset"))
+    {
+        mouseCycleSkip = to_int(val);
+    }
     else if (StrEquals(name, "password"))
     {
         (*user)->mode = commandMode::enterPassword;
@@ -462,7 +466,7 @@ StringArrData* SplitLine(char* input)
 
     int partCount = partIndex + 1;
 
-    int totalsize = sizeof(StringArrData);
+    int totalsize = sizeof(char**) + sizeof(StringArrData);
     for (int i = 0; i < partCount; i++)
     {
         totalsize += parts[i] + 1 + sizeof(char*);
