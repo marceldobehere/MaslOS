@@ -12,7 +12,7 @@ if (osData.enableStackTrace)
 extern "C" void _start(BootInfo* bootInfo)
 {  
     osData.stackPointer = 0;
-    osData.enableStackTrace = true;
+    osData.enableStackTrace = false;
     AddToMStack(MStack("_start", "kernel.cpp"));
 
 
@@ -182,7 +182,7 @@ extern "C" void _start(BootInfo* bootInfo)
                 }
             }
             //PIT::Sleep(10);
-            asm("hlt");
+            //asm("hlt");
         }
         //GlobalRenderer->Print("C");
         //asm("hlt");
