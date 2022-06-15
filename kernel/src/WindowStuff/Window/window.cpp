@@ -76,6 +76,18 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size,
             window->parentRenderer->Clear(x,y,pos.x + newSize.width-1, pos.y-2, Colors.dgray);
 
             const char* stitle = StrSubstr(title, 0, newSize.width / 10);
+
+
+            // if (window->instance != NULL)
+            // {
+            //     if (window->instance->instanceType == InstanceType::Terminal)
+            //     {
+            //         TerminalInstance* terminal = (TerminalInstance*)window->instance;
+            //         free((void*)stitle);
+            //         stitle = StrCopy(to_string(terminal->tasks.getCount()));
+            //     }
+            // }
+
             if (activeWindow == this)
                 window->parentRenderer->putStr(stitle, x, y, Colors.white);
             else

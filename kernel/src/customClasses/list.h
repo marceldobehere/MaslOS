@@ -31,6 +31,7 @@ template <typename T> class List
 
 template class List<int>;
 template class List<Window*>;
+template class List<Task*>;
 
 /*
 template <typename T> class Array

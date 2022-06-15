@@ -10,17 +10,17 @@ void PrintMStackTrace(MStack stack[], int64_t size, BasicRenderer* renderer, uin
     }
     renderer->Println();
 
-    stackframe* stk;
-    asm("mov %%rbp, %0" : "=r"(stk) ::);
+    // stackframe* stk;
+    // asm("mov %%rbp, %0" : "=r"(stk) ::);
 
-    renderer->Println("STACK TRACE:\n", col);
-    for (int i = 0; i < 10 && stk != NULL; i++)
-    {
-        renderer->Println("  > At \"{}\"", ConvertHexToString(stk->eip), col);
-        //renderer->Println(" in file \"{}\"", stack[i].filename, col);
-        stk = stk->ebp;
-    }
-    renderer->Println();
+    // renderer->Println("STACK TRACE:\n", col);
+    // for (int i = 0; i < 10 && stk != NULL; i++)
+    // {
+    //     renderer->Println("  > At \"{}\"", ConvertHexToString(stk->eip), col);
+    //     //renderer->Println(" in file \"{}\"", stack[i].filename, col);
+    //     stk = stk->ebp;
+    // }
+    // renderer->Println();
 }
 
 void PrintMStackTrace(MStack stack[], int64_t size)

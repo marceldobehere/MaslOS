@@ -8,9 +8,8 @@ enum InstanceType
 
 class DefaultInstance
 {
-    private:
-
+    protected:
 
     public:
-    InstanceType instanceType = InstanceType::Default;
+        InstanceType instanceType = InstanceType::Default;
 };

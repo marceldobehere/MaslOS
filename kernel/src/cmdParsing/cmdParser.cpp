@@ -9,6 +9,7 @@
 #include "../userinput/mouse.h"
 #include "../OSDATA/osdata.h"
 #include "../scheduling-pit/pit.h"
+#include "../tasks/sleep/taskSleep.h"
 
 void LogError(const char* msg, Window* window)
 {
@@ -144,29 +145,15 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                 //PIT::Sleep((uint64_t)time);
                 {
 
-                    // window->renderer->Println("TIME: {} s", to_string(PIT::TimeSinceBoot), Colors.bred);
-                    // window->renderer->Println("TIME: {} ms", to_string((int)(PIT::TimeSinceBoot*1000)), Colors.bred);
-                    // window->renderer->Println("DIV:  {}", to_string(PIT::Divisor), Colors.bred);
-                    // window->renderer->Println("FREQ: {} Hz", to_string(PIT::freq), Colors.bred);
+                    if (window->instance != NULL)
+                    {
+                        if (window->instance->instanceType == InstanceType::Terminal)
+                        {
+                            TerminalInstance* terminal = (TerminalInstance*)window->instance;
 
-                    // window->renderer->Println();
-
-                    // for (int i = 0; i < 20; i++)
-                    // {
-                    //     window->renderer->Print("hoi! ");
-                    //     PIT::Sleep(100);
-                    // }
-
-                    // window->renderer->Println();
-                    // window->renderer->Println();
-
-                    // window->renderer->Println("TIME: {} s", to_string(PIT::TimeSinceBoot), Colors.bred);
-                    // window->renderer->Println("TIME: {} ms", to_string((int)(PIT::TimeSinceBoot*1000)), Colors.bred);
-                    // window->renderer->Println("DIV:  {}", to_string(PIT::Divisor), Colors.bred);
-                    // window->renderer->Println("FREQ: {} Hz", to_string(PIT::freq), Colors.bred);
-
-
-
+                            terminal->tasks.add(NewSleepTask(time / 1000.0));
+                        }
+                    }
 
                 }
             }

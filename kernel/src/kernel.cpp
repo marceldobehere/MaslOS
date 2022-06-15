@@ -61,7 +61,7 @@ extern "C" void _start(BootInfo* bootInfo)
     {
         mainWindow = (Window*)malloc(sizeof(Window));
         TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
-        *terminal = TerminalInstance(&adminUser);
+        *terminal = TerminalInstance(&adminUser, mainWindow);
         *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(5, 30), realMainWindow->renderer, "Main Window");
         osData.windows.add(mainWindow);
 
@@ -72,7 +72,7 @@ extern "C" void _start(BootInfo* bootInfo)
     {
         Window* window = (Window*)malloc(sizeof(Window));
         TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
-        *terminal = TerminalInstance(&guestUser);
+        *terminal = TerminalInstance(&guestUser, window);
         *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(700, 60), realMainWindow->renderer, "Testing Window");
         osData.windows.add(window);
     }
@@ -147,9 +147,44 @@ extern "C" void _start(BootInfo* bootInfo)
         //realMainWindow->Render();
         
 
+        double endTime = PIT::TimeSinceBoot + 0.02;
+        while (PIT::TimeSinceBoot < endTime)
+        {
+            //GlobalRenderer->Print("A");
+            for (int i = 0; i < osData.windows.getCount(); i++)
+            {     
+                //GlobalRenderer->Print("B");
+                   
+                Window* window = osData.windows[i];
+                if (window->instance == NULL)
+                    continue;
+                if (window->instance->instanceType != InstanceType::Terminal)
+                    continue;
 
+                TerminalInstance* terminal = (TerminalInstance*)window->instance;
 
-        PIT::Sleep(50);
+                if (terminal->tasks.getCount() != 0)
+                {
+                    Task* task = terminal->tasks[0];
+                    //GlobalRenderer->Println("DOING TASK");
+                    DoTask(task);
+                    if (task->GetDone())
+                    {
+                        terminal->tasks.removeFirst();
+                        FreeTask(task);
+                        //GlobalRenderer->Println("TASK DONE");
+                        terminal->PrintUserIfNeeded();
+                    }
+                    else
+                    {
+                        //GlobalRenderer->Println("TASK NOT DONE");
+                    }
+                }
+            }
+            //PIT::Sleep(10);
+            asm("hlt");
+        }
+        //GlobalRenderer->Print("C");
         //asm("hlt");
     }
 

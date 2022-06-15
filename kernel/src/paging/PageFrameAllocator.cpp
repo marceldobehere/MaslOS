@@ -3,6 +3,7 @@
 #include "../efiMemory.h"
 #include "../bitmap.h"
 #include "../memory.h"
+#include "../panic.h"
 
 PageFrameAllocator* GlobalAllocator;
 
@@ -73,7 +74,8 @@ void* PageFrameAllocator::RequestPage()
         return(void*)(pageBitmapIndex * 4096);
     }
     
-    GlobalRenderer->Println("ERROR: NO MORE RAM AVAIABLE!", Colors.red);
+    //GlobalRenderer->Println("ERROR: NO MORE RAM AVAIABLE!", Colors.red);
+    Panic("No more RAM avaiable!");
 
     while (true);
 

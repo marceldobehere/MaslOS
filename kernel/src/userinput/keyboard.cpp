@@ -7,6 +7,7 @@
 #include "../Cols.h"
 #include "../OSDATA/userdata.h"
 #include "../OSDATA/osdata.h"
+#include "../tasks/enterHandler/taskEnterHandler.h"
 
 
 bool lshift = false;
@@ -29,31 +30,32 @@ void ClearInput(TerminalInstance* instance)
 
 void HandleEnter()
 {
-    AddToMStack(MStack("HandleEnter", "userinput/keyboard.cpp"));
-    if (activeWindow->instance->instanceType == InstanceType::Terminal)
-    {
-        TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
-        if (instance->userlen > 0)
-        {
-            if (instance->userlen > 255)
-                instance->userlen = 255;
+    Panic("Old Function used!");
+    // AddToMStack(MStack("HandleEnter", "userinput/keyboard.cpp"));
+    // if (activeWindow->instance->instanceType == InstanceType::Terminal)
+    // {
+    //     TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
+    //     if (instance->userlen > 0)
+    //     {
+    //         if (instance->userlen > 255)
+    //             instance->userlen = 255;
                 
-            instance->terminalInput[instance->userlen] = 0;
-            ParseCommand(instance->terminalInput, instance->lastTerminalInput, &instance->currentUser, activeWindow);
-            //GlobalRenderer->Print("> ");
-            //GlobalRenderer->Println(userData);
-        }
-        if (activeWindow != NULL)
-        {
-            if (activeWindow->allowKeyboardDrawing)
-            {
-                activeWindow->renderer->Println();
-                PrintUser(activeWindow, instance->currentUser);
-                ClearInput(instance);
-            }
-        }
-    }
-    RemoveLastMStack();
+    //         instance->terminalInput[instance->userlen] = 0;
+    //         ParseCommand(instance->terminalInput, instance->lastTerminalInput, &instance->currentUser, activeWindow);
+    //         //GlobalRenderer->Print("> ");
+    //         //GlobalRenderer->Println(userData);
+    //     }
+    //     if (activeWindow != NULL)
+    //     {
+    //         if (activeWindow->allowKeyboardDrawing)
+    //         {
+    //             activeWindow->renderer->Println();
+    //             PrintUser(activeWindow, instance->currentUser);
+    //             ClearInput(instance);
+    //         }
+    //     }
+    // }
+    // RemoveLastMStack();
 }
 
 void InitKeyboard()
@@ -89,6 +91,11 @@ void PrintUser(Window* window, OSUser* user)
 {
     AddToMStack(MStack("PrintUser", "userinput/keyboard.cpp"));
     if (window == NULL)
+    {
+        RemoveLastMStack();
+        return;
+    }
+    if (user== NULL)
     {
         RemoveLastMStack();
         return;
@@ -137,7 +144,6 @@ void HandleKeyboard(uint8_t scancode)
     }
 
 
-
     if (activeWindow == NULL)
     {
         RemoveLastMStack();
@@ -154,17 +160,24 @@ void HandleKeyboard(uint8_t scancode)
     else if (scancode == RightShift + 0x80)
         rshift = false;
     else if (scancode == Enter)
+    {
+        if (activeWindow->instance->instanceType == InstanceType::Terminal)
         {
-            if (activeWindow->allowKeyboardDrawing)
-                activeWindow->renderer->Println();
-            HandleEnter();
+            TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
+            if (!instance->GetBusy())
+            {
+                if (activeWindow->allowKeyboardDrawing)
+                    activeWindow->renderer->Println();
+                instance->tasks.add(NewEnterTask(instance));
+            }
         }
+    }
     else if (scancode == Backspace)
     {
         if (activeWindow->instance->instanceType == InstanceType::Terminal)
         {
             TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
-            if (instance->userlen > 0)
+            if (instance->userlen > 0 && !instance->GetBusy())
             {
                 instance->userlen--;
                 instance->terminalInput[instance->userlen] = 0;
@@ -220,7 +233,7 @@ void HandleKeyboard(uint8_t scancode)
             {
                 TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
 
-                if (activeWindow->allowKeyboardDrawing)
+                if (activeWindow->allowKeyboardDrawing && !instance->GetBusy())
                 {
                     if (instance->currentUser->mode == commandMode::none)
                         activeWindow->renderer->Print(ascii);
@@ -230,7 +243,7 @@ void HandleKeyboard(uint8_t scancode)
                         activeWindow->renderer->Print("*");
                 }
 
-                if (instance->userlen < 255)
+                if (instance->userlen < 255 && !instance->GetBusy())
                 {
                     instance->terminalInput[instance->userlen] = ascii;
                     instance->userlen++;

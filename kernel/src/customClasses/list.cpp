@@ -133,7 +133,6 @@ template <typename T> void List<T>::removeFirst()
 
     removeAt(0);
 
-    count--;
     RemoveLastMStack();
 }
 
