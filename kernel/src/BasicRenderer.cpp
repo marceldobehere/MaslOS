@@ -428,7 +428,7 @@ void BasicRenderer::Print(const char* chrs, dispVar vars[])
     }
 }
 
-void BasicRenderer::DrawImage(ImageFile* image, int64_t x, int64_t y, int64_t sx, int64_t sy)
+void GlobDrawImage(kernelFiles::ImageFile* image, int64_t x, int64_t y, int64_t sx, int64_t sy, Framebuffer* framebuffer)
 {
     uint64_t addr = (uint64_t)framebuffer->BaseAddress;
     uint64_t mult = framebuffer->PixelsPerScanLine*4;
@@ -454,6 +454,11 @@ void BasicRenderer::DrawImage(ImageFile* image, int64_t x, int64_t y, int64_t sx
             imgaddr ++;
         }
     }
+}
+
+void BasicRenderer::DrawImage(kernelFiles::ImageFile* image, int64_t x, int64_t y, int64_t sx, int64_t sy)
+{
+    GlobDrawImage(image, x, y, sx, sy, framebuffer);
 }
 
 BasicRenderer::BasicRenderer(Framebuffer* framebuffer, PSF1_FONT* psf1_font)

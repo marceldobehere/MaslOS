@@ -6,7 +6,7 @@
 #include "S-Font.h"
 #include <stdint.h> 
 #include "dispTypes/dispTypes.h"
-#include "ImageStruct.h"
+#include "kernelFiles/ImageStruct.h"
 
 class BasicRenderer
 {
@@ -52,13 +52,14 @@ class BasicRenderer
         void Clear(int64_t x1, int64_t y1, int64_t x2, int64_t y2, uint32_t col);
         void Clear(uint32_t col, bool resetCursor);
 
-        void DrawImage(ImageFile* image, int64_t x, int64_t y, int64_t sx, int64_t sy);
-
         void Cls();
+        void DrawImage(kernelFiles::ImageFile* image, int64_t x, int64_t y, int64_t sx, int64_t sy);
 
         BasicRenderer(Framebuffer* framebuffer, PSF1_FONT* psf1_font);
 
         
 };
+
+void GlobDrawImage(kernelFiles::ImageFile* image, int64_t x, int64_t y, int64_t sx, int64_t sy, Framebuffer* framebuffer);
 
 extern BasicRenderer* GlobalRenderer;

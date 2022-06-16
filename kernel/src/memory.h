@@ -5,14 +5,16 @@
 #include "cstr.h"
 #include "efiMemory.h"
 #include "Cols.h"
-#include "ImageStruct.h"
+#include "kernelFiles/FileStruct.h"  //kernelFiles::
+#include "kernelFiles/ZIPStruct.h"
 
 struct BootInfo
 {
 	Framebuffer* framebuffer;
 	PSF1_FONT* psf1_font;
-    ImageFile* bgImage;
-    ImageFile* testImage;
+    kernelFiles::ImageFile* bgImage;
+    kernelFiles::ImageFile* testImage;
+    kernelFiles::ZIPFile* mouseZIP;
 	EFI_MEMORY_DESCRIPTOR* mMap;
 	uint64_t mMapSize;
 	uint64_t mMapDescSize;

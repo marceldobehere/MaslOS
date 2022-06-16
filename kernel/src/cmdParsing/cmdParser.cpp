@@ -307,6 +307,13 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
     {
         mouseCycleSkip = to_int(val);
     }
+    else if (StrEquals(name, "mouse image"))
+    {
+        currentMouseImageName = StrCopy(val);
+        if (kernelFiles::ZIP::GetFileFromFileName(mouseZIP, currentMouseImageName) == NULL)
+            LogError("Mouse Image File doesn't exist! Setting to default...", window);
+    }
+    //mouseImage = kernelFiles::ConvertFileToImage(kernelFiles::ZIP::GetFileFromFileName(bootInfo->mouseZIP, "default.mbif"));
     else if (StrEquals(name, "password"))
     {
         (*user)->mode = commandMode::enterPassword;

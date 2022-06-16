@@ -94,7 +94,8 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     PrepareInterrupts();
 
-    InitPS2Mouse();
+    InitPS2Mouse(bootInfo->mouseZIP, "default.mbif");
+    //mouseImage = kernelFiles::ConvertFileToImage(kernelFiles::ZIP::GetFileFromFileName(bootInfo->mouseZIP, "default.mbif"));
 
     InitKeyboard();
 

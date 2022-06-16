@@ -3,6 +3,7 @@
 #include "../WindowStuff/WindowManager/windowManager.h"
 #include "../scheduling-pit/pit.h"
 
+
 #define PS2XSign        0b00010000
 #define PS2YSign        0b00100000
 #define PS2XOverflow    0b01000000
@@ -16,6 +17,11 @@
 #define MouseRight  1 
 #define MouseMiddle 2
 
+
+kernelFiles::ZIPFile* mouseZIP;
+kernelFiles::ImageFile* currentMouseImage;
+const char* currentMouseImageName;
+const char* oldMouseImageName = "";
 
 uint32_t MouseDataMap[] =
 {
@@ -168,6 +174,23 @@ void DrawMousePointer()
     //DrawMousePointer2();
 }
 
+void DrawMousePointerNew(MPoint point, Framebuffer* framebuffer)
+{
+    if (mouseZIP != NULL)
+    {
+        if (!StrEquals(oldMouseImageName, currentMouseImageName))
+        {
+            oldMouseImageName = currentMouseImageName;
+            currentMouseImage = kernelFiles::ConvertFileToImage(kernelFiles::ZIP::GetFileFromFileName(mouseZIP, currentMouseImageName));
+        }
+    }
+
+    if (currentMouseImage != NULL)
+        GlobDrawImage(currentMouseImage, point.x, point.y, 1, 1, framebuffer);
+    else
+        DrawMouseBuffer(MousePosition, framebuffer);
+}
+
 void DrawMousePointer1(Framebuffer* framebuffer)
 {
     LoadFromBuffer(oldMousePosition, framebuffer);
@@ -176,7 +199,8 @@ void DrawMousePointer1(Framebuffer* framebuffer)
 void DrawMousePointer2(Framebuffer* framebuffer)
 {
     //SaveIntoBuffer(MousePosition, framebuffer);
-    DrawMouseBuffer(MousePosition, framebuffer);
+    //DrawMouseBuffer(MousePosition, framebuffer);
+    DrawMousePointerNew(MousePosition, framebuffer);
     oldMousePosition.x = MousePosition.x;
     oldMousePosition.y = MousePosition.y;
 }
@@ -221,8 +245,11 @@ MPoint diff = MPoint();
 bool startDrag = false;
 Window* dragWindow = NULL;
 
-void InitPS2Mouse()
+void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName)
 {
+    mouseZIP = _mouseZIP;
+    oldMouseImageName = "";
+    currentMouseImageName = _mouseName;
     mouseCycleSkip = 2;
     outb(0x64, 0xA8);
     Mousewait();

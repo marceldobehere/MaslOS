@@ -5,8 +5,14 @@
 #include "../BasicRenderer.h"
 #include "../cstr.h"
 #include "../Cols.h"
+#include "../kernelFiles/ImageStruct.h"
+#include "../kernelFiles/ZIPStruct.h"
 
 extern int mouseCycleSkip;
+
+extern kernelFiles::ZIPFile* mouseZIP;
+extern kernelFiles::ImageFile* currentMouseImage;
+extern const char* currentMouseImageName;
 
 void Mousewait();
 
@@ -16,7 +22,7 @@ void MouseWrite(uint8_t value);
 
 uint8_t MouseRead();
 
-void InitPS2Mouse();
+void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName);
 
 void MouseWrite(uint8_t value);
 

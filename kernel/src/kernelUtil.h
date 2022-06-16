@@ -49,6 +49,7 @@ struct KernelInfo
 #include "customClasses/array.h"
 #include "customClasses/list.h"
 
+#include "kernelFiles/kernelFiles.h"
 
 //extern KernelInfo kernelInfo;
 //extern PageTableManager pageTableManager;

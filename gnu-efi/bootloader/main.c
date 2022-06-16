@@ -38,6 +38,24 @@ typedef struct
 } ImageFile;
 
 
+typedef struct
+{
+	int64_t size;
+	int32_t filenameSize;
+	
+	char* filename;
+	void* fileData;
+} NormalFile;
+
+typedef struct
+{
+	int64_t size;
+	int32_t fileCount;
+	
+	NormalFile* files;
+} ZIPFile;
+
+
 
 EFI_FILE* LoadFile(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable)
 {
@@ -157,7 +175,105 @@ ImageFile* LoadImage(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, 
 }
 
 
+ZIPFile* LoadZIP(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable)
+{
 
+	EFI_FILE* zipEFI = LoadFile(Directory, Path, ImageHandle, SystemTable);
+
+	if (zipEFI == NULL)
+		return NULL;
+
+	ZIPFile* zip;
+	SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(ZIPFile), (void**)&zip);
+
+	UINTN size;
+
+	uint64_t index = 0;
+
+	size = 8;
+	//zipEFI->SetPosition(zipEFI, index);
+	zipEFI->Read(zipEFI, &size, &zip->size);
+	index += 8;
+	Print(L"Filesize: %d bytes\n\r", zip->size);
+	
+	zipEFI->SetPosition(zipEFI, index);
+	size = 4;
+	zipEFI->Read(zipEFI, &size, &zip->fileCount);
+	index += 4;
+
+	Print(L"Filecount: %d files\n\r", zip->fileCount);
+
+	
+	SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(NormalFile) * zip->fileCount, (void**)&zip->files);
+
+	for (int32_t i = 0; i < zip->fileCount; i++)
+	{
+		Print(L"File %d: (Index: %d)\n\r", i, index);
+		NormalFile* currFile = zip->files + i;
+
+		zipEFI->SetPosition(zipEFI, index);
+		size = 4;
+		zipEFI->Read(zipEFI, &size, &currFile->filenameSize);
+		index += 4;
+		Print(L" - Filename: %d chars\n\r", currFile->filenameSize);
+
+		SystemTable->BootServices->AllocatePool(EfiLoaderData, currFile->filenameSize + 1, (void**)&currFile->filename);
+		*(currFile->filename + currFile->filenameSize) = (char)0;
+
+		zipEFI->SetPosition(zipEFI, index);
+		size = currFile->filenameSize;
+		zipEFI->Read(zipEFI, &size, currFile->filename);
+		index += currFile->filenameSize;
+
+		zipEFI->SetPosition(zipEFI, index);
+		size = 8;
+		zipEFI->Read(zipEFI, &size, &currFile->size);
+		index += 8;
+		Print(L" - Filesize: %d bytes\n\r", currFile->size);
+
+		SystemTable->BootServices->AllocatePool(EfiLoaderData, currFile->size, (void**)&currFile->fileData);
+
+		zipEFI->SetPosition(zipEFI, index);
+		size = currFile->size;
+		zipEFI->Read(zipEFI, &size, currFile->fileData);
+		index += currFile->size;
+		//Print(L">File %d/%d: (Index: %d)\n\r", i, zip->fileCount, index);
+	}
+
+
+	return zip;
+
+	// UINTN size = 3*4;
+	// int32_t arr[3];
+	// img->Read(img, &size, arr);
+
+	// // int32_t arr2[3] = {0, 0, 0};
+
+	// // for (int i = 0; i < 3; i++)
+	// // 	arr2[i] = (((uint32_t)arr[(i*4)+3]) << 24) | (((uint32_t)arr[(i*4)+2]) << 16) | (((uint32_t)arr[(i*4)+1]) << 8) | (((uint32_t)arr[(i*4)+0]) << 0);
+
+	// Print(L"Image Data:\n\r");
+	// Print(L" - Width:  %d\n\r", arr[0]);
+	// Print(L" - Height: %d\n\r", arr[1]);
+	// Print(L" - Size:   %d\n\r", arr[2]);
+
+	// image->width = arr[0];
+	// image->height = arr[1];
+
+
+	// {
+	// 	img->SetPosition(img, 4*3);
+	// 	SystemTable->BootServices->AllocatePool(EfiLoaderData, arr[2], (void**)&image->imageBuffer);
+	// 	size = arr[2];
+	// 	img->Read(img, &size, (char*)image->imageBuffer);
+	// }
+
+	// // size = 10; //(UINTN)(arr[2] * 0 + 100);
+	// // char data[arr[2]];
+	// // img->Read(img, &size, data);
+	// //Print(L" - First Byte:   %d\n\r", *((char*)image->imageBuffer));
+	// return image;
+}
 
 
 	Framebuffer framebuffer;
@@ -272,6 +388,7 @@ typedef struct
 	PSF1_FONT* psf1_font;
 	ImageFile* bgImage;
 	ImageFile* testImage;
+	ZIPFile* mouseZIP;
 	EFI_MEMORY_DESCRIPTOR* mMap;
 	UINTN mMapSize;
 	UINTN mMapDescSize;
@@ -419,6 +536,19 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 		Print(L"Image loaded. Char size: %d\n\r", (image->height*image->width*4));
 	}
 
+
+	ZIPFile* mouseZIP = LoadZIP(NULL, L"mouse.mbzf", ImageHandle, SystemTable);
+
+	if (mouseZIP == NULL)
+	{
+		Print(L"Mouse ZIP was not loaded!\n\r");
+	}
+	else
+	{
+		Print(L"Mouse ZIP loaded. Char size: %d\n\r", (mouseZIP->size));
+	}
+
+
 	EFI_MEMORY_DESCRIPTOR* Map = NULL;
 	UINTN MapSize, MapKey;
 	UINTN DescriptorSize;
@@ -443,6 +573,7 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 	bootInfo.mMapDescSize = DescriptorSize;
 	bootInfo.testImage = image;
 	bootInfo.bgImage = bgImage;
+	bootInfo.mouseZIP = mouseZIP;
 
 
 	Print(L"Exiting EFI Bootservices...\n\r");
