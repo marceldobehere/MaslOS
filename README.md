@@ -19,5 +19,7 @@ install cmake if ya haven't
 
 install nasm if ya haven't
 
+make sure mtools is on version 4.0.27 or lower. newer versions aren't working just yet
+
 
 Go into the MaslOS Folder and run ./RUN.sh
