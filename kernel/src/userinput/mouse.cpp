@@ -174,8 +174,67 @@ void DrawMousePointer()
     //DrawMousePointer2();
 }
 
+void FigureOutCorrectMouseImage()
+{
+    int maxDis = 8;
+    Window* window = WindowManager::getWindowAtMousePosition(maxDis);
+    if (window == NULL)
+    {
+        currentMouseImageName = "default.mbif";
+        return;
+    }
+    
+    if (MousePosition.x >= window->position.x - maxDis && MousePosition.x <= window->position.x + maxDis)
+    {
+        if (MousePosition.y >= (window->position.y - 22) - maxDis && MousePosition.y <= (window->position.y - 22) + maxDis)
+        {
+            currentMouseImageName = "drag_D_d.mbif";
+
+        }
+        else if (MousePosition.y >= (window->position.y + window->size.height) - maxDis && MousePosition.y <= (window->position.y + window->size.height) + maxDis)
+        {
+            currentMouseImageName = "drag_U_d.mbif";
+        }
+        else
+        {
+            currentMouseImageName = "drag_x.mbif";
+        }
+    }
+    else if (MousePosition.x >= (window->position.x + window->size.width) - maxDis && MousePosition.x <= (window->position.x + window->size.width) + maxDis)
+    {
+        if (MousePosition.y >= (window->position.y - 22) - maxDis && MousePosition.y <= (window->position.y - 22) + maxDis)
+        {
+            currentMouseImageName = "drag_U_d.mbif";
+        }
+        else if (MousePosition.y >= (window->position.y + window->size.height) - maxDis && MousePosition.y <= (window->position.y + window->size.height) + maxDis)
+        {
+            currentMouseImageName = "drag_D_d.mbif";
+        }
+        else
+        {
+            currentMouseImageName = "drag_x.mbif";
+        }
+    }
+    else if (MousePosition.y >= (window->position.y - 22) - maxDis && MousePosition.y <= (window->position.y - 22) + maxDis)
+    {
+        currentMouseImageName = "drag_y.mbif";
+    }
+    else if (MousePosition.y >= (window->position.y + window->size.height) - maxDis && MousePosition.y <= (window->position.y + window->size.height) + maxDis)
+    {
+        currentMouseImageName = "drag_y.mbif";
+    }
+    else
+    {
+        currentMouseImageName = "default.mbif";
+    }
+}
+
 void DrawMousePointerNew(MPoint point, Framebuffer* framebuffer)
 {
+    if (&osData.windows != NULL)
+    {
+        FigureOutCorrectMouseImage();
+    }
     if (mouseZIP != NULL)
     {
         if (!StrEquals(oldMouseImageName, currentMouseImageName))

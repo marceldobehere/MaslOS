@@ -3,7 +3,7 @@
 namespace WindowManager
 {
 
-    Window* getWindowAtMousePosition()
+    Window* getWindowAtMousePosition(int dis)
     {
         AddToMStack(MStack("", "WindowStuff/WindowManager/windowManager.cpp"));
         //GlobalRenderer->Println("Mouse POS Check");
@@ -18,6 +18,12 @@ namespace WindowManager
             br.x++;
             br.y++;
 
+            tl.x -= dis;
+            tl.y -= dis;
+            br.x += dis;
+            br.y += dis;
+
+
             if (MousePosition.x >= tl.x && MousePosition.x <= br.x && MousePosition.y >= tl.y && MousePosition.y <=br.y)
             {
                 RemoveLastMStack();
@@ -29,7 +35,10 @@ namespace WindowManager
         return NULL;   
     }
 
-
+    Window* getWindowAtMousePosition()
+    {
+        return getWindowAtMousePosition(8);
+    }
 
 }
 

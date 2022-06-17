@@ -7,7 +7,5 @@
 namespace WindowManager
 {
     Window* getWindowAtMousePosition();
-
-    
-
+    Window* getWindowAtMousePosition(int distance);
 }
