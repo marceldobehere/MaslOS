@@ -15,7 +15,7 @@ extern "C" void _start(BootInfo* bootInfo)
     osData.enableStackTrace = true;
     AddToMStack(MStack("_start", "kernel.cpp"));
 
-    
+    while(true);
 
     KernelInfo kernelInfo = InitializeKernel(bootInfo);
     PageTableManager* pageTableManager = kernelInfo.pageTableManager;

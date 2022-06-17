@@ -5,7 +5,8 @@ namespace kernelFiles
 {
 	typedef struct
 	{
-		int64_t width, height;
+		int32_t width, height, xOff, yOff;
+		int64_t size;
 		void* imageBuffer;
 	} ImageFile;
 

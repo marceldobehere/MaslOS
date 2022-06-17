@@ -33,7 +33,8 @@ typedef struct
 
 typedef struct
 {
-	int64_t width, height;
+	int32_t width, height, xOff, yOff;
+	int64_t size;
 	void* imageBuffer;
 } ImageFile;
 
@@ -142,9 +143,17 @@ ImageFile* LoadImage(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, 
 	// PSF1_HEADER* fontHeader;
 	// SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(PSF1_HEADER), (void**)&fontHeader);
 	 
-	UINTN size = 3*4;
-	int32_t arr[3];
+	UINTN size = 4*4;
+	int32_t arr[4];
+	int64_t imgSize = 0;
 	img->Read(img, &size, arr);
+
+	{
+		img->SetPosition(img, 4*4);
+		size = 8;
+		img->Read(img, &size, &imgSize);
+	}
+
 
 	// int32_t arr2[3] = {0, 0, 0};
 
@@ -154,16 +163,18 @@ ImageFile* LoadImage(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, 
 	Print(L"Image Data:\n\r");
 	Print(L" - Width:  %d\n\r", arr[0]);
 	Print(L" - Height: %d\n\r", arr[1]);
-	Print(L" - Size:   %d\n\r", arr[2]);
+	Print(L" - xOff:   %d\n\r", arr[2]);
+	Print(L" - yOff:   %d\n\r", arr[3]);
+	Print(L" - Size:   %d\n\r", imgSize);
 
 	image->width = arr[0];
 	image->height = arr[1];
 
 
 	{
-		img->SetPosition(img, 4*3);
+		img->SetPosition(img, 4*4 + 8);
 		SystemTable->BootServices->AllocatePool(EfiLoaderData, arr[2], (void**)&image->imageBuffer);
-		size = arr[2];
+		size = imgSize;
 		img->Read(img, &size, (char*)image->imageBuffer);
 	}
 
@@ -208,14 +219,14 @@ ZIPFile* LoadZIP(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, EFI_
 
 	for (int32_t i = 0; i < zip->fileCount; i++)
 	{
-		Print(L"File %d: (Index: %d)\n\r", i, index);
+		//Print(L"File %d: (Index: %d)\n\r", i, index);
 		NormalFile* currFile = zip->files + i;
 
 		zipEFI->SetPosition(zipEFI, index);
 		size = 4;
 		zipEFI->Read(zipEFI, &size, &currFile->filenameSize);
 		index += 4;
-		Print(L" - Filename: %d chars\n\r", currFile->filenameSize);
+		//Print(L" - Filename: %d chars\n\r", currFile->filenameSize);
 
 		SystemTable->BootServices->AllocatePool(EfiLoaderData, currFile->filenameSize + 1, (void**)&currFile->filename);
 		*(currFile->filename + currFile->filenameSize) = (char)0;
@@ -229,7 +240,7 @@ ZIPFile* LoadZIP(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, EFI_
 		size = 8;
 		zipEFI->Read(zipEFI, &size, &currFile->size);
 		index += 8;
-		Print(L" - Filesize: %d bytes\n\r", currFile->size);
+		//Print(L" - Filesize: %d bytes\n\r", currFile->size);
 
 		SystemTable->BootServices->AllocatePool(EfiLoaderData, currFile->size, (void**)&currFile->fileData);
 
