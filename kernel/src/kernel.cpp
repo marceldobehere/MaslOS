@@ -167,8 +167,8 @@ extern "C" void _start(BootInfo* bootInfo)
         //realMainWindow->Render();
         
 
-        double endTime = PIT::TimeSinceBoot + 0.02;
-        while (PIT::TimeSinceBoot < endTime)
+        //double endTime = PIT::TimeSinceBoot + 0.02;
+        //while (PIT::TimeSinceBoot < endTime)
         {
             //GlobalRenderer->Print("A");
             for (int i = 0; i < osData.windows.getCount(); i++)
