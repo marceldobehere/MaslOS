@@ -274,7 +274,7 @@ void BasicRenderer::Clear(uint32_t col)
 void BasicRenderer::Cls()
 {
     BasicRenderer::Clear(0);
-    BasicRenderer::Println("Masl OS v0.09", Colors.green);
+    BasicRenderer::Println("Masl OS v0.11", Colors.green);
     BasicRenderer::Println("-------------", Colors.green);
     BasicRenderer::Println();
 }
@@ -430,6 +430,9 @@ void BasicRenderer::Print(const char* chrs, dispVar vars[])
 
 void GlobDrawImage(kernelFiles::ImageFile* image, int64_t x, int64_t y, int64_t sx, int64_t sy, Framebuffer* framebuffer)
 {
+    x += image->xOff * sx;
+    y += image->yOff * sy;
+
     uint64_t addr = (uint64_t)framebuffer->BaseAddress;
     uint64_t mult = framebuffer->PixelsPerScanLine*4;
     uint32_t* imgaddr = (uint32_t*)image->imageBuffer;

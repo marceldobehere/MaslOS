@@ -15,7 +15,7 @@ extern "C" void _start(BootInfo* bootInfo)
     osData.enableStackTrace = true;
     AddToMStack(MStack("_start", "kernel.cpp"));
 
-    while(true);
+    //while(true);
 
     KernelInfo kernelInfo = InitializeKernel(bootInfo);
     PageTableManager* pageTableManager = kernelInfo.pageTableManager;
@@ -25,23 +25,24 @@ extern "C" void _start(BootInfo* bootInfo)
     osData.windows = List<Window*>();
     osData.drawBackground = false;
     
-    // GlobalRenderer->Clear(Colors.black);
+    GlobalRenderer->Clear(Colors.black);
     // {
-    //     int xdiff = 0;
+    //     int xdiff = 20;
     
     //     GlobalRenderer->Println("Filecount: {}\n", to_string(bootInfo->mouseZIP->fileCount), Colors.yellow);
     //     int ydiff = GlobalRenderer->CursorPosition.y + 10;
-    //     // for (int i = 0; i < bootInfo->mouseZIP->fileCount; i++)
-    //     // {
-    //     //     kernelFiles::ImageFile* image = kernelFiles::ConvertFileToImage(&bootInfo->mouseZIP->files[i]);
-    //     //     GlobalRenderer->DrawImage(image, xdiff, ydiff, 1, 1);
-    //     //     xdiff += image->width + 10;
-    //     // }
+    //     for (int i = 0; i < bootInfo->mouseZIP->fileCount; i++)
     //     {
-    //         kernelFiles::ImageFile* image = kernelFiles::ConvertFileToImage(kernelFiles::ZIP::GetFileFromFileName(bootInfo->mouseZIP, "default.mbif"));
-    //         if (image != NULL)
-    //             GlobalRenderer->DrawImage(image, xdiff, ydiff, 2, 2);
+    //         kernelFiles::ImageFile* image = kernelFiles::ConvertFileToImage(&bootInfo->mouseZIP->files[i]);
+    //         GlobalRenderer->DrawImage(image, xdiff, ydiff, 1, 1);
+    //         //GlobalRenderer->DrawImage(image, xdiff + image->xOff, ydiff + image->yOff + 20, 1, 1);
+    //         xdiff += image->width + 20;
     //     }
+    //     // {
+    //     //     kernelFiles::ImageFile* image = kernelFiles::ConvertFileToImage(kernelFiles::ZIP::GetFileFromFileName(bootInfo->mouseZIP, "default.mbif"));
+    //     //     if (image != NULL)
+    //     //         GlobalRenderer->DrawImage(image, xdiff, ydiff, 2, 2);
+    //     // }
     // }
     
     // while (true);

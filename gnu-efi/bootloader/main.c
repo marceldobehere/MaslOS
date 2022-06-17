@@ -169,11 +169,14 @@ ImageFile* LoadImage(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, 
 
 	image->width = arr[0];
 	image->height = arr[1];
+	image->xOff = arr[2];
+	image->yOff = arr[3];
+	image->size = imgSize;
 
 
 	{
 		img->SetPosition(img, 4*4 + 8);
-		SystemTable->BootServices->AllocatePool(EfiLoaderData, arr[2], (void**)&image->imageBuffer);
+		SystemTable->BootServices->AllocatePool(EfiLoaderData, imgSize, (void**)&image->imageBuffer);
 		size = imgSize;
 		img->Read(img, &size, (char*)image->imageBuffer);
 	}

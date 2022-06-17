@@ -16,9 +16,9 @@ namespace kernelFiles
         //GlobalRenderer->Println("ADDR: {}", ConvertHexToString((uint64_t)&File->fileData), Colors.yellow);
         char* data = (char*) File->fileData;
 
-        int32_t sizes[3] = {0, 0, 0};
+        int32_t sizes[4] = {0, 0, 0, 0};
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 4; i++)
 	 	    sizes[i] =  (((uint32_t)data[(i*4)+3]) << 24) |
                         (((uint32_t)data[(i*4)+2]) << 16) |
                         (((uint32_t)data[(i*4)+1]) <<  8) |
@@ -26,10 +26,14 @@ namespace kernelFiles
 
         image->width = sizes[0];
         image->height = sizes[1];
+        image->xOff = sizes[2];
+        image->yOff = sizes[3];
 
-        image->imageBuffer = malloc(sizes[3]);
-        for (int i = 3*4; i < sizes[3]+12; i++)
-            ((char*)image->imageBuffer)[i-12] = data[i];
+        image->size = *((int64_t*)&data[4*4]);
+
+        image->imageBuffer = malloc(image->size);
+        for (int i = 24; i < image->size+24; i++)
+            ((char*)image->imageBuffer)[i-24] = data[i];
 
         RemoveLastMStack();
         return image;
