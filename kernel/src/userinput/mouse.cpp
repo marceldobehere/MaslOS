@@ -23,6 +23,8 @@ kernelFiles::ImageFile* currentMouseImage;
 const char* currentMouseImageName;
 const char* oldMouseImageName = "";
 
+bool dragArr[4] = {false, false, false, false}; //xl yu xr xd
+
 uint32_t MouseDataMap[] =
 {
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -177,23 +179,29 @@ void DrawMousePointer()
 void FigureOutCorrectMouseImage()
 {
     int maxDis = 8;
+    for (int i = 0; i < 4; i++)
+        dragArr[i] = false;
     Window* window = WindowManager::getWindowAtMousePosition(maxDis);
     if (window == NULL)
     {
         currentMouseImageName = "default.mbif";
+        
         return;
     }
     
     if (MousePosition.x >= window->position.x - maxDis && MousePosition.x <= window->position.x + maxDis)
     {
+        dragArr[0] = true;
         if (MousePosition.y >= (window->position.y - 22) - maxDis && MousePosition.y <= (window->position.y - 22) + maxDis)
         {
             currentMouseImageName = "drag_D_d.mbif";
+            dragArr[1] = true;
 
         }
         else if (MousePosition.y >= (window->position.y + window->size.height) - maxDis && MousePosition.y <= (window->position.y + window->size.height) + maxDis)
         {
             currentMouseImageName = "drag_U_d.mbif";
+            dragArr[3] = true;
         }
         else
         {
@@ -202,13 +210,16 @@ void FigureOutCorrectMouseImage()
     }
     else if (MousePosition.x >= (window->position.x + window->size.width) - maxDis && MousePosition.x <= (window->position.x + window->size.width) + maxDis)
     {
+        dragArr[2] = true;
         if (MousePosition.y >= (window->position.y - 22) - maxDis && MousePosition.y <= (window->position.y - 22) + maxDis)
         {
             currentMouseImageName = "drag_U_d.mbif";
+            dragArr[1] = true;
         }
         else if (MousePosition.y >= (window->position.y + window->size.height) - maxDis && MousePosition.y <= (window->position.y + window->size.height) + maxDis)
         {
             currentMouseImageName = "drag_D_d.mbif";
+            dragArr[3] = true;
         }
         else
         {
@@ -218,10 +229,12 @@ void FigureOutCorrectMouseImage()
     else if (MousePosition.y >= (window->position.y - 22) - maxDis && MousePosition.y <= (window->position.y - 22) + maxDis)
     {
         currentMouseImageName = "drag_y.mbif";
+        dragArr[1] = true;
     }
     else if (MousePosition.y >= (window->position.y + window->size.height) - maxDis && MousePosition.y <= (window->position.y + window->size.height) + maxDis)
     {
         currentMouseImageName = "drag_y.mbif";
+        dragArr[3] = true;
     }
     else
     {
@@ -310,6 +323,8 @@ void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName)
     oldMouseImageName = "";
     currentMouseImageName = _mouseName;
     mouseCycleSkip = 2;
+    for (int i = 0; i < 4; i++)
+        dragArr[i] = false;
     outb(0x64, 0xA8);
     Mousewait();
 
@@ -399,6 +414,9 @@ void HandlePS2Mouse(uint8_t data)
     }
 }
 
+bool activeDrag[4] = {false, false, false, false};
+bool activeDragOn = false;
+
 void HandleClick(bool L, bool R, bool M)
 {
     //activeWindow->renderer->Println("Click");
@@ -410,8 +428,15 @@ void HandleClick(bool L, bool R, bool M)
         startDrag = false;
         if (window != NULL)
         {
-            diff.x = MousePosition.x - window->position.x;
-            diff.y = MousePosition.y - window->position.y;
+            activeDragOn = false;
+            for (int i = 0; i < 4; i++)
+            {
+                activeDrag[i] = dragArr[i];
+                activeDragOn |= activeDrag[i];
+            }
+
+            diff.x = MousePosition.x;
+            diff.y = MousePosition.y;
             window->moveToFront = true;
         }
     }   
@@ -431,8 +456,39 @@ void HandleHold(bool L, bool R, bool M)
             }
             else
             {
-                window->newPosition.x = MousePosition.x - diff.x;
-                window->newPosition.y = MousePosition.y - diff.y;
+                if (!activeDragOn)
+                {
+                    window->newPosition.x += (MousePosition.x - diff.x);
+                    window->newPosition.y += (MousePosition.y - diff.y);
+                }
+                else
+                {
+                    if (activeDrag[0])
+                    {
+                        window->newSize.width -= (MousePosition.x - diff.x);
+                        if (window->newSize.width >= 10)
+                            window->newPosition.x += (MousePosition.x - diff.x);
+                    }
+                    if (activeDrag[1])
+                    {
+                        window->newSize.height -= (MousePosition.y - diff.y);
+                        if (window->newSize.height >= 10)
+                            window->newPosition.y += (MousePosition.y - diff.y);
+                    }
+                    if (activeDrag[2])
+                    {
+                        window->newSize.width += (MousePosition.x - diff.x);
+                    }
+                    if (activeDrag[3])
+                    {
+                        window->newSize.height += (MousePosition.y - diff.y);
+                    }
+                }
+
+
+
+                diff.x = MousePosition.x;
+                diff.y = MousePosition.y;
             }
         }
 

@@ -123,24 +123,24 @@ void HandleKeyboard(uint8_t scancode)
     }
     else if (scancode == ARR_UP)
     {  
-        int64_t index = osData.windows.getIndexOf(activeWindow);
-        if (index == -1)
-        {
-            RemoveLastMStack();
-            return;
-        }
-        osData.windows[index]->newSize.width += 10;
+        // int64_t index = osData.windows.getIndexOf(activeWindow);
+        // if (index == -1)
+        // {
+        //     RemoveLastMStack();
+        //     return;
+        // }
+        // osData.windows[index]->newSize.width += 10;
     }
     else if (scancode == ARR_DOWN)
     {
-        int64_t index = osData.windows.getIndexOf(activeWindow);
-        if (index == -1)
-        {
-            RemoveLastMStack();
-            return;
-        }
-        if (osData.windows[index]->newSize.width >= 10)
-            osData.windows[index]->newSize.width -= 10;
+        // int64_t index = osData.windows.getIndexOf(activeWindow);
+        // if (index == -1)
+        // {
+        //     RemoveLastMStack();
+        //     return;
+        // }
+        // if (osData.windows[index]->newSize.width >= 10)
+        //     osData.windows[index]->newSize.width -= 10;
     }
 
 
