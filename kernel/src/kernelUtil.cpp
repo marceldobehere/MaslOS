@@ -6,6 +6,33 @@
 
 
 
+
+void PrepareACPI(BootInfo* bootInfo)
+{
+    AddToStack("PrepareACPI", "kernelUtil.cpp");
+    osData.debugTerminalWindow->Log("Preparing ACPI...");
+    ACPI::SDTHeader* xsdt = (ACPI::SDTHeader*)(bootInfo->rsdp->XSDTAddress);
+    osData.debugTerminalWindow->Log("XSDT Header Addr: {}", ConvertHexToString((uint64_t)xsdt));
+    osData.debugTerminalWindow->Log("Length: {}", to_string((uint64_t)xsdt->Length));
+    int entries = (xsdt->Length - sizeof(ACPI::SDTHeader)) / 8;
+    osData.debugTerminalWindow->Log("Entry count: {}", to_string(entries));
+
+    for (int t = 0; t < entries; t++)
+    {
+        osData.debugTerminalWindow->renderer->Print("> ");
+        ACPI::SDTHeader* newSDTHeader = (ACPI::SDTHeader*)*(uint64_t*)((uint64_t)xsdt + sizeof(ACPI::SDTHeader) + (t * 8));
+        
+        for (int i = 0; i < 4; i++)
+            osData.debugTerminalWindow->renderer->Print(newSDTHeader->Signature[i]);
+
+        osData.debugTerminalWindow->renderer->Println(" ");
+    }
+
+    RemoveFromStack();
+}
+
+
+
 KernelInfo kernelInfo;
 static PageFrameAllocator t = PageFrameAllocator();
 

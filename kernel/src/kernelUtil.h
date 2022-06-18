@@ -57,6 +57,10 @@ struct KernelInfo
 
 #include "kernelFiles/kernelFiles.h"
 
+#include "acpi/acpi.h"
+
+void PrepareACPI(BootInfo* bootInfo);
+
 //extern KernelInfo kernelInfo;
 //extern PageTableManager pageTableManager;
 //extern PageFrameAllocator t;

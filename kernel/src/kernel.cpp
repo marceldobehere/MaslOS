@@ -136,6 +136,36 @@ extern "C" void _start(BootInfo* bootInfo)
 
     debugTerminalWindow->Log("Kernel Initialised Successfully!");
 
+    
+
+    debugTerminalWindow->Log("Address of RSDP: {}", ConvertHexToString((uint64_t)bootInfo->rsdp));
+
+    {
+        char* substr = StrSubstr((char*)bootInfo->rsdp, 0, 8);
+        debugTerminalWindow->Log("RSDP: \"{}\"", substr);
+        free(substr);
+    }
+    
+    PrepareACPI(bootInfo);
+
+    {
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
     activeWindow->renderer->Cls();
     //activeWindow->renderer->Println("Kernel Initialised Successfully!", Colors.yellow);
     KeyboardPrintStart(mainWindow);
