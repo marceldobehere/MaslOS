@@ -1,6 +1,6 @@
 #include "kernelUtil.h"
 
-// extern uint64_t _KernelStart;
+// extern uint64_t _KernelStart; 
 // extern uint64_t _KernelEnd;
 
 
@@ -11,6 +11,7 @@ void PrepareACPI(BootInfo* bootInfo)
 {
     AddToStack("PrepareACPI", "kernelUtil.cpp");
     osData.debugTerminalWindow->Log("Preparing ACPI...");
+    osData.debugTerminalWindow->Log("RSDP Addr: {}", ConvertHexToString((uint64_t)bootInfo->rsdp));
     ACPI::SDTHeader* xsdt = (ACPI::SDTHeader*)(bootInfo->rsdp->XSDTAddress);
     osData.debugTerminalWindow->Log("XSDT Header Addr: {}", ConvertHexToString((uint64_t)xsdt));
     osData.debugTerminalWindow->Log("Length: {}", to_string((uint64_t)xsdt->Length));
@@ -97,6 +98,46 @@ void PrepareInterrupts()
 }
 
 
+void PrepareWindows()
+{
+    osData.windows = List<Window*>();
+
+    Window* realMainWindow;
+    {
+        realMainWindow = (Window*)malloc(sizeof(Window));
+        *(realMainWindow) = Window(NULL, Size(GlobalRenderer->framebuffer->Width, GlobalRenderer->framebuffer->Height), Position(0, 0), GlobalRenderer, "Real Main Window");
+        osData.realMainWindow = realMainWindow;
+    }
+
+    Window* realMainWindow2;
+    {
+        realMainWindow2 = (Window*)malloc(sizeof(Window));
+        *(realMainWindow2) = Window(NULL, Size(GlobalRenderer->framebuffer->Width, GlobalRenderer->framebuffer->Height), Position(0, 0), GlobalRenderer, "Real Main Window - Buffer 2");
+        osData.realMainWindow2 = realMainWindow2;
+    }
+
+    Window* debugTerminalWindow;
+    {
+        debugTerminalWindow = (Window*)malloc(sizeof(Window));
+        //TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
+        //*terminal = TerminalInstance(&adminUser, debugTerminalWindow);
+        *(debugTerminalWindow) = Window(NULL /*(DefaultInstance*)terminal*/, Size(400, 600), Position(600, 20), realMainWindow->renderer, "Debug Terminal");
+        osData.windows.add(debugTerminalWindow);
+
+        osData.debugTerminalWindow = debugTerminalWindow;
+        osData.showDebugterminal = true;
+
+        osData.debugTerminalWindow->newPosition.x = GlobalRenderer->framebuffer->Width - (osData.debugTerminalWindow->size.width + 2);
+        osData.debugTerminalWindow->newPosition.y = 23;
+
+        debugTerminalWindow->renderer->Clear(Colors.black);
+        //KeyboardPrintStart(debugTerminalWindow);
+        debugTerminalWindow->renderer->Println("MaslOS - Debug Terminal", Colors.green);
+        debugTerminalWindow->renderer->Println("-----------------------\n", Colors.green);
+        debugTerminalWindow->renderer->color = Colors.yellow;
+    }
+}
+
 
 
 BasicRenderer r = *((BasicRenderer*)NULL);
@@ -127,6 +168,12 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     InitKeyboard();
 
     initUsers();
+
+    PrepareWindows();
+
+    bootInfo->rsdp = (ACPI::RSDP2*)((uint64_t)bootInfo->rsdp + 20);
+
+    PrepareACPI(bootInfo);
 
     outb(PIC1_DATA, 0b11111000);
     outb(PIC2_DATA, 0b11101111);

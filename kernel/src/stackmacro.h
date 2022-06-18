@@ -13,7 +13,7 @@
 #if !RECORD_STACK_TRACE
 
     #undef ADDToStack
-    #define ADDToStack() ;
+    #define ADDToStack(name, location) ;
 
     #undef RemoveFromStack
     #define RemoveFromStack() ;

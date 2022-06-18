@@ -72,6 +72,7 @@ void SetIDTGate(void* handler, uint8_t entryOffset, uint8_t type_attr, uint8_t s
 
 void PrepareInterrupts();
 
+void PrepareTerminals();
 
 //extern BasicRenderer r;
 KernelInfo InitializeKernel(BootInfo* bootInfo);

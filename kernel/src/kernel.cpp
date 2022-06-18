@@ -23,7 +23,11 @@ extern "C" void _start(BootInfo* bootInfo)
 
     osData.kernelInfo = &kernelInfo;
     osData.exit = false;
-    osData.windows = List<Window*>();
+
+    Window* debugTerminalWindow = osData.debugTerminalWindow;
+    Window* realMainWindow = osData.realMainWindow;
+    Window* realMainWindow2 = osData.realMainWindow2;
+    
     osData.drawBackground = false;
     
     GlobalRenderer->Clear(Colors.black);
@@ -62,28 +66,15 @@ extern "C" void _start(BootInfo* bootInfo)
     //while(true);
 
 
-    Window* realMainWindow;
-    {
-        realMainWindow = (Window*)malloc(sizeof(Window));
-        *(realMainWindow) = Window(NULL, Size(GlobalRenderer->framebuffer->Width, GlobalRenderer->framebuffer->Height), Position(0, 0), GlobalRenderer, "Real Main Window");
-        osData.realMainWindow = realMainWindow;
-    }
 
-    Window* realMainWindow2;
-    {
-        realMainWindow2 = (Window*)malloc(sizeof(Window));
-        *(realMainWindow2) = Window(NULL, Size(GlobalRenderer->framebuffer->Width, GlobalRenderer->framebuffer->Height), Position(0, 0), GlobalRenderer, "Real Main Window - Buffer 2");
-        osData.realMainWindow2 = realMainWindow2;
-    }
-
-    CopyFrameBuffer(realMainWindow->framebuffer, realMainWindow2->framebuffer);
+    CopyFrameBuffer(osData.realMainWindow->framebuffer, osData.realMainWindow2->framebuffer);
 
     Window* mainWindow;
     {
         mainWindow = (Window*)malloc(sizeof(Window));
         TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
         *terminal = TerminalInstance(&adminUser, mainWindow);
-        *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(5, 30), realMainWindow->renderer, "Main Window");
+        *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(5, 30), osData.realMainWindow->renderer, "Main Window");
         osData.windows.add(mainWindow);
 
         activeWindow = mainWindow;
@@ -104,26 +95,7 @@ extern "C" void _start(BootInfo* bootInfo)
         KeyboardPrintStart(window);
     }
  
-    Window* debugTerminalWindow;
-    {
-        debugTerminalWindow = (Window*)malloc(sizeof(Window));
-        //TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
-        //*terminal = TerminalInstance(&adminUser, debugTerminalWindow);
-        *(debugTerminalWindow) = Window(NULL /*(DefaultInstance*)terminal*/, Size(400, 600), Position(600, 20), realMainWindow->renderer, "Debug Terminal");
-        osData.windows.add(debugTerminalWindow);
 
-        osData.debugTerminalWindow = debugTerminalWindow;
-        osData.showDebugterminal = true;
-
-        osData.debugTerminalWindow->newPosition.x = GlobalRenderer->framebuffer->Width - (osData.debugTerminalWindow->size.width + 2);
-        osData.debugTerminalWindow->newPosition.y = 23;
-
-        debugTerminalWindow->renderer->Clear(Colors.black);
-        //KeyboardPrintStart(debugTerminalWindow);
-        debugTerminalWindow->renderer->Println("MaslOS - Debug Terminal", Colors.green);
-        debugTerminalWindow->renderer->Println("-----------------------\n", Colors.green);
-        debugTerminalWindow->renderer->color = Colors.yellow;
-    }
     
     
     //osData.windows[1]->renderer->Clear(Colors.blue);
@@ -146,7 +118,7 @@ extern "C" void _start(BootInfo* bootInfo)
         free(substr);
     }
     
-    PrepareACPI(bootInfo);
+    //PrepareACPI(bootInfo);
 
     {
 
@@ -215,6 +187,7 @@ extern "C" void _start(BootInfo* bootInfo)
             {
                 window->Resize(window->newSize);
             }
+            
             window->Render();
         }
         DrawMousePointer2(realMainWindow->framebuffer);

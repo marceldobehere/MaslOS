@@ -38,28 +38,20 @@ void PrintMStackTrace(MStack stack[], int64_t size)
 
 void AddToTheMStack(MStack thing)
 {
-#if RECORD_STACK_TRACE  
-
-    if (!osData.enableStackTrace)
-        return;
-
     if (osData.stackPointer < 1000)
     {
         osData.stackArr[osData.stackPointer] = thing;
         osData.stackPointer++;
     }
-#endif
 }
 
 void RemoveTheLastElementFromTheMStack()
 {
-#if RECORD_STACK_TRACE  
     if (!osData.enableStackTrace)
         return;
 
     if (osData.stackPointer > 0)
         osData.stackPointer--;
-#endif
 }
 
 
