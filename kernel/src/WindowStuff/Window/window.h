@@ -67,6 +67,12 @@ class Window
     void Render();
     void Render(Framebuffer* from, Framebuffer* to, Position pos, Size size, Window* window);
     void Free();
+
+    void Log(const char* message);
+    void Log(const char* message, const char* var);
+
+    void Log(const char* message, uint32_t col);
+    void Log(const char* message, const char* var, uint32_t col);
 };
 
 

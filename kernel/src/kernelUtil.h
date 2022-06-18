@@ -1,15 +1,10 @@
 #pragma once
 
+
 #include <stddef.h>
 #include "BasicRenderer.h"
 #include "Cols.h"
 #include "cstr.h" 
-
-
-#include "efiMemory.h"
-#include "memory.h" 
-
-//#include "userinput/mouse.h"
 
 #include "paging/PageFrameAllocator.h"  
 #include "paging/PageMapIndexer.h"
@@ -24,6 +19,17 @@ struct KernelInfo
 {
     PageTableManager* pageTableManager;
 };
+
+
+#include "stackmacro.h"
+
+
+#include "efiMemory.h"
+#include "memory.h" 
+
+//#include "userinput/mouse.h"
+
+
 
 #include "OSDATA/osdata.h"
 #include "OSDATA/userdata.h"

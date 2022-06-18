@@ -10,7 +10,7 @@
 
 __attribute__((interrupt)) void PageFault_handler(struct interrupt_frame* frame)
 {
-    AddToMStack(MStack("PageFault_handler", "interrupts/interrupts.cpp"));
+    AddToStack("PageFault_handler", "interrupts/interrupts.cpp");
     Panic("Page Fault Detected!", false);
     uint64_t Register = 0;
     //Panic("Page Fault Detected! {}", to_string(*((uint64_t*)frame)), true);
@@ -60,57 +60,57 @@ __attribute__((interrupt)) void PageFault_handler(struct interrupt_frame* frame)
     GlobalRenderer->Println();
 	asm("hlt");
     while(true);
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 __attribute__((interrupt)) void DoubleFault_handler(interrupt_frame* frame)
 {
-    AddToMStack(MStack("DoubleFault_handler", "interrupts/interrupts.cpp"));
+    AddToStack("DoubleFault_handler", "interrupts/interrupts.cpp");
     Panic("Double Fault Detected!");
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 __attribute__((interrupt)) void GPFault_handler(interrupt_frame* frame)
 {
-    AddToMStack(MStack("GPFault_handler", "interrupts/interrupts.cpp"));
+    AddToStack("GPFault_handler", "interrupts/interrupts.cpp");
     Panic("General Protection Fault Detected!");
     //Panic("General Protection Fault Detected! {}", to_string(*((uint64_t*)frame)), true);
-    RemoveLastMStack();
+    RemoveFromStack();
 }
  
 __attribute__((interrupt)) void KeyboardInt_handler(interrupt_frame* frame)
 { 
-    AddToMStack(MStack("KeyboardInt_handler", "interrupts/interrupts.cpp"));
+    AddToStack("KeyboardInt_handler", "interrupts/interrupts.cpp");
     uint8_t scancode = inb(0x60);
     //GlobalRenderer->Println("Pressed: {}", to_string((uint64_t)scancode));
     HandleKeyboard(scancode);  
     PIC_EndMaster();
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 __attribute__((interrupt)) void MouseInt_handler(interrupt_frame* frame)
 { 
-    AddToMStack(MStack("MouseInt_handler", "interrupts/interrupts.cpp"));
+    AddToStack("MouseInt_handler", "interrupts/interrupts.cpp");
     uint8_t mousedata = inb(0x60);
 
     HandlePS2Mouse(mousedata);
 
     PIC_EndSlave();
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 __attribute__((interrupt)) void PITInt_handler(interrupt_frame* frame)
 { 
-    AddToMStack(MStack("PITInt_handler", "interrupts/interrupts.cpp"));
+    AddToStack("PITInt_handler", "interrupts/interrupts.cpp");
     PIC_EndMaster();
     PIT::Tick();
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 
 void RemapPIC() 
 {
-    AddToMStack(MStack("RemapPIC", "interrupts/interrupts.cpp"));
+    AddToStack("RemapPIC", "interrupts/interrupts.cpp");
     uint8_t a1, a2;
     a1 = inb(PIC1_DATA);
     io_wait();
@@ -142,23 +142,23 @@ void RemapPIC()
     outb(PIC2_DATA, 0xa2);
     io_wait();
 
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 void PIC_EndMaster()
 {
-    AddToMStack(MStack("PIC_EndMaster", "interrupts/interrupts.cpp"));
+    AddToStack("PIC_EndMaster", "interrupts/interrupts.cpp");
     outb(PIC1_COMMAND, PIC_EOI);
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 
 void PIC_EndSlave()
 {
-    AddToMStack(MStack("PIC_EndSlave", "interrupts/interrupts.cpp"));
+    AddToStack("PIC_EndSlave", "interrupts/interrupts.cpp");
     outb(PIC2_COMMAND, PIC_EOI);
     outb(PIC1_COMMAND, PIC_EOI);
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 

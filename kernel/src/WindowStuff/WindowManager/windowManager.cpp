@@ -5,7 +5,7 @@ namespace WindowManager
 
     Window* getWindowAtMousePosition(int dis)
     {
-        AddToMStack(MStack("", "WindowStuff/WindowManager/windowManager.cpp"));
+        AddToStack("", "WindowStuff/WindowManager/windowManager.cpp");
         //GlobalRenderer->Println("Mouse POS Check");
         for (int64_t i = osData.windows.getCount() - 1; i >= 0; i--)
         {
@@ -26,12 +26,12 @@ namespace WindowManager
 
             if (MousePosition.x >= tl.x && MousePosition.x <= br.x && MousePosition.y >= tl.y && MousePosition.y <=br.y)
             {
-                RemoveLastMStack();
+                RemoveFromStack();
                 return osData.windows[i];
             }
         }
         //GlobalRenderer->Println("NONE");
-        RemoveLastMStack();
+        RemoveFromStack();
         return NULL;   
     }
 

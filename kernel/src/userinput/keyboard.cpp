@@ -17,21 +17,21 @@ bool allowArrows = false;
 
 void ClearInput(TerminalInstance* instance)
 {
-    AddToMStack(MStack("ClearInput", "userinput/keyboard.cpp"));
+    AddToStack("ClearInput", "userinput/keyboard.cpp");
     for (int i = 0; i < 256; i++)
     {
         instance->lastTerminalInput[i] = instance->terminalInput[i];
         instance->terminalInput[i] = 0;
     }
     instance->userlen = 0;
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 
 void HandleEnter()
 {
     Panic("Old Function used!");
-    // AddToMStack(MStack("HandleEnter", "userinput/keyboard.cpp"));
+    // AddToStack("HandleEnter", "userinput/keyboard.cpp"));
     // if (activeWindow->instance->instanceType == InstanceType::Terminal)
     // {
     //     TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
@@ -55,7 +55,7 @@ void HandleEnter()
     //         }
     //     }
     // }
-    // RemoveLastMStack();
+    // RemoveFromStack();
 }
 
 void InitKeyboard()
@@ -65,16 +65,16 @@ void InitKeyboard()
 
 void KeyboardPrintStart(Window* window)
 {
-    AddToMStack(MStack("KeyboardPrintStart", "userinput/keyboard.cpp"));
+    AddToStack("KeyboardPrintStart", "userinput/keyboard.cpp");
     if (window == NULL)
     {
-        RemoveLastMStack();
+        RemoveFromStack();
         return;
     }
 
     if (!window->allowKeyboardDrawing)
     {
-        RemoveLastMStack();
+        RemoveFromStack();
         return;
     }
 
@@ -84,31 +84,31 @@ void KeyboardPrintStart(Window* window)
         TerminalInstance* instance = (TerminalInstance*)window->instance;
         PrintUser(window, instance->currentUser);
     }
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 void PrintUser(Window* window, OSUser* user)
 {
-    AddToMStack(MStack("PrintUser", "userinput/keyboard.cpp"));
+    AddToStack("PrintUser", "userinput/keyboard.cpp");
     if (window == NULL)
     {
-        RemoveLastMStack();
+        RemoveFromStack();
         return;
     }
     if (user== NULL)
     {
-        RemoveLastMStack();
+        RemoveFromStack();
         return;
     }
 
     window->renderer->Print(user->userName, user->colData.userColor);
     window->renderer->Print("> ");
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 void HandleKeyboard(uint8_t scancode)
 {
-    AddToMStack(MStack("HandleKeyboard", "userinput/keyboard.cpp"));
+    AddToStack("HandleKeyboard", "userinput/keyboard.cpp");
     if (scancode == ARR_LEFT)
     {  
         int64_t index = osData.windows.getIndexOf(activeWindow);
@@ -126,7 +126,7 @@ void HandleKeyboard(uint8_t scancode)
         // int64_t index = osData.windows.getIndexOf(activeWindow);
         // if (index == -1)
         // {
-        //     RemoveLastMStack();
+        //     RemoveFromStack();
         //     return;
         // }
         // osData.windows[index]->newSize.width += 10;
@@ -136,7 +136,7 @@ void HandleKeyboard(uint8_t scancode)
         // int64_t index = osData.windows.getIndexOf(activeWindow);
         // if (index == -1)
         // {
-        //     RemoveLastMStack();
+        //     RemoveFromStack();
         //     return;
         // }
         // if (osData.windows[index]->newSize.width >= 10)
@@ -146,7 +146,7 @@ void HandleKeyboard(uint8_t scancode)
 
     if (activeWindow == NULL)
     {
-        RemoveLastMStack();
+        RemoveFromStack();
         return;
     }
 
@@ -252,7 +252,7 @@ void HandleKeyboard(uint8_t scancode)
         }
     }
 
-    RemoveLastMStack();
+    RemoveFromStack();
 } 
 
 

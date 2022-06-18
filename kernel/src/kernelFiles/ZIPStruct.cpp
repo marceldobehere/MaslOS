@@ -9,10 +9,10 @@ namespace kernelFiles
     {
         DefaultFile* GetFileFromFileName(ZIPFile* zip, const char* filename)
         {
-            AddToMStack(MStack("GetFileFromFileName", "kernelFiles/ZIPStruct.cpp"));
+            AddToStack("GetFileFromFileName", "kernelFiles/ZIPStruct.cpp");
             if (zip == NULL)
             {
-                RemoveLastMStack();
+                RemoveFromStack();
                 return NULL;
             }
             
@@ -21,12 +21,12 @@ namespace kernelFiles
             {
                 if (StrEquals(zip->files[i].filename, filename))
                 {
-                    RemoveLastMStack();
+                    RemoveFromStack();
                     return &zip->files[i];
                 }
             }
 
-            RemoveLastMStack();
+            RemoveFromStack();
             return NULL;
         }
     }

@@ -6,7 +6,7 @@
 
 void Panic(const char* panicMessage, const char* var, bool lock)
 {
-    AddToMStack(MStack("Panic", "panic.cpp"));
+    AddToStack("Panic", "panic.cpp");
     GlobalRenderer->Clear(Colors.red);
     GlobalRenderer->Println();
     GlobalRenderer->Println();
@@ -17,9 +17,19 @@ void Panic(const char* panicMessage, const char* var, bool lock)
     PrintMStackTrace(osData.stackArr, osData.stackPointer);
     GlobalRenderer->Println();
     GlobalRenderer->Println();
+
+    if (osData.crashCount == 0)
+    {
+        osData.debugTerminalWindow->position.x = GlobalRenderer->framebuffer->Width - (osData.debugTerminalWindow->size.width + 2);
+        osData.debugTerminalWindow->position.y = 23;
+        osData.debugTerminalWindow->parentFrameBuffer = GlobalRenderer->framebuffer;
+        osData.debugTerminalWindow->Render();
+    }
+
+    osData.crashCount++;
     if (lock)
         while(true);
-    RemoveLastMStack();
+    RemoveFromStack();
 } 
 
 void Panic(const char* panicMessage, const char* var)

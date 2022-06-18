@@ -23,7 +23,7 @@ bool TerminalInstance::GetBusy()
 
 void TerminalInstance::HandleEnter()
 {
-    AddToMStack(MStack("HandleEnter", "WindowStuff/SubInstances/terminalInstance/terminalInstance.cpp"));
+    AddToStack("HandleEnter", "WindowStuff/SubInstances/terminalInstance/terminalInstance.cpp");
     if (userlen > 0)
     {
         if (userlen > 255)
@@ -40,12 +40,12 @@ void TerminalInstance::HandleEnter()
         //GlobalRenderer->Println(userData);
     }
     printUser = true;
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 void TerminalInstance::PrintUserIfNeeded()
 {
-    AddToMStack(MStack("PrintUserIfNeeded", "WindowStuff/SubInstances/terminalInstance/terminalInstance.cpp"));
+    AddToStack("PrintUserIfNeeded", "WindowStuff/SubInstances/terminalInstance/terminalInstance.cpp");
     if (!printUser)
         return;
     if (GetBusy())
@@ -61,5 +61,5 @@ void TerminalInstance::PrintUserIfNeeded()
         }
     }
     printUser = false;
-    RemoveLastMStack();
+    RemoveFromStack();
 }

@@ -5,10 +5,10 @@ namespace kernelFiles
 {
     ImageFile* ConvertFileToImage(DefaultFile* File)
     {
-        AddToMStack(MStack("ConvertFileToImage", "kernelFiles/kernelFiles.cpp"));
+        AddToStack("ConvertFileToImage", "kernelFiles/kernelFiles.cpp");
         if (File == NULL)
         {
-            RemoveLastMStack();
+            RemoveFromStack();
             return NULL;
         }
         ImageFile* image = (ImageFile*)malloc(sizeof(ImageFile));
@@ -35,7 +35,7 @@ namespace kernelFiles
         for (int i = 24; i < image->size+24; i++)
             ((char*)image->imageBuffer)[i-24] = data[i];
 
-        RemoveLastMStack();
+        RemoveFromStack();
         return image;
     }
 }

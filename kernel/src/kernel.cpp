@@ -12,8 +12,9 @@ if (osData.enableStackTrace)
 extern "C" void _start(BootInfo* bootInfo)
 {  
     osData.stackPointer = 0;
-    osData.enableStackTrace = true;
-    AddToMStack(MStack("_start", "kernel.cpp"));
+    osData.enableStackTrace = RECORD_STACK_TRACE;
+    AddToStack("_start", "kernel.cpp");
+    osData.crashCount = 0;
 
     //while(true);
 
@@ -89,31 +90,54 @@ extern "C" void _start(BootInfo* bootInfo)
         osData.mainTerminalWindow = mainWindow;
     }
 
+
     {
         Window* window = (Window*)malloc(sizeof(Window));
         TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
         *terminal = TerminalInstance(&guestUser, window);
         *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(700, 60), realMainWindow->renderer, "Testing Window");
         osData.windows.add(window);
+            
+        window->renderer->Cls();  
+        window->renderer->DrawImage(bootInfo->testImage, 150, 0, 2, 2);
+        //osData.windows[1]->renderer->Println("Hello, world!");
+        KeyboardPrintStart(window);
     }
  
+    Window* debugTerminalWindow;
+    {
+        debugTerminalWindow = (Window*)malloc(sizeof(Window));
+        //TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
+        //*terminal = TerminalInstance(&adminUser, debugTerminalWindow);
+        *(debugTerminalWindow) = Window(NULL /*(DefaultInstance*)terminal*/, Size(400, 600), Position(600, 20), realMainWindow->renderer, "Debug Terminal");
+        osData.windows.add(debugTerminalWindow);
+
+        osData.debugTerminalWindow = debugTerminalWindow;
+        osData.showDebugterminal = true;
+
+        osData.debugTerminalWindow->newPosition.x = GlobalRenderer->framebuffer->Width - (osData.debugTerminalWindow->size.width + 2);
+        osData.debugTerminalWindow->newPosition.y = 23;
+
+        debugTerminalWindow->renderer->Clear(Colors.black);
+        //KeyboardPrintStart(debugTerminalWindow);
+        debugTerminalWindow->renderer->Println("MaslOS - Debug Terminal", Colors.green);
+        debugTerminalWindow->renderer->Println("-----------------------\n", Colors.green);
+        debugTerminalWindow->renderer->color = Colors.yellow;
+    }
     
     
     //osData.windows[1]->renderer->Clear(Colors.blue);
     //osData.windows[1]->renderer->color = Colors.white;
-    
-    osData.windows[1]->renderer->Cls();  
-    osData.windows[1]->renderer->DrawImage(bootInfo->testImage, 150, 0, 2, 2);
-    //osData.windows[1]->renderer->Println("Hello, world!");
-    KeyboardPrintStart(osData.windows[1]);
+
     
     
     
     //activeWindow = osData.windows[1];
 
+    debugTerminalWindow->Log("Kernel Initialised Successfully!");
 
     activeWindow->renderer->Cls();
-    activeWindow->renderer->Println("Kernel Initialised Successfully!", Colors.yellow);
+    //activeWindow->renderer->Println("Kernel Initialised Successfully!", Colors.yellow);
     KeyboardPrintStart(mainWindow);
     mainWindow->Render();
 
@@ -152,6 +176,10 @@ extern "C" void _start(BootInfo* bootInfo)
         for (int i = 0; i < osData.windows.getCount(); i++)
         {            
             Window* window = osData.windows[i];
+
+            if (window == osData.debugTerminalWindow && !osData.showDebugterminal)
+                continue;
+
             window->position = window->newPosition;
             if (window->size != window->newSize)
             {
@@ -215,7 +243,7 @@ extern "C" void _start(BootInfo* bootInfo)
     GlobalRenderer->Clear(Colors.black);
 
 
-    RemoveLastMStack();
+    RemoveFromStack();
     return;
 }
 

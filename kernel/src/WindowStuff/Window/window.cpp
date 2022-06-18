@@ -7,7 +7,7 @@ Window* activeWindow = NULL;
 
 Window::Window(DefaultInstance* instance, Size size, Position position, BasicRenderer* parentRenderer, const char* title)
 {
-    AddToMStack(MStack("Constructor", "WindowStuff/Window/window.cpp"));
+    AddToStack("Constructor", "WindowStuff/Window/window.cpp");
     this->instance = instance;
     this->position = position;
     this->size = size;
@@ -34,22 +34,22 @@ Window::Window(DefaultInstance* instance, Size size, Position position, BasicRen
         renderer = (BasicRenderer*)malloc(sizeof(Framebuffer));
         *renderer = BasicRenderer(framebuffer, GlobalRenderer->psf1_font);
     }
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 
 void Window::Free()
 {
-    AddToMStack(MStack("Free", "WindowStuff/Window/window.cpp"));
+    AddToStack("Free", "WindowStuff/Window/window.cpp");
     free(framebuffer->BaseAddress);
     free(framebuffer);
     free(renderer);
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size, Window* window)
 {
-    AddToMStack(MStack("Render", "WindowStuff/Window/window.cpp"));
+    AddToStack("Render", "WindowStuff/Window/window.cpp");
     uint32_t* pointerC = (uint32_t*)from->BaseAddress;
     for (int64_t y = 0; y < from->Height; y++)
     {
@@ -136,13 +136,13 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size,
         } 
     }
     
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 /*
 void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size)
 {
-    AddToMStack(MStack("Render", "WindowStuff/Window/window.cpp"));
+    AddToStack("Render", "WindowStuff/Window/window.cpp"));
     uint32_t* pointerC = (uint32_t*)framebuffer->BaseAddress;
     for (int64_t y = 0; y < framebuffer->Height; y++)
     {
@@ -214,7 +214,7 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size)
         counter++;
     } 
     
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 */
@@ -228,7 +228,7 @@ void Window::Render()
 
 void Window::Resize(Size newSize)
 {
-    AddToMStack(MStack("Resize", "WindowStuff/Window/window.cpp"));
+    AddToStack("Resize", "WindowStuff/Window/window.cpp");
     if (newSize.height < 10)
         newSize.height = 10;
 
@@ -264,23 +264,23 @@ void Window::Resize(Size newSize)
         free((void*)oldRenderer);
     }
     size = newSize;
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 void CopyFrameBuffer(Framebuffer* a, Framebuffer* b)
 {
-    AddToMStack(MStack("CopyFrameBuffer", "WindowStuff/Window/window.cpp"));
+    AddToStack("CopyFrameBuffer", "WindowStuff/Window/window.cpp");
     uint32_t* endAddr = (uint32_t*)(a->BaseAddress + a->BufferSize);
 
     uint32_t* addrB = (uint32_t*)b->BaseAddress;
     for (uint32_t* addrA = (uint32_t*)a->BaseAddress; addrA < endAddr; addrA++, addrB++)
         *addrB = *addrA; 
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 void CopyFrameBuffer(Framebuffer* a, Framebuffer* a2, Framebuffer* b)
 {
-    AddToMStack(MStack("CopyFrameBuffer", "WindowStuff/Window/window.cpp"));
+    AddToStack("CopyFrameBuffer", "WindowStuff/Window/window.cpp");
     uint32_t* endAddr = (uint32_t*)(a->BaseAddress + a->BufferSize);
 
     uint32_t* addrA2 = (uint32_t*)a2->BaseAddress;
@@ -299,5 +299,26 @@ void CopyFrameBuffer(Framebuffer* a, Framebuffer* a2, Framebuffer* b)
 
     //free((void*)osData.mainTerminalWindow->title);
     //osData.mainTerminalWindow->title = StrCopy(to_string(counter));
-    RemoveLastMStack();
+    RemoveFromStack();
+}
+
+void Window::Log(const char* message, const char* var, uint32_t col)
+{
+    renderer->Print("> ");
+    renderer->Println(message, var, col);
+}
+
+void Window::Log(const char* message)
+{
+    Log(message, NULL, renderer->color);
+}
+
+void Window::Log(const char* message, const char* var)
+{
+    Log(message, var, renderer->color);
+}
+
+void Window::Log(const char* message, uint32_t col)
+{
+    Log(message, NULL, col);
 }

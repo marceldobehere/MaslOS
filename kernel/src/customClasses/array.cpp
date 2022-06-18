@@ -4,40 +4,40 @@
 
 template <typename T> Array<T>::Array(uint64_t size)
 {
-    AddToMStack(MStack("Constructor", "customClasses/array.cpp"));
+    AddToStack("Constructor", "customClasses/array.cpp");
     this->size = size;
     arr = (T*)malloc(size * sizeof(T));
     freed = false;
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 template <typename T> void Array<T>::reInit(uint64_t size)
 {
-    AddToMStack(MStack("reInit", "customClasses/array.cpp"));
+    AddToStack("reInit", "customClasses/array.cpp");
     this->size = size;
     free();
     arr = (T*)malloc(size * sizeof(T));
     freed = false;
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 template <typename T> T& Array<T>::operator[](uint64_t index)
 {
-    AddToMStack(MStack("operator[]", "customClasses/array.cpp"));
+    AddToStack("operator[]", "customClasses/array.cpp");
     if (index >= this->size)
         return *((T*)NULL);
 
     T& t = arr[index];
-    RemoveLastMStack();
+    RemoveFromStack();
     return t;
 }
 
 template <typename T> void Array<T>::free()
 {
-    AddToMStack(MStack("free", "customClasses/array.cpp"));
+    AddToStack("free", "customClasses/array.cpp");
     if (freed)
     {
-        RemoveLastMStack();
+        RemoveFromStack();
         return;
     }
 
@@ -45,29 +45,29 @@ template <typename T> void Array<T>::free()
         _free(arr);
     arr = NULL;
     freed = true;
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 
 template <typename T> Array<T> Array<T>::clone()
 {
-    AddToMStack(MStack("clone", "customClasses/array.cpp"));
+    AddToStack("clone", "customClasses/array.cpp");
     Array<T> newArr = Array<T>(size);
 
     for (uint64_t i = 0; i < size; i++)
         newArr[i] = arr[i];
 
-    RemoveLastMStack();
+    RemoveFromStack();
     return newArr;
 }
 
 
 template <typename T> void Array<T>::copy(Array<T> target)
 {
-    AddToMStack(MStack("copy", "customClasses/array.cpp"));
+    AddToStack("copy", "customClasses/array.cpp");
     for (uint64_t i = 0; i < size; i++)
         target[i] = arr[i];
-    RemoveLastMStack();
+    RemoveFromStack();
 }
 
 template <typename T> uint64_t Array<T>::getSize()

@@ -5,24 +5,24 @@
 
 bool StrEquals(const char* a, const char* b)
 {
-    AddToMStack(MStack("StrEquals", "cmdParsing/cstrTools.cpp"));
+    AddToStack("StrEquals", "cmdParsing/cstrTools.cpp");
     int index = 0;
     while (!(a[index] == 0 && b[index] == 0))
     {
         if (a[index] != b[index])
         {
-            RemoveLastMStack();
+            RemoveFromStack();
             return false;
         }
         index++;
     }
-    RemoveLastMStack();
+    RemoveFromStack();
     return true;
 }
 
 char* StrCopy(const char* og)
 {
-    AddToMStack(MStack("StrCopy", "cmdParsing/cstrTools.cpp"));
+    AddToStack("StrCopy", "cmdParsing/cstrTools.cpp");
     int size = 0;
     for (int i = 0; og[i] != 0; i++)
         size++;
@@ -31,13 +31,13 @@ char* StrCopy(const char* og)
     for (int i = 0; og[i] != 0; i++)
         newStr[i] = og[i];
     newStr[size] = 0;
-    RemoveLastMStack();
+    RemoveFromStack();
     return newStr;
 }
 
 char* StrSubstr(const char* og, int index, int len)
 {
-    AddToMStack(MStack("StrSubstr", "cmdParsing/cstrTools.cpp"));
+    AddToStack("StrSubstr", "cmdParsing/cstrTools.cpp");
 
     if (index < 0)
         index = 0;
@@ -59,13 +59,13 @@ char* StrSubstr(const char* og, int index, int len)
     for (int i = 0; i < len; i++)
         newStr[i] = og[i+index];
     newStr[len] = 0;
-    RemoveLastMStack();
+    RemoveFromStack();
     return newStr;
 }
 
 char* StrSubstr(const char* og, int index)
 {
-    //AddToMStack(MStack("StrSubstr", "cmdParsing/cstrTools.cpp"));
+    //AddToStack("StrSubstr", "cmdParsing/cstrTools.cpp"));
     int len;
     for (len = 0; og[len] != 0; len++);//GlobalRenderer->Print(og[len]);
 
@@ -84,7 +84,7 @@ char* StrSubstr(const char* og, int index)
 
     {
         char* res = StrSubstr(og, index, len);
-        RemoveLastMStack();
+        RemoveFromStack();
         return res;
     }
 
@@ -113,7 +113,7 @@ char* StrSubstr(const char* og, int index)
 
 
 
-    // RemoveLastMStack();
+    // RemoveFromStack();
     // return res;
 }
 

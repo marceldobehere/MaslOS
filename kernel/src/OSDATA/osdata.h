@@ -13,10 +13,13 @@ struct OSData
     Window* realMainWindow;
     Window* realMainWindow2;
     Window* mainTerminalWindow;
+    Window* debugTerminalWindow;
+    bool showDebugterminal;
     MStack stackArr[1000];
     int64_t stackPointer = 0;
     bool drawBackground;
     bool enableStackTrace;
+    int64_t crashCount = 0;
 };
 
 extern OSData osData;
