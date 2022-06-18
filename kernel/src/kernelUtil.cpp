@@ -14,20 +14,21 @@ void PrepareACPI(BootInfo* bootInfo)
     osData.debugTerminalWindow->Log("RSDP Addr: {}", ConvertHexToString((uint64_t)bootInfo->rsdp));
     ACPI::SDTHeader* xsdt = (ACPI::SDTHeader*)(bootInfo->rsdp->XSDTAddress);
     osData.debugTerminalWindow->Log("XSDT Header Addr: {}", ConvertHexToString((uint64_t)xsdt));
-    osData.debugTerminalWindow->Log("Length: {}", to_string((uint64_t)xsdt->Length));
+    //osData.debugTerminalWindow->Log("Length: {}", to_string((uint64_t)xsdt->Length));
     int entries = (xsdt->Length - sizeof(ACPI::SDTHeader)) / 8;
     osData.debugTerminalWindow->Log("Entry count: {}", to_string(entries));
 
+    osData.debugTerminalWindow->renderer->Print("> ");
     for (int t = 0; t < entries; t++)
     {
-        osData.debugTerminalWindow->renderer->Print("> ");
         ACPI::SDTHeader* newSDTHeader = (ACPI::SDTHeader*)*(uint64_t*)((uint64_t)xsdt + sizeof(ACPI::SDTHeader) + (t * 8));
         
         for (int i = 0; i < 4; i++)
             osData.debugTerminalWindow->renderer->Print(newSDTHeader->Signature[i]);
 
-        osData.debugTerminalWindow->renderer->Println(" ");
+        osData.debugTerminalWindow->renderer->Print(" ");
     }
+    osData.debugTerminalWindow->renderer->Println();
 
     RemoveFromStack();
 }
@@ -122,7 +123,7 @@ void PrepareWindows()
         //TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
         //*terminal = TerminalInstance(&adminUser, debugTerminalWindow);
         *(debugTerminalWindow) = Window(NULL /*(DefaultInstance*)terminal*/, Size(400, 600), Position(600, 20), realMainWindow->renderer, "Debug Terminal");
-        osData.windows.add(debugTerminalWindow);
+        //osData.windows.add(debugTerminalWindow);
 
         osData.debugTerminalWindow = debugTerminalWindow;
         osData.showDebugterminal = true;
@@ -171,7 +172,9 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     PrepareWindows();
 
-    bootInfo->rsdp = (ACPI::RSDP2*)((uint64_t)bootInfo->rsdp + 20);
+    
+
+    bootInfo->rsdp = (ACPI::RSDP2*)((uint64_t)bootInfo->rsdp + 20); //idk why but this is very important unless ya want the whole os to crash on boot
 
     PrepareACPI(bootInfo);
 

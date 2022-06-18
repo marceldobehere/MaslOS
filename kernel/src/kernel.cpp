@@ -101,22 +101,24 @@ extern "C" void _start(BootInfo* bootInfo)
     //osData.windows[1]->renderer->Clear(Colors.blue);
     //osData.windows[1]->renderer->color = Colors.white;
 
+
     
-    
-    
+    osData.windows.add(osData.debugTerminalWindow);
+
+
     //activeWindow = osData.windows[1];
 
     debugTerminalWindow->Log("Kernel Initialised Successfully!");
 
     
 
-    debugTerminalWindow->Log("Address of RSDP: {}", ConvertHexToString((uint64_t)bootInfo->rsdp));
+    // debugTerminalWindow->Log("Address of RSDP: {}", ConvertHexToString((uint64_t)bootInfo->rsdp));
 
-    {
-        char* substr = StrSubstr((char*)bootInfo->rsdp, 0, 8);
-        debugTerminalWindow->Log("RSDP: \"{}\"", substr);
-        free(substr);
-    }
+    // {
+    //     char* substr = StrSubstr((char*)bootInfo->rsdp, 0, 8);
+    //     debugTerminalWindow->Log("RSDP: \"{}\"", substr);
+    //     free(substr);
+    // }
     
     //PrepareACPI(bootInfo);
 
@@ -181,13 +183,12 @@ extern "C" void _start(BootInfo* bootInfo)
 
             if (window == osData.debugTerminalWindow && !osData.showDebugterminal)
                 continue;
-
-            window->position = window->newPosition;
-            if (window->size != window->newSize)
-            {
-                window->Resize(window->newSize);
-            }
             
+            window->position = window->newPosition;
+
+            if (window->size != window->newSize)
+                window->Resize(window->newSize);
+
             window->Render();
         }
         DrawMousePointer2(realMainWindow->framebuffer);

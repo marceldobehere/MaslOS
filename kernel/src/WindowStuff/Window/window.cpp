@@ -73,9 +73,9 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size,
         {
             int64_t x = pos.x;
             int64_t y = pos.y- 21;
-            window->parentRenderer->Clear(x,y,pos.x + newSize.width-1, pos.y-2, Colors.dgray);
+            window->parentRenderer->Clear(x,y,pos.x + size.width-1, pos.y-2, Colors.dgray);
 
-            const char* stitle = StrSubstr(title, 0, newSize.width / 10);
+            const char* stitle = StrSubstr(title, 0, size.width / 10);
 
 
             // if (window->instance != NULL)
@@ -101,7 +101,7 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size,
             cBorder = Colors.bgreen;
 
         uint8_t counter = 0;
-        for (int64_t x = -1; x < newSize.width + 1; x++)
+        for (int64_t x = -1; x < size.width + 1; x++)
         {
             int64_t newX = x + pos.x;
             int64_t newY = -1 + pos.y;
@@ -109,7 +109,7 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size,
                 *(uint32_t*)(to->BaseAddress + ((newX + (newY * to->Width)) * 4)) = cBorder;
             
             
-            newY = newSize.height + pos.y;
+            newY = size.height + pos.y;
             if (newX >= 0 && newY >= 0 && newX < to->Width && newY < to->Height && (counter % 2) == 0)
                 *(uint32_t*)(to->BaseAddress + ((newX + (newY * to->Width)) * 4)) = cBorder;
 
@@ -121,9 +121,9 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size,
         }
 
         counter = 0;
-        for (int64_t y = -22; y < newSize.height; y++)
+        for (int64_t y = -22; y < size.height; y++)
         {
-            int64_t newX = newSize.width + pos.x;
+            int64_t newX = size.width + pos.x;
             int64_t newY = y + pos.y;
             if (newX >= 0 && newY >= 0 && newX < to->Width && newY < to->Height && (counter % 2) == 1)
                 *(uint32_t*)(to->BaseAddress + ((newX + (newY * to->Width)) * 4)) = cBorder;
