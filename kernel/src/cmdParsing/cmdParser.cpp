@@ -39,6 +39,15 @@ void LogInvalidArgumentCount(int expected, int found, Window* window)
 void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 {
     AddToStack("ParseCommand", "cmdParsing/cmdParser.cpp");
+
+    if (window->instance == NULL)
+    {
+        RemoveFromStack();
+        return;
+    }
+
+    TerminalInstance* terminal = (TerminalInstance*)window->instance;
+
     //window->renderer->Println("This is test out!");
     if (StrEquals(input, "cls"))
     {
@@ -74,9 +83,9 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 
     StringArrData* data = SplitLine(oldInput);
 
-    if (StrEquals(data->data[0], "login") && (*user)->mode == commandMode::enterPassword)
+    if (StrEquals(data->data[0], "login") && terminal->mode == commandMode::enterPassword)
     {
-        (*user)->mode = commandMode::none;
+        terminal->mode = commandMode::none;
         StringArrData* data2 = SplitLine(input);
         if (data->len == 2)
         {
@@ -92,9 +101,9 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         return;
     }
 
-    if (StrEquals(data->data[0], "set") && (*user)->mode == commandMode::enterPassword)
+    if (StrEquals(data->data[0], "set") && terminal->mode == commandMode::enterPassword)
     {
-        (*user)->mode = commandMode::none;
+        terminal->mode = commandMode::none;
         StringArrData* data2 = SplitLine(input);
         if (data->len == 2 || data->len == 3)
         {
@@ -241,6 +250,15 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 void login(const char* name, OSUser** user, Window* window)
 {
     AddToStack("login", "cmdParsing/cmdParser.cpp");
+
+    if (window->instance == NULL)
+    {
+        RemoveFromStack();
+        return;
+    }
+
+    TerminalInstance* terminal = (TerminalInstance*)window->instance;
+
     OSUser* usr = getUser(name);
     if (usr == 0)
     {
@@ -254,7 +272,7 @@ void login(const char* name, OSUser** user, Window* window)
     else
     {
         window->renderer->Println("Please enter the password down below:");
-        (*user)->mode = commandMode::enterPassword;
+        terminal->mode = commandMode::enterPassword;
     }
     RemoveFromStack();
 }
@@ -262,7 +280,16 @@ void login(const char* name, OSUser** user, Window* window)
 void login(const char* name, const char* pass, OSUser** user, Window* window)
 {
     AddToStack("login", "cmdParsing/cmdParser.cpp");
-    (*user)->mode = commandMode::none;
+
+    if (window->instance == NULL)
+    {
+        RemoveFromStack();
+        return;
+    }
+
+    TerminalInstance* terminal = (TerminalInstance*)window->instance;
+
+    terminal->mode = commandMode::none;
 
     OSUser* usr = getUser(name);
     if (usr == 0)
@@ -282,6 +309,15 @@ void login(const char* name, const char* pass, OSUser** user, Window* window)
 void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
 {
     AddToStack("SetCmd", "cmdParsing/cmdParser.cpp");
+
+    if (window->instance == NULL)
+    {
+        RemoveFromStack();
+        return;
+    }
+
+    TerminalInstance* terminal = (TerminalInstance*)window->instance;
+
     if (StrEquals(name, "user color"))
     {
         ParsedColData data = ParseColor(val);
@@ -337,7 +373,7 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
     //mouseImage = kernelFiles::ConvertFileToImage(kernelFiles::ZIP::GetFileFromFileName(bootInfo->mouseZIP, "default.mbif"));
     else if (StrEquals(name, "password"))
     {
-        (*user)->mode = commandMode::enterPassword;
+        terminal->mode = commandMode::enterPassword;
         window->renderer->Println("Please enter the new password down below:");
     }
     else if (StrEquals(name, "mouse color front"))

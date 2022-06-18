@@ -2,13 +2,6 @@
 
 #include "../Cols.h"
 
-enum commandMode
-{
-    none,
-    enterPassword,
-    enterText
-};
-
 
 struct OSUserColData
 {
@@ -23,7 +16,6 @@ struct OSUser
     const char* userName;
     OSUserColData colData;
     uint32_t permLevel;
-    commandMode mode;
 };
 
 

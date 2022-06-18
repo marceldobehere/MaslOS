@@ -235,11 +235,11 @@ void HandleKeyboard(uint8_t scancode)
 
                 if (activeWindow->allowKeyboardDrawing && !instance->GetBusy())
                 {
-                    if (instance->currentUser->mode == commandMode::none)
+                    if (instance->mode == commandMode::none)
                         activeWindow->renderer->Print(ascii);
-                    else if (instance->currentUser->mode == commandMode::enterText)
+                    else if (instance->mode == commandMode::enterText)
                         activeWindow->renderer->Print(ascii);
-                    else if (instance->currentUser->mode == commandMode::enterPassword)
+                    else if (instance->mode == commandMode::enterPassword)
                         activeWindow->renderer->Print("*");
                 }
 

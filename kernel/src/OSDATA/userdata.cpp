@@ -15,7 +15,6 @@ void initUsers()
         adminUser.colData.arrowColor = Colors.white;
         adminUser.colData.defaultTextColor = Colors.white;
         adminUser.colData.userColor = Colors.bgreen;
-        adminUser.mode = commandMode::none;
     }
 
     {
@@ -25,7 +24,6 @@ void initUsers()
         guestUser.colData.arrowColor = Colors.white;
         guestUser.colData.defaultTextColor = Colors.white;
         guestUser.colData.userColor = Colors.yellow;
-        guestUser.mode = commandMode::none;
     }
 }
 

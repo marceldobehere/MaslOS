@@ -3,6 +3,14 @@
 #include "../defaultInstance/defaultInstance.h"
 #include "../../../customClasses/list.h"
 
+enum commandMode
+{
+    none,
+    enterPassword,
+    enterText
+};
+
+
 class TerminalInstance : public DefaultInstance
 {
     private:
@@ -19,5 +27,6 @@ class TerminalInstance : public DefaultInstance
     TerminalInstance(OSUser* user, Window* window);
     void HandleEnter();
     void PrintUserIfNeeded();
+    commandMode mode;
 
 };

@@ -6,6 +6,7 @@ TerminalInstance::TerminalInstance(OSUser* user, Window* window)
     this->currentUser = user;
     this->window = window;
     tasks = List<Task*>(4);
+    mode = commandMode::none;
     instanceType = InstanceType::Terminal;
     userlen = 0;
     for (int i = 0; i < 256; i++)
