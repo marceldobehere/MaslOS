@@ -58,6 +58,7 @@ struct KernelInfo
 #include "kernelFiles/kernelFiles.h"
 
 #include "acpi/acpi.h"
+#include "pci/pci.h"
 
 void PrepareACPI(BootInfo* bootInfo);
 

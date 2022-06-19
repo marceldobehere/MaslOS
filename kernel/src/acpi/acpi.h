@@ -47,6 +47,6 @@ namespace ACPI
     } __attribute__((packed));
 
 
-
+    void* FindTable(SDTHeader* sdtHeader, char* signature);
 
 }  

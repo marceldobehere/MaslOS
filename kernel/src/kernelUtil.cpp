@@ -30,6 +30,13 @@ void PrepareACPI(BootInfo* bootInfo)
     }
     osData.debugTerminalWindow->renderer->Println();
 
+
+    ACPI::MCFGHeader* mcfg = (ACPI::MCFGHeader*)ACPI::FindTable(xsdt, (char*)"MCFG");
+
+    osData.debugTerminalWindow->Log("MCFG Header Addr: {}", ConvertHexToString((uint64_t)mcfg));
+
+    PCI::EnumeratePCI(mcfg);
+
     RemoveFromStack();
 }
 
