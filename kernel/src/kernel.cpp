@@ -193,6 +193,8 @@ extern "C" void _start(BootInfo* bootInfo)
         }
         DrawMousePointer2(realMainWindow->framebuffer);
 
+        
+
 
         CopyFrameBuffer(realMainWindow->framebuffer, realMainWindow2->framebuffer, GlobalRenderer->framebuffer);
         //CopyFrameBuffer(realMainWindow->framebuffer, realMainWindow2->framebuffer);
