@@ -68,12 +68,17 @@ class Window
     BasicRenderer* renderer;
     Framebuffer* framebuffer;
     Framebuffer* parentFrameBuffer;
-    uint32_t borderColor;
+    uint32_t defaultBorderColor;
+    uint32_t selectedBorderColor;
+    uint32_t defaultTitleColor;
+    uint32_t selectedTitleColor;
+    uint32_t defaultTitleBackgroundColor;
+    
     bool moveToFront;
     const char* title;
     Window(DefaultInstance* instance, Size size, Position position, BasicRenderer* parentRenderer, const char* title);
 
-    void Resize(Size newSize);
+    void Resize(Size _newSize);
     void Render();
     void Render(Framebuffer* from, Framebuffer* to, Position pos, Size size, Window* window);
     void Free();

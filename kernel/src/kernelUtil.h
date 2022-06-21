@@ -60,6 +60,8 @@ struct KernelInfo
 #include "acpi/acpi.h"
 #include "pci/pci.h"
 
+#include "VirtualRenderer.h"
+
 void PrepareACPI(BootInfo* bootInfo);
 
 //extern KernelInfo kernelInfo;

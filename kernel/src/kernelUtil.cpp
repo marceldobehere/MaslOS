@@ -6,7 +6,6 @@
 
 
 
-
 void PrepareACPI(BootInfo* bootInfo)
 {
     AddToStack("PrepareACPI", "kernelUtil.cpp");
@@ -108,6 +107,8 @@ void PrepareInterrupts()
 
 void PrepareWindows()
 {
+    VirtualRenderer::psf1_font = GlobalRenderer->psf1_font;
+
     osData.windows = List<Window*>();
     osData.windowPointerThing = (WindowManager::WindowPointerBufferThing*)malloc(sizeof(WindowManager::WindowPointerBufferThing));
     *osData.windowPointerThing = WindowManager::WindowPointerBufferThing(GlobalRenderer->framebuffer, NULL, Colors.blue);

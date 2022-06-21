@@ -15,7 +15,12 @@ Window::Window(DefaultInstance* instance, Size size, Position position, BasicRen
     this->newSize = size;
     this->parentRenderer = parentRenderer;
     this->parentFrameBuffer = parentRenderer->framebuffer;
-    this->borderColor = Colors.gray;
+    //this->borderColor = Colors.gray;
+    this->defaultBorderColor = Colors.gray;
+    this->selectedBorderColor = Colors.bgreen;
+    this->defaultTitleColor = Colors.gray;
+    this->selectedTitleColor = Colors.white;
+    this->defaultTitleBackgroundColor = Colors.dgray;
     allowKeyboardDrawing = true;
     this->title = title;
     moveToFront = false;
@@ -97,7 +102,7 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size,
         }
         
 
-        uint32_t cBorder = borderColor;
+        uint32_t cBorder = window->defaultBorderColor;
         if (activeWindow == window)
             cBorder = Colors.bgreen;
 
@@ -227,16 +232,16 @@ void Window::Render()
 }
 
 
-void Window::Resize(Size newSize)
+void Window::Resize(Size _newSize)
 {
     AddToStack("Resize", "WindowStuff/Window/window.cpp");
-    if (newSize.height < 10)
-        newSize.height = 10;
+    if (_newSize.height < 10)
+        _newSize.height = 10;
 
-    if (newSize.width < 10)
-        newSize.width = 10;
+    if (_newSize.width < 10)
+        _newSize.width = 10;
 
-    this->newSize = newSize;
+    this->newSize = _newSize;
 
     {
         Framebuffer* oldFramebuffer = framebuffer;
@@ -244,10 +249,10 @@ void Window::Resize(Size newSize)
         {
             framebuffer = (Framebuffer*)malloc(sizeof(Framebuffer));
             *framebuffer = Framebuffer();
-            framebuffer->Height = newSize.height;
-            framebuffer->Width = newSize.width;
-            framebuffer->PixelsPerScanLine = newSize.width;
-            framebuffer->BufferSize = newSize.height * newSize.width * 4;
+            framebuffer->Height = _newSize.height;
+            framebuffer->Width = _newSize.width;
+            framebuffer->PixelsPerScanLine = _newSize.width;
+            framebuffer->BufferSize = _newSize.height * _newSize.width * 4;
             framebuffer->BaseAddress = malloc(framebuffer->BufferSize);
         }
 
@@ -264,7 +269,8 @@ void Window::Resize(Size newSize)
         free((void*)oldFramebuffer);
         free((void*)oldRenderer);
     }
-    size = newSize;
+    this->newSize = _newSize;
+    this->size = _newSize;
     RemoveFromStack();
 }
 

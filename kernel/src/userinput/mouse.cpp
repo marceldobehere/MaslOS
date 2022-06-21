@@ -3,7 +3,7 @@
 #include "../WindowStuff/WindowManager/windowManager.h"
 #include "../scheduling-pit/pit.h"
 #include "../OSDATA/osdata.h"
-
+#include "../VirtualRenderer.h"
 
 #define PS2XSign        0b00010000
 #define PS2YSign        0b00100000
@@ -259,7 +259,7 @@ void DrawMousePointerNew(MPoint point, PointerFramebuffer* framebuffer)
     }
 
     if (currentMouseImage != NULL)
-        GlobDrawImage(currentMouseImage, point.x, point.y, 1, 1, framebuffer);
+        VirtualRenderer::DrawImage(currentMouseImage, point.x, point.y, 1, 1, VirtualRenderer::Border(framebuffer), framebuffer);
     else
         ;//DrawMouseBuffer(MousePosition, framebuffer);
 }
