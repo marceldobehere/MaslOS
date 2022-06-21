@@ -61,6 +61,5 @@ class BasicRenderer
 };
 
 void GlobDrawImage(kernelFiles::ImageFile* image, int64_t x, int64_t y, int64_t sx, int64_t sy, Framebuffer* framebuffer);
-void GlobDrawImage(kernelFiles::ImageFile* image, int64_t x, int64_t y, int64_t sx, int64_t sy, PointerFramebuffer* framebuffer);
 
 extern BasicRenderer* GlobalRenderer;
