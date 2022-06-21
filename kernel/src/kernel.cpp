@@ -176,7 +176,8 @@ extern "C" void _start(BootInfo* bootInfo)
                 {
                     osData.windows.removeAt(index);
                     osData.windows.add(activeWindow);
-                    osData.windowPointerThing->UpdatePointerRect(activeWindow->position.x, activeWindow->position.y, activeWindow->position.x + activeWindow->size.width, activeWindow->position.y + activeWindow->size.height);
+                    //osData.windowPointerThing->UpdatePointerRect(activeWindow->position.x, activeWindow->position.y, activeWindow->position.x + activeWindow->size.width, activeWindow->position.y + activeWindow->size.height);
+                    osData.windowPointerThing->RenderWindow(activeWindow);
                 }
             }
         }
@@ -196,40 +197,30 @@ extern "C" void _start(BootInfo* bootInfo)
              
                 int x1 = window->position.x;
                 int y1 = window->position.y;
-                int x2 = x1 + window->size.width;
-                int y2 = y1 + window->size.height;
             
-
                 window->position = window->newPosition;
 
-                {
-                    int _x1 = window->position.x;
-                    int _y1 = window->position.y;
-                    int _x2 = _x1 + window->size.width;
-                    int _y2 = _y1 + window->size.height;
+                int x2 = window->position.x;
+                int y2 = window->position.y;
 
-                    if (_x1 < x1)
-                        x1 = _x1;
-                    
-                    if (_x2 > x2)
-                        x2 = _x2;
+                //osData.windowPointerThing->UpdatePointerRect(x1, y1, x2, y2);
 
-                    if (_y1 < y1)
-                        y1 = _y1;
+                osData.windowPointerThing->UpdatePointerRect(x1, y1, x1 + window->size.width, y2);
+                osData.windowPointerThing->UpdatePointerRect(x1, y2, x2, y1 + window->size.height);
+                
+                osData.windowPointerThing->UpdatePointerRect(x1, y1, x1 + window->size.width, y2);
+                osData.windowPointerThing->UpdatePointerRect(x1, y2, x2, y1 + window->size.height);
 
-                    if (_y2 > y2)
-                        y2 = _y2;
 
-                }
-
-                osData.windowPointerThing->UpdatePointerRect(x1, y1, x2, y2);
+                osData.windowPointerThing->RenderWindow(window);
             }
 
             if (window->size != window->newSize)
             {
-                osData.windowPointerThing->UpdatePointerRect(window->position.x, window->position.y, window->position.x + window->size.width, window->position.y + window->size.height);
+                //osData.windowPointerThing->UpdatePointerRect(window->position.x, window->position.y, window->position.x + window->size.width, window->position.y + window->size.height);
                 window->Resize(window->newSize);
-                osData.windowPointerThing->UpdatePointerRect(window->position.x, window->position.y, window->position.x + window->size.width, window->position.y + window->size.height);
+                //osData.windowPointerThing->UpdatePointerRect(window->position.x, window->position.y, window->position.x + window->size.width, window->position.y + window->size.height);
+                osData.windowPointerThing->RenderWindow(window);
             }
 
             window->Render();
