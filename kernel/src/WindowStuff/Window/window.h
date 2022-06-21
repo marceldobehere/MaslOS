@@ -41,6 +41,16 @@ struct Position
         this->x = 0;
         this->y = 0;
     }
+
+    bool operator== (Position other)
+    {
+        return (x == other.x) && (y== other.y);
+    }
+
+    bool operator!= (Position other)
+    {
+        return (x != other.x) || (y != other.y);
+    }
 };
 
 class Window

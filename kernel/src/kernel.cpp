@@ -166,39 +166,75 @@ extern "C" void _start(BootInfo* bootInfo)
         // else
         //     realMainWindow->renderer->Clear(Colors.dblue);
 
-        // if (activeWindow != NULL)
-        // {
-        //     if (activeWindow->moveToFront)
-        //     {
-        //         activeWindow->moveToFront = false;
-        //         int index = osData.windows.getIndexOf(activeWindow);
-        //         if (index != -1)
-        //         {
-        //             osData.windows.removeAt(index);
-        //             osData.windows.add(activeWindow);
-        //         }
-        //     }
-        // }
+        if (activeWindow != NULL)
+        {
+            if (activeWindow->moveToFront)
+            {
+                activeWindow->moveToFront = false;
+                int index = osData.windows.getIndexOf(activeWindow);
+                if (index != -1)
+                {
+                    osData.windows.removeAt(index);
+                    osData.windows.add(activeWindow);
+                    osData.windowPointerThing->UpdatePointerRect(activeWindow->position.x, activeWindow->position.y, activeWindow->position.x + activeWindow->size.width, activeWindow->position.y + activeWindow->size.height);
+                }
+            }
+        }
 
 
+        for (int i = 0; i < osData.windows.getCount(); i++)
+        {            
+            Window* window = osData.windows[i];
 
-
-        // //DrawMousePointer1(realMainWindow->framebuffer);
-        // for (int i = 0; i < osData.windows.getCount(); i++)
-        // {            
-        //     Window* window = osData.windows[i];
-
-        //     if (window == osData.debugTerminalWindow && !osData.showDebugterminal)
-        //         continue;
+            if (window == osData.debugTerminalWindow && !osData.showDebugterminal)
+                continue;
             
-        //     window->position = window->newPosition;
+            if (window->position != window->newPosition)
+            {
+                //osData.windowPointerThing->UpdatePointerRect(window->position.x, window->position.y, window->position.x + window->size.width, window->position.y + window->size.height);
+                
+             
+                int x1 = window->position.x;
+                int y1 = window->position.y;
+                int x2 = x1 + window->size.width;
+                int y2 = y1 + window->size.height;
+            
 
-        //     if (window->size != window->newSize)
-        //         window->Resize(window->newSize);
+                window->position = window->newPosition;
 
-        //     window->Render();
-        // }
-        //DrawMousePointer2(realMainWindow->framebuffer);
+                {
+                    int _x1 = window->position.x;
+                    int _y1 = window->position.y;
+                    int _x2 = _x1 + window->size.width;
+                    int _y2 = _y1 + window->size.height;
+
+                    if (_x1 < x1)
+                        x1 = _x1;
+                    
+                    if (_x2 > x2)
+                        x2 = _x2;
+
+                    if (_y1 < y1)
+                        y1 = _y1;
+
+                    if (_y2 > y2)
+                        y2 = _y2;
+
+                }
+
+                osData.windowPointerThing->UpdatePointerRect(x1, y1, x2, y2);
+            }
+
+            if (window->size != window->newSize)
+            {
+                osData.windowPointerThing->UpdatePointerRect(window->position.x, window->position.y, window->position.x + window->size.width, window->position.y + window->size.height);
+                window->Resize(window->newSize);
+                osData.windowPointerThing->UpdatePointerRect(window->position.x, window->position.y, window->position.x + window->size.width, window->position.y + window->size.height);
+            }
+
+            window->Render();
+        }
+
 
         
 
