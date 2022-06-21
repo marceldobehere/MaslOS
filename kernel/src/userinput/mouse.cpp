@@ -2,6 +2,7 @@
 #include "../WindowStuff/Window/window.h"
 #include "../WindowStuff/WindowManager/windowManager.h"
 #include "../scheduling-pit/pit.h"
+#include "../OSDATA/osdata.h"
 
 
 #define PS2XSign        0b00010000
@@ -96,79 +97,79 @@ double clickTimes[3] = {0, 0, 0};
 
 MPoint MousePosition;
 
-void SaveIntoBuffer(MPoint point, Framebuffer* framebuffer)
-{
-    unsigned int *pixPtr = (unsigned int*)framebuffer->BaseAddress;
-    unsigned int pps = framebuffer->PixelsPerScanLine;
+// void SaveIntoBuffer(MPoint point, Framebuffer* framebuffer)
+// {
+//     unsigned int *pixPtr = (unsigned int*)framebuffer->BaseAddress;
+//     unsigned int pps = framebuffer->PixelsPerScanLine;
 
-    unsigned long xoff = point.x;
-    unsigned long yoff = point.y;
+//     unsigned long xoff = point.x;
+//     unsigned long yoff = point.y;
 
-    unsigned long index = 0;
+//     unsigned long index = 0;
 
-    for (unsigned long y = yoff; y < yoff + 16; y++)
-        for (unsigned long x = xoff; x < xoff + 16; x++)
-        {
-            MouseTempBitmap[index] = *(unsigned int*)(pixPtr + x + (y * pps));
-            index++;
-        }
-}
+//     for (unsigned long y = yoff; y < yoff + 16; y++)
+//         for (unsigned long x = xoff; x < xoff + 16; x++)
+//         {
+//             MouseTempBitmap[index] = *(unsigned int*)(pixPtr + x + (y * pps));
+//             index++;
+//         }
+// }
 
-void LoadFromBuffer(MPoint point, Framebuffer* framebuffer)
-{
-    unsigned int *pixPtr = (unsigned int*)framebuffer->BaseAddress;
-    unsigned int pps = framebuffer->PixelsPerScanLine;
+// void LoadFromBuffer(MPoint point, Framebuffer* framebuffer)
+// {
+//     unsigned int *pixPtr = (unsigned int*)framebuffer->BaseAddress;
+//     unsigned int pps = framebuffer->PixelsPerScanLine;
 
-    unsigned long xoff = point.x;
-    unsigned long yoff = point.y;
+//     unsigned long xoff = point.x;
+//     unsigned long yoff = point.y;
 
-    unsigned long index = 0;
+//     unsigned long index = 0;
 
-    for (unsigned long y = yoff; y < yoff + 16; y++)
-        for (unsigned long x = xoff; x < xoff + 16; x++)
-        {
-            *(unsigned int*)(pixPtr + x + (y * pps)) = MouseTempBitmap[index];
-            index++;
-        }
-}
+//     for (unsigned long y = yoff; y < yoff + 16; y++)
+//         for (unsigned long x = xoff; x < xoff + 16; x++)
+//         {
+//             *(unsigned int*)(pixPtr + x + (y * pps)) = MouseTempBitmap[index];
+//             index++;
+//         }
+// }
 
-void DrawMouseBuffer(MPoint point, Framebuffer* framebuffer)
-{
-    unsigned int *pixPtr = (unsigned int*)framebuffer->BaseAddress;
-    unsigned int pps = framebuffer->PixelsPerScanLine;
+// void DrawMouseBuffer(MPoint point, Framebuffer* framebuffer)
+// {
+//     unsigned int *pixPtr = (unsigned int*)framebuffer->BaseAddress;
+//     unsigned int pps = framebuffer->PixelsPerScanLine;
 
-    unsigned long xoff = point.x;
-    unsigned long yoff = point.y;
+//     unsigned long xoff = point.x;
+//     unsigned long yoff = point.y;
 
-    unsigned long index = 0;
-    unsigned long index_x = 0;
-    unsigned long index_x2 = 0;
-    for (unsigned long y = yoff; y < yoff + 16; y++)
-    {
-        index_x = 0;
-        for (unsigned long x = xoff; x < xoff + 8; x++)
-        {
-            if((uint8_t)((uint8_t)(MouseShowBitmap[index] << index_x) >> 7) != 0)
-                *(unsigned int*)(pixPtr + x + (y * pps)) = MouseDataMap[index_x2];
+//     unsigned long index = 0;
+//     unsigned long index_x = 0;
+//     unsigned long index_x2 = 0;
+//     for (unsigned long y = yoff; y < yoff + 16; y++)
+//     {
+//         index_x = 0;
+//         for (unsigned long x = xoff; x < xoff + 8; x++)
+//         {
+//             if((uint8_t)((uint8_t)(MouseShowBitmap[index] << index_x) >> 7) != 0)
+//                 *(unsigned int*)(pixPtr + x + (y * pps)) = MouseDataMap[index_x2];
                 
-            index_x++;
-            index_x2++;
-        }
-        index++;
+//             index_x++;
+//             index_x2++;
+//         }
+//         index++;
 
-        index_x = 0;
-        for (unsigned long x = xoff + 8; x < xoff + 16; x++)
-        {
-            if((uint8_t)((uint8_t)(MouseShowBitmap[index] << index_x) >> 7) != 0)
-                *(unsigned int*)(pixPtr + x + (y * pps)) = MouseDataMap[index_x2];
+//         index_x = 0;
+//         for (unsigned long x = xoff + 8; x < xoff + 16; x++)
+//         {
+//             if((uint8_t)((uint8_t)(MouseShowBitmap[index] << index_x) >> 7) != 0)
+//                 *(unsigned int*)(pixPtr + x + (y * pps)) = MouseDataMap[index_x2];
                 
-            index_x++;
-            index_x2++;
-        }
-        index++;
-    }
+//             index_x++;
+//             index_x2++;
+//         }
+//         index++;
+//     }
 
-}
+// }
 
 void DrawMousePointer()
 {
@@ -242,7 +243,7 @@ void FigureOutCorrectMouseImage()
     }
 }
 
-void DrawMousePointerNew(MPoint point, Framebuffer* framebuffer)
+void DrawMousePointerNew(MPoint point, PointerFramebuffer* framebuffer)
 {
     if (&osData.windows != NULL)
     {
@@ -260,19 +261,19 @@ void DrawMousePointerNew(MPoint point, Framebuffer* framebuffer)
     if (currentMouseImage != NULL)
         GlobDrawImage(currentMouseImage, point.x, point.y, 1, 1, framebuffer);
     else
-        DrawMouseBuffer(MousePosition, framebuffer);
+        ;//DrawMouseBuffer(MousePosition, framebuffer);
 }
 
-void DrawMousePointer1(Framebuffer* framebuffer)
+void DrawMousePointer1(PointerFramebuffer* framebuffer)
 {
-    LoadFromBuffer(oldMousePosition, framebuffer);
+    //LoadFromBuffer(oldMousePosition, framebuffer);
 }
 
-void DrawMousePointer2(Framebuffer* framebuffer)
+void DrawMousePointer2(PointerFramebuffer* framebuffer, MPoint mousePos)
 {
     //SaveIntoBuffer(MousePosition, framebuffer);
     //DrawMouseBuffer(MousePosition, framebuffer);
-    DrawMousePointerNew(MousePosition, framebuffer);
+    DrawMousePointerNew(mousePos, framebuffer);
     oldMousePosition.x = MousePosition.x;
     oldMousePosition.y = MousePosition.y;
 }
@@ -342,7 +343,7 @@ void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName)
     MousePosition.y = 50;
     oldMousePosition.x = 50;
     oldMousePosition.y = 50;
-    SaveIntoBuffer(MousePosition, GlobalRenderer->framebuffer);
+    //SaveIntoBuffer(MousePosition, GlobalRenderer->framebuffer);
     DrawMousePointer();
 
 

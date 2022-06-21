@@ -14,19 +14,27 @@ void Panic(const char* panicMessage, const char* var, bool lock)
     GlobalRenderer->Println();
     GlobalRenderer->Println(panicMessage, var, Colors.white);
     GlobalRenderer->Println();
-    PrintMStackTrace(osData.stackArr, osData.stackPointer);
-    GlobalRenderer->Println();
-    GlobalRenderer->Println();
 
-    if (osData.crashCount == 0)
+    if (osData.crashCount == 1)
     {
         osData.debugTerminalWindow->position.x = GlobalRenderer->framebuffer->Width - (osData.debugTerminalWindow->size.width + 2);
         osData.debugTerminalWindow->position.y = 23;
         osData.debugTerminalWindow->parentFrameBuffer = GlobalRenderer->framebuffer;
         osData.debugTerminalWindow->Render();
     }
-
+    else
+    {
+        GlobalRenderer->Println("(BTW the rendering of the debug terminal is causing issues so no debug terminal)");
+        GlobalRenderer->Println();
+    }
+    
+    PrintMStackTrace(osData.stackArr, osData.stackPointer);
+    GlobalRenderer->Println();
+    GlobalRenderer->Println();
     osData.crashCount++;
+
+
+    
     if (lock)
         while(true);
     RemoveFromStack();

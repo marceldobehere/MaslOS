@@ -109,6 +109,8 @@ void PrepareInterrupts()
 void PrepareWindows()
 {
     osData.windows = List<Window*>();
+    osData.windowPointerThing = (WindowManager::WindowPointerBufferThing*)malloc(sizeof(WindowManager::WindowPointerBufferThing));
+    *osData.windowPointerThing = WindowManager::WindowPointerBufferThing(GlobalRenderer->framebuffer, NULL, Colors.blue);
 
     Window* realMainWindow;
     {
@@ -140,8 +142,8 @@ void PrepareWindows()
 
         debugTerminalWindow->renderer->Clear(Colors.black);
         //KeyboardPrintStart(debugTerminalWindow);
-        debugTerminalWindow->renderer->Println("MaslOS - Debug Terminal", Colors.green);
-        debugTerminalWindow->renderer->Println("-----------------------\n", Colors.green);
+        debugTerminalWindow->renderer->Println("MaslOS - Debug Terminal (OUTPUT ONLY)", Colors.green);
+        debugTerminalWindow->renderer->Println("-------------------------------------\n", Colors.green);
         debugTerminalWindow->renderer->color = Colors.yellow;
     }
 }

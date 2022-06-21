@@ -6,9 +6,9 @@
 #include "Cols.h"
 #include "cstr.h" 
 
-#include "paging/PageFrameAllocator.h"  
-#include "paging/PageMapIndexer.h"
-#include "paging/paging.h" 
+// #include "paging/PageFrameAllocator.h"  
+// #include "paging/PageMapIndexer.h"
+// #include "paging/paging.h" 
 #include "paging/PageTableManager.h"
 
 

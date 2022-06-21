@@ -32,12 +32,12 @@ void ProcessMousePacket();
 
 
 void DrawMousePointer();
-void DrawMousePointer1(Framebuffer* framebuffer);
-void DrawMousePointer2(Framebuffer* framebuffer);
+void DrawMousePointer1(PointerFramebuffer* framebuffer);
+void DrawMousePointer2(PointerFramebuffer* framebuffer, MPoint mousePos);
 
-void LoadFromBuffer(MPoint point, Framebuffer* framebuffer);
-void SaveIntoBuffer(MPoint point, Framebuffer* framebuffer);
-void DrawMouseBuffer(MPoint point, Framebuffer* framebuffer);
+// void LoadFromBuffer(MPoint point, PointerFramebuffer* framebuffer);
+// void SaveIntoBuffer(MPoint point, PointerFramebuffer* framebuffer);
+// void DrawMouseBuffer(MPoint point, PointerFramebuffer* framebuffer);
 
 extern uint32_t mouseColFront, mouseColBack;
 

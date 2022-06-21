@@ -459,9 +459,40 @@ void GlobDrawImage(kernelFiles::ImageFile* image, int64_t x, int64_t y, int64_t 
     }
 }
 
+void GlobDrawImage(kernelFiles::ImageFile* image, int64_t x, int64_t y, int64_t sx, int64_t sy, PointerFramebuffer* framebuffer)
+{
+    x += image->xOff * sx;
+    y += image->yOff * sy;
+
+    uint64_t addr = (uint64_t)framebuffer->BaseAddress;
+    uint64_t mult = framebuffer->Width;
+    uint32_t* imgaddr = (uint32_t*)image->imageBuffer;
+    for (int64_t y1 = 0; y1 < image->height; y1++)
+    {
+        for (int64_t x1 = 0; x1 < image->width; x1++)
+        {
+            if (*imgaddr != 0)//((*imgaddr/* | 0xffffff00*/) & (uint32_t)0xff000000 != (uint32_t)0x00000000)
+            {
+                for (int iy = 0; iy < sy; iy++)
+                {
+                    int64_t yp = (y1*sy) + iy + y;
+                    for (int ix = 0; ix < sx; ix++)
+                    {
+                        int64_t xp = (x1*sx) + x + ix;
+                        if (xp >= 0 && yp >= 0 && xp < framebuffer->Width && yp < framebuffer->Height)
+                            ((uint32_t**)addr)[xp + mult * yp] = imgaddr;
+                    }
+                }
+            }
+            
+            imgaddr ++;
+        }
+    }
+}
+
 void BasicRenderer::DrawImage(kernelFiles::ImageFile* image, int64_t x, int64_t y, int64_t sx, int64_t sy)
 {
-    GlobDrawImage(image, x, y, sx, sy, framebuffer);
+    GlobDrawImage(image, x, y, sx, sy, (Framebuffer*)framebuffer);
 }
 
 BasicRenderer::BasicRenderer(Framebuffer* framebuffer, PSF1_FONT* psf1_font)

@@ -155,7 +155,130 @@ extern "C" void _start(BootInfo* bootInfo)
     //     mainWindow->title = test;
     // }
 
+    //osData.windowPointerThing->RenderWindow(activeWindow);
+    osData.windowPointerThing->Clear();
+    osData.windowPointerThing->RenderWindows();
+
     while(!osData.exit)
+    {    
+        // if (osData.drawBackground)
+        //     realMainWindow->renderer->DrawImage(bootInfo->bgImage, 0, 0, 2, 2);
+        // else
+        //     realMainWindow->renderer->Clear(Colors.dblue);
+
+        // if (activeWindow != NULL)
+        // {
+        //     if (activeWindow->moveToFront)
+        //     {
+        //         activeWindow->moveToFront = false;
+        //         int index = osData.windows.getIndexOf(activeWindow);
+        //         if (index != -1)
+        //         {
+        //             osData.windows.removeAt(index);
+        //             osData.windows.add(activeWindow);
+        //         }
+        //     }
+        // }
+
+
+
+
+        // //DrawMousePointer1(realMainWindow->framebuffer);
+        // for (int i = 0; i < osData.windows.getCount(); i++)
+        // {            
+        //     Window* window = osData.windows[i];
+
+        //     if (window == osData.debugTerminalWindow && !osData.showDebugterminal)
+        //         continue;
+            
+        //     window->position = window->newPosition;
+
+        //     if (window->size != window->newSize)
+        //         window->Resize(window->newSize);
+
+        //     window->Render();
+        // }
+        //DrawMousePointer2(realMainWindow->framebuffer);
+
+        
+
+
+        //CopyFrameBuffer(realMainWindow->framebuffer, realMainWindow2->framebuffer, GlobalRenderer->framebuffer);
+        
+        MPoint mPos = MousePosition;
+
+        DrawMousePointer2(osData.windowPointerThing->virtualScreenBuffer, mPos);
+        osData.windowPointerThing->Render();
+        osData.windowPointerThing->UpdatePointerRect(mPos.x - 16, mPos.y - 16, mPos.x + 32, mPos.y + 32);
+        //DrawMousePointer2(osData.windowPointerThing->copyOfScreenBuffer);
+
+        //double endTime = PIT::TimeSinceBoot + 0.02;
+        //while (PIT::TimeSinceBoot < endTime)
+        {
+            //GlobalRenderer->Print("A");
+            for (int i = 0; i < osData.windows.getCount(); i++)
+            {     
+                //GlobalRenderer->Print("B");
+                   
+                Window* window = osData.windows[i];
+                if (window->instance == NULL)
+                    continue;
+                if (window->instance->instanceType != InstanceType::Terminal)
+                    continue;
+
+                TerminalInstance* terminal = (TerminalInstance*)window->instance;
+
+                if (terminal->tasks.getCount() != 0)
+                {
+                    Task* task = terminal->tasks[0];
+                    //GlobalRenderer->Println("DOING TASK");
+                    DoTask(task);
+                    if (task->GetDone())
+                    {
+                        terminal->tasks.removeFirst();
+                        FreeTask(task);
+                        //GlobalRenderer->Println("TASK DONE");
+                        terminal->PrintUserIfNeeded();
+                    }
+                    else
+                    {
+                        //GlobalRenderer->Println("TASK NOT DONE");
+                    }
+                }
+            }
+            //PIT::Sleep(10);
+            //asm("hlt");
+        }
+        //GlobalRenderer->Print("C");
+        //asm("hlt");
+    }
+
+    GlobalRenderer->Clear(Colors.black);
+    GlobalRenderer->color = Colors.white;
+    GlobalRenderer->Println("Goodbye.");
+    PIT::Sleep(1000);
+    GlobalRenderer->Clear(Colors.black);
+
+
+    RemoveFromStack();
+    return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+while(!osData.exit)
     {    
         if (osData.drawBackground)
             realMainWindow->renderer->DrawImage(bootInfo->bgImage, 0, 0, 2, 2);
@@ -242,17 +365,8 @@ extern "C" void _start(BootInfo* bootInfo)
         //asm("hlt");
     }
 
-    GlobalRenderer->Clear(Colors.black);
-    GlobalRenderer->color = Colors.white;
-    GlobalRenderer->Println("Goodbye.");
-    PIT::Sleep(1000);
-    GlobalRenderer->Clear(Colors.black);
 
-
-    RemoveFromStack();
-    return;
-}
-
+*/
 
 
 /*

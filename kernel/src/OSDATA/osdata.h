@@ -1,8 +1,12 @@
 #pragma once
-#include "../kernelUtil.h"
-#include "../customClasses/list.h"
-#include "../WindowStuff/Window/window.h"
 #include "MStack/MStackS.h"
+
+#include "../kernelUtil.h"
+//#include "../customClasses/list.h"
+
+#include "../WindowStuff/WindowManager/windowManager.h"
+
+//#include "../WindowStuff/Window/window.h"
 
 
 struct OSData
@@ -20,6 +24,7 @@ struct OSData
     bool drawBackground;
     bool enableStackTrace;
     int64_t crashCount = 0;
+    WindowManager::WindowPointerBufferThing* windowPointerThing;
 };
 
 extern OSData osData;
