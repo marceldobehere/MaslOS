@@ -70,12 +70,13 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size,
 
     if (window != NULL)
     {
+        if (false)
         {
             int64_t x = pos.x;
             int64_t y = pos.y- 21;
             window->parentRenderer->Clear(x,y,pos.x + size.width-1, pos.y-2, Colors.dgray);
 
-            const char* stitle = StrSubstr(title, 0, size.width / 10);
+            const char* stitle = title;//StrSubstr(title, 0, size.width / 10);
 
 
             // if (window->instance != NULL)
@@ -92,7 +93,7 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size,
                 window->parentRenderer->putStr(stitle, x, y, Colors.white);
             else
                 window->parentRenderer->putStr(stitle, x, y, Colors.bgray);
-            free((void*)stitle);
+            //free((void*)stitle);
         }
         
 

@@ -29,6 +29,7 @@ namespace WindowManager
             uint32_t* GetPixelAt(int x, int y);
             void UpdatePointerRect(int x1, int y1, int x2, int y2);
             void RenderWindow(Window* window);
+            void RenderWindowRect(Window* window, int x1, int y1, int x2, int y2);
             void RenderWindows();
             void Clear();
             void Render();

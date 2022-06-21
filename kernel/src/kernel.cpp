@@ -195,21 +195,35 @@ extern "C" void _start(BootInfo* bootInfo)
                 //osData.windowPointerThing->UpdatePointerRect(window->position.x, window->position.y, window->position.x + window->size.width, window->position.y + window->size.height);
                 
              
-                int x1 = window->position.x;
-                int y1 = window->position.y;
-            
-                window->position = window->newPosition;
-
-                int x2 = window->position.x;
-                int y2 = window->position.y;
-
-                //osData.windowPointerThing->UpdatePointerRect(x1, y1, x2, y2);
-
-                osData.windowPointerThing->UpdatePointerRect(x1, y1, x1 + window->size.width, y2);
-                osData.windowPointerThing->UpdatePointerRect(x1, y2, x2, y1 + window->size.height);
+                {
+                    int x1 = window->position.x;
+                    int y1 = window->position.y;
+                    int sx1 = window->size.width;
+                    int sy1 = window->size.height;
                 
-                osData.windowPointerThing->UpdatePointerRect(x1, y1, x1 + window->size.width, y2);
-                osData.windowPointerThing->UpdatePointerRect(x1, y2, x2, y1 + window->size.height);
+                    window->position = window->newPosition;
+
+                    int x2 = window->position.x;
+                    int y2 = window->position.y;
+                    int sx2 = window->size.width;
+                    int sy2 = window->size.height;
+
+                    {
+                        osData.windowPointerThing->UpdatePointerRect(x1, y1, x2 + sx2, y2 + sy2);
+
+                        osData.windowPointerThing->UpdatePointerRect(x2, y2 + sy2, x1 + sx1, y1 + sy1);
+
+                        osData.windowPointerThing->UpdatePointerRect(x2 + sx2, y1, x1 + sx1, y2 + sy2);
+
+                        osData.windowPointerThing->UpdatePointerRect(x1, y2, x2, y1 + sy1);
+                    }
+                }
+
+                // osData.windowPointerThing->UpdatePointerRect(x1, y1, x1 + window->size.width, y2);
+                // osData.windowPointerThing->UpdatePointerRect(x1, y2, x2, y1 + window->size.height);
+
+                // osData.windowPointerThing->UpdatePointerRect(x1, y1, x1 + window->size.width, y2);
+                // osData.windowPointerThing->UpdatePointerRect(x1, y2, x2, y1 + window->size.height);
 
 
                 osData.windowPointerThing->RenderWindow(window);
@@ -218,12 +232,40 @@ extern "C" void _start(BootInfo* bootInfo)
             if (window->size != window->newSize)
             {
                 //osData.windowPointerThing->UpdatePointerRect(window->position.x, window->position.y, window->position.x + window->size.width, window->position.y + window->size.height);
-                window->Resize(window->newSize);
+                
+                
+                
+                {
+                    int x1 = window->position.x;
+                    int y1 = window->position.y;
+                    int sx1 = window->size.width;
+                    int sy1 = window->size.height;
+                
+                    window->Resize(window->newSize);
+
+                    int x2 = window->position.x;
+                    int y2 = window->position.y;
+                    int sx2 = window->size.width;
+                    int sy2 = window->size.height;
+
+                    {
+                        osData.windowPointerThing->UpdatePointerRect(x1, y1, x2 + sx2, y2 + sy2);
+
+                        osData.windowPointerThing->UpdatePointerRect(x2, y2 + sy2, x1 + sx1, y1 + sy1);
+
+                        osData.windowPointerThing->UpdatePointerRect(x2 + sx2, y1, x1 + sx1, y2 + sy2);
+
+                        osData.windowPointerThing->UpdatePointerRect(x1, y2, x2, y1 + sy1);
+                    }
+                }
+                
+                
+                
                 //osData.windowPointerThing->UpdatePointerRect(window->position.x, window->position.y, window->position.x + window->size.width, window->position.y + window->size.height);
                 osData.windowPointerThing->RenderWindow(window);
             }
 
-            window->Render();
+            //window->Render();
         }
 
 

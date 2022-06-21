@@ -136,26 +136,49 @@ namespace WindowManager
 
     void WindowPointerBufferThing::UpdatePointerRect(int x1, int y1, int x2, int y2)
     {
-        for (int64_t y = y1; y <= y2; y++)
-        {
-            for (int64_t x = x1; x <= x2; x++)
+        if (x1 < 0)
+            x1 = 0;
+        if (y1 < 0)
+            y1 = 0;
+        if (x1 >= virtualScreenBuffer->Width)
+            x1 = virtualScreenBuffer->Width - 1;
+        if (y1 >= virtualScreenBuffer->Height)
+            y1 = virtualScreenBuffer->Height - 1;
+
+        if (x2 < 0)
+            x2 = 0;
+        if (y2 < 0)
+            y2 = 0;
+        if (x2 >= virtualScreenBuffer->Width)
+            x2 = virtualScreenBuffer->Width - 1;
+        if (y2 >= virtualScreenBuffer->Height)
+            y2 = virtualScreenBuffer->Height - 1;
+
+
+        for (int y = y1; y <= y2; y++)
+            for (int x = x1; x <= x2; x++)
             {
                 int64_t index = x + y * virtualScreenBuffer->Width; 
-                if (x >= 0 && y >= 0 && x < virtualScreenBuffer->Width && y < virtualScreenBuffer->Height)
-                    (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = GetPixelAt(x, y);
+                (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = &defaultBackgroundColor;
             }
-        }
+        
+
+
+
+        int count = osData.windows.getCount();
+        for (int i = 0; i < count; i++)
+            RenderWindowRect(osData.windows[i], x1, y1, x2, y2);
     }
 
-    void WindowPointerBufferThing::RenderWindow(Window* window)
-    {
-        AddToStack("RenderWindwow", "WindowStuff/WindowManager/windowManager.cpp");
-        uint32_t* pixel = (uint32_t*)window->framebuffer->BaseAddress;
 
-        int64_t x1 = window->position.x;
-        int64_t y1 = window->position.y;
-        int64_t x2 = x1 + window->size.width;
-        int64_t y2 = y1 + window->size.height;
+    void WindowPointerBufferThing::RenderWindowRect(Window* window, int x1, int y1, int x2, int y2)
+    {
+        AddToStack("RenderWindwowRect", "WindowStuff/WindowManager/windowManager.cpp");
+
+        int64_t _x1 = window->position.x;
+        int64_t _y1 = window->position.y;
+        int64_t _x2 = _x1 + window->size.width - 1;
+        int64_t _y2 = _y1 + window->size.height - 1;
 
         // GlobalRenderer->Println("X1: {}", to_string(x1), Colors.white);
         // GlobalRenderer->Println("Y1: {}", to_string(y1), Colors.white);
@@ -166,27 +189,88 @@ namespace WindowManager
         // GlobalRenderer->Println("Frame ADDR 1: {}", ConvertHexToString((uint64_t)window->framebuffer->BaseAddress), Colors.white);
         // GlobalRenderer->Println("Frame ADDR 2: {}", ConvertHexToString((uint64_t)virtualScreenBuffer->BaseAddress), Colors.white);
 
-        for (int64_t y = y1; y < y2; y++)
+        if (y1 > _y1)
+            _y1 = y1;
+
+        if (y2 < _y2)
+            _y2 = y2;
+
+        if (x1 > _x1)
+            _x1 = x1;
+
+        if (x2 < _x2)
+            _x2 = x2;
+
+        for (int64_t y = _y1; y <= _y2; y++)
         {
             //GlobalRenderer->Print("Y");
-            for (int64_t x = x1; x < x2; x++)
+            for (int64_t x = _x1; x <= _x2; x++)
             {
                 //GlobalRenderer->Print("X");
                 int64_t index = x + y * virtualScreenBuffer->Width; 
+                int64_t index2 = (x - window->position.x) + (y - window->position.y) * window->framebuffer->Width; 
                 
-                // if ((((uint32_t**)copyOfVirtualBuffer->BaseAddress)[index]) != pixel)
-                // {
-                //     (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = pixel;
-                //     (((uint32_t**)copyOfVirtualBuffer->BaseAddress)[index]) = pixel;
-                // }
-
-                if (x >= 0 && y >= 0 && x < virtualScreenBuffer->Width && y < virtualScreenBuffer->Height)
-                    (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = pixel;
-                pixel++;
+                (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = &((uint32_t*)window->framebuffer->BaseAddress)[index2];
             }
         }
+
+
+
+
+
+
+
+
         //GlobalRenderer->Println("\nDone.");
         RemoveFromStack();
+    } 
+
+
+
+
+
+
+    void WindowPointerBufferThing::RenderWindow(Window* window)
+    {
+        RenderWindowRect(window, 0, 0, actualScreenBuffer->Width, actualScreenBuffer->Height);
+        // AddToStack("RenderWindwow", "WindowStuff/WindowManager/windowManager.cpp");
+        // uint32_t* pixel = (uint32_t*)window->framebuffer->BaseAddress;
+
+        // int64_t x1 = window->position.x;
+        // int64_t y1 = window->position.y;
+        // int64_t x2 = x1 + window->size.width;
+        // int64_t y2 = y1 + window->size.height;
+
+        // // GlobalRenderer->Println("X1: {}", to_string(x1), Colors.white);
+        // // GlobalRenderer->Println("Y1: {}", to_string(y1), Colors.white);
+        // // GlobalRenderer->Println("X2: {}", to_string(x2), Colors.white);
+        // // GlobalRenderer->Println("Y2: {}", to_string(y2), Colors.white);
+
+    
+        // // GlobalRenderer->Println("Frame ADDR 1: {}", ConvertHexToString((uint64_t)window->framebuffer->BaseAddress), Colors.white);
+        // // GlobalRenderer->Println("Frame ADDR 2: {}", ConvertHexToString((uint64_t)virtualScreenBuffer->BaseAddress), Colors.white);
+
+        // for (int64_t y = y1; y < y2; y++)
+        // {
+        //     //GlobalRenderer->Print("Y");
+        //     for (int64_t x = x1; x < x2; x++)
+        //     {
+        //         //GlobalRenderer->Print("X");
+        //         int64_t index = x + y * virtualScreenBuffer->Width; 
+                
+        //         // if ((((uint32_t**)copyOfVirtualBuffer->BaseAddress)[index]) != pixel)
+        //         // {
+        //         //     (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = pixel;
+        //         //     (((uint32_t**)copyOfVirtualBuffer->BaseAddress)[index]) = pixel;
+        //         // }
+
+        //         if (x >= 0 && y >= 0 && x < virtualScreenBuffer->Width && y < virtualScreenBuffer->Height)
+        //             (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = pixel;
+        //         pixel++;
+        //     }
+        // }
+        // //GlobalRenderer->Println("\nDone.");
+        // RemoveFromStack();
     } 
 
     void WindowPointerBufferThing::RenderWindows()
@@ -197,6 +281,7 @@ namespace WindowManager
 
     void WindowPointerBufferThing::Render()
     {
+        uint64_t counta = 0;
         uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress;
         uint32_t*  aPixel = (uint32_t*) actualScreenBuffer->BaseAddress;
         uint32_t*  cPixel = (uint32_t*) copyOfScreenBuffer->BaseAddress;
@@ -209,11 +294,24 @@ namespace WindowManager
             {
                 *cPixel = col;
                 *aPixel = col;
+                counta++;
             }
             vPixel++;
             aPixel++;
             cPixel++;
         }
+
+        //osData.debugTerminalWindow->Log("             : ################", Colors.black);
+        osData.debugTerminalWindow->renderer->Clear(
+            osData.debugTerminalWindow->renderer->CursorPosition.x,
+            osData.debugTerminalWindow->renderer->CursorPosition.y,
+            osData.debugTerminalWindow->renderer->CursorPosition.x + 200,
+            osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
+            Colors.black);
+        osData.debugTerminalWindow->Log("Pixel changed: {}", to_string(counta), Colors.yellow);
+        osData.debugTerminalWindow->renderer->CursorPosition.x = 0;
+        osData.debugTerminalWindow->renderer->CursorPosition.y -= 16;
+        
     }
 
 }

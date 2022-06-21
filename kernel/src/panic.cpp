@@ -15,6 +15,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
     GlobalRenderer->Println(panicMessage, var, Colors.white);
     GlobalRenderer->Println();
 
+    osData.crashCount++;
     if (osData.crashCount == 1)
     {
         osData.debugTerminalWindow->position.x = GlobalRenderer->framebuffer->Width - (osData.debugTerminalWindow->size.width + 2);
@@ -27,11 +28,10 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         GlobalRenderer->Println("(BTW the rendering of the debug terminal is causing issues so no debug terminal)");
         GlobalRenderer->Println();
     }
-    
+
     PrintMStackTrace(osData.stackArr, osData.stackPointer);
     GlobalRenderer->Println();
     GlobalRenderer->Println();
-    osData.crashCount++;
 
 
     
