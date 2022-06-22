@@ -99,8 +99,8 @@ template <typename T> void List<T>::add(T item)
 template <typename T> void List<T>::clear()
 {
     AddToStack("clear", "customClasses/list.cpp");
-    for (uint64_t i = 0; i < count; i++)
-        arr[i] = *((T*)NULL);
+    // for (uint64_t i = 0; i < count; i++)
+    //     arr[i] = *((T*)NULL);
 
     count = 0;
     RemoveFromStack();
@@ -114,12 +114,12 @@ template <typename T> void List<T>::removeAt(uint64_t index)
         RemoveFromStack();
         return;
     }
-
     for (uint64_t i = index + 1; i < count; i++)
     {
         arr[i - 1] = arr[i];
     }
-    arr[count] = *((T*)NULL);
+
+    //arr[count] = *((T*)NULL);
 
     count--;
     RemoveFromStack();
@@ -142,7 +142,7 @@ template <typename T> void List<T>::removeLast()
     if (count == 0)
         return;
 
-    arr[count] = *((T*)NULL);
+    //arr[count] = *((T*)NULL);
 
     count--;
     RemoveFromStack();

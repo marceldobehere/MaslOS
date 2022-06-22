@@ -25,7 +25,7 @@ template <typename T> T& Array<T>::operator[](uint64_t index)
 {
     AddToStack("operator[]", "customClasses/array.cpp");
     if (index >= this->size)
-        return *((T*)NULL);
+        Panic("Accessing Array out of bounds!");
 
     T& t = arr[index];
     RemoveFromStack();

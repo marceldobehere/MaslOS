@@ -401,7 +401,32 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
             int y = to_int(split->data[1]);
 
             if (x >= 10 && y >= 10)
+            {
+                int x1 = window->position.x - 1;
+                int y1 = window->position.y - 23;
+                int sx1 = window->size.width + 3;
+                int sy1 = window->size.height + 25;
+
                 window->Resize(Size(x, y));
+
+                int x2 = window->position.x - 1;
+                int y2 = window->position.y - 23;
+                int sx2 = window->size.width + 3;
+                int sy2 = window->size.height + 25;
+
+                {
+                    osData.windowPointerThing->UpdatePointerRect(x1, y1, x2 + sx2, y2 + sy2);
+
+                    osData.windowPointerThing->UpdatePointerRect(x2, y2 + sy2, x1 + sx1, y1 + sy1);
+
+                    osData.windowPointerThing->UpdatePointerRect(x2 + sx2, y1, x1 + sx1, y2 + sy2);
+
+                    osData.windowPointerThing->UpdatePointerRect(x1, y2, x2, y1 + sy1);
+
+                    osData.windowPointerThing->RenderWindow(window);
+                }
+
+            }
             else
                 LogError("Invalid size given!", window);
         }
