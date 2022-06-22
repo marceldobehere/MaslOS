@@ -57,6 +57,7 @@ namespace WindowManager
 
     WindowPointerBufferThing::WindowPointerBufferThing(Framebuffer* actualScreenBuffer, Framebuffer* background, uint32_t backgroundColor)
     {
+        this->fps = 1;
         this->defaultBackgroundColor = backgroundColor;
         this->actualScreenBuffer = actualScreenBuffer;
         this->background = background;
@@ -155,6 +156,13 @@ namespace WindowManager
             y2 = virtualScreenBuffer->Height - 1;
 
 
+        if (x1 > x2 || y1 > y2)
+        {
+            RemoveFromStack();
+            return;
+        }
+
+
         for (int y = y1; y <= y2; y++)
             for (int x = x1; x <= x2; x++)
             {
@@ -162,8 +170,6 @@ namespace WindowManager
                 (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = &defaultBackgroundColor;
             }
         
-
-
 
         int count = osData.windows.getCount();
         for (int i = 0; i < count; i++)
@@ -221,6 +227,7 @@ namespace WindowManager
 
         }
 
+
         {
             _x1 = window->position.x - 1;
             _y1 = window->position.y - 23;
@@ -254,6 +261,12 @@ namespace WindowManager
         }
 
 
+
+        if (_x1 > _x2 || _y1 > _y2)
+        {
+            RemoveFromStack();
+            return;
+        }
 
         {
             int64_t x = window->position.x;
@@ -493,10 +506,33 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
         osData.debugTerminalWindow->Log("Pixel changed: {}", to_string(counta), Colors.yellow);
+
+        osData.debugTerminalWindow->renderer->Clear(
+            osData.debugTerminalWindow->renderer->CursorPosition.x,
+            osData.debugTerminalWindow->renderer->CursorPosition.y,
+            osData.debugTerminalWindow->renderer->CursorPosition.x + 200,
+            osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
+            Colors.black);
+        osData.debugTerminalWindow->Log("FPS: {}", to_string(fps), Colors.yellow);
+
         osData.debugTerminalWindow->renderer->CursorPosition.x = 0;
-        osData.debugTerminalWindow->renderer->CursorPosition.y -= 16;
+        osData.debugTerminalWindow->renderer->CursorPosition.y -= 32;
         
     }
 
+
+    void WindowPointerBufferThing::UpdateWindowBorder(Window* window)
+    {
+        int x1 = window->position.x;
+        int y1 = window->position.y;
+        int x2 = x1 + window->size.width;
+        int y2 = y1 + window->size.height;
+        
+        osData.windowPointerThing->UpdatePointerRect(x1-1, y1-22, x1-1, y2);
+        osData.windowPointerThing->UpdatePointerRect(x2, y1-22, x2, y2);
+
+        osData.windowPointerThing->UpdatePointerRect(x1-1, y1-22, x2, y1-1);
+        osData.windowPointerThing->UpdatePointerRect(x1-1, y2, x2, y2);
+    }
 }
 

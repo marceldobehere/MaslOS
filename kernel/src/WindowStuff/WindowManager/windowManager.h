@@ -16,6 +16,7 @@ namespace WindowManager
 
 
         public:
+            double fps;
             uint32_t defaultColor = Colors.black;
             uint32_t defaultBackgroundColor = defaultColor;
             Framebuffer* actualScreenBuffer;
@@ -33,6 +34,7 @@ namespace WindowManager
             void RenderWindows();
             void Clear();
             void Render();
+            void UpdateWindowBorder(Window* window);
 
     };  
 }

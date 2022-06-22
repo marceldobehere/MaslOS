@@ -97,75 +97,44 @@ extern "C" void _start(BootInfo* bootInfo)
  
 
     
-    
-    //osData.windows[1]->renderer->Clear(Colors.blue);
-    //osData.windows[1]->renderer->color = Colors.white;
-
 
     
     osData.windows.add(osData.debugTerminalWindow);
 
 
-    //activeWindow = osData.windows[1];
-
     debugTerminalWindow->Log("Kernel Initialised Successfully!");
-
-    
-
-    // debugTerminalWindow->Log("Address of RSDP: {}", ConvertHexToString((uint64_t)bootInfo->rsdp));
-
-    // {
-    //     char* substr = StrSubstr((char*)bootInfo->rsdp, 0, 8);
-    //     debugTerminalWindow->Log("RSDP: \"{}\"", substr);
-    //     free(substr);
-    // }
-    
-    //PrepareACPI(bootInfo);
-
-    {
-
-
-
-
-    }
-
-
-
-
-
-
-
 
 
 
 
 
     activeWindow->renderer->Cls();
-    //activeWindow->renderer->Println("Kernel Initialised Successfully!", Colors.yellow);
     KeyboardPrintStart(mainWindow);
     mainWindow->Render();
 
-    // {
-    //     char* test = (char*)malloc(5);
-    //     test[0] = 'H';
-    //     test[1] = 'O';
-    //     test[2] = 'I';
-    //     test[3] = '!';
-    //     test[4] = 0;
-    //     mainWindow->title = test;
-    // }
-
-    //osData.windowPointerThing->RenderWindow(activeWindow);
     
     osData.windowPointerThing->Clear();
     osData.windowPointerThing->RenderWindows();
     bool updateBorder = true;
+    int frame = 0;
+    double oldTime = PIT::TimeSinceBoot;
+    double fps = 1;
     while(!osData.exit)
-    {    
+    {  
+        frame++;  
+        if (frame >= 20)
+        {
+            double currTime = PIT::TimeSinceBoot;
+            fps = (frame - 1) / (currTime - oldTime);
+            oldTime = currTime;
+            frame = 0;
+        }
+
         // if (osData.drawBackground)
         //     realMainWindow->renderer->DrawImage(bootInfo->bgImage, 0, 0, 2, 2);
         // else
         //     realMainWindow->renderer->Clear(Colors.dblue);
+
 
         if (activeWindow != NULL)
         {
@@ -179,23 +148,9 @@ extern "C" void _start(BootInfo* bootInfo)
                     Window* oldActive = osData.windows[osData.windows.getCount() - 1];
                     osData.windows.removeAt(index);
                     osData.windows.add(activeWindow);
-                    //osData.windowPointerThing->UpdatePointerRect(activeWindow->position.x, activeWindow->position.y, activeWindow->position.x + activeWindow->size.width, activeWindow->position.y + activeWindow->size.height);
+                    
                     osData.windowPointerThing->RenderWindow(activeWindow);
-
-
-                    {
-                        int x1 = oldActive->position.x;
-                        int y1 = oldActive->position.y;
-                        int x2 = x1 + oldActive->size.width;
-                        int y2 = y1 + oldActive->size.height;
-                        
-                        osData.windowPointerThing->UpdatePointerRect(x1-1, y1-22, x1-1, y2);
-                        osData.windowPointerThing->UpdatePointerRect(x2, y1-22, x2, y2);
-
-                        osData.windowPointerThing->UpdatePointerRect(x1-1, y1-1, x2, y1-1);
-                        osData.windowPointerThing->UpdatePointerRect(x1-1, y2, x2, y2);
-                        osData.windowPointerThing->UpdatePointerRect(x1-1, y1-22, x2, y1-22);
-                    }
+                    osData.windowPointerThing->UpdateWindowBorder(oldActive);
                 }
             }
         }
@@ -207,27 +162,7 @@ extern "C" void _start(BootInfo* bootInfo)
                 {
                     Window* oldActive = osData.windows[osData.windows.getCount() - 1];
                     
-                    int x1 = oldActive->position.x;
-                    int y1 = oldActive->position.y;
-                    int x2 = x1 + oldActive->size.width;
-                    int y2 = y1 + oldActive->size.height;
-                    
-                    osData.windowPointerThing->UpdatePointerRect(x1-1, y1-22, x1-1, y2);
-                    osData.windowPointerThing->UpdatePointerRect(x2, y1-22, x2, y2);
-
-                    osData.windowPointerThing->UpdatePointerRect(x1-1, y1-1, x2, y1-1);
-                    osData.windowPointerThing->UpdatePointerRect(x1-1, y2, x2, y2);
-                    osData.windowPointerThing->UpdatePointerRect(x1-1, y1-22, x2, y1-22);
-
-
-                    // VirtualRenderer::Border border = VirtualRenderer::Border(osData.windowPointerThing->virtualScreenBuffer);
-                    // uint32_t col1 = Colors.red;
-                    // uint32_t col2 = Colors.orange;
-                    // VirtualRenderer::Clear(x1-1, y1-22, x1-1, y2, border, osData.windowPointerThing->virtualScreenBuffer, &col1);
-                    // VirtualRenderer::Clear(x2, y1-22, x2, y2, border, osData.windowPointerThing->virtualScreenBuffer, &col2);
-                    // VirtualRenderer::Clear(x1-1, y1-1, x2, y1-1, border, osData.windowPointerThing->virtualScreenBuffer, &col1);
-                    // VirtualRenderer::Clear(x1-1, y2, x2, y2, border, osData.windowPointerThing->virtualScreenBuffer, &col2);
-                    // VirtualRenderer::Clear(x1-1, y1-22, x2, y1-22, border, osData.windowPointerThing->virtualScreenBuffer, &col1);
+                    osData.windowPointerThing->UpdateWindowBorder(oldActive);
                 }
             }
         }
@@ -258,52 +193,19 @@ extern "C" void _start(BootInfo* bootInfo)
 
                 if (window->position != nPos)
                 {
-                    //osData.windowPointerThing->UpdatePointerRect(window->position.x, window->position.y, window->position.x + window->size.width, window->position.y + window->size.height);
-                
-                
-                    {                    
-                        window->position = nPos;
+                    window->position = nPos;
 
-                        x2 = window->position.x - 1;
-                        y2 = window->position.y - 23;
-                        sx2 = window->size.width + 3;
-                        sy2 = window->size.height + 25;
+                    x2 = window->position.x - 1;
+                    y2 = window->position.y - 23;
+                    sx2 = window->size.width + 3;
+                    sy2 = window->size.height + 25;
 
-                        update = true;
-
-                        // {
-                        //     osData.windowPointerThing->UpdatePointerRect(x1, y1, x2 + sx2, y2 + sy2);
-
-                        //     osData.windowPointerThing->UpdatePointerRect(x2, y2 + sy2, x1 + sx1, y1 + sy1);
-
-                        //     osData.windowPointerThing->UpdatePointerRect(x2 + sx2, y1, x1 + sx1, y2 + sy2);
-
-                        //     osData.windowPointerThing->UpdatePointerRect(x1, y2, x2, y1 + sy1);
-                        // }
-                    }
-
-                    // osData.windowPointerThing->UpdatePointerRect(x1, y1, x1 + window->size.width, y2);
-                    // osData.windowPointerThing->UpdatePointerRect(x1, y2, x2, y1 + window->size.height);
-
-                    // osData.windowPointerThing->UpdatePointerRect(x1, y1, x1 + window->size.width, y2);
-                    // osData.windowPointerThing->UpdatePointerRect(x1, y2, x2, y1 + window->size.height);
-
-
-                    //osData.windowPointerThing->RenderWindow(window);
+                    update = true;
                 }
 
                 if (window->size != nSize)
                 {
-                    //osData.windowPointerThing->UpdatePointerRect(window->position.x, window->position.y, window->position.x + window->size.width, window->position.y + window->size.height);
-                    
-                    
-                    
                     {
-                        // int x1 = window->position.x - 1;
-                        // int y1 = window->position.y - 23;
-                        // int sx1 = window->size.width + 3;
-                        // int sy1 = window->size.height + 25;
-                    
                         window->Resize(nSize);
 
                         x2 = window->position.x - 1;
@@ -312,22 +214,7 @@ extern "C" void _start(BootInfo* bootInfo)
                         sy2 = window->size.height + 25;
 
                         update = true;
-
-                        // {
-                        //     osData.windowPointerThing->UpdatePointerRect(x1, y1, x2 + sx2, y2 + sy2);
-
-                        //     osData.windowPointerThing->UpdatePointerRect(x2, y2 + sy2, x1 + sx1, y1 + sy1);
-
-                        //     osData.windowPointerThing->UpdatePointerRect(x2 + sx2, y1, x1 + sx1, y2 + sy2);
-
-                        //     osData.windowPointerThing->UpdatePointerRect(x1, y2, x2, y1 + sy1);
-                        // }
                     }
-                    
-                    
-                    
-                    //osData.windowPointerThing->UpdatePointerRect(window->position.x, window->position.y, window->position.x + window->size.width, window->position.y + window->size.height);
-                    //osData.windowPointerThing->RenderWindow(window);
                 }
             
 
@@ -347,25 +234,23 @@ extern "C" void _start(BootInfo* bootInfo)
                 }
 
             }
-
-            //window->Render();
         }
 
 
-        
-
-
-        //CopyFrameBuffer(realMainWindow->framebuffer, realMainWindow2->framebuffer, GlobalRenderer->framebuffer);
-        
         MPoint mPos = MousePosition;
 
         DrawMousePointer2(osData.windowPointerThing->virtualScreenBuffer, mPos);
+        osData.windowPointerThing->fps = fps;
         osData.windowPointerThing->Render();
-        osData.windowPointerThing->UpdatePointerRect(mPos.x - 16, mPos.y - 16, mPos.x + 32, mPos.y + 32);
-        //DrawMousePointer2(osData.windowPointerThing->copyOfScreenBuffer);
+        osData.windowPointerThing->UpdatePointerRect(mPos.x - 16, mPos.y - 16, mPos.x + 16, mPos.y + 16);
+
+
+
+
+
 
         //double endTime = PIT::TimeSinceBoot + 0.02;
-        //while (PIT::TimeSinceBoot < endTime)
+        for (int ax = 0; ax < 10; ax++)
         {
             //GlobalRenderer->Print("A");
             for (int i = 0; i < osData.windows.getCount(); i++)
@@ -383,7 +268,6 @@ extern "C" void _start(BootInfo* bootInfo)
                 if (terminal->tasks.getCount() != 0)
                 {
                     Task* task = terminal->tasks[0];
-                    //GlobalRenderer->Println("DOING TASK");
                     DoTask(task);
                     if (task->GetDone())
                     {
@@ -517,6 +401,31 @@ while(!osData.exit)
         //asm("hlt");
     }
 
+
+*/
+
+/*
+                    // int x1 = oldActive->position.x;
+                    // int y1 = oldActive->position.y;
+                    // int x2 = x1 + oldActive->size.width;
+                    // int y2 = y1 + oldActive->size.height;
+                    
+                    // osData.windowPointerThing->UpdatePointerRect(x1-1, y1-22, x1-1, y2);
+                    // osData.windowPointerThing->UpdatePointerRect(x2, y1-22, x2, y2);
+
+                    // osData.windowPointerThing->UpdatePointerRect(x1-1, y1-22, x2, y1-1);
+                    // osData.windowPointerThing->UpdatePointerRect(x1-1, y2, x2, y2);
+                    //osData.windowPointerThing->UpdatePointerRect(x1-1, y1-22, x2, y1-22);
+
+
+                    // VirtualRenderer::Border border = VirtualRenderer::Border(osData.windowPointerThing->virtualScreenBuffer);
+                    // uint32_t col1 = Colors.red;
+                    // uint32_t col2 = Colors.orange;
+                    // VirtualRenderer::Clear(x1-1, y1-22, x1-1, y2, border, osData.windowPointerThing->virtualScreenBuffer, &col1);
+                    // VirtualRenderer::Clear(x2, y1-22, x2, y2, border, osData.windowPointerThing->virtualScreenBuffer, &col2);
+                    // VirtualRenderer::Clear(x1-1, y1-1, x2, y1-1, border, osData.windowPointerThing->virtualScreenBuffer, &col1);
+                    // VirtualRenderer::Clear(x1-1, y2, x2, y2, border, osData.windowPointerThing->virtualScreenBuffer, &col2);
+                    // VirtualRenderer::Clear(x1-1, y1-22, x2, y1-22, border, osData.windowPointerThing->virtualScreenBuffer, &col1);
 
 */
 
@@ -689,7 +598,17 @@ while(!osData.exit)
 
 /*
 
+    
 
+    // debugTerminalWindow->Log("Address of RSDP: {}", ConvertHexToString((uint64_t)bootInfo->rsdp));
+
+    // {
+    //     char* substr = StrSubstr((char*)bootInfo->rsdp, 0, 8);
+    //     debugTerminalWindow->Log("RSDP: \"{}\"", substr);
+    //     free(substr);
+    // }
+    
+    //PrepareACPI(bootInfo);
 
 
 

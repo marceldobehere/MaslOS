@@ -424,6 +424,7 @@ void HandleClick(bool L, bool R, bool M)
     if (L)
     {
         Window* window = WindowManager::getWindowAtMousePosition();
+        Window* oldActive = activeWindow;
         activeWindow = window;
         dragWindow = window;
         startDrag = false;
@@ -439,7 +440,14 @@ void HandleClick(bool L, bool R, bool M)
             diff.x = MousePosition.x;
             diff.y = MousePosition.y;
             window->moveToFront = true;
+            //osData.windowPointerThing->UpdateWindowBorder(osData.windows[osData.windows.getCount() - 1]);
         }
+        else
+        {
+            //osData.windowPointerThing->UpdateWindowBorder(osData.windows[osData.windows.getCount() - 1]);
+        }
+        if (oldActive != NULL)
+            osData.windowPointerThing->UpdateWindowBorder(oldActive);
     }   
 }
 
