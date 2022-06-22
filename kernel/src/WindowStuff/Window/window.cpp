@@ -241,7 +241,7 @@ void Window::Resize(Size _newSize)
     if (_newSize.width < 10)
         _newSize.width = 10;
 
-    this->newSize = _newSize;
+    //this->newSize = _newSize;
 
     {
         Framebuffer* oldFramebuffer = framebuffer;

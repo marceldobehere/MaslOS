@@ -112,14 +112,13 @@ void HandleKeyboard(uint8_t scancode)
     if (scancode == ARR_LEFT)
     {  
         int64_t index = osData.windows.getIndexOf(activeWindow);
-        index = (index - 1 + osData.windows.getCount()) % osData.windows.getCount();
+        index = 0;
         activeWindow = osData.windows[index];
+        activeWindow->moveToFront = true;
     }
     else if (scancode == ARR_RIGHT)
     {
-        int64_t index = osData.windows.getIndexOf(activeWindow);
-        index = (index + 1) % osData.windows.getCount();
-        activeWindow = osData.windows[index];
+
     }
     else if (scancode == ARR_UP)
     {  

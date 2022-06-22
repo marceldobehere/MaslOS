@@ -89,12 +89,11 @@ uint32_t MouseTempBitmap[] =
 
 extern uint32_t mouseColFront = Colors.white, mouseColBack = Colors.black;
 
-MPoint oldMousePosition;
-
 bool clicks[3] = {false, false, false};
 double clickTimes[3] = {0, 0, 0};
 
 
+MPoint IMousePosition;
 MPoint MousePosition;
 
 // void SaveIntoBuffer(MPoint point, Framebuffer* framebuffer)
@@ -190,16 +189,16 @@ void FigureOutCorrectMouseImage()
         return;
     }
     
-    if (MousePosition.x >= window->position.x - maxDis && MousePosition.x <= window->position.x + maxDis)
+    if (IMousePosition.x >= window->position.x - maxDis && IMousePosition.x <= window->position.x + maxDis)
     {
         dragArr[0] = true;
-        if (MousePosition.y >= (window->position.y - 22) - maxDis && MousePosition.y <= (window->position.y - 22) + maxDis)
+        if (IMousePosition.y >= (window->position.y - 22) - maxDis && IMousePosition.y <= (window->position.y - 22) + maxDis)
         {
             currentMouseImageName = "drag_D_d.mbif";
             dragArr[1] = true;
 
         }
-        else if (MousePosition.y >= (window->position.y + window->size.height) - maxDis && MousePosition.y <= (window->position.y + window->size.height) + maxDis)
+        else if (IMousePosition.y >= (window->position.y + window->size.height) - maxDis && IMousePosition.y <= (window->position.y + window->size.height) + maxDis)
         {
             currentMouseImageName = "drag_U_d.mbif";
             dragArr[3] = true;
@@ -209,15 +208,15 @@ void FigureOutCorrectMouseImage()
             currentMouseImageName = "drag_x.mbif";
         }
     }
-    else if (MousePosition.x >= (window->position.x + window->size.width) - maxDis && MousePosition.x <= (window->position.x + window->size.width) + maxDis)
+    else if (IMousePosition.x >= (window->position.x + window->size.width) - maxDis && IMousePosition.x <= (window->position.x + window->size.width) + maxDis)
     {
         dragArr[2] = true;
-        if (MousePosition.y >= (window->position.y - 22) - maxDis && MousePosition.y <= (window->position.y - 22) + maxDis)
+        if (IMousePosition.y >= (window->position.y - 22) - maxDis && IMousePosition.y <= (window->position.y - 22) + maxDis)
         {
             currentMouseImageName = "drag_U_d.mbif";
             dragArr[1] = true;
         }
-        else if (MousePosition.y >= (window->position.y + window->size.height) - maxDis && MousePosition.y <= (window->position.y + window->size.height) + maxDis)
+        else if (IMousePosition.y >= (window->position.y + window->size.height) - maxDis && IMousePosition.y <= (window->position.y + window->size.height) + maxDis)
         {
             currentMouseImageName = "drag_D_d.mbif";
             dragArr[3] = true;
@@ -227,12 +226,12 @@ void FigureOutCorrectMouseImage()
             currentMouseImageName = "drag_x.mbif";
         }
     }
-    else if (MousePosition.y >= (window->position.y - 22) - maxDis && MousePosition.y <= (window->position.y - 22) + maxDis)
+    else if (IMousePosition.y >= (window->position.y - 22) - maxDis && IMousePosition.y <= (window->position.y - 22) + maxDis)
     {
         currentMouseImageName = "drag_y.mbif";
         dragArr[1] = true;
     }
-    else if (MousePosition.y >= (window->position.y + window->size.height) - maxDis && MousePosition.y <= (window->position.y + window->size.height) + maxDis)
+    else if (IMousePosition.y >= (window->position.y + window->size.height) - maxDis && IMousePosition.y <= (window->position.y + window->size.height) + maxDis)
     {
         currentMouseImageName = "drag_y.mbif";
         dragArr[3] = true;
@@ -261,21 +260,20 @@ void DrawMousePointerNew(MPoint point, PointerFramebuffer* framebuffer)
     if (currentMouseImage != NULL)
         VirtualRenderer::DrawImage(currentMouseImage, point.x, point.y, 1, 1, VirtualRenderer::Border(framebuffer), framebuffer);
     else
-        ;//DrawMouseBuffer(MousePosition, framebuffer);
+        ;//DrawMouseBuffer(IMousePosition, framebuffer);
 }
 
 void DrawMousePointer1(PointerFramebuffer* framebuffer)
 {
-    //LoadFromBuffer(oldMousePosition, framebuffer);
+    //LoadFromBuffer(oldIMousePosition, framebuffer);
 }
 
 void DrawMousePointer2(PointerFramebuffer* framebuffer, MPoint mousePos)
 {
-    //SaveIntoBuffer(MousePosition, framebuffer);
-    //DrawMouseBuffer(MousePosition, framebuffer);
+    //SaveIntoBuffer(IMousePosition, framebuffer);
+    //DrawMouseBuffer(IMousePosition, framebuffer);
     DrawMousePointerNew(mousePos, framebuffer);
-    oldMousePosition.x = MousePosition.x;
-    oldMousePosition.y = MousePosition.y;
+    MousePosition = IMousePosition;
 }
 
 
@@ -339,11 +337,11 @@ void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName)
     startDrag = false;
     dragWindow = NULL;
 
+    IMousePosition.x = 50;
+    IMousePosition.y = 50;
     MousePosition.x = 50;
     MousePosition.y = 50;
-    oldMousePosition.x = 50;
-    oldMousePosition.y = 50;
-    //SaveIntoBuffer(MousePosition, GlobalRenderer->framebuffer);
+    //SaveIntoBuffer(IMousePosition, GlobalRenderer->framebuffer);
     DrawMousePointer();
 
 
@@ -560,50 +558,50 @@ void ProcessMousePacket()
 
     if (!xNegative)
     {
-        MousePosition.x += MousePacket[1];
+        IMousePosition.x += MousePacket[1];
         if (xOverflow)
-            MousePosition.x += 255;
+            IMousePosition.x += 255;
     }
     else
     {
         MousePacket[1] = 256 - MousePacket[1];
-        MousePosition.x -= MousePacket[1];
+        IMousePosition.x -= MousePacket[1];
         if (xOverflow)
-            MousePosition.x -= 255;
+            IMousePosition.x -= 255;
     }
 
     if (yNegative)
     {
         MousePacket[2] = 256 - MousePacket[2];
-        MousePosition.y += MousePacket[2];
+        IMousePosition.y += MousePacket[2];
         if (yOverflow)
-            MousePosition.y += 255;
+            IMousePosition.y += 255;
     }
     else
     {
         //MousePacket[2] = 256 - MousePacket[2];
-        MousePosition.y -= MousePacket[2];
+        IMousePosition.y -= MousePacket[2];
         if (yOverflow)
-            MousePosition.y -= 255;
+            IMousePosition.y -= 255;
     }
 
     //GlobalRenderer->overwrite = true;
 
     // GlobalRenderer->CursorPosition.x = 0;
     // GlobalRenderer->CursorPosition.y = 32;
-    // GlobalRenderer->Println("X: {}        ", to_string((int64_t)MousePosition.x));
-    // GlobalRenderer->Println("Y: {}        ", to_string((int64_t)MousePosition.y));
+    // GlobalRenderer->Println("X: {}        ", to_string((int64_t)IMousePosition.x));
+    // GlobalRenderer->Println("Y: {}        ", to_string((int64_t)IMousePosition.y));
 
 
-    if(MousePosition.x < 0)
-        MousePosition.x = 0;
-    else if(MousePosition.x > GlobalRenderer->framebuffer->Width - 16)
-        MousePosition.x = GlobalRenderer->framebuffer->Width - 16;
+    if(IMousePosition.x < 0)
+        IMousePosition.x = 0;
+    else if(IMousePosition.x > GlobalRenderer->framebuffer->Width - 16)
+        IMousePosition.x = GlobalRenderer->framebuffer->Width - 16;
 
-    if(MousePosition.y < 0)
-        MousePosition.y = 0;
-    else if(MousePosition.y > GlobalRenderer->framebuffer->Height - 16)
-        MousePosition.y = GlobalRenderer->framebuffer->Height - 16;
+    if(IMousePosition.y < 0)
+        IMousePosition.y = 0;
+    else if(IMousePosition.y > GlobalRenderer->framebuffer->Height - 16)
+        IMousePosition.y = GlobalRenderer->framebuffer->Height - 16;
 
 
     //DrawMousePointer();
@@ -611,21 +609,22 @@ void ProcessMousePacket()
     MousePacketReady = false;
 
     // {
-    //     LoadFromBuffer(oldMousePosition);
+    //     LoadFromBuffer(oldIMousePosition);
     //     //if (leftButton)
-    //     //    GlobalRenderer->delChar(MousePosition.x, MousePosition.y, mouseColFront);
+    //     //    GlobalRenderer->delChar(IMousePosition.x, IMousePosition.y, mouseColFront);
     //     //if (rightButton)
-    //     //    GlobalRenderer->delChar(MousePosition.x, MousePosition.y, mouseColBack);
-    //     SaveIntoBuffer(MousePosition);
-    //     DrawMouseBuffer(MousePosition);
-    //     oldMousePosition.x = MousePosition.x;
-    //     oldMousePosition.y = MousePosition.y;
+    //     //    GlobalRenderer->delChar(IMousePosition.x, IMousePosition.y, mouseColBack);
+    //     SaveIntoBuffer(IMousePosition);
+    //     DrawMouseBuffer(IMousePosition);
+    //     oldIMousePosition.x = IMousePosition.x;
+    //     oldIMousePosition.y = IMousePosition.y;
     // }
 
     bool cClicks[3] = {leftButton, rightButton, middleButton};
 
     bool tClicks[3] = {false, false, false};
     bool tHolds[3] = {false, false, false};
+    double time = PIT::TimeSinceBoot;
     for (int i = 0; i < 3; i++)
     {
         if (!cClicks[i])
@@ -639,14 +638,14 @@ void ProcessMousePacket()
         {
             if (clicks[i])
             {   
-                if (PIT::TimeSinceBoot >= clickTimes[i] + 0.2)
+                if (time >= clickTimes[i] + 0.1)
                     tHolds[i] = true;  
             }
             else
             {
                 clicks[i] = true;
                 tClicks[i] = true;
-                clickTimes[i] = PIT::TimeSinceBoot;
+                clickTimes[i] = time;
             }
         }
     }

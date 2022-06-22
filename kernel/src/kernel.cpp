@@ -238,7 +238,6 @@ extern "C" void _start(BootInfo* bootInfo)
 
 
         MPoint mPos = MousePosition;
-
         DrawMousePointer2(osData.windowPointerThing->virtualScreenBuffer, mPos);
         osData.windowPointerThing->fps = fps;
         osData.windowPointerThing->Render();

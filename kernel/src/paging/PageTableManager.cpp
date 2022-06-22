@@ -67,6 +67,7 @@ void PageTableManager::MapMemory(void* virtualMemory, void* physicalMemory)
     PDE.SetAddress((uint64_t)physicalMemory >> 12);
     PDE.SetFlag(PT_Flag::Present, true);
     PDE.SetFlag(PT_Flag::ReadWrite, true);
+    PDE.SetFlag(PT_Flag::WriteThrough, true); // idk if this is a good idea
     PT->entries[indexer.P_i] = PDE;
 
 
