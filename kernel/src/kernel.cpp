@@ -244,10 +244,6 @@ extern "C" void _start(BootInfo* bootInfo)
         osData.windowPointerThing->UpdatePointerRect(mPos.x - 16, mPos.y - 16, mPos.x + 16, mPos.y + 16);
 
 
-
-
-
-
         //double endTime = PIT::TimeSinceBoot + 0.02;
         for (int ax = 0; ax < 10; ax++)
         {
