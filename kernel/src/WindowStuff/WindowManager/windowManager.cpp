@@ -6,6 +6,8 @@
 namespace WindowManager
 {
 
+    kernelFiles::ImageFile* windowIcons[countOfIcons];
+
     Window* getWindowAtMousePosition(int dis)
     {
         AddToStack("", "WindowStuff/WindowManager/windowManager.cpp");
@@ -355,6 +357,31 @@ namespace WindowManager
         {
             VirtualRenderer::Border border = VirtualRenderer::Border(_x1, _y1, _x2, _y2);
             int64_t x = window->position.x + window->size.width;
+            int64_t y = window->position.y - 22;
+
+            
+            VirtualRenderer::DrawImage(windowIcons[windowIconEnum.CLOSE_H], x - 20, y + 2, 1, 1, border, virtualScreenBuffer);
+
+            
+        }
+
+        {
+            //uint32_t col = Colors.bred;
+            //VirtualRenderer::DrawLine(_x1 + 5, _y1 + 5, _x1 + 20, _y1 + 10, border, virtualScreenBuffer,  &window->defaultBorderColor);
+            //VirtualRenderer::DrawLine(_x1 + 5, _y1 + 10, _x1 + 1, _y1 + 11, border, virtualScreenBuffer, &window->selectedBorderColor);
+            //VirtualRenderer::DrawLine(_x1 + 5, _y1 + 14, _x1 + 8, _y1 + 17, border, virtualScreenBuffer, &window->selectedBorderColor);
+            //VirtualRenderer::DrawLine(_x1 + 5, _y1 + 18, _x1 + 6, _y1 + 25, border, virtualScreenBuffer, &window->defaultBorderColor);
+            
+
+            //windowIcons[windowIconEnum.CLOSE_N]
+
+            //VirtualRenderer::DrawImage(kernelFiles::ConvertFileToImage(&osData.windowIconsZIP->files[0]), x - 30, y + 10, 1, 1, border, virtualScreenBuffer);
+            //VirtualRenderer::DrawImage(kernelFiles::ConvertFileToImage(kernelFiles::ZIP::GetFileFromFileName(osData.windowIconsZIP, WindowManager::windowIconNames[3])), x - 60, y + 40, 1, 1, border, virtualScreenBuffer);
+            //osData.debugTerminalWindow->Log("- ADDR A: {}", ConvertHexToString((uint64_t)windowIcons[0]), Colors.yellow);
+            //VirtualRenderer::DrawImage(windowIcons[windowIconEnum.MIN_H], x - 90, y + 50, 2, 2, border, virtualScreenBuffer);
+
+            //VirtualRenderer::Border border = VirtualRenderer::Border(_x1, _y1, _x2, _y2);
+            //int64_t x = window->position.x + window->size.width;
             //uint32_t col = Colors.bred;
             //VirtualRenderer::DrawLine(_x1 + 5, _y1 + 5, _x1 + 20, _y1 + 10, border, virtualScreenBuffer,  &window->defaultBorderColor);
             //VirtualRenderer::DrawLine(_x1 + 5, _y1 + 10, _x1 + 1, _y1 + 11, border, virtualScreenBuffer, &window->selectedBorderColor);

@@ -574,13 +574,13 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 
 	ZIPFile* windowZIP = LoadZIP(NULL, L"window-icons.mbzf", ImageHandle, SystemTable);
 
-	if (windowZIP== NULL)
+	if (windowZIP == NULL)
 	{
-		Print(L"Mouse ZIP was not loaded!\n\r");
+		Print(L"Window Icon ZIP was not loaded!\n\r");
 	}
 	else
 	{
-		Print(L"Mouse ZIP loaded. Char size: %d\n\r", (windowZIP->size));
+		Print(L"Window Icon ZIP loaded. Char size: %d\n\r", (windowZIP->size));
 	}
 
 

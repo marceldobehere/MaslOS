@@ -1,40 +1,67 @@
 #pragma once
 
 #include "../../customClasses/list.h"
-//#include "../Window/window.h"  
-//#include "../../OSDATA/osdata.h" 
+//#include "../Window/window.h"
+//#include "../../OSDATA/osdata.h"
 #include "../../Cols.h"
 
 namespace WindowManager
 {
-    Window* getWindowAtMousePosition();
-    Window* getWindowAtMousePosition(int distance);
+    Window *getWindowAtMousePosition();
+    Window *getWindowAtMousePosition(int distance);
+
+    static struct _windowIconEnum
+    {
+        static const int 
+        CLOSE_N = 0,
+        CLOSE_S = 1,
+        CLOSE_H = 2,
+
+        MIN_N = 3,
+        MIN_S = 4,
+        MIN_H = 5,
+
+        HIDE_N = 6,
+        HIDE_S = 7,
+        HIDE_H = 8;
+
+    } windowIconEnum;
+
+    static const int countOfIcons = 9;
+
+    static const char* const windowIconNames[countOfIcons] = {
+        "close_n.mbif", "close_s.mbif", "close_h.mbif", 
+        "min_n.mbif",   "min_s.mbif",   "min_h.mbif", 
+        "hide_n.mbif",  "hide_s.mbif",  "hide_h.mbif"
+    };
+
+    extern kernelFiles::ImageFile* windowIcons[];
 
     class WindowPointerBufferThing
     {
-        private:
+    private:
+    public:
 
+        //static const char** windowIconNames = {"", ""};
+        
+        double fps;
+        uint32_t defaultColor = Colors.black;
+        uint32_t defaultBackgroundColor = defaultColor;
+        Framebuffer *actualScreenBuffer;
+        Framebuffer *copyOfScreenBuffer;
+        Framebuffer *background;
+        PointerFramebuffer *virtualScreenBuffer;
+        PointerFramebuffer *copyOfVirtualBuffer;
 
-        public:
-            double fps;
-            uint32_t defaultColor = Colors.black;
-            uint32_t defaultBackgroundColor = defaultColor;
-            Framebuffer* actualScreenBuffer;
-            Framebuffer* copyOfScreenBuffer;
-            Framebuffer* background;
-            PointerFramebuffer* virtualScreenBuffer;
-            PointerFramebuffer* copyOfVirtualBuffer;
+        WindowPointerBufferThing(Framebuffer *actualScreenBuffer, Framebuffer *background, uint32_t backgroundColor);
 
-            WindowPointerBufferThing(Framebuffer* actualScreenBuffer, Framebuffer* background, uint32_t backgroundColor);
-
-            //uint32_t* GetPixelAt(int x, int y);
-            void UpdatePointerRect(int x1, int y1, int x2, int y2);
-            void RenderWindow(Window* window);
-            void RenderWindowRect(Window* window, int x1, int y1, int x2, int y2);
-            void RenderWindows();
-            void Clear();
-            void Render();
-            void UpdateWindowBorder(Window* window);
-
-    };  
+        // uint32_t* GetPixelAt(int x, int y);
+        void UpdatePointerRect(int x1, int y1, int x2, int y2);
+        void RenderWindow(Window *window);
+        void RenderWindowRect(Window *window, int x1, int y1, int x2, int y2);
+        void RenderWindows();
+        void Clear();
+        void Render();
+        void UpdateWindowBorder(Window *window);
+    };
 }

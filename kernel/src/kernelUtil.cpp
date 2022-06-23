@@ -180,8 +180,18 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     initUsers();
 
+    osData.windowIconsZIP = bootInfo->windowIconZIP;
     PrepareWindows(kernelFiles::ConvertImageToFramebuffer(bootInfo->bgImage));
 
+    for (int i = 0; i < WindowManager::countOfIcons; i++)
+    {
+        //osData.debugTerminalWindow->Log("Loading Window {}.", to_string(i), Colors.yellow);
+        //osData.debugTerminalWindow->Log("- Name: \"{}\"", WindowManager::windowIconNames[i], Colors.yellow);
+        WindowManager::windowIcons[i] = kernelFiles::ConvertFileToImage(kernelFiles::ZIP::GetFileFromFileName(osData.windowIconsZIP, WindowManager::windowIconNames[i]));
+        //osData.debugTerminalWindow->Log("- ADDR 1: {}", ConvertHexToString((uint64_t)WindowManager::windowIcons[i]), Colors.yellow);
+        //osData.debugTerminalWindow->Log("- Width:  {}px", to_string(WindowManager::windowIcons[i]->width), Colors.yellow);
+        //osData.debugTerminalWindow->Log("- Height: {}px", to_string(WindowManager::windowIcons[i]->height), Colors.yellow);
+    }
     
 
     bootInfo->rsdp = (ACPI::RSDP2*)((uint64_t)bootInfo->rsdp + 20); //idk why but this is very important unless ya want the whole os to crash on boot

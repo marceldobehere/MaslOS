@@ -30,15 +30,17 @@ extern "C" void _start(BootInfo* bootInfo)
     
     osData.drawBackground = true;
     
-    GlobalRenderer->Clear(Colors.black);
+
+    //GlobalRenderer->Clear(Colors.black);
+    
     // {
     //     int xdiff = 20;
     
-    //     GlobalRenderer->Println("Filecount: {}\n", to_string(bootInfo->mouseZIP->fileCount), Colors.yellow);
+    //     GlobalRenderer->Println("Filecount: {}\n", to_string(bootInfo->windowIconZIP->fileCount), Colors.yellow);
     //     int ydiff = GlobalRenderer->CursorPosition.y + 10;
-    //     for (int i = 0; i < bootInfo->mouseZIP->fileCount; i++)
+    //     for (int i = 0; i < bootInfo->windowIconZIP->fileCount; i++)
     //     {
-    //         kernelFiles::ImageFile* image = kernelFiles::ConvertFileToImage(&bootInfo->mouseZIP->files[i]);
+    //         kernelFiles::ImageFile* image = kernelFiles::ConvertFileToImage(&bootInfo->windowIconZIP->files[i]);
     //         GlobalRenderer->DrawImage(image, xdiff, ydiff, 1, 1);
     //         //GlobalRenderer->DrawImage(image, xdiff + image->xOff, ydiff + image->yOff + 20, 1, 1);
     //         xdiff += image->width + 20;

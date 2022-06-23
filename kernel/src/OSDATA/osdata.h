@@ -14,6 +14,7 @@ struct OSData
     bool exit;
     KernelInfo* kernelInfo;
     List<Window*> windows;
+    kernelFiles::ZIPFile* windowIconsZIP;
     Window* realMainWindow;
     Window* realMainWindow2;
     Window* mainTerminalWindow;
