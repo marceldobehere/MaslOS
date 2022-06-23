@@ -1,6 +1,7 @@
 #include "kernelFiles.h"
 #include "../OSDATA/MStack/MStackM.h"
 
+
 namespace kernelFiles
 {
     ImageFile* ConvertFileToImage(DefaultFile* File)
@@ -37,5 +38,20 @@ namespace kernelFiles
 
         RemoveFromStack();
         return image;
+    }
+
+
+    Framebuffer* ConvertImageToFramebuffer(ImageFile* image)
+    {
+        Framebuffer* fb = (Framebuffer*)malloc(sizeof(Framebuffer));
+
+        fb->Width = image->width;
+        fb->Height = image->height;
+        fb->BaseAddress = image->imageBuffer;
+        fb->BufferSize = image->size;
+        fb->PixelsPerScanLine = 4;
+
+
+        return fb;
     }
 }

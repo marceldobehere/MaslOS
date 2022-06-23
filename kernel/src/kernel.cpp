@@ -28,7 +28,7 @@ extern "C" void _start(BootInfo* bootInfo)
     Window* realMainWindow = osData.realMainWindow;
     Window* realMainWindow2 = osData.realMainWindow2;
     
-    osData.drawBackground = false;
+    osData.drawBackground = true;
     
     GlobalRenderer->Clear(Colors.black);
     // {
@@ -116,6 +116,7 @@ extern "C" void _start(BootInfo* bootInfo)
     osData.windowPointerThing->Clear();
     osData.windowPointerThing->RenderWindows();
     bool updateBorder = true;
+    bool bgm = osData.drawBackground;
     int frame = 0;
     double oldTime = PIT::TimeSinceBoot;
     double fps = 1;
@@ -128,6 +129,12 @@ extern "C" void _start(BootInfo* bootInfo)
             fps = (frame - 1) / (currTime - oldTime);
             oldTime = currTime;
             frame = 0;
+        }
+
+        if (bgm != osData.drawBackground)
+        {
+            osData.windowPointerThing->RenderWindows();
+            bgm = osData.drawBackground;
         }
 
         // if (osData.drawBackground)

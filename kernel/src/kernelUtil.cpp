@@ -105,13 +105,13 @@ void PrepareInterrupts()
 }
 
 
-void PrepareWindows()
+void PrepareWindows(Framebuffer* img)
 {
     VirtualRenderer::psf1_font = GlobalRenderer->psf1_font;
 
     osData.windows = List<Window*>();
     osData.windowPointerThing = (WindowManager::WindowPointerBufferThing*)malloc(sizeof(WindowManager::WindowPointerBufferThing));
-    *osData.windowPointerThing = WindowManager::WindowPointerBufferThing(GlobalRenderer->framebuffer, NULL, Colors.blue);
+    *osData.windowPointerThing = WindowManager::WindowPointerBufferThing(GlobalRenderer->framebuffer, img, Colors.blue);
 
     Window* realMainWindow;
     {
@@ -180,7 +180,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     initUsers();
 
-    PrepareWindows();
+    PrepareWindows(kernelFiles::ConvertImageToFramebuffer(bootInfo->bgImage));
 
     
 

@@ -115,25 +115,25 @@ namespace WindowManager
         ClearPointerBuffer(copyOfVirtualBuffer, &defaultBackgroundColor);
     }   
 
-    uint32_t* WindowPointerBufferThing::GetPixelAt(int x, int y)
-    {
-        for (int i = osData.windows.getCount() - 1; i >= 0; i--)
-        {
-            Window* window = osData.windows[i];
+    // uint32_t* WindowPointerBufferThing::GetPixelAt(int x, int y)
+    // {
+    //     for (int i = osData.windows.getCount() - 1; i >= 0; i--)
+    //     {
+    //         Window* window = osData.windows[i];
 
-            if (x >= window->position.x && y >= window->position.y && x < window->position.x + window->size.width && y < window->position.y + window->size.height)
-            {
-                int subX = x - window->position.x;
-                int subY = y - window->position.y;
+    //         if (x >= window->position.x && y >= window->position.y && x < window->position.x + window->size.width && y < window->position.y + window->size.height)
+    //         {
+    //             int subX = x - window->position.x;
+    //             int subY = y - window->position.y;
 
-                return &((uint32_t*)window->framebuffer->BaseAddress)[subX + subY * window->framebuffer->Width];
-            }
-        }
+    //             return &((uint32_t*)window->framebuffer->BaseAddress)[subX + subY * window->framebuffer->Width];
+    //         }
+    //     }
 
 
 
-        return &defaultBackgroundColor;
-    }
+    //     return &defaultBackgroundColor;
+    // }
 
     void WindowPointerBufferThing::UpdatePointerRect(int x1, int y1, int x2, int y2)
     {
@@ -163,12 +163,25 @@ namespace WindowManager
         }
 
 
-        for (int y = y1; y <= y2; y++)
-            for (int x = x1; x <= x2; x++)
-            {
-                int64_t index = x + y * virtualScreenBuffer->Width; 
-                (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = &defaultBackgroundColor;
-            }
+        if (osData.drawBackground)
+        {
+            for (int y = y1; y <= y2; y++)
+                for (int x = x1; x <= x2; x++)
+                {
+                    int64_t index = x + y * virtualScreenBuffer->Width;
+                    int64_t index2 = ((x * background->Width)/virtualScreenBuffer->Width) + (((y * background->Height)/virtualScreenBuffer->Height)*background->Width);
+                    (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = &((uint32_t*)background->BaseAddress)[index2];//&defaultBackgroundColor;
+                }
+        }
+        else
+        {
+            for (int y = y1; y <= y2; y++)
+                for (int x = x1; x <= x2; x++)
+                {
+                    int64_t index = x + y * virtualScreenBuffer->Width;
+                    (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = &defaultBackgroundColor;
+                }
+        }
         
 
         int count = osData.windows.getCount();
@@ -472,8 +485,9 @@ if (window != NULL)
 
     void WindowPointerBufferThing::RenderWindows()
     {
-        for (int i = 0; i < osData.windows.getCount(); i++)
-            RenderWindow(osData.windows[i]);
+        UpdatePointerRect(0, 0, virtualScreenBuffer->Width - 1, virtualScreenBuffer->Height - 1);
+        //for (int i = 0; i < osData.windows.getCount(); i++)
+        //    RenderWindow(osData.windows[i]);
     } 
 
     void WindowPointerBufferThing::Render()

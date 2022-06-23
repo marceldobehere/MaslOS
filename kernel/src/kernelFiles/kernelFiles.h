@@ -3,10 +3,12 @@
 #include "FileStruct.h"
 #include "ImageStruct.h"
 #include "../memory/heap.h"
+#include "../Framebuffer.h"
 
 namespace kernelFiles
 {
     ImageFile* ConvertFileToImage(DefaultFile* File);
+	Framebuffer* ConvertImageToFramebuffer(ImageFile* image);
 }
 
 
