@@ -403,6 +403,7 @@ typedef struct
 	ImageFile* bgImage;
 	ImageFile* testImage;
 	ZIPFile* mouseZIP;
+	ZIPFile* windowIconZIP;
 	EFI_MEMORY_DESCRIPTOR* mMap;
 	UINTN mMapSize;
 	UINTN mMapDescSize;
@@ -571,6 +572,17 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 		Print(L"Mouse ZIP loaded. Char size: %d\n\r", (mouseZIP->size));
 	}
 
+	ZIPFile* windowZIP = LoadZIP(NULL, L"window-icons.mbzf", ImageHandle, SystemTable);
+
+	if (windowZIP== NULL)
+	{
+		Print(L"Mouse ZIP was not loaded!\n\r");
+	}
+	else
+	{
+		Print(L"Mouse ZIP loaded. Char size: %d\n\r", (windowZIP->size));
+	}
+
 
 	EFI_MEMORY_DESCRIPTOR* Map = NULL;
 	UINTN MapSize, MapKey;
@@ -613,6 +625,7 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 	bootInfo.testImage = image;
 	bootInfo.bgImage = bgImage;
 	bootInfo.mouseZIP = mouseZIP;
+	bootInfo.windowIconZIP = windowZIP;
 	bootInfo.rsdp = rsdp;
 
 

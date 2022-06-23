@@ -16,6 +16,7 @@ struct BootInfo
     kernelFiles::ImageFile* bgImage;
     kernelFiles::ImageFile* testImage;
     kernelFiles::ZIPFile* mouseZIP;
+	kernelFiles::ZIPFile* windowIconZIP;
 	EFI_MEMORY_DESCRIPTOR* mMap;
 	uint64_t mMapSize;
 	uint64_t mMapDescSize;
