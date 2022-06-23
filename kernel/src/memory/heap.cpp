@@ -6,6 +6,7 @@
 
 const uint32_t HeapMagicNum = 2406789212;
 
+int64_t heapCount = 0;
 void* heapStart;
 void* heapEnd;
 HeapSegHdr* lastHdr;
@@ -42,6 +43,7 @@ void HeapSegHdr::CombineForward()
     length = length + next->length + sizeof(HeapSegHdr);
     //GlobalRenderer->Print("-");
     next = next->next;
+    heapCount--;
     //GlobalRenderer->Print(">");
     RemoveFromStack();
 }
@@ -110,6 +112,7 @@ HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
     if (lastHdr == this) 
         lastHdr = newSplitHdr;
     //GlobalRenderer->Println("Split successful!");
+    heapCount++;
 
     RemoveFromStack();
     RemoveFromStack();
@@ -149,6 +152,7 @@ void InitializeHeap(void* heapAddress, size_t pageCount)
     startSeg->free = true;
     startSeg->magicNum = HeapMagicNum;
     lastHdr = startSeg;
+    heapCount = 1;
 
     RemoveFromStack();
 }
@@ -287,5 +291,6 @@ void ExpandHeap(size_t length)
     newSegment->next = NULL;
     newSegment->length = length - sizeof(HeapSegHdr);
     newSegment->CombineBackward();
+    heapCount++;
     RemoveFromStack();
 }

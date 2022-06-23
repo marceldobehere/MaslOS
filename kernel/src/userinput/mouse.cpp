@@ -253,7 +253,14 @@ void DrawMousePointerNew(MPoint point, PointerFramebuffer* framebuffer)
         if (!StrEquals(oldMouseImageName, currentMouseImageName))
         {
             oldMouseImageName = currentMouseImageName;
+            kernelFiles::ImageFile* oldMouseImage = currentMouseImage;
             currentMouseImage = kernelFiles::ConvertFileToImage(kernelFiles::ZIP::GetFileFromFileName(mouseZIP, currentMouseImageName));
+            
+            if (oldMouseImage != NULL)
+            {
+                free(oldMouseImage->imageBuffer);
+                free(oldMouseImage);
+            }
         }
     }
 
@@ -341,6 +348,7 @@ void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName)
     IMousePosition.y = 50;
     MousePosition.x = 50;
     MousePosition.y = 50;
+    currentMouseImage = NULL;
     //SaveIntoBuffer(IMousePosition, GlobalRenderer->framebuffer);
     DrawMousePointer();
 
@@ -473,13 +481,13 @@ void HandleHold(bool L, bool R, bool M)
                     if (activeDrag[0])
                     {
                         window->newSize.width -= (MousePosition.x - diff.x);
-                        if (window->newSize.width >= 10)
+                        if (window->newSize.width >= 80)
                             window->newPosition.x += (MousePosition.x - diff.x);
                     }
                     if (activeDrag[1])
                     {
                         window->newSize.height -= (MousePosition.y - diff.y);
-                        if (window->newSize.height >= 10)
+                        if (window->newSize.height >= 20)
                             window->newPosition.y += (MousePosition.y - diff.y);
                     }
                     if (activeDrag[2])

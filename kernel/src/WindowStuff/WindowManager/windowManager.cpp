@@ -90,6 +90,15 @@ namespace WindowManager
             copyOfVirtualBuffer->BaseAddress = malloc(copyOfVirtualBuffer->BufferSize);
         }
 
+        {
+            taskbar = (Framebuffer*)malloc(sizeof(Framebuffer));
+            taskbar->Width = actualScreenBuffer->Width;
+            taskbar->Height = 40;
+            taskbar->PixelsPerScanLine = 4;
+            taskbar->BufferSize = taskbar->Height * taskbar->Width * taskbar->PixelsPerScanLine;
+            taskbar->BaseAddress = malloc(taskbar->BufferSize);
+        }
+
         Clear();
 
     }
@@ -112,6 +121,7 @@ namespace WindowManager
     {
         ClearFrameBuffer(actualScreenBuffer, defaultBackgroundColor);
         ClearFrameBuffer(copyOfScreenBuffer, defaultBackgroundColor);
+        ClearFrameBuffer(taskbar, defaultTaskbarBackgroundColor);
 
         ClearPointerBuffer(virtualScreenBuffer, &defaultBackgroundColor);
         ClearPointerBuffer(copyOfVirtualBuffer, &defaultBackgroundColor);
@@ -136,6 +146,45 @@ namespace WindowManager
 
     //     return &defaultBackgroundColor;
     // }
+
+    void WindowPointerBufferThing::DrawBGandTaskbarRect(int x1, int y1, int x2, int y2)
+    {
+        if (osData.drawBackground)
+        {
+            for (int y = y1; y <= y2; y++)
+                for (int x = x1; x <= x2; x++)
+                {
+                    int64_t index = x + y * virtualScreenBuffer->Width;
+                    int64_t index2 = ((x * background->Width)/virtualScreenBuffer->Width) + (((y * background->Height)/virtualScreenBuffer->Height)*background->Width);
+                    (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = &((uint32_t*)background->BaseAddress)[index2];//&defaultBackgroundColor;
+                }
+        }
+        else
+        {
+            for (int y = y1; y <= y2; y++)
+                for (int x = x1; x <= x2; x++)
+                {
+                    int64_t index = x + y * virtualScreenBuffer->Width;
+                    (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = &defaultBackgroundColor;
+                }
+        }
+
+        int64_t ypos = virtualScreenBuffer->Height - taskbar->Height;
+
+        if (y2 < ypos)
+            return;
+        if (y1 < ypos)
+            y1 = ypos;
+
+        for (int y = y1; y <= y2; y++)
+            for (int x = x1; x <= x2; x++)
+            {
+                int64_t index = x + y * virtualScreenBuffer->Width;
+                int64_t index2 = x + (y-ypos) * virtualScreenBuffer->Width;
+                (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = &((uint32_t*)taskbar->BaseAddress)[index2];//&defaultBackgroundColor;
+            }
+    }
+
 
     void WindowPointerBufferThing::UpdatePointerRect(int x1, int y1, int x2, int y2)
     {
@@ -165,25 +214,7 @@ namespace WindowManager
         }
 
 
-        if (osData.drawBackground)
-        {
-            for (int y = y1; y <= y2; y++)
-                for (int x = x1; x <= x2; x++)
-                {
-                    int64_t index = x + y * virtualScreenBuffer->Width;
-                    int64_t index2 = ((x * background->Width)/virtualScreenBuffer->Width) + (((y * background->Height)/virtualScreenBuffer->Height)*background->Width);
-                    (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = &((uint32_t*)background->BaseAddress)[index2];//&defaultBackgroundColor;
-                }
-        }
-        else
-        {
-            for (int y = y1; y <= y2; y++)
-                for (int x = x1; x <= x2; x++)
-                {
-                    int64_t index = x + y * virtualScreenBuffer->Width;
-                    (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = &defaultBackgroundColor;
-                }
-        }
+        DrawBGandTaskbarRect(x1, y1, x2, y2);
         
 
         int count = osData.windows.getCount();
@@ -288,7 +319,7 @@ namespace WindowManager
             int64_t y = window->position.y- 21;
             VirtualRenderer::Clear(x,y, x + window->size.width-1, window->position.y-2, VirtualRenderer::Border(_x1, _y1, _x2, _y2), virtualScreenBuffer, &window->defaultTitleBackgroundColor);
 
-            const char* stitle = StrSubstr(window->title, 0, (window->size.width - 50) / 10);
+            const char* stitle = StrSubstr(window->title, 0, (window->size.width - 60) / 10);
 
 
             // if (window->instance != NULL)
@@ -360,7 +391,36 @@ namespace WindowManager
             int64_t y = window->position.y - 22;
 
             
-            VirtualRenderer::DrawImage(windowIcons[windowIconEnum.CLOSE_H], x - 20, y + 2, 1, 1, border, virtualScreenBuffer);
+            {
+                int state = 0;
+                if (activeWindow == window)
+                    state = 1;
+                if (MousePosition.x >= x - 20 && MousePosition.x <= x && MousePosition.y >= y && MousePosition.y <= y + 20)
+                    state = 2;
+
+                VirtualRenderer::DrawImage(windowIcons[windowIconEnum.CLOSE_N + state], x - 20, y + 1, 1, 1, border, virtualScreenBuffer);
+                x -= 20;
+            }
+            {
+                int state = 0;
+                if (activeWindow == window)
+                    state = 1;
+                if (MousePosition.x >= x - 20 && MousePosition.x <= x && MousePosition.y >= y && MousePosition.y <= y + 20)
+                    state = 2;
+
+                VirtualRenderer::DrawImage(windowIcons[windowIconEnum.MIN_N + state], x - 20, y + 1, 1, 1, border, virtualScreenBuffer);
+                x -= 20;
+            }
+            {
+                int state = 0;
+                if (activeWindow == window)
+                    state = 1;
+                if (MousePosition.x >= x - 20 && MousePosition.x <= x && MousePosition.y >= y && MousePosition.y <= y + 20)
+                    state = 2;
+
+                VirtualRenderer::DrawImage(windowIcons[windowIconEnum.HIDE_N + state], x - 20, y + 1, 1, 1, border, virtualScreenBuffer);
+                x -= 20;
+            }
 
             
         }
@@ -530,24 +590,41 @@ if (window != NULL)
     void WindowPointerBufferThing::Render()
     {
         uint64_t counta = 0;
-        uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress;
-        uint32_t*  aPixel = (uint32_t*) actualScreenBuffer->BaseAddress;
-        uint32_t*  cPixel = (uint32_t*) copyOfScreenBuffer->BaseAddress;
 
-        int64_t count = actualScreenBuffer->Height*actualScreenBuffer->Width;
-        for (int64_t i = 0; i < count; i++)
+        // {
+        //     uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress;
+        //     vPixel += (actualScreenBuffer->Height - taskbar->Height) * actualScreenBuffer->Width;
+        //     uint32_t*  tPixel = (uint32_t*) taskbar->BaseAddress;
+
+        //     int64_t count = taskbar->Height*actualScreenBuffer->Width;
+        //     for (int64_t i = 0; i < count; i++)
+        //     {
+        //         *vPixel = tPixel;
+        //         vPixel++;
+        //     }
+        // }
+
         {
-            uint32_t col = **vPixel;
-            if (*cPixel != col)
+            uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress;
+            uint32_t*  aPixel = (uint32_t*) actualScreenBuffer->BaseAddress;
+            uint32_t*  cPixel = (uint32_t*) copyOfScreenBuffer->BaseAddress;
+
+            int64_t count = actualScreenBuffer->Height*actualScreenBuffer->Width;
+            for (int64_t i = 0; i < count; i++)
             {
-                *cPixel = col;
-                *aPixel = col;//counta + 0xff111111;
-                counta++;
+                uint32_t col = **vPixel;
+                if (*cPixel != col)
+                {
+                    *cPixel = col;
+                    *aPixel = col;//counta + 0xff111111;
+                    counta++;
+                }
+                vPixel++;
+                aPixel++;
+                cPixel++;
             }
-            vPixel++;
-            aPixel++;
-            cPixel++;
         }
+
 
         //osData.debugTerminalWindow->Log("             : ################", Colors.black);
         osData.debugTerminalWindow->renderer->Clear(
@@ -566,8 +643,17 @@ if (window != NULL)
             Colors.black);
         osData.debugTerminalWindow->Log("FPS: {}", to_string(fps), Colors.yellow);
 
+
+        osData.debugTerminalWindow->renderer->Clear(
+            osData.debugTerminalWindow->renderer->CursorPosition.x,
+            osData.debugTerminalWindow->renderer->CursorPosition.y,
+            osData.debugTerminalWindow->renderer->CursorPosition.x + 200,
+            osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
+            Colors.black);
+        osData.debugTerminalWindow->Log("Heap count: {}", to_string(heapCount), Colors.yellow);
+
         osData.debugTerminalWindow->renderer->CursorPosition.x = 0;
-        osData.debugTerminalWindow->renderer->CursorPosition.y -= 32;
+        osData.debugTerminalWindow->renderer->CursorPosition.y -= 48;
         
     }
 

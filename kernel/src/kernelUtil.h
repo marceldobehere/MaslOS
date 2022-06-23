@@ -62,6 +62,8 @@ struct KernelInfo
 
 #include "VirtualRenderer.h"
 
+#include "WindowStuff/Taskbar/taskbar.h"
+
 void PrepareACPI(BootInfo* bootInfo);
 
 //extern KernelInfo kernelInfo;

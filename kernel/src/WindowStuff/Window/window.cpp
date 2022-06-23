@@ -20,7 +20,7 @@ Window::Window(DefaultInstance* instance, Size size, Position position, BasicRen
     this->selectedBorderColor = Colors.bgreen;
     this->defaultTitleColor = Colors.gray;
     this->selectedTitleColor = Colors.white;
-    this->defaultTitleBackgroundColor = Colors.dgray;
+    this->defaultTitleBackgroundColor = 0xff555555;
     allowKeyboardDrawing = true;
     this->title = title;
     moveToFront = false;

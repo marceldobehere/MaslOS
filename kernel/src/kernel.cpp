@@ -249,8 +249,9 @@ extern "C" void _start(BootInfo* bootInfo)
         MPoint mPos = MousePosition;
         DrawMousePointer2(osData.windowPointerThing->virtualScreenBuffer, mPos);
         osData.windowPointerThing->fps = fps;
+        Taskbar::RenderTaskbar();
         osData.windowPointerThing->Render();
-        osData.windowPointerThing->UpdatePointerRect(mPos.x - 16, mPos.y - 16, mPos.x + 16, mPos.y + 16);
+        osData.windowPointerThing->UpdatePointerRect(mPos.x - 32, mPos.y - 32, mPos.x + 32, mPos.y + 32);
 
 
         //double endTime = PIT::TimeSinceBoot + 0.02;

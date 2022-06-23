@@ -28,3 +28,5 @@ void _free(void* address);
 void ExpandHeap(size_t length);
 
 extern void* heapStart;
+
+extern int64_t heapCount;

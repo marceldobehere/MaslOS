@@ -47,15 +47,18 @@ namespace WindowManager
         double fps;
         uint32_t defaultColor = Colors.black;
         uint32_t defaultBackgroundColor = defaultColor;
+        uint32_t defaultTaskbarBackgroundColor = Colors.dblue;
         Framebuffer *actualScreenBuffer;
         Framebuffer *copyOfScreenBuffer;
         Framebuffer *background;
+        Framebuffer *taskbar;
         PointerFramebuffer *virtualScreenBuffer;
         PointerFramebuffer *copyOfVirtualBuffer;
 
         WindowPointerBufferThing(Framebuffer *actualScreenBuffer, Framebuffer *background, uint32_t backgroundColor);
 
         // uint32_t* GetPixelAt(int x, int y);
+        void DrawBGandTaskbarRect(int x1, int y1, int x2, int y2);
         void UpdatePointerRect(int x1, int y1, int x2, int y2);
         void RenderWindow(Window *window);
         void RenderWindowRect(Window *window, int x1, int y1, int x2, int y2);

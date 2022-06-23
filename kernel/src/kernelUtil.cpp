@@ -193,6 +193,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
         //osData.debugTerminalWindow->Log("- Height: {}px", to_string(WindowManager::windowIcons[i]->height), Colors.yellow);
     }
     
+    Taskbar::InitTaskbar();
 
     bootInfo->rsdp = (ACPI::RSDP2*)((uint64_t)bootInfo->rsdp + 20); //idk why but this is very important unless ya want the whole os to crash on boot
 
