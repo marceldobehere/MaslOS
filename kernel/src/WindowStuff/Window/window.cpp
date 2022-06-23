@@ -235,11 +235,11 @@ void Window::Render()
 void Window::Resize(Size _newSize)
 {
     AddToStack("Resize", "WindowStuff/Window/window.cpp");
-    if (_newSize.height < 10)
-        _newSize.height = 10;
+    if (_newSize.height < 20)
+        _newSize.height = 20;
 
-    if (_newSize.width < 10)
-        _newSize.width = 10;
+    if (_newSize.width < 80)
+        _newSize.width = 80;
 
     //this->newSize = _newSize;
 

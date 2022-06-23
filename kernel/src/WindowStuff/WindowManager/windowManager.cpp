@@ -286,7 +286,7 @@ namespace WindowManager
             int64_t y = window->position.y- 21;
             VirtualRenderer::Clear(x,y, x + window->size.width-1, window->position.y-2, VirtualRenderer::Border(_x1, _y1, _x2, _y2), virtualScreenBuffer, &window->defaultTitleBackgroundColor);
 
-            const char* stitle = StrSubstr(window->title, 0, window->size.width / 10);
+            const char* stitle = StrSubstr(window->title, 0, (window->size.width - 50) / 10);
 
 
             // if (window->instance != NULL)
@@ -352,7 +352,17 @@ namespace WindowManager
             } 
         }
 
+        {
+            VirtualRenderer::Border border = VirtualRenderer::Border(_x1, _y1, _x2, _y2);
+            int64_t x = window->position.x + window->size.width;
+            //uint32_t col = Colors.bred;
+            //VirtualRenderer::DrawLine(_x1 + 5, _y1 + 5, _x1 + 20, _y1 + 10, border, virtualScreenBuffer,  &window->defaultBorderColor);
+            //VirtualRenderer::DrawLine(_x1 + 5, _y1 + 10, _x1 + 1, _y1 + 11, border, virtualScreenBuffer, &window->selectedBorderColor);
+            //VirtualRenderer::DrawLine(_x1 + 5, _y1 + 14, _x1 + 8, _y1 + 17, border, virtualScreenBuffer, &window->selectedBorderColor);
+            //VirtualRenderer::DrawLine(_x1 + 5, _y1 + 18, _x1 + 6, _y1 + 25, border, virtualScreenBuffer, &window->defaultBorderColor);
+            
 
+        }
 
 
 

@@ -36,5 +36,6 @@ namespace VirtualRenderer
     void putStr(const char *chrs, int64_t xoff, int64_t yoff, Border border, PointerFramebuffer* framebuffer, uint32_t* col);
 
     void putChar(char chr, int64_t xoff, int64_t yoff, Border border, PointerFramebuffer* framebuffer, uint32_t* col);
-    
+
+    void DrawLine(int64_t x1, int64_t y1, int64_t x2, int64_t y2, Border border, PointerFramebuffer* framebuffer, uint32_t* col);
 }

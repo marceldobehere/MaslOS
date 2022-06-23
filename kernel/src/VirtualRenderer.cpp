@@ -1,4 +1,6 @@
 #include "VirtualRenderer.h"
+#include "OSDATA/MStack/MStackM.h"
+
 
 namespace VirtualRenderer
 {
@@ -94,4 +96,69 @@ namespace VirtualRenderer
         }
     }
 
+
+    void DrawLine(int64_t x1, int64_t y1, int64_t x2, int64_t y2, Border border, PointerFramebuffer* framebuffer, uint32_t* col)
+    {
+        AddToStack("DrawLine", "VirtualRenderer.cpp");
+        uint64_t fbBase = (uint64_t)framebuffer->BaseAddress;
+        uint64_t fbWidth = framebuffer->Width;
+        uint64_t fbHeight = framebuffer->Height;
+
+        if (x1 > x2)
+        {
+            int64_t t = x1;
+            x1 = x2;
+            x2 = t;
+        }
+
+        if (y1 > y2)
+        {
+            //(y1, y2) = (y2, y1);
+            int64_t t = y1;
+            y1 = y2;
+            y2 = t;
+        }
+
+        int64_t xdiff = (x2-x1) + 1;
+        int64_t ydiff = (y2-y1) + 1;
+
+        if (xdiff > ydiff)
+        {
+            for (int64_t x = x1; x <= x2; x++)
+            {
+                int64_t y = y1 + ((x-x1)*(ydiff))/(xdiff);
+
+                if (x >= border.x1 && x <= border.x2 && y >= border.y1 && y <= border.y2)
+                    ((uint32_t**)fbBase)[x + y * fbWidth] = (uint32_t*)col;
+            }
+        }
+        else if (xdiff < ydiff)
+        {
+            //int64_t step = (ydiff+1)/(xdiff+1);
+            //osData.debugTerminalWindow->Log("1");
+            //osData.debugTerminalWindow->Log("XDIFF: {}", to_string(xdiff), Colors.yellow);
+            //osData.debugTerminalWindow->Log("YDIFF: {}", to_string(ydiff), Colors.yellow);
+            //osData.debugTerminalWindow->Log("STEP:  {}", to_string(step), Colors.yellow);
+
+
+            for (int64_t y = y1; y <= y2; y++)
+            {
+                int64_t x = x1 + ((y-y1)*(xdiff))/(ydiff);
+
+                if (x >= border.x1 && x <= border.x2 && y >= border.y1 && y <= border.y2)
+                    ((uint32_t**)fbBase)[x + y * fbWidth] = (uint32_t*)col;
+            }
+        }
+        else
+        {
+            int64_t y = y1;
+            for (int64_t x = x1; x <= x2; x++)
+            {
+                if (x >= border.x1 && x <= border.x2 && y >= border.y1 && y <= border.y2)
+                    ((uint32_t**)fbBase)[x + y * fbWidth] = (uint32_t*)col;
+                y++;
+            } 
+        }
+        RemoveFromStack();
+    }
 }

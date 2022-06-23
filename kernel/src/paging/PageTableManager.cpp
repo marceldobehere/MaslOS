@@ -20,7 +20,7 @@ void PageTableManager::MapMemory(void* virtualMemory, void* physicalMemory)
         PDE.SetAddress((uint64_t)PDP >> 12);
         PDE.SetFlag(PT_Flag::Present, true);
         PDE.SetFlag(PT_Flag::ReadWrite, true);
-        PDE.SetFlag(PT_Flag::WriteThrough, true);
+        //PDE.SetFlag(PT_Flag::WriteThrough, true);
         PML4->entries[indexer.PDP_i] = PDE;
     }
     else
@@ -38,7 +38,7 @@ void PageTableManager::MapMemory(void* virtualMemory, void* physicalMemory)
         PDE.SetAddress((uint64_t)PD >> 12);
         PDE.SetFlag(PT_Flag::Present, true);
         PDE.SetFlag(PT_Flag::ReadWrite, true);
-        PDE.SetFlag(PT_Flag::WriteThrough, true);
+        //PDE.SetFlag(PT_Flag::WriteThrough, true);
         PDP->entries[indexer.PD_i] = PDE;
     }
     else
@@ -56,7 +56,7 @@ void PageTableManager::MapMemory(void* virtualMemory, void* physicalMemory)
         PDE.SetAddress((uint64_t)PT >> 12);
         PDE.SetFlag(PT_Flag::Present, true);
         PDE.SetFlag(PT_Flag::ReadWrite, true);
-        PDE.SetFlag(PT_Flag::WriteThrough, true);
+        //PDE.SetFlag(PT_Flag::WriteThrough, true);
         PD->entries[indexer.PT_i] = PDE;
     }
     else
@@ -70,7 +70,7 @@ void PageTableManager::MapMemory(void* virtualMemory, void* physicalMemory)
     PDE.SetAddress((uint64_t)physicalMemory >> 12);
     PDE.SetFlag(PT_Flag::Present, true);
     PDE.SetFlag(PT_Flag::ReadWrite, true);
-    PDE.SetFlag(PT_Flag::WriteThrough, true); // idk if this is a good idea
+    //PDE.SetFlag(PT_Flag::WriteThrough, true); // idk if this is a good idea
     PT->entries[indexer.P_i] = PDE;
 
 
