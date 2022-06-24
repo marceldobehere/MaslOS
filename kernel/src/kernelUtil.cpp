@@ -139,7 +139,7 @@ void PrepareWindows(Framebuffer* img)
         osData.showDebugterminal = true;
 
         osData.debugTerminalWindow->newPosition.x = GlobalRenderer->framebuffer->Width - (osData.debugTerminalWindow->size.width + 2);
-        osData.debugTerminalWindow->newPosition.y = 23;
+        osData.debugTerminalWindow->newPosition.y = 1;
 
         debugTerminalWindow->renderer->Clear(Colors.black);
         //KeyboardPrintStart(debugTerminalWindow);

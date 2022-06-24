@@ -688,6 +688,9 @@ if (window != NULL)
 
     void WindowPointerBufferThing::UpdateWindowBorder(Window* window)
     {
+        if (!window->showBorder)
+            return;
+
         int x1 = window->position.x;
         int y1 = window->position.y;
         int x2 = x1 + window->size.width;

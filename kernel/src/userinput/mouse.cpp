@@ -469,11 +469,11 @@ void HandleHold(bool L, bool R, bool M)
         Window* window = dragWindow;
         if (window != NULL)
         {
-            if (!startDrag)
+            if (!startDrag && window->moveable)
             {
                 startDrag = true;
             }
-            else
+            else if (startDrag)
             {
                 if (!activeDragOn)
                 {
