@@ -102,8 +102,8 @@ __attribute__((interrupt)) void MouseInt_handler(interrupt_frame* frame)
 __attribute__((interrupt)) void PITInt_handler(interrupt_frame* frame)
 { 
     AddToStack("PITInt_handler", "interrupts/interrupts.cpp");
-    PIC_EndMaster();
     PIT::Tick();
+    PIC_EndMaster();
     RemoveFromStack();
 }
 

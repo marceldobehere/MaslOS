@@ -22,6 +22,7 @@ namespace PIT
             divisor = 100;
 
         Divisor = divisor;
+        outb(0x43, 0x36);
         outb(0x40, (uint8_t)(divisor & 0x00ff));
         io_wait();
         outb(0x40, (uint8_t)((divisor & 0xff00) >> 8));

@@ -8,7 +8,7 @@ CC = gcc
 ASMC = nasm
 LD = ld
 
-CFLAGS = -ffreestanding -fshort-wchar -mno-red-zone -fno-omit-frame-pointer -O2
+CFLAGS = -ffreestanding -fshort-wchar -mno-red-zone -fno-omit-frame-pointer
 ASMFLAGS = 
 LDFLAGS = -T $(LDS) -static -Bsymbolic -nostdlib
 
@@ -36,12 +36,16 @@ $(OBJDIR)/interrupts/interrupts.o: $(SRCDIR)/interrupts/interrupts.cpp
 	$(CC) -mno-red-zone -mgeneral-regs-only -ffreestanding -fno-omit-frame-pointer -c $^ -o $@
 
 
+$(OBJDIR)/scheduling-pit/pit.o: $(SRCDIR)/scheduling-pit/pit.cpp
+	@ echo X==== COMPILING PIT $^
+	@ mkdir -p $(@D)
+	$(CC) $(CFLAGS) -c $^ -o $@
 
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@ echo !==== COMPILING $^
 	@ mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c $^ -o $@
+	$(CC) $(CFLAGS) -O2 -c $^ -o $@
 
 
 
@@ -79,6 +83,7 @@ buildimg:
 	mcopy -i $(BUILDDIR)/$(OSNAME).img src/external/background.mbif ::
 	mcopy -i $(BUILDDIR)/$(OSNAME).img src/external/mouse.mbzf ::
 	mcopy -i $(BUILDDIR)/$(OSNAME).img src/external/window-icons.mbzf ::
+	mcopy -i $(BUILDDIR)/$(OSNAME).img src/external/boot.mbif ::
 
 run:
 	qemu-system-x86_64 -machine q35 -drive file=$(BUILDDIR)/$(OSNAME).img -m 256M -cpu qemu64 -drive if=pflash,format=raw,unit=0,file="$(OVMFDIR)/OVMF_CODE-pure-efi.fd",readonly=on -drive if=pflash,format=raw,unit=1,file="$(OVMFDIR)/OVMF_VARS-pure-efi.fd" -net none

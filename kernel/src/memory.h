@@ -15,6 +15,7 @@ struct BootInfo
 	PSF1_FONT* psf1_font;
     kernelFiles::ImageFile* bgImage;
     kernelFiles::ImageFile* testImage;
+	kernelFiles::ImageFile* bootImage;
     kernelFiles::ZIPFile* mouseZIP;
 	kernelFiles::ZIPFile* windowIconZIP;
 	EFI_MEMORY_DESCRIPTOR* mMap;

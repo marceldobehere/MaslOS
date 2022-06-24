@@ -402,6 +402,7 @@ typedef struct
 	PSF1_FONT* psf1_font;
 	ImageFile* bgImage;
 	ImageFile* testImage;
+	ImageFile* bootImage;
 	ZIPFile* mouseZIP;
 	ZIPFile* windowIconZIP;
 	EFI_MEMORY_DESCRIPTOR* mMap;
@@ -528,60 +529,46 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 	// );
 
 	PSF1_FONT* newFont = LoadPSF1Font(NULL, L"zap-light16.psf", ImageHandle, SystemTable);
-
 	if (newFont == NULL)
-	{
 		Print(L"Font was not loaded!\n\r");
-	}
 	else
-	{
 		Print(L"Font loaded. Char size: %d\n\r", newFont->psf1_Header->charsize);
-	}
+
 
 	ImageFile* image = LoadImage(NULL, L"test.mbif", ImageHandle, SystemTable);
-
 	if (image == NULL)
-	{
 		Print(L"Image was not loaded!\n\r");
-	}
 	else
-	{
 		Print(L"Image loaded. Char size: %d\n\r", (image->height*image->width*4));
-	}
+
 
 	ImageFile* bgImage = LoadImage(NULL, L"background.mbif", ImageHandle, SystemTable);
-
 	if (bgImage == NULL)
-	{
-		Print(L"Image was not loaded!\n\r");
-	}
+		Print(L"Image was not loaded!\n\r");	
 	else
-	{
-		Print(L"Image loaded. Char size: %d\n\r", (image->height*image->width*4));
-	}
+		Print(L"Image loaded. Char size: %d\n\r", (bgImage->height*bgImage->width*4));
+	
+
+	ImageFile* bootImage = LoadImage(NULL, L"boot.mbif", ImageHandle, SystemTable);
+	if (bootImage == NULL)
+		Print(L"Image was not loaded!\n\r");	
+	else
+		Print(L"Image loaded. Char size: %d\n\r", (bootImage->height*bootImage->width*4));
 
 
 	ZIPFile* mouseZIP = LoadZIP(NULL, L"mouse.mbzf", ImageHandle, SystemTable);
-
 	if (mouseZIP == NULL)
-	{
 		Print(L"Mouse ZIP was not loaded!\n\r");
-	}
 	else
-	{
 		Print(L"Mouse ZIP loaded. Char size: %d\n\r", (mouseZIP->size));
-	}
+
 
 	ZIPFile* windowZIP = LoadZIP(NULL, L"window-icons.mbzf", ImageHandle, SystemTable);
-
 	if (windowZIP == NULL)
-	{
 		Print(L"Window Icon ZIP was not loaded!\n\r");
-	}
 	else
-	{
 		Print(L"Window Icon ZIP loaded. Char size: %d\n\r", (windowZIP->size));
-	}
+
 
 
 	EFI_MEMORY_DESCRIPTOR* Map = NULL;
@@ -623,6 +610,7 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 	bootInfo.mMapSize = MapSize;
 	bootInfo.mMapDescSize = DescriptorSize;
 	bootInfo.testImage = image;
+	bootInfo.bootImage = bootImage;
 	bootInfo.bgImage = bgImage;
 	bootInfo.mouseZIP = mouseZIP;
 	bootInfo.windowIconZIP = windowZIP;

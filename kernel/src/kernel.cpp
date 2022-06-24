@@ -31,6 +31,13 @@ extern "C" void _start(BootInfo* bootInfo)
     osData.drawBackground = true;
     
 
+    GlobalRenderer->Clear(Colors.black);
+    GlobalRenderer->DrawImage(bootInfo->bootImage, 0, 0, 1, 1);
+    PIT::Sleep(1000);
+    GlobalRenderer->Clear(Colors.black);
+
+//    while(true);
+
     //GlobalRenderer->Clear(Colors.black);
     
     // {
@@ -121,7 +128,7 @@ extern "C" void _start(BootInfo* bootInfo)
     double oldTime = PIT::TimeSinceBoot;
     double fps = 1;
     while(!osData.exit)
-    {  
+    {
         frame++;  
         if (frame >= 20)
         {
