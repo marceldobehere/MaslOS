@@ -19,7 +19,9 @@ namespace WindowManager
             Position br = Position(tl.x + osData.windows[i]->size.width, tl.y + osData.windows[i]->size.height);
             
             tl.x--;
-            tl.y -= 22;
+            tl.y--;
+            if (osData.windows[i]->showTitleBar)
+                tl.y -= 21;
             br.x++;
             br.y++;
 
@@ -314,6 +316,7 @@ namespace WindowManager
             return;
         }
 
+        if (window->showTitleBar)
         {
             int64_t x = window->position.x;
             int64_t y = window->position.y- 21;
@@ -340,7 +343,8 @@ namespace WindowManager
         }
 
 
-
+        
+        if (window->showBorder)
         {
             uint32_t** arr = ((uint32_t**)virtualScreenBuffer->BaseAddress);
             int64_t width = virtualScreenBuffer->Width;
@@ -361,16 +365,38 @@ namespace WindowManager
                 newY = window->size.height + window->position.y;
                 if (newX >= _x1 && newY >= _y1 && newX <= _x2 && newY <= _y2 && (counter % 2) == 0)
                     arr[newX + newY * width] = cBorder;
-
-                newY = -22 + window->position.y;
-                if (newX >= _x1 && newY >= _y1 && newX <= _x2 && newY <= _y2 && (counter % 2) == 0)
-                    arr[newX + newY * width] = cBorder;
+                
+                // if (window->showTitleBar)
+                // {
+                //     newY = -22 + window->position.y;
+                //     if (newX >= _x1 && newY >= _y1 && newX <= _x2 && newY <= _y2 && (counter % 2) == 0)
+                //         arr[newX + newY * width] = cBorder;
+                // }
             
                 counter++;
             }
 
+            if (window->showTitleBar)
+            {
+                counter = 0;
+                for (int64_t x = -1; x < window->size.width + 1; x++)
+                {
+                    int64_t newX = x + window->position.x;
+                    int64_t newY = -22 + window->position.y;
+                        
+                    if (newX >= _x1 && newY >= _y1 && newX <= _x2 && newY <= _y2 && (counter % 2) == 0)
+                        arr[newX + newY * width] = cBorder;
+                    
+                    counter++;
+                }  
+            }
+
+
             counter = 0;
-            for (int64_t y = -22; y < window->size.height; y++)
+            int64_t maxY = -22;
+            if (!window->showTitleBar)
+                maxY = -1;
+            for (int64_t y = maxY; y < window->size.height; y++)
             {
                 int64_t newX = window->size.width + window->position.x;
                 int64_t newY = y + window->position.y;
@@ -385,6 +411,8 @@ namespace WindowManager
             } 
         }
 
+        
+        if (window->showTitleBar)
         {
             VirtualRenderer::Border border = VirtualRenderer::Border(_x1, _y1, _x2, _y2);
             int64_t x = window->position.x + window->size.width;

@@ -5,7 +5,7 @@
 
 Window* activeWindow = NULL;
 
-Window::Window(DefaultInstance* instance, Size size, Position position, BasicRenderer* parentRenderer, const char* title)
+Window::Window(DefaultInstance* instance, Size size, Position position, const char* title, bool showTitleBar, bool showBorder, bool moveable)
 {
     AddToStack("Constructor", "WindowStuff/Window/window.cpp");
     this->instance = instance;
@@ -13,8 +13,8 @@ Window::Window(DefaultInstance* instance, Size size, Position position, BasicRen
     this->size = size;
     this->newPosition = position;
     this->newSize = size;
-    this->parentRenderer = parentRenderer;
-    this->parentFrameBuffer = parentRenderer->framebuffer;
+    //this->parentRenderer = parentRenderer;
+    //this->parentFrameBuffer = parentRenderer->framebuffer;
     //this->borderColor = Colors.gray;
     this->defaultBorderColor = Colors.gray;
     this->selectedBorderColor = Colors.bgreen;
@@ -24,6 +24,9 @@ Window::Window(DefaultInstance* instance, Size size, Position position, BasicRen
     allowKeyboardDrawing = true;
     this->title = title;
     moveToFront = false;
+    this->showBorder = showBorder;
+    this->showTitleBar = showTitleBar;
+    this->moveable = moveable;
 
     {
         framebuffer = (Framebuffer*)malloc(sizeof(Framebuffer));
@@ -226,7 +229,7 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size)
 */
 
 
-void Window::Render()
+void Window::RenderDeprecated()
 {
     Render(framebuffer, parentFrameBuffer, position, size, this);
 }

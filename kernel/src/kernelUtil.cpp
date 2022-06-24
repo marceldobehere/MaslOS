@@ -113,26 +113,26 @@ void PrepareWindows(Framebuffer* img)
     osData.windowPointerThing = (WindowManager::WindowPointerBufferThing*)malloc(sizeof(WindowManager::WindowPointerBufferThing));
     *osData.windowPointerThing = WindowManager::WindowPointerBufferThing(GlobalRenderer->framebuffer, img, Colors.blue);
 
-    Window* realMainWindow;
-    {
-        realMainWindow = (Window*)malloc(sizeof(Window));
-        *(realMainWindow) = Window(NULL, Size(GlobalRenderer->framebuffer->Width, GlobalRenderer->framebuffer->Height), Position(0, 0), GlobalRenderer, "Real Main Window");
-        osData.realMainWindow = realMainWindow;
-    }
+    // Window* realMainWindow;
+    // {
+    //     realMainWindow = (Window*)malloc(sizeof(Window));
+    //     *(realMainWindow) = Window(NULL, Size(GlobalRenderer->framebuffer->Width, GlobalRenderer->framebuffer->Height), Position(0, 0), GlobalRenderer, "Real Main Window");
+    //     osData.realMainWindow = realMainWindow;
+    // }
 
-    Window* realMainWindow2;
-    {
-        realMainWindow2 = (Window*)malloc(sizeof(Window));
-        *(realMainWindow2) = Window(NULL, Size(GlobalRenderer->framebuffer->Width, GlobalRenderer->framebuffer->Height), Position(0, 0), GlobalRenderer, "Real Main Window - Buffer 2");
-        osData.realMainWindow2 = realMainWindow2;
-    }
+    // Window* realMainWindow2;
+    // {
+    //     realMainWindow2 = (Window*)malloc(sizeof(Window));
+    //     *(realMainWindow2) = Window(NULL, Size(GlobalRenderer->framebuffer->Width, GlobalRenderer->framebuffer->Height), Position(0, 0), GlobalRenderer, "Real Main Window - Buffer 2");
+    //     osData.realMainWindow2 = realMainWindow2;
+    // }
 
     Window* debugTerminalWindow;
     {
         debugTerminalWindow = (Window*)malloc(sizeof(Window));
         //TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
         //*terminal = TerminalInstance(&adminUser, debugTerminalWindow);
-        *(debugTerminalWindow) = Window(NULL /*(DefaultInstance*)terminal*/, Size(400, 600), Position(600, 20), realMainWindow->renderer, "Debug Terminal");
+        *(debugTerminalWindow) = Window(NULL /*(DefaultInstance*)terminal*/, Size(400, 600), Position(600, 20), "Debug Terminal", false, true, true);
         //osData.windows.add(debugTerminalWindow);
 
         osData.debugTerminalWindow = debugTerminalWindow;

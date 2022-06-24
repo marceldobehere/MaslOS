@@ -189,10 +189,14 @@ void FigureOutCorrectMouseImage()
         return;
     }
     
+    int minY = 22;
+    if (!window->showTitleBar)
+        minY = 1;
+
     if (IMousePosition.x >= window->position.x - maxDis && IMousePosition.x <= window->position.x + maxDis)
     {
         dragArr[0] = true;
-        if (IMousePosition.y >= (window->position.y - 22) - maxDis && IMousePosition.y <= (window->position.y - 22) + maxDis)
+        if (IMousePosition.y >= (window->position.y - minY) - maxDis && IMousePosition.y <= (window->position.y - minY) + maxDis)
         {
             currentMouseImageName = "drag_D_d.mbif";
             dragArr[1] = true;
@@ -211,7 +215,7 @@ void FigureOutCorrectMouseImage()
     else if (IMousePosition.x >= (window->position.x + window->size.width) - maxDis && IMousePosition.x <= (window->position.x + window->size.width) + maxDis)
     {
         dragArr[2] = true;
-        if (IMousePosition.y >= (window->position.y - 22) - maxDis && IMousePosition.y <= (window->position.y - 22) + maxDis)
+        if (IMousePosition.y >= (window->position.y - minY) - maxDis && IMousePosition.y <= (window->position.y - minY) + maxDis)
         {
             currentMouseImageName = "drag_U_d.mbif";
             dragArr[1] = true;
@@ -226,7 +230,7 @@ void FigureOutCorrectMouseImage()
             currentMouseImageName = "drag_x.mbif";
         }
     }
-    else if (IMousePosition.y >= (window->position.y - 22) - maxDis && IMousePosition.y <= (window->position.y - 22) + maxDis)
+    else if (IMousePosition.y >= (window->position.y - minY) - maxDis && IMousePosition.y <= (window->position.y - minY) + maxDis)
     {
         currentMouseImageName = "drag_y.mbif";
         dragArr[1] = true;

@@ -462,7 +462,7 @@ void GetCmd(const char* name, OSUser* user, Window* window)
     }
     else if (StrEquals(name, "screen resolution"))
     {
-        dispVar vars[] = {dispVar(osData.realMainWindow->size.width), dispVar(osData.realMainWindow->size.height)};
+        dispVar vars[] = {dispVar((uint64_t)GlobalRenderer->framebuffer->Width), dispVar((uint64_t)GlobalRenderer->framebuffer->Height)};
         window->renderer->Println("Screen Resolution: {0}x{1}.", vars);
     }
     else if (StrEquals(name, "stack trace"))

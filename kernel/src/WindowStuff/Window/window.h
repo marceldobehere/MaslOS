@@ -73,13 +73,14 @@ class Window
     uint32_t defaultTitleColor;
     uint32_t selectedTitleColor;
     uint32_t defaultTitleBackgroundColor;
+    bool showTitleBar, showBorder, moveable;
     
     bool moveToFront;
     const char* title;
-    Window(DefaultInstance* instance, Size size, Position position, BasicRenderer* parentRenderer, const char* title);
+    Window(DefaultInstance* instance, Size size, Position position, const char* title, bool showTitleBar, bool showBorder, bool moveable);
 
     void Resize(Size _newSize);
-    void Render();
+    void RenderDeprecated();
     void Render(Framebuffer* from, Framebuffer* to, Position pos, Size size, Window* window);
     void Free();
 

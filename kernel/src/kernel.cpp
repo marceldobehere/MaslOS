@@ -25,8 +25,8 @@ extern "C" void _start(BootInfo* bootInfo)
     osData.exit = false;
 
     Window* debugTerminalWindow = osData.debugTerminalWindow;
-    Window* realMainWindow = osData.realMainWindow;
-    Window* realMainWindow2 = osData.realMainWindow2;
+    //Window* realMainWindow = osData.realMainWindow;
+    //Window* realMainWindow2 = osData.realMainWindow2;
     
     osData.drawBackground = true;
     
@@ -76,7 +76,7 @@ extern "C" void _start(BootInfo* bootInfo)
         mainWindow = (Window*)malloc(sizeof(Window));
         TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
         *terminal = TerminalInstance(&adminUser, mainWindow);
-        *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(5, 30), osData.realMainWindow->renderer, "Main Window");
+        *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(5, 30), "Main Window", true, true, true);
         osData.windows.add(mainWindow);
 
         activeWindow = mainWindow;
@@ -88,7 +88,7 @@ extern "C" void _start(BootInfo* bootInfo)
         Window* window = (Window*)malloc(sizeof(Window));
         TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
         *terminal = TerminalInstance(&guestUser, window);
-        *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(700, 60), realMainWindow->renderer, "Testing Window");
+        *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(700, 60), "Testing Window", true, true, true);
         osData.windows.add(window);
             
         window->renderer->Cls();  
@@ -108,11 +108,9 @@ extern "C" void _start(BootInfo* bootInfo)
 
 
 
-
-
     activeWindow->renderer->Cls();
     KeyboardPrintStart(mainWindow);
-    mainWindow->Render();
+    //mainWindow->Render();
 
     
     osData.windowPointerThing->Clear();
@@ -245,11 +243,10 @@ extern "C" void _start(BootInfo* bootInfo)
             }
         }
 
-
+        Taskbar::RenderTaskbar();
         MPoint mPos = MousePosition;
         DrawMousePointer2(osData.windowPointerThing->virtualScreenBuffer, mPos);
         osData.windowPointerThing->fps = fps;
-        Taskbar::RenderTaskbar();
         osData.windowPointerThing->Render();
         osData.windowPointerThing->UpdatePointerRect(mPos.x - 32, mPos.y - 32, mPos.x + 32, mPos.y + 32);
 

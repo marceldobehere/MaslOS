@@ -15,8 +15,8 @@ struct OSData
     KernelInfo* kernelInfo;
     List<Window*> windows;
     kernelFiles::ZIPFile* windowIconsZIP;
-    Window* realMainWindow;
-    Window* realMainWindow2;
+    //Window* realMainWindow;
+    //Window* realMainWindow2;
     Window* mainTerminalWindow;
     Window* debugTerminalWindow;
     bool showDebugterminal;

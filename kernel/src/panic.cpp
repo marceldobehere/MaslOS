@@ -21,7 +21,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         osData.debugTerminalWindow->position.x = GlobalRenderer->framebuffer->Width - (osData.debugTerminalWindow->size.width + 2);
         osData.debugTerminalWindow->position.y = 23;
         osData.debugTerminalWindow->parentFrameBuffer = GlobalRenderer->framebuffer;
-        osData.debugTerminalWindow->Render();
+        osData.debugTerminalWindow->Render(osData.debugTerminalWindow->framebuffer, GlobalRenderer->framebuffer, osData.debugTerminalWindow->position, osData.debugTerminalWindow->size, osData.debugTerminalWindow);
     }
     else
     {
