@@ -76,7 +76,7 @@ buildimg:
 	mcopy -i $(BUILDDIR)/$(OSNAME).img $(BUILDDIR)/kernel.elf ::
 	mcopy -i $(BUILDDIR)/$(OSNAME).img $(BUILDDIR)/zap-light16.psf ::
 	mcopy -i $(BUILDDIR)/$(OSNAME).img src/external/test.mbif ::
-	mcopy -i $(BUILDDIR)/$(OSNAME).img src/external/bg.mbif ::
+	mcopy -i $(BUILDDIR)/$(OSNAME).img src/external/background.mbif ::
 	mcopy -i $(BUILDDIR)/$(OSNAME).img src/external/mouse.mbzf ::
 	mcopy -i $(BUILDDIR)/$(OSNAME).img src/external/window-icons.mbzf ::
 

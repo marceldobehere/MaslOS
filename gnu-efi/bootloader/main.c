@@ -549,7 +549,7 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 		Print(L"Image loaded. Char size: %d\n\r", (image->height*image->width*4));
 	}
 
-	ImageFile* bgImage = LoadImage(NULL, L"bg.mbif", ImageHandle, SystemTable);
+	ImageFile* bgImage = LoadImage(NULL, L"background.mbif", ImageHandle, SystemTable);
 
 	if (bgImage == NULL)
 	{
