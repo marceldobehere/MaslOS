@@ -19,6 +19,7 @@ namespace Taskbar
                 *addr = col;
         }
 
+        
 
 
 
