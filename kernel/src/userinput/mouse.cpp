@@ -87,7 +87,7 @@ uint32_t MouseTempBitmap[] =
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-extern uint32_t mouseColFront = Colors.white, mouseColBack = Colors.black;
+uint32_t mouseColFront = Colors.white, mouseColBack = Colors.black;
 
 bool clicks[3] = {false, false, false};
 double clickTimes[3] = {0, 0, 0};

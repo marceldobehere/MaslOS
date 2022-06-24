@@ -31,7 +31,7 @@ struct GDT
     GDTEntry UserData;
 
 }__attribute((packed))
-__attribute((alligned(0x1000)));
+__attribute((aligned(0x1000)));
 
 
 extern GDT DefaultGDT;

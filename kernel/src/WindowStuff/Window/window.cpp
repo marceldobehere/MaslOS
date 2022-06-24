@@ -62,7 +62,7 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size,
     for (int64_t y = 0; y < from->Height; y++)
     {
         int64_t newY = y + pos.y;
-        uint32_t* pointerP = (uint32_t*)(to->BaseAddress + ((pos.x + (newY * to->Width)) * 4));
+        uint32_t* pointerP = (uint32_t*)((uint64_t)to->BaseAddress + ((pos.x + (newY * to->Width)) * 4));
         for (int64_t x = 0; x < from->Width; x++)
         {
             int64_t newX = x + pos.x;
@@ -75,6 +75,7 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size,
         }
     }
 
+    uint64_t toBaseAddr = (uint64_t)to->BaseAddress;
 
     if (window != NULL)
     {
@@ -115,16 +116,16 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size,
             int64_t newX = x + pos.x;
             int64_t newY = -1 + pos.y;
             if (newX >= 0 && newY >= 0 && newX < to->Width && newY < to->Height && (counter % 2) == 1)
-                *(uint32_t*)(to->BaseAddress + ((newX + (newY * to->Width)) * 4)) = cBorder;
+                *(uint32_t*)(toBaseAddr + ((newX + (newY * to->Width)) * 4)) = cBorder;
             
             
             newY = size.height + pos.y;
             if (newX >= 0 && newY >= 0 && newX < to->Width && newY < to->Height && (counter % 2) == 0)
-                *(uint32_t*)(to->BaseAddress + ((newX + (newY * to->Width)) * 4)) = cBorder;
+                *(uint32_t*)(toBaseAddr + ((newX + (newY * to->Width)) * 4)) = cBorder;
 
             newY = -22 + pos.y;
             if (newX >= 0 && newY >= 0 && newX < to->Width && newY < to->Height && (counter % 2) == 0)
-                *(uint32_t*)(to->BaseAddress + ((newX + (newY * to->Width)) * 4)) = cBorder;
+                *(uint32_t*)(toBaseAddr + ((newX + (newY * to->Width)) * 4)) = cBorder;
         
             counter++;
         }
@@ -135,11 +136,11 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size,
             int64_t newX = size.width + pos.x;
             int64_t newY = y + pos.y;
             if (newX >= 0 && newY >= 0 && newX < to->Width && newY < to->Height && (counter % 2) == 1)
-                *(uint32_t*)(to->BaseAddress + ((newX + (newY * to->Width)) * 4)) = cBorder;
+                *(uint32_t*)((uint64_t)toBaseAddr + ((newX + (newY * to->Width)) * 4)) = cBorder;
             
             newX = -1 + pos.x;
             if (newX >= 0 && newY >= 0 && newX < to->Width && newY < to->Height && (counter % 2) == 0)
-                *(uint32_t*)(to->BaseAddress + ((newX + (newY * to->Width)) * 4)) = cBorder;
+                *(uint32_t*)((uint64_t)toBaseAddr + ((newX + (newY * to->Width)) * 4)) = cBorder;
             
             counter++;
         } 
@@ -280,7 +281,7 @@ void Window::Resize(Size _newSize)
 void CopyFrameBuffer(Framebuffer* a, Framebuffer* b)
 {
     AddToStack("CopyFrameBuffer", "WindowStuff/Window/window.cpp");
-    uint32_t* endAddr = (uint32_t*)(a->BaseAddress + a->BufferSize);
+    uint32_t* endAddr = (uint32_t*)((uint64_t)a->BaseAddress + a->BufferSize);
 
     uint32_t* addrB = (uint32_t*)b->BaseAddress;
     for (uint32_t* addrA = (uint32_t*)a->BaseAddress; addrA < endAddr; addrA++, addrB++)
@@ -291,7 +292,7 @@ void CopyFrameBuffer(Framebuffer* a, Framebuffer* b)
 void CopyFrameBuffer(Framebuffer* a, Framebuffer* a2, Framebuffer* b)
 {
     AddToStack("CopyFrameBuffer", "WindowStuff/Window/window.cpp");
-    uint32_t* endAddr = (uint32_t*)(a->BaseAddress + a->BufferSize);
+    uint32_t* endAddr = (uint32_t*)((uint64_t)a->BaseAddress + a->BufferSize);
 
     uint32_t* addrA2 = (uint32_t*)a2->BaseAddress;
     uint32_t* addrB = (uint32_t*)b->BaseAddress;

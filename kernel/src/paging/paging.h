@@ -51,4 +51,4 @@ struct PageTable
     PageDirectoryEntry entries [512];
     
 
-}__attribute__((alligned(0x1000)));
+}__attribute__((aligned(0x1000)));
