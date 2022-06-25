@@ -404,6 +404,7 @@ typedef struct
 	ImageFile* testImage;
 	ImageFile* bootImage;
 	ImageFile* MButton;
+	ImageFile* MButtonS;
 	ZIPFile* mouseZIP;
 	ZIPFile* windowIconZIP;
 	EFI_MEMORY_DESCRIPTOR* mMap;
@@ -556,11 +557,19 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 	else
 		Print(L"Image loaded. Char size: %d\n\r", (bootImage->height*bootImage->width*4));
 
+
 	ImageFile* MButtonImage = LoadImage(NULL, L"MButton.mbif", ImageHandle, SystemTable);
 	if (MButtonImage == NULL)
 		Print(L"Image was not loaded!\n\r");	
 	else
 		Print(L"Image loaded. Char size: %d\n\r", (MButtonImage->height*MButtonImage->width*4));
+
+
+	ImageFile* MButtonImageS = LoadImage(NULL, L"MButton_S.mbif", ImageHandle, SystemTable);
+	if (MButtonImageS == NULL)
+		Print(L"Image was not loaded!\n\r");	
+	else
+		Print(L"Image loaded. Char size: %d\n\r", (MButtonImageS->height*MButtonImageS->width*4));
 
 
 	ZIPFile* mouseZIP = LoadZIP(NULL, L"mouse.mbzf", ImageHandle, SystemTable);
@@ -620,6 +629,7 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 	bootInfo.bootImage = bootImage;
 	bootInfo.bgImage = bgImage;
 	bootInfo.MButton = MButtonImage;
+	bootInfo.MButtonS = MButtonImageS;
 	bootInfo.mouseZIP = mouseZIP;
 	bootInfo.windowIconZIP = windowZIP;
 	bootInfo.rsdp = rsdp;

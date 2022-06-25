@@ -17,6 +17,7 @@ struct BootInfo
     kernelFiles::ImageFile* testImage;
 	kernelFiles::ImageFile* bootImage;
 	kernelFiles::ImageFile* MButton;
+	kernelFiles::ImageFile* MButtonS;
     kernelFiles::ZIPFile* mouseZIP;
 	kernelFiles::ZIPFile* windowIconZIP;
 	EFI_MEMORY_DESCRIPTOR* mMap;

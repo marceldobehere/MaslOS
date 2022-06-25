@@ -4,7 +4,7 @@
 namespace Taskbar
 {
 
-    void InitTaskbar(kernelFiles::ImageFile* MButton);
+    void InitTaskbar(kernelFiles::ImageFile* MButton, kernelFiles::ImageFile* mButtonS);
 
     void RenderTaskbar();
 
