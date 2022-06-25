@@ -4,9 +4,11 @@
 namespace Taskbar
 {
     Framebuffer* taskbarBuffer;
+    kernelFiles::ImageFile* MButton;
 
-    void InitTaskbar()
+    void InitTaskbar(kernelFiles::ImageFile* mButton)
     {
+        MButton = mButton;
         taskbarBuffer = osData.windowPointerThing->taskbar;
     }
 
@@ -19,7 +21,8 @@ namespace Taskbar
                 *addr = col;
         }
 
-        
+        GlobDrawImage(MButton, 0, 0, 1, 1, taskbarBuffer);
+        //GlobDrawImage(currentMouseImage, 10, 10, 1, 1, taskbarBuffer);
 
 
 

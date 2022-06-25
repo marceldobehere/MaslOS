@@ -96,8 +96,8 @@ namespace WindowManager
             taskbar = (Framebuffer*)malloc(sizeof(Framebuffer));
             taskbar->Width = actualScreenBuffer->Width;
             taskbar->Height = 40;
-            taskbar->PixelsPerScanLine = 4;
-            taskbar->BufferSize = taskbar->Height * taskbar->Width * taskbar->PixelsPerScanLine;
+            taskbar->PixelsPerScanLine = taskbar->Width;
+            taskbar->BufferSize = taskbar->Height * taskbar->Width * 4;
             taskbar->BaseAddress = malloc(taskbar->BufferSize);
         }
 
