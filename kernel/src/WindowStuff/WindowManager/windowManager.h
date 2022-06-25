@@ -44,7 +44,7 @@ namespace WindowManager
 
         //static const char** windowIconNames = {"", ""};
         
-        double fps;
+        uint64_t fps;
         uint32_t defaultColor = Colors.black;
         uint32_t defaultBackgroundColor = defaultColor;
         uint32_t defaultTaskbarBackgroundColor = Colors.dblue;

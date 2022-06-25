@@ -3,17 +3,17 @@
 
 namespace PIT
 {
-    double TimeSinceBoot = 0;
+    uint64_t TicksSinceBoot = 0;
 
     uint16_t Divisor = 65535;
 
-    double freq = (double)GetFrequency();
+    uint64_t freq = GetFrequency();
 
     void InitPIT()
     {
-        TimeSinceBoot = 0;
+        TicksSinceBoot = 0;
         SetDivisor(65535);
-        freq = (double)GetFrequency();
+        freq = GetFrequency();
     }
 
     void SetDivisor(uint16_t divisor)
@@ -30,16 +30,16 @@ namespace PIT
         freq = (double)GetFrequency();
     }
 
-    void Sleepd(double seconds)
-    {
-        double startTime = TimeSinceBoot;
-        while (TimeSinceBoot < startTime + seconds)
-            ;//asm("hlt");
-    }
-
     void Sleep(uint64_t milliseconds)
     {
-        Sleepd(milliseconds / 1000.0);
+        uint64_t endTime = TimeSinceBootMS() + milliseconds;
+        while (TimeSinceBootMS() < endTime)
+            asm("hlt");
+    }
+
+    void Sleepd(double seconds)
+    {
+        Sleepd((uint64_t)(seconds * 1000));
     }
 
     uint64_t GetFrequency()
@@ -50,11 +50,22 @@ namespace PIT
     void SetFrequency(uint64_t frequency)
     {
         SetDivisor(BaseFrequency / frequency);
-        freq = (double)GetFrequency();
+        freq = GetFrequency();
     }
 
     void Tick()
     {
-        TimeSinceBoot += 1/freq;
+        TicksSinceBoot++;
     }
+
+    double TimeSinceBootS()
+    {
+        return (TicksSinceBoot)/(double)freq;
+    }
+    
+    uint64_t TimeSinceBootMS()
+    {
+        return (TicksSinceBoot*1000)/freq;
+    }
+
 }

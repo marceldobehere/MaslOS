@@ -125,15 +125,17 @@ extern "C" void _start(BootInfo* bootInfo)
     bool updateBorder = true;
     bool bgm = osData.drawBackground;
     int frame = 0;
-    double oldTime = PIT::TimeSinceBoot;
-    double fps = 1;
+    uint64_t oldTime = PIT::TimeSinceBootMS();
+    //double fps = 1;
+    uint64_t fps = 1;
     while(!osData.exit)
     {
         frame++;  
         if (frame >= 20)
         {
-            double currTime = PIT::TimeSinceBoot;
-            fps = (frame - 1) / (currTime - oldTime);
+            uint64_t currTime = PIT::TimeSinceBootMS();
+            //fps = ((frame - 1)*1000.0) / (currTime - oldTime);
+            fps = ((frame - 1)*1000) / (currTime - oldTime);
             oldTime = currTime;
             frame = 0;
         }

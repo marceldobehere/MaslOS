@@ -90,7 +90,7 @@ uint32_t MouseTempBitmap[] =
 uint32_t mouseColFront = Colors.white, mouseColBack = Colors.black;
 
 bool clicks[3] = {false, false, false};
-double clickTimes[3] = {0, 0, 0};
+uint64_t clickTimes[3] = {0, 0, 0};
 
 
 MPoint IMousePosition;
@@ -341,7 +341,7 @@ void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName)
     for (int i = 0; i < 3; i++)
     {
         clicks[i] = false;
-        clickTimes[i] = PIT::TimeSinceBoot;
+        clickTimes[i] = PIT::TimeSinceBootMS();
     }
 
     diff = MPoint();
@@ -636,7 +636,7 @@ void ProcessMousePacket()
 
     bool tClicks[3] = {false, false, false};
     bool tHolds[3] = {false, false, false};
-    double time = PIT::TimeSinceBoot;
+    uint64_t time = PIT::TimeSinceBootMS();
     for (int i = 0; i < 3; i++)
     {
         if (!cClicks[i])
@@ -650,7 +650,7 @@ void ProcessMousePacket()
         {
             if (clicks[i])
             {   
-                if (time >= clickTimes[i] + 0.1)
+                if (time >= clickTimes[i] + 100)
                     tHolds[i] = true;  
             }
             else

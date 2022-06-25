@@ -1,18 +1,20 @@
 #pragma once
 #include "../task.h"
-
+#include <stdint.h>
 
 class TaskSleep : public Task
 {
     private:
-        double startTime;
-        double endTime;
+        uint64_t startTime;
+        uint64_t endTime;
 
     public:
 
-        TaskSleep(double time);
+        //TaskSleep(double time);
+        TaskSleep(uint64_t ms);
         void Do();
         void Free();
 };
 
-TaskSleep* NewSleepTask(double time);
+//TaskSleep* NewSleepTask(double time);
+TaskSleep* NewSleepTask(uint64_t ms);

@@ -469,6 +469,14 @@ void GetCmd(const char* name, OSUser* user, Window* window)
     {
         PrintMStackTrace(osData.stackArr, osData.stackPointer, window->renderer, user->colData.defaultTextColor);
     }
+    else if (StrEquals(name, "TSB S"))
+    {
+        window->renderer->Println("Time since boot: {} s.", to_string(PIT::TimeSinceBootS()), Colors.bgreen);
+    }
+    else if (StrEquals(name, "TSB MS"))
+    {
+        window->renderer->Println("Time since boot: {} ms.", to_string(PIT::TimeSinceBootMS()), Colors.bgreen);
+    }
     else
     {
         LogError("Parameter \"{}\" does not exist.", name, window);
