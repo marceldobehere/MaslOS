@@ -15,7 +15,7 @@ HeapSegHdr* lastHdr;
 
 void HeapSegHdr::CombineForward()
 {
-    AddToStack("CombineForward", "memory/heap.cpp");
+    AddToStack();
     //GlobalRenderer->Print("B");
     //GlobalRenderer->Print("[{}]", ConvertHexToString((uint64_t)this), Colors.yellow);
     if (next == NULL)
@@ -50,7 +50,7 @@ void HeapSegHdr::CombineForward()
 
 void HeapSegHdr::CombineBackward()
 {
-    AddToStack("CombineBackward", "memory/heap.cpp");
+    AddToStack();
     //GlobalRenderer->Print("C");
     if (last != NULL)
         if (last->free)
@@ -64,42 +64,42 @@ void HeapSegHdr::CombineBackward()
 
 HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
 {
-    AddToStack("Split", "memory/heap.cpp");
+    AddToStack();
 
-    AddToStack("Split 1", "memory/heap.cpp");
+    //AddToStack();
     if (splitLength < 0x10)
     {
-        RemoveFromStack();
+        //RemoveFromStack();
         RemoveFromStack();
         return NULL;
     }
 
-    AddToStack("Split 2", "memory/heap.cpp");
+    //AddToStack();
     //GlobalRenderer->Println("this len: {}", to_string(length), Colors.bgreen);
     int64_t splitSegLength = (length - splitLength) - sizeof(HeapSegHdr);
     //GlobalRenderer->Println("Splitseg len: {}", to_string(splitSegLength), Colors.bgreen);
     if (splitSegLength < 0x10)
     {
-        RemoveFromStack();
-        RemoveFromStack();
+        //RemoveFromStack();
+        //RemoveFromStack();
         RemoveFromStack();
         return NULL;
     }
 
     HeapSegHdr* newSplitHdr = (HeapSegHdr*)((uint64_t)this + splitLength + sizeof(HeapSegHdr));
-    //AddToStack(to_string((uint64_t)newSplitHdr), "memory/heap.cpp"));
+    //AddToStack();
     *newSplitHdr = HeapSegHdr();
 
     //GlobalRenderer->Println("Splitheader addr: {}", ConvertHexToString((uint64_t)newSplitHdr), Colors.bgreen);
-    AddToStack("Split 3", "memory/heap.cpp");
+    //AddToStack();
     if (next != NULL)
         next->last = newSplitHdr;
-    //AddToStack(to_string((uint64_t)newSplitHdr), "memory/heap.cpp"));
+    //AddToStack();
 
-    AddToStack("Split 4", "memory/heap.cpp");
+    //AddToStack();
     newSplitHdr->next = next;
     next = newSplitHdr;
-    AddToStack("Split 5", "memory/heap.cpp");
+    //AddToStack();
     newSplitHdr->last = this;
     newSplitHdr->length = splitSegLength;
     newSplitHdr->free = free;
@@ -108,19 +108,19 @@ HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
 
     //GlobalRenderer->Println("this len: {}", to_string(length), Colors.bgreen);
 
-    AddToStack("Split 6", "memory/heap.cpp");
+    //AddToStack();
     if (lastHdr == this) 
         lastHdr = newSplitHdr;
     //GlobalRenderer->Println("Split successful!");
     heapCount++;
 
-    RemoveFromStack();
-    RemoveFromStack();
-    RemoveFromStack();
-    RemoveFromStack();
     //RemoveFromStack();
-    RemoveFromStack();
-    RemoveFromStack();
+    //RemoveFromStack();
+    //RemoveFromStack();
+    //RemoveFromStack();
+    //RemoveFromStack();
+    //RemoveFromStack();
+    //RemoveFromStack();
     RemoveFromStack();
     return newSplitHdr;
 }
@@ -129,7 +129,7 @@ HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
 
 void InitializeHeap(void* heapAddress, size_t pageCount)
 {
-    AddToStack("InitializeHeap", "memory/heap.cpp");
+    AddToStack();
     void* pos = heapAddress;
 
     for (size_t i = 0; i < pageCount; i++)
@@ -159,7 +159,7 @@ void InitializeHeap(void* heapAddress, size_t pageCount)
 
 void* malloc(size_t size)
 {
-    AddToStack("malloc", "memory/heap.cpp");
+    AddToStack();
     
     if (size % 0x10 > 0)
     {
@@ -216,7 +216,7 @@ void* malloc(size_t size)
 
 void free(void* address)
 {
-    AddToStack("free", "memory/heap.cpp");
+    AddToStack();
     HeapSegHdr* segment = ((HeapSegHdr*)address) - 1;
 
     if (segment->magicNum == HeapMagicNum)
@@ -245,7 +245,7 @@ void free(void* address)
 
 void* _malloc(size_t size)
 {
-    AddToStack("_malloc", "memory/heap.cpp");
+    AddToStack();
     void* res = malloc(size);
 
     RemoveFromStack();
@@ -254,14 +254,14 @@ void* _malloc(size_t size)
 
 void _free(void* address)
 {
-    AddToStack("_free", "memory/heap.cpp");
+    AddToStack();
     free(address);
     RemoveFromStack();
 }
 
 void ExpandHeap(size_t length)
 {
-    AddToStack("ExpandHeap", "memory/heap.cpp");
+    AddToStack();
     if (length % 0x1000)
     {
         length -= (length % 0x1000);

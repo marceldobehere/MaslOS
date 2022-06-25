@@ -7,7 +7,7 @@ Window* activeWindow = NULL;
 
 Window::Window(DefaultInstance* instance, Size size, Position position, const char* title, bool showTitleBar, bool showBorder, bool moveable)
 {
-    AddToStack("Constructor", "WindowStuff/Window/window.cpp");
+    AddToStack();
     this->instance = instance;
     this->position = position;
     this->size = size;
@@ -48,7 +48,7 @@ Window::Window(DefaultInstance* instance, Size size, Position position, const ch
 
 void Window::Free()
 {
-    AddToStack("Free", "WindowStuff/Window/window.cpp");
+    AddToStack();
     free(framebuffer->BaseAddress);
     free(framebuffer);
     free(renderer);
@@ -57,7 +57,7 @@ void Window::Free()
 
 void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size, Window* window)
 {
-    AddToStack("Render", "WindowStuff/Window/window.cpp");
+    AddToStack();
     uint32_t* pointerC = (uint32_t*)from->BaseAddress;
     for (int64_t y = 0; y < from->Height; y++)
     {
@@ -152,7 +152,7 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size,
 /*
 void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size)
 {
-    AddToStack("Render", "WindowStuff/Window/window.cpp"));
+    AddToStack();
     uint32_t* pointerC = (uint32_t*)framebuffer->BaseAddress;
     for (int64_t y = 0; y < framebuffer->Height; y++)
     {
@@ -238,7 +238,7 @@ void Window::RenderDeprecated()
 
 void Window::Resize(Size _newSize)
 {
-    AddToStack("Resize", "WindowStuff/Window/window.cpp");
+    AddToStack();
     if (_newSize.height < 20)
         _newSize.height = 20;
 
@@ -280,7 +280,7 @@ void Window::Resize(Size _newSize)
 
 void CopyFrameBuffer(Framebuffer* a, Framebuffer* b)
 {
-    AddToStack("CopyFrameBuffer", "WindowStuff/Window/window.cpp");
+    AddToStack();
     uint32_t* endAddr = (uint32_t*)((uint64_t)a->BaseAddress + a->BufferSize);
 
     uint32_t* addrB = (uint32_t*)b->BaseAddress;
@@ -291,7 +291,7 @@ void CopyFrameBuffer(Framebuffer* a, Framebuffer* b)
 
 void CopyFrameBuffer(Framebuffer* a, Framebuffer* a2, Framebuffer* b)
 {
-    AddToStack("CopyFrameBuffer", "WindowStuff/Window/window.cpp");
+    AddToStack();
     uint32_t* endAddr = (uint32_t*)((uint64_t)a->BaseAddress + a->BufferSize);
 
     uint32_t* addrA2 = (uint32_t*)a2->BaseAddress;

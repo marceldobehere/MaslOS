@@ -9,7 +9,7 @@ namespace kernelFiles
     {
         DefaultFile* GetFileFromFileName(ZIPFile* zip, const char* filename)
         {
-            AddToStack("GetFileFromFileName", "kernelFiles/ZIPStruct.cpp");
+            AddToStack();
             if (zip == NULL)
             {
                 RemoveFromStack();

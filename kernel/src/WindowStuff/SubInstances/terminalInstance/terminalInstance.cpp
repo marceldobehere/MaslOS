@@ -24,7 +24,7 @@ bool TerminalInstance::GetBusy()
 
 void TerminalInstance::HandleEnter()
 {
-    AddToStack("HandleEnter", "WindowStuff/SubInstances/terminalInstance/terminalInstance.cpp");
+    AddToStack();
     if (userlen > 0)
     {
         if (userlen > 255)
@@ -46,7 +46,7 @@ void TerminalInstance::HandleEnter()
 
 void TerminalInstance::PrintUserIfNeeded()
 {
-    AddToStack("PrintUserIfNeeded", "WindowStuff/SubInstances/terminalInstance/terminalInstance.cpp");
+    AddToStack();
     if (!printUser)
         return;
     if (GetBusy())

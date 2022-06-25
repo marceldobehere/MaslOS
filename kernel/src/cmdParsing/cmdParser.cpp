@@ -13,21 +13,21 @@
 
 void LogError(const char* msg, Window* window)
 {
-    AddToStack("LogError", "cmdParsing/cmdParser.cpp");
+    AddToStack();
     window->renderer->Println(msg, Colors.bred);
     RemoveFromStack();
 }
 
 void LogError(const char* msg, const char* var, Window* window)
 {
-    AddToStack("LogError", "cmdParsing/cmdParser.cpp");
+    AddToStack();
     window->renderer->Println(msg, var, Colors.bred);
     RemoveFromStack();
 }
 
 void LogInvalidArgumentCount(int expected, int found, Window* window)
 {
-    AddToStack("LogInvalidArgumentCount", "cmdParsing/cmdParser.cpp");
+    AddToStack();
     window->renderer->Print("Invalid Argument count. Expected {} but got ", to_string((uint64_t)expected), Colors.bred);
     window->renderer->Println("{} instead.", to_string((uint64_t)found), Colors.bred);
     RemoveFromStack();
@@ -38,7 +38,7 @@ void LogInvalidArgumentCount(int expected, int found, Window* window)
 
 void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 {
-    AddToStack("ParseCommand", "cmdParsing/cmdParser.cpp");
+    AddToStack();
 
     if (window->instance == NULL)
     {
@@ -249,7 +249,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 
 void login(const char* name, OSUser** user, Window* window)
 {
-    AddToStack("login", "cmdParsing/cmdParser.cpp");
+    AddToStack();
 
     if (window->instance == NULL)
     {
@@ -279,7 +279,7 @@ void login(const char* name, OSUser** user, Window* window)
 
 void login(const char* name, const char* pass, OSUser** user, Window* window)
 {
-    AddToStack("login", "cmdParsing/cmdParser.cpp");
+    AddToStack();
 
     if (window->instance == NULL)
     {
@@ -308,7 +308,7 @@ void login(const char* name, const char* pass, OSUser** user, Window* window)
 
 void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
 {
-    AddToStack("SetCmd", "cmdParsing/cmdParser.cpp");
+    AddToStack();
 
     if (window->instance == NULL)
     {
@@ -446,7 +446,7 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
 
 void GetCmd(const char* name, OSUser* user, Window* window)
 {
-    AddToStack("GetCmd", "cmdParsing/cmdParser.cpp");
+    AddToStack();
     if (StrEquals(name, "free ram"))
     {
         window->renderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
@@ -489,7 +489,7 @@ void GetCmd(const char* name, OSUser* user, Window* window)
 
 ParsedColData ParseColor(const char* col)
 {
-    AddToStack("ParseColor", "cmdParsing/cmdParser.cpp");
+    AddToStack();
     ParsedColData data = ParsedColData();
     data.parseSuccess = false;
     data.col = 0;
@@ -541,7 +541,7 @@ ParsedColData ParseColor(const char* col)
 
 StringArrData* SplitLine(const char* input)
 {
-    AddToStack("SplitLine", "cmdParsing/cmdParser.cpp");
+    AddToStack();
     uint64_t index = 0;
     uint64_t parts[256];
     uint64_t partIndex = 0;

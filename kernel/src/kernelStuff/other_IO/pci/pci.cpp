@@ -6,7 +6,7 @@ namespace PCI
 {
     void EnumeratePCI(ACPI::MCFGHeader* mcfg)
     {
-        AddToStack("EnumeratePCI", "pci/pci.cpp");
+        AddToStack();
         int entries = (mcfg->Header.Length - sizeof(ACPI::MCFGHeader)) / sizeof(ACPI::DeviceConfig);
 
         for (int t = 0; t < entries; t++)
@@ -20,7 +20,7 @@ namespace PCI
 
     void EnumerateBus(uint64_t baseAddress, uint64_t bus)
     {
-        AddToStack("EnumerateBus", "pci/pci.cpp");
+        AddToStack();
         uint64_t offset = bus << 20;
 
         uint64_t busAddress = baseAddress + offset;
@@ -41,7 +41,7 @@ namespace PCI
 
     void EnumerateDevice(uint64_t busAddress, uint64_t device)
     {
-        AddToStack("EnumerateDevice", "pci/pci.cpp");
+        AddToStack();
         uint64_t offset = device << 15;
 
         uint64_t deviceAddress = busAddress + offset;
@@ -62,7 +62,7 @@ namespace PCI
 
     void EnumerateFunction(uint64_t deviceAddress, uint64_t function)
     {
-        AddToStack("EnumerateFunction", "pci/pci.cpp");
+        AddToStack();
         uint64_t offset = function << 12;
 
         uint64_t functionAddress = deviceAddress + offset;

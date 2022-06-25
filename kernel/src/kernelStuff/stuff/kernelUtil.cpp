@@ -8,7 +8,7 @@
 
 void PrepareACPI(BootInfo* bootInfo)
 {
-    AddToStack("PrepareACPI", "kernelUtil.cpp");
+    AddToStack();
     osData.debugTerminalWindow->Log("Preparing ACPI...");
     osData.debugTerminalWindow->Log("RSDP Addr: {}", ConvertHexToString((uint64_t)bootInfo->rsdp));
     ACPI::SDTHeader* xsdt = (ACPI::SDTHeader*)(bootInfo->rsdp->XSDTAddress);
@@ -154,6 +154,7 @@ void PrepareWindows(Framebuffer* img)
 BasicRenderer r = *((BasicRenderer*)NULL);
 KernelInfo InitializeKernel(BootInfo* bootInfo)
 {
+    AddToStack();
     r = BasicRenderer(bootInfo->framebuffer, bootInfo->psf1_font);
     GlobalRenderer = &r;
     //osData.realMainWindow->framebuffer = r.framebuffer;
@@ -204,6 +205,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     asm ("sti");
 
+    RemoveFromStack();
     return kernelInfo;
 }
 

@@ -4,7 +4,7 @@
 
 template <typename T> Array<T>::Array(uint64_t size)
 {
-    AddToStack("Constructor", "customClasses/array.cpp");
+    AddToStack();
     this->size = size;
     arr = (T*)malloc(size * sizeof(T));
     freed = false;
@@ -13,7 +13,7 @@ template <typename T> Array<T>::Array(uint64_t size)
 
 template <typename T> void Array<T>::reInit(uint64_t size)
 {
-    AddToStack("reInit", "customClasses/array.cpp");
+    AddToStack();
     this->size = size;
     free();
     arr = (T*)malloc(size * sizeof(T));
@@ -23,7 +23,7 @@ template <typename T> void Array<T>::reInit(uint64_t size)
 
 template <typename T> T& Array<T>::operator[](uint64_t index)
 {
-    AddToStack("operator[]", "customClasses/array.cpp");
+    AddToStack();
     if (index >= this->size)
         Panic("Accessing Array out of bounds!");
 
@@ -34,7 +34,7 @@ template <typename T> T& Array<T>::operator[](uint64_t index)
 
 template <typename T> void Array<T>::free()
 {
-    AddToStack("free", "customClasses/array.cpp");
+    AddToStack();
     if (freed)
     {
         RemoveFromStack();
@@ -51,7 +51,7 @@ template <typename T> void Array<T>::free()
 
 template <typename T> Array<T> Array<T>::clone()
 {
-    AddToStack("clone", "customClasses/array.cpp");
+    AddToStack();
     Array<T> newArr = Array<T>(size);
 
     for (uint64_t i = 0; i < size; i++)
@@ -64,7 +64,7 @@ template <typename T> Array<T> Array<T>::clone()
 
 template <typename T> void Array<T>::copy(Array<T> target)
 {
-    AddToStack("copy", "customClasses/array.cpp");
+    AddToStack();
     for (uint64_t i = 0; i < size; i++)
         target[i] = arr[i];
     RemoveFromStack();

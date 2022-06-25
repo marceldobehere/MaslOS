@@ -9,7 +9,7 @@ uint8_t* Buffer;
 
 bool Bitmap::operator[](uint64_t index)
 {
-    AddToStack("operator[]", "bitmap.cpp");
+    AddToStack();
     if (index > Size * 8)
     {
         RemoveFromStack();
@@ -24,7 +24,7 @@ bool Bitmap::operator[](uint64_t index)
 
 bool Bitmap::Set(uint64_t index, bool value)
 {
-    AddToStack("Set", "bitmap.cpp");
+    AddToStack();
     if (index > Size * 8)
     {
         RemoveFromStack();

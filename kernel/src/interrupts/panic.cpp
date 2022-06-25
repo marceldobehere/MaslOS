@@ -6,7 +6,7 @@
 
 void Panic(const char* panicMessage, const char* var, bool lock)
 {
-    AddToStack("Panic", "panic.cpp");
+    AddToStack();
     GlobalRenderer->Clear(Colors.red);
     GlobalRenderer->Println();
     GlobalRenderer->Println();

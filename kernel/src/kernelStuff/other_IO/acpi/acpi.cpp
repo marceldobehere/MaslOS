@@ -6,7 +6,7 @@ namespace ACPI
 
     void* FindTable(SDTHeader* sdtHeader, char* signature)
     {
-        AddToStack("FindTable", "acpi/acpi.cpp");
+        AddToStack();
         SDTHeader* xsdt = sdtHeader;
         int entries = (xsdt->Length - sizeof(ACPI::SDTHeader)) / 8;
         //osData.debugTerminalWindow->Log("Entry count: {}", to_string(entries));
@@ -20,7 +20,6 @@ namespace ACPI
             {
                 if (newSDTHeader->Signature[i] != signature[i])
                 {
-                    RemoveFromStack();
                     break;
                 }
                 

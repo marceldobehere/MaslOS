@@ -5,7 +5,7 @@
 
 
 
-#define AddToStack(name, location) AddToTheMStack(MStack(name, location));
+#define AddToStack() AddToTheMStack(MStack(__PRETTY_FUNCTION__, __FILE__, __LINE__));
 
 #define RemoveFromStack() RemoveTheLastElementFromTheMStack();
 
@@ -13,7 +13,7 @@
 #if !RECORD_STACK_TRACE
 
     #undef ADDToStack
-    #define ADDToStack(name, location) ;
+    #define ADDToStack() ;
 
     #undef RemoveFromStack
     #define RemoveFromStack() ;

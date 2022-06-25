@@ -5,7 +5,7 @@
 
 bool StrEquals(const char* a, const char* b)
 {
-    AddToStack("StrEquals", "cmdParsing/cstrTools.cpp");
+    AddToStack();
     int index = 0;
     while (!(a[index] == 0 && b[index] == 0))
     {
@@ -22,7 +22,7 @@ bool StrEquals(const char* a, const char* b)
 
 char* StrCopy(const char* og)
 {
-    AddToStack("StrCopy", "cmdParsing/cstrTools.cpp");
+    AddToStack();
     int size = 0;
     for (int i = 0; og[i] != 0; i++)
         size++;
@@ -37,7 +37,7 @@ char* StrCopy(const char* og)
 
 char* StrSubstr(const char* og, int index, int len)
 {
-    AddToStack("StrSubstr", "cmdParsing/cstrTools.cpp");
+    AddToStack();
 
     if (index < 0)
         index = 0;
@@ -65,7 +65,7 @@ char* StrSubstr(const char* og, int index, int len)
 
 char* StrSubstr(const char* og, int index)
 {
-    //AddToStack("StrSubstr", "cmdParsing/cstrTools.cpp"));
+    //AddToStack();
     int len;
     for (len = 0; og[len] != 0; len++);//GlobalRenderer->Print(og[len]);
 

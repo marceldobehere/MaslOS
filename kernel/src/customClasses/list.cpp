@@ -4,7 +4,7 @@
 
 template <typename T> void List<T>::init(uint64_t capacity)
 {
-    AddToStack("init", "customClasses/list.cpp");
+    AddToStack();
     if (capacity < 2)
         capacity = 2;
     freed = false;
@@ -16,21 +16,21 @@ template <typename T> void List<T>::init(uint64_t capacity)
 
 template <typename T> List<T>::List(uint64_t capacity) : arr(Array<T>(0))
 {
-    AddToStack("Constructor", "customClasses/list.cpp");
+    AddToStack();
     init(capacity);
     RemoveFromStack();
 }
 
 template <typename T> List<T>::List() : arr(Array<T>(0))
 {
-    AddToStack("Constructor", "customClasses/list.cpp");
+    AddToStack();
     init(4);
     RemoveFromStack();
 }
 
 template <typename T> void List<T>::free()
 {
-    AddToStack("free", "customClasses/list.cpp");
+    AddToStack();
     arr.free();
     cap = 0;
     freed = true;
@@ -40,7 +40,7 @@ template <typename T> void List<T>::free()
 
 template <typename T>void List<T>::expandArr()
 {
-    AddToStack("expandArr", "customClasses/list.cpp");
+    AddToStack();
     cap *= 2;
     Array<T> newArr = Array<T>(cap);
     arr.copy(newArr);
@@ -51,7 +51,7 @@ template <typename T>void List<T>::expandArr()
 
 template <typename T> List<T> List<T>::clone()
 {
-    AddToStack("clone", "customClasses/list.cpp");
+    AddToStack();
     List<T> newList = List<T>(cap);
 
     for (uint64_t i = 0; i < count; i++)
@@ -74,7 +74,7 @@ template <typename T> uint64_t List<T>::getCapacity()
 
 template <typename T> int64_t List<T>::getIndexOf(T item)
 {
-    AddToStack("getIndexOf", "customClasses/list.cpp");
+    AddToStack();
     for (uint64_t index = 0; index < count; index++)
         if (arr[index] == item)
         {
@@ -87,7 +87,7 @@ template <typename T> int64_t List<T>::getIndexOf(T item)
 
 template <typename T> void List<T>::add(T item)
 {
-    AddToStack("add", "customClasses/list.cpp");
+    AddToStack();
     if (count + 1 > cap)
         expandArr();
     
@@ -98,7 +98,7 @@ template <typename T> void List<T>::add(T item)
 
 template <typename T> void List<T>::clear()
 {
-    AddToStack("clear", "customClasses/list.cpp");
+    AddToStack();
     // for (uint64_t i = 0; i < count; i++)
     //     arr[i] = *((T*)NULL);
 
@@ -108,7 +108,7 @@ template <typename T> void List<T>::clear()
 
 template <typename T> void List<T>::removeAt(uint64_t index)
 {
-    AddToStack("removeAt", "customClasses/list.cpp");
+    AddToStack();
     if (index < 0 || index >= count)
     {
         RemoveFromStack();
@@ -127,9 +127,12 @@ template <typename T> void List<T>::removeAt(uint64_t index)
 
 template <typename T> void List<T>::removeFirst()
 {
-    AddToStack("removeFirst", "customClasses/list.cpp");
+    AddToStack();
     if (count == 0)
+    {
+        RemoveFromStack();
         return;
+    }
 
     removeAt(0);
 
@@ -138,9 +141,12 @@ template <typename T> void List<T>::removeFirst()
 
 template <typename T> void List<T>::removeLast()
 {
-    AddToStack("removeLast", "customClasses/list.cpp");
+    AddToStack();
     if (count == 0)
+    {
+        RemoveFromStack();
         return;
+    }
 
     //arr[count] = *((T*)NULL);
 
@@ -150,7 +156,7 @@ template <typename T> void List<T>::removeLast()
 
 template <typename T> T& List<T>::operator[](uint64_t index)
 {
-    AddToStack("operator[]", "customClasses/list.cpp");
+    AddToStack();
     T& data = arr[index];
     RemoveFromStack();
     return data;

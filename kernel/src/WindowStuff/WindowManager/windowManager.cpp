@@ -10,7 +10,7 @@ namespace WindowManager
 
     Window* getWindowAtMousePosition(int dis)
     {
-        AddToStack("", "WindowStuff/WindowManager/windowManager.cpp");
+        AddToStack();
         //GlobalRenderer->Println("Mouse POS Check");
         for (int64_t i = osData.windows.getCount() - 1; i >= 0; i--)
         {
@@ -190,6 +190,7 @@ namespace WindowManager
 
     void WindowPointerBufferThing::UpdatePointerRect(int x1, int y1, int x2, int y2)
     {
+        AddToStack();
         if (x1 < 0)
             x1 = 0;
         if (y1 < 0)
@@ -222,12 +223,13 @@ namespace WindowManager
         int count = osData.windows.getCount();
         for (int i = 0; i < count; i++)
             RenderWindowRect(osData.windows[i], x1, y1, x2, y2);
+        RemoveFromStack();
     }
 
 
     void WindowPointerBufferThing::RenderWindowRect(Window* window, int x1, int y1, int x2, int y2)
     {
-        AddToStack("RenderWindowRect", "WindowStuff/WindowManager/windowManager.cpp");
+        AddToStack();
 
         int64_t _x1 = window->position.x;
         int64_t _y1 = window->position.y;
@@ -568,7 +570,7 @@ if (window != NULL)
     void WindowPointerBufferThing::RenderWindow(Window* window)
     {
         RenderWindowRect(window, 0, 0, actualScreenBuffer->Width, actualScreenBuffer->Height);
-        // AddToStack("RenderWindwow", "WindowStuff/WindowManager/windowManager.cpp");
+        // AddToStack();
         // uint32_t* pixel = (uint32_t*)window->framebuffer->BaseAddress;
 
         // int64_t x1 = window->position.x;

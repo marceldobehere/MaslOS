@@ -17,7 +17,7 @@ bool allowArrows = false;
 
 void ClearInput(TerminalInstance* instance)
 {
-    AddToStack("ClearInput", "userinput/keyboard.cpp");
+    AddToStack();
     for (int i = 0; i < 256; i++)
     {
         instance->lastTerminalInput[i] = instance->terminalInput[i];
@@ -31,7 +31,7 @@ void ClearInput(TerminalInstance* instance)
 void HandleEnter()
 {
     Panic("Old Function used!");
-    // AddToStack("HandleEnter", "userinput/keyboard.cpp"));
+    // AddToStack();
     // if (activeWindow->instance->instanceType == InstanceType::Terminal)
     // {
     //     TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
@@ -65,7 +65,7 @@ void InitKeyboard()
 
 void KeyboardPrintStart(Window* window)
 {
-    AddToStack("KeyboardPrintStart", "userinput/keyboard.cpp");
+    AddToStack();
     if (window == NULL)
     {
         RemoveFromStack();
@@ -89,7 +89,7 @@ void KeyboardPrintStart(Window* window)
 
 void PrintUser(Window* window, OSUser* user)
 {
-    AddToStack("PrintUser", "userinput/keyboard.cpp");
+    AddToStack();
     if (window == NULL)
     {
         RemoveFromStack();
@@ -108,7 +108,7 @@ void PrintUser(Window* window, OSUser* user)
 
 void HandleKeyboard(uint8_t scancode)
 {
-    AddToStack("HandleKeyboard", "userinput/keyboard.cpp");
+    AddToStack();
     if (scancode == ARR_LEFT)
     {  
         int64_t index = osData.windows.getIndexOf(activeWindow);

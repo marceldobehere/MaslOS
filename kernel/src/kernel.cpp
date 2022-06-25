@@ -12,14 +12,18 @@ if (osData.enableStackTrace)
 extern "C" void _start(BootInfo* bootInfo)
 {  
     osData.stackPointer = 0;
+    for (int i = 0; i < 1000; i++)
+        osData.stackArr[i] = MStack();
+    
     osData.enableStackTrace = RECORD_STACK_TRACE;
-    AddToStack("_start", "kernel.cpp");
+    AddToStack();
     osData.crashCount = 0;
 
     //while(true);
 
     KernelInfo kernelInfo = InitializeKernel(bootInfo);
     PageTableManager* pageTableManager = kernelInfo.pageTableManager;
+    //AddToStack();
 
     osData.kernelInfo = &kernelInfo;
     osData.exit = false;

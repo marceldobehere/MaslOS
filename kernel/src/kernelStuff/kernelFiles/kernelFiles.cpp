@@ -6,7 +6,7 @@ namespace kernelFiles
 {
     ImageFile* ConvertFileToImage(DefaultFile* File)
     {
-        AddToStack("ConvertFileToImage", "kernelFiles/kernelFiles.cpp");
+        AddToStack();
         if (File == NULL)
         {
             RemoveFromStack();
