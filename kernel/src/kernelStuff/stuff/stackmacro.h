@@ -12,8 +12,8 @@
 
 #if !RECORD_STACK_TRACE
 
-    #undef ADDToStack
-    #define ADDToStack() ;
+    #undef AddToStack
+    #define AddToStack() ;
 
     #undef RemoveFromStack
     #define RemoveFromStack() ;
