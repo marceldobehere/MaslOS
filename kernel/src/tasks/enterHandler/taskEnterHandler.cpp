@@ -1,6 +1,6 @@
 #include "taskEnterHandler.h"
-#include "../../cstr.h"
-#include "../../panic.h"
+#include "../../kernelStuff/stuff/cstr.h"
+#include "../../interrupts/panic.h"
 #include "../../memory/heap.h"
 
 TaskEnterHandler::TaskEnterHandler(TerminalInstance* terminal)

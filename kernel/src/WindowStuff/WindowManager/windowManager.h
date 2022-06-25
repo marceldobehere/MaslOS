@@ -3,7 +3,7 @@
 #include "../../customClasses/list.h"
 //#include "../Window/window.h"
 //#include "../../OSDATA/osdata.h"
-#include "../../Cols.h"
+#include "../../Rendering/Cols.h"
 
 namespace WindowManager
 {

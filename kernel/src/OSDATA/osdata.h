@@ -1,7 +1,7 @@
 #pragma once
 #include "MStack/MStackS.h"
 
-#include "../kernelUtil.h"
+#include "../kernelStuff/stuff/kernelUtil.h"
 //#include "../customClasses/list.h"
 
 #include "../WindowStuff/WindowManager/windowManager.h"

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MStackS.h"
-#include "../../OSDATA/osdata.h"
+#include "../osdata.h"
 
 struct stackframe
 {

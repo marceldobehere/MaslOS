@@ -36,18 +36,17 @@ $(OBJDIR)/interrupts/interrupts.o: $(SRCDIR)/interrupts/interrupts.cpp
 	$(CC) -mno-red-zone -mgeneral-regs-only -ffreestanding -fno-omit-frame-pointer -c $^ -o $@
 
 
-$(OBJDIR)/scheduling-pit/pit.o: $(SRCDIR)/scheduling-pit/pit.cpp
+$(OBJDIR)/kernelStuff/other_IO/pit/pit.o: $(SRCDIR)/kernelStuff/other_IO/pit/pit.cpp
 	@ echo X==== COMPILING PIT $^
 	@ mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $^ -o $@
+
 
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@ echo !==== COMPILING $^
 	@ mkdir -p $(@D)
 	$(CC) $(CFLAGS) -O2 -c $^ -o $@
-
-
 
 
 
@@ -63,6 +62,7 @@ $(OBJDIR)/%_asm.o: $(SRCDIR)/%.asm
 link:
 	@ echo !=== LINKING
 	$(LD) $(LDFLAGS) -o $(BUILDDIR)/kernel.elf $(OBJS)
+	@ echo DONE LINKING
 
 
 setup:

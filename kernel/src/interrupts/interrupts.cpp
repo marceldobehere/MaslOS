@@ -1,11 +1,11 @@
 #include "interrupts.h"
 
-#include "../BasicRenderer.h"
+#include "../Rendering/BasicRenderer.h"
 #include "../userinput/keyboard.h"
 #include "../userinput/mouse.h"
-#include "../panic.h"
-#include "../IO.h"
-#include "../scheduling-pit/pit.h"
+#include "panic.h"
+#include "../kernelStuff/IO/IO.h"
+#include "../kernelStuff/other_IO/pit/pit.h"
 #include "../OSDATA/MStack/MStackM.h"
 
 __attribute__((interrupt)) void PageFault_handler(struct interrupt_frame* frame)

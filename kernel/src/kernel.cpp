@@ -1,4 +1,4 @@
-#include "kernelUtil.h"
+#include "kernelStuff/stuff/kernelUtil.h"
 
 
 /*
@@ -131,7 +131,7 @@ extern "C" void _start(BootInfo* bootInfo)
     while(!osData.exit)
     {
         frame++;  
-        if (frame >= 20)
+        if (frame >= 30)
         {
             uint64_t currTime = PIT::TimeSinceBootMS();
             //fps = ((frame - 1)*1000.0) / (currTime - oldTime);

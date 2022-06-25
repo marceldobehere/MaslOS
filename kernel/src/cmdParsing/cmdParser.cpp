@@ -1,14 +1,14 @@
 #include "cmdParser.h"
-#include "../BasicRenderer.h"
+#include "../Rendering/BasicRenderer.h"
 #include "cstrTools.h"
-#include "../Cols.h"
+#include "../Rendering/Cols.h"
 #include <stdint.h>
 #include "../memory/heap.h"
 #include "../paging/PageFrameAllocator.h"
 #include "../userinput/keyboard.h"
 #include "../userinput/mouse.h"
 #include "../OSDATA/osdata.h"
-#include "../scheduling-pit/pit.h"
+#include "../kernelStuff/other_IO/pit/pit.h"
 #include "../tasks/sleep/taskSleep.h"
 
 void LogError(const char* msg, Window* window)

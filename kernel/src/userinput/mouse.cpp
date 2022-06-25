@@ -1,9 +1,9 @@
 #include "mouse.h"
 #include "../WindowStuff/Window/window.h"
 #include "../WindowStuff/WindowManager/windowManager.h"
-#include "../scheduling-pit/pit.h"
+#include "../kernelStuff/other_IO/pit/pit.h"
 #include "../OSDATA/osdata.h"
-#include "../VirtualRenderer.h"
+#include "../Rendering/VirtualRenderer.h"
 
 #define PS2XSign        0b00010000
 #define PS2YSign        0b00100000

@@ -2,9 +2,9 @@
 
 #include <stdint.h>
 #include "kbScancodeTranslation.h"
-#include "../BasicRenderer.h"
+#include "../Rendering/BasicRenderer.h"
 #include "../cmdParsing/cmdParser.h"
-#include "../Cols.h"
+#include "../Rendering/Cols.h"
 #include "../OSDATA/userdata.h"
 #include "../OSDATA/osdata.h"
 #include "../tasks/enterHandler/taskEnterHandler.h"

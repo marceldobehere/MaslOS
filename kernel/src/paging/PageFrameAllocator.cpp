@@ -1,9 +1,10 @@
 #include "PageFrameAllocator.h"
 #include <stddef.h>
-#include "../efiMemory.h"
-#include "../bitmap.h"
-#include "../memory.h"
-#include "../panic.h"
+#include "../kernelStuff/memory/efiMemory.h"
+#include "bitmap.h"
+#include "../kernelStuff/memory/memory.h"
+#include "../kernelStuff/stuff/cstr.h"
+#include "../interrupts/panic.h"
 
 PageFrameAllocator* GlobalAllocator;
 

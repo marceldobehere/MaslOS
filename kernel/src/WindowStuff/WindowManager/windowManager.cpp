@@ -1,6 +1,6 @@
 #include "windowManager.h"
 #include "../../OSDATA/osdata.h" 
-#include "../../VirtualRenderer.h"
+#include "../../Rendering/VirtualRenderer.h"
 //#include "../../userinput/mouse.h"
 
 namespace WindowManager

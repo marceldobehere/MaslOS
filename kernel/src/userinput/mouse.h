@@ -1,12 +1,12 @@
 #pragma once
 
-#include  "../IO.h"
-#include "../math.h"
-#include "../BasicRenderer.h"
-#include "../cstr.h"
-#include "../Cols.h"
-#include "../kernelFiles/ImageStruct.h"
-#include "../kernelFiles/ZIPStruct.h"
+#include "../kernelStuff/IO/IO.h"
+#include "../kernelStuff/stuff/math.h"
+#include "../Rendering/BasicRenderer.h"
+#include "../kernelStuff/stuff/cstr.h"
+#include "../Rendering/Cols.h"
+#include "../kernelStuff/kernelFiles/ImageStruct.h"
+#include "../kernelStuff/kernelFiles/ZIPStruct.h"
 
 extern int mouseCycleSkip;
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "../SubInstances/defaultInstance/defaultInstance.h"
 //#include "../SubInstances/terminalInstance/terminalInstance.h"
-#include "../../BasicRenderer.h"
+#include "../../Rendering/BasicRenderer.h"
 
 struct Size
 {
