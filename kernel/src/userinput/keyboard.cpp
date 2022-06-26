@@ -111,14 +111,19 @@ void HandleKeyboard(uint8_t scancode)
     AddToStack();
     if (scancode == ARR_LEFT)
     {  
-        int64_t index = osData.windows.getIndexOf(activeWindow);
-        index = 0;
-        activeWindow = osData.windows[index];
+        int64_t count = Taskbar::taskWindowList->getCount();
+        int64_t index = Taskbar::taskWindowList->getIndexOf(activeWindow);
+        index = (index + count - 1) % count;
+        activeWindow = Taskbar::taskWindowList->elementAt(index);
         activeWindow->moveToFront = true;
     }
     else if (scancode == ARR_RIGHT)
     {
-
+        int64_t count = Taskbar::taskWindowList->getCount();
+        int64_t index = Taskbar::taskWindowList->getIndexOf(activeWindow);
+        index = (index + count + 1) % count;
+        activeWindow = Taskbar::taskWindowList->elementAt(index);
+        activeWindow->moveToFront = true;
     }
     else if (scancode == ARR_UP)
     {  

@@ -96,6 +96,24 @@ template <typename T> void List<T>::add(T item)
     RemoveFromStack();
 }
 
+template <typename T> void List<T>::insertAt(T item, uint64_t index)
+{
+    if (index > count)
+        return;
+    
+    AddToStack();
+    if (count + 1 > cap)
+        expandArr();
+    
+    for (uint64_t i = count - 1; i >= index; i--)
+        arr[i+1] = arr[i];
+    
+    arr[index] = item;
+
+    count++;
+    RemoveFromStack();
+}
+
 template <typename T> void List<T>::clear()
 {
     AddToStack();
@@ -160,4 +178,9 @@ template <typename T> T& List<T>::operator[](uint64_t index)
     T& data = arr[index];
     RemoveFromStack();
     return data;
+}
+
+template <typename T> T List<T>::elementAt(uint64_t index)
+{
+    return arr[index];
 }

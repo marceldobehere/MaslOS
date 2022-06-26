@@ -22,9 +22,11 @@ template <typename T> class List
     uint64_t getCapacity();
     int64_t getIndexOf(T item);
     void add(T item);
+    void insertAt(T item, uint64_t index);
     void removeAt(uint64_t index);
     void removeLast();
     void removeFirst();
+    T elementAt(uint64_t index);
     T& operator[](uint64_t index);
     void clear();
 };

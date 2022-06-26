@@ -1,6 +1,7 @@
 #include "taskbar.h"
 #include "../../OSDATA/osdata.h"
 
+
 namespace Taskbar
 {
     Framebuffer* taskbarBuffer;
@@ -12,6 +13,9 @@ namespace Taskbar
     uint32_t selectedTabBackgroundColor;
     uint32_t defaultTabTextColor;
     uint32_t selectedTabTextColor;
+    SyncedList<Window*>* taskWindowList;
+
+    int8_t Scounter = 0;
 
     void InitTaskbar(kernelFiles::ImageFile* mButton, kernelFiles::ImageFile* mButtonS)
     {
@@ -21,6 +25,9 @@ namespace Taskbar
         taskbarBuffer = osData.windowPointerThing->taskbar;
         renderer = (BasicRenderer*)malloc(sizeof(BasicRenderer));
         *renderer = BasicRenderer(taskbarBuffer, GlobalRenderer->psf1_font);
+        
+        taskWindowList = (SyncedList<Window*>*)malloc(sizeof(SyncedList<Window*>));
+        *taskWindowList = SyncedList<Window*>(&osData.windows);
 
         backgroundColor =            0xff001530;
         defaultTabBackgroundColor =  0xff002299;
@@ -28,11 +35,22 @@ namespace Taskbar
         defaultTabTextColor =        0xffABABAB;
         selectedTabTextColor =       0xffFFFFFF;
 
+        Scounter = 10;
+
         RemoveFromStack();
     }
 
+    
+
     void RenderTaskbar()
     {
+        Scounter++;
+        if (Scounter % 3 == 0)
+            return;
+        else if (Scounter > 100)
+            Scounter = 0;
+
+
         AddToStack();
         {
             uint32_t* endAddr = (uint32_t*)((uint64_t)taskbarBuffer->BaseAddress + taskbarBuffer->BufferSize);
@@ -48,8 +66,10 @@ namespace Taskbar
             GlobDrawImage(MButton, 0, 0, 1, 1, taskbarBuffer);
         
         //GlobDrawImage(currentMouseImage, 10, 10, 1, 1, taskbarBuffer);
+        if (Scounter % 5 == 0)
+            taskWindowList->sync();
 
-        int64_t wCount = osData.windows.getCount();
+        int64_t wCount = taskWindowList->getCount();
         int64_t size = 200;
         int64_t width = taskbarBuffer->Width;
         int64_t height = taskbarBuffer->Height;
@@ -73,9 +93,12 @@ namespace Taskbar
                 if (x + size > width)
                     break;
 
-                Window* window = osData.windows[i];
+                Window* window = taskWindowList->elementAt(i);
 
                 bool hover = window == activeWindow;
+
+                if (!hover && MousePosition.x >= x && MousePosition.x < (x + size) && MousePosition.y >= ypos && MousePosition.y < GlobalRenderer->framebuffer->Height)
+                    hover = true;
                 
                 if (hover)
                     renderer->Clear(x, 2, x + size, height - 3, selectedTabBackgroundColor); // Clear whole Rect
