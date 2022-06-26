@@ -62,7 +62,6 @@ namespace WindowManager
     WindowPointerBufferThing::WindowPointerBufferThing(Framebuffer* actualScreenBuffer, Framebuffer* background, uint32_t backgroundColor)
     {
         this->fps = 1;
-        this->defaultBackgroundColor = backgroundColor;
         this->actualScreenBuffer = actualScreenBuffer;
         this->background = background;
 
@@ -123,7 +122,7 @@ namespace WindowManager
     {
         ClearFrameBuffer(actualScreenBuffer, defaultBackgroundColor);
         ClearFrameBuffer(copyOfScreenBuffer, defaultBackgroundColor);
-        ClearFrameBuffer(taskbar, defaultTaskbarBackgroundColor);
+        ClearFrameBuffer(taskbar, Colors.dgray);
 
         ClearPointerBuffer(virtualScreenBuffer, &defaultBackgroundColor);
         ClearPointerBuffer(copyOfVirtualBuffer, &defaultBackgroundColor);
@@ -324,7 +323,7 @@ namespace WindowManager
             int64_t y = window->position.y- 21;
             VirtualRenderer::Clear(x,y, x + window->size.width-1, window->position.y-2, VirtualRenderer::Border(_x1, _y1, _x2, _y2), virtualScreenBuffer, &window->defaultTitleBackgroundColor);
 
-            const char* stitle = StrSubstr(window->title, 0, (window->size.width - 60) / 10);
+            const char* stitle = StrSubstr(window->title, 0, (window->size.width - 60) / 8);
 
 
             // if (window->instance != NULL)

@@ -83,7 +83,10 @@ __attribute__((interrupt)) void KeyboardInt_handler(interrupt_frame* frame)
     AddToStack();
     uint8_t scancode = inb(0x60);
     //GlobalRenderer->Println("Pressed: {}", to_string((uint64_t)scancode));
-    HandleKeyboard(scancode);  
+    if (osData.booting)
+        osData.booting = false;
+    else
+        HandleKeyboard(scancode);  
     PIC_EndMaster();
     RemoveFromStack();
 }

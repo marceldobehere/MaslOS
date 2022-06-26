@@ -11,6 +11,7 @@ if (osData.enableStackTrace)
 
 extern "C" void _start(BootInfo* bootInfo)
 {  
+    osData.booting = false;
     osData.stackPointer = 0;
     for (int i = 0; i < 1000; i++)
         osData.stackArr[i] = MStack();
@@ -34,10 +35,18 @@ extern "C" void _start(BootInfo* bootInfo)
     
     osData.drawBackground = true;
     
-
+    
     GlobalRenderer->Clear(Colors.black);
     GlobalRenderer->DrawImage(bootInfo->bootImage, 0, 0, 1, 1);
-    PIT::Sleep(1000);
+    osData.booting = true;
+
+    {
+        uint64_t endTime = PIT::TimeSinceBootMS() + 1000;
+        while (PIT::TimeSinceBootMS() < endTime && osData.booting)
+            asm("hlt");
+        osData.booting = false;
+    }
+    
     GlobalRenderer->Clear(Colors.black);
 
 //    while(true);

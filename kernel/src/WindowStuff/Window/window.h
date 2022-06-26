@@ -60,6 +60,7 @@ class Window
     
     public:
     DefaultInstance* instance;
+    kernelFiles::ImageFile* icon;
     bool allowKeyboardDrawing;
     Size size;
     Position position;

@@ -47,7 +47,6 @@ namespace WindowManager
         uint64_t fps;
         uint32_t defaultColor = Colors.black;
         uint32_t defaultBackgroundColor = defaultColor;
-        uint32_t defaultTaskbarBackgroundColor = Colors.dblue;
         Framebuffer *actualScreenBuffer;
         Framebuffer *copyOfScreenBuffer;
         Framebuffer *background;

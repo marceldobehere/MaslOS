@@ -27,6 +27,7 @@ Window::Window(DefaultInstance* instance, Size size, Position position, const ch
     this->showBorder = showBorder;
     this->showTitleBar = showTitleBar;
     this->moveable = moveable;
+    this->icon = NULL;
 
     {
         framebuffer = (Framebuffer*)malloc(sizeof(Framebuffer));

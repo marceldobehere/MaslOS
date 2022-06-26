@@ -12,6 +12,7 @@
 struct OSData
 {
     bool exit;
+    bool booting;
     KernelInfo* kernelInfo;
     List<Window*> windows;
     kernelFiles::ZIPFile* windowIconsZIP;
