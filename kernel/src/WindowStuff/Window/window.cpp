@@ -27,7 +27,18 @@ Window::Window(DefaultInstance* instance, Size size, Position position, const ch
     this->showBorder = showBorder;
     this->showTitleBar = showTitleBar;
     this->moveable = moveable;
-    this->icon = NULL;
+    
+    if (instance == NULL)
+        icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.DEFAULT];
+    else if (instance->instanceType == InstanceType::Default)
+        icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.DEFAULT];
+    else if (instance->instanceType == InstanceType::Terminal)
+        icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.TERMINAL];
+    else if (instance->instanceType == InstanceType::DebugTerminal)
+        icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.DEBUG];
+    else
+        icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.DEFAULT];
+
 
     {
         framebuffer = (Framebuffer*)malloc(sizeof(Framebuffer));

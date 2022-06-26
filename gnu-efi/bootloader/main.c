@@ -406,7 +406,8 @@ typedef struct
 	ImageFile* MButton;
 	ImageFile* MButtonS;
 	ZIPFile* mouseZIP;
-	ZIPFile* windowIconZIP;
+	ZIPFile* windowButtonZIP;
+	ZIPFile* windowIconsZIP;
 	EFI_MEMORY_DESCRIPTOR* mMap;
 	UINTN mMapSize;
 	UINTN mMapDescSize;
@@ -579,11 +580,18 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 		Print(L"Mouse ZIP loaded. Char size: %d\n\r", (mouseZIP->size));
 
 
-	ZIPFile* windowZIP = LoadZIP(NULL, L"window-icons.mbzf", ImageHandle, SystemTable);
-	if (windowZIP == NULL)
+	ZIPFile* windowIconZIP = LoadZIP(NULL, L"window_icons.mbzf", ImageHandle, SystemTable);
+	if (windowIconZIP == NULL)
 		Print(L"Window Icon ZIP was not loaded!\n\r");
 	else
-		Print(L"Window Icon ZIP loaded. Char size: %d\n\r", (windowZIP->size));
+		Print(L"Window Icon ZIP loaded. Char size: %d\n\r", (windowIconZIP->size));
+
+
+	ZIPFile* windowButtonZIP = LoadZIP(NULL, L"window_buttons.mbzf", ImageHandle, SystemTable);
+	if (windowButtonZIP == NULL)
+		Print(L"Window Button ZIP was not loaded!\n\r");
+	else
+		Print(L"Window Button ZIP loaded. Char size: %d\n\r", (windowButtonZIP->size));
 
 
 
@@ -631,7 +639,8 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 	bootInfo.MButton = MButtonImage;
 	bootInfo.MButtonS = MButtonImageS;
 	bootInfo.mouseZIP = mouseZIP;
-	bootInfo.windowIconZIP = windowZIP;
+	bootInfo.windowIconsZIP = windowIconZIP;
+	bootInfo.windowButtonZIP = windowButtonZIP;
 	bootInfo.rsdp = rsdp;
 
 

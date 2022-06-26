@@ -130,9 +130,10 @@ void PrepareWindows(Framebuffer* img)
     Window* debugTerminalWindow;
     {
         debugTerminalWindow = (Window*)malloc(sizeof(Window));
-        //TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
-        //*terminal = TerminalInstance(&adminUser, debugTerminalWindow);
-        *(debugTerminalWindow) = Window(NULL /*(DefaultInstance*)terminal*/, Size(400, 600), Position(600, 20), "Debug Terminal", false, true, true);
+        DebugTerminalInstance* dterminal = (DebugTerminalInstance*)malloc(sizeof(DebugTerminalInstance));
+        *dterminal = DebugTerminalInstance(debugTerminalWindow);
+        
+        *(debugTerminalWindow) = Window(dterminal, Size(400, 600), Position(600, 20), "Debug Terminal", false, true, true);
         //osData.windows.add(debugTerminalWindow);
 
         osData.debugTerminalWindow = debugTerminalWindow;
@@ -181,18 +182,27 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     initUsers();
 
-    osData.windowIconsZIP = bootInfo->windowIconZIP;
-    PrepareWindows(kernelFiles::ConvertImageToFramebuffer(bootInfo->bgImage));
+    osData.windowIconZIP = bootInfo->windowIconsZIP;
+    osData.windowButtonZIP = bootInfo->windowButtonZIP;
 
-    for (int i = 0; i < WindowManager::countOfIcons; i++)
+    for (int i = 0; i < WindowManager::countOfWindowIcons; i++)
+        WindowManager::internalWindowIcons[i] = kernelFiles::ConvertFileToImage(kernelFiles::ZIP::GetFileFromFileName(osData.windowIconZIP, WindowManager::windowIconNames[i]));
+    
+    for (int i = 0; i < WindowManager::countOfButtonIcons; i++)
     {
         //osData.debugTerminalWindow->Log("Loading Window {}.", to_string(i), Colors.yellow);
         //osData.debugTerminalWindow->Log("- Name: \"{}\"", WindowManager::windowIconNames[i], Colors.yellow);
-        WindowManager::windowIcons[i] = kernelFiles::ConvertFileToImage(kernelFiles::ZIP::GetFileFromFileName(osData.windowIconsZIP, WindowManager::windowIconNames[i]));
+        WindowManager::windowButtonIcons[i] = kernelFiles::ConvertFileToImage(kernelFiles::ZIP::GetFileFromFileName(osData.windowButtonZIP, WindowManager::windowButtonIconNames[i]));
         //osData.debugTerminalWindow->Log("- ADDR 1: {}", ConvertHexToString((uint64_t)WindowManager::windowIcons[i]), Colors.yellow);
         //osData.debugTerminalWindow->Log("- Width:  {}px", to_string(WindowManager::windowIcons[i]->width), Colors.yellow);
         //osData.debugTerminalWindow->Log("- Height: {}px", to_string(WindowManager::windowIcons[i]->height), Colors.yellow);
     }
+    
+    PrepareWindows(kernelFiles::ConvertImageToFramebuffer(bootInfo->bgImage));
+
+
+
+
     
     Taskbar::InitTaskbar(bootInfo->MButton, bootInfo->MButtonS);
 

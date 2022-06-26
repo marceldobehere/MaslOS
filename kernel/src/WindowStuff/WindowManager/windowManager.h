@@ -10,7 +10,7 @@ namespace WindowManager
     Window *getWindowAtMousePosition();
     Window *getWindowAtMousePosition(int distance);
 
-    static struct _windowIconEnum
+    static struct _windowButtonIconEnum
     {
         static const int 
         CLOSE_N = 0,
@@ -25,17 +25,43 @@ namespace WindowManager
         HIDE_S = 7,
         HIDE_H = 8;
 
-    } windowIconEnum;
+    } windowButtonIconEnum;
 
-    static const int countOfIcons = 9;
+    static const int countOfButtonIcons = 9;
 
-    static const char* const windowIconNames[countOfIcons] = {
+    static const char* const windowButtonIconNames[countOfButtonIcons] = {
         "close_n.mbif", "close_s.mbif", "close_h.mbif", 
         "min_n.mbif",   "min_s.mbif",   "min_h.mbif", 
         "hide_n.mbif",  "hide_s.mbif",  "hide_h.mbif"
     };
 
-    extern kernelFiles::ImageFile* windowIcons[];
+
+    static struct _windowIconEnum
+    {
+        static const int 
+        DEBUG = 0,
+        DEFAULT = 1,
+        TASK_MANAGER = 2,
+        TERMINAL = 3;
+
+    } windowIconEnum;
+
+    static const int countOfWindowIcons = 4;
+
+    static const char* const windowIconNames[countOfWindowIcons] = {
+        "debug.mbif",
+        "generic.mbif",
+        "task_manager.mbif",
+        "terminal.mbif"
+    };
+
+
+
+
+
+    extern kernelFiles::ImageFile* windowButtonIcons[];
+
+    extern kernelFiles::ImageFile* internalWindowIcons[];
 
     class WindowPointerBufferThing
     {

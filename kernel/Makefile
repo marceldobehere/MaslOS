@@ -82,7 +82,8 @@ buildimg:
 	mcopy -i $(BUILDDIR)/$(OSNAME).img src/external/test.mbif ::
 	mcopy -i $(BUILDDIR)/$(OSNAME).img src/external/background.mbif ::
 	mcopy -i $(BUILDDIR)/$(OSNAME).img src/external/mouse.mbzf ::
-	mcopy -i $(BUILDDIR)/$(OSNAME).img src/external/window-icons.mbzf ::
+	mcopy -i $(BUILDDIR)/$(OSNAME).img src/external/window_icons.mbzf ::
+	mcopy -i $(BUILDDIR)/$(OSNAME).img src/external/window_buttons.mbzf ::
 	mcopy -i $(BUILDDIR)/$(OSNAME).img src/external/boot.mbif ::
 	mcopy -i $(BUILDDIR)/$(OSNAME).img src/external/MButton.mbif ::
 	mcopy -i $(BUILDDIR)/$(OSNAME).img src/external/MButton_S.mbif ::

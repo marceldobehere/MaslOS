@@ -75,7 +75,7 @@ namespace Taskbar
 
                 Window* window = osData.windows[i];
 
-                bool hover = i % 2 == 1;
+                bool hover = window == activeWindow;
                 
                 if (hover)
                     renderer->Clear(x, 2, x + size, height - 3, selectedTabBackgroundColor); // Clear whole Rect

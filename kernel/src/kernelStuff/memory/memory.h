@@ -7,6 +7,7 @@
 #include "../kernelFiles/ZIPStruct.h"
 #include "../other_IO/acpi/acpi.h"
 
+
 struct BootInfo
 {
 	Framebuffer* framebuffer;
@@ -17,7 +18,8 @@ struct BootInfo
 	kernelFiles::ImageFile* MButton;
 	kernelFiles::ImageFile* MButtonS;
     kernelFiles::ZIPFile* mouseZIP;
-	kernelFiles::ZIPFile* windowIconZIP;
+	kernelFiles::ZIPFile* windowButtonZIP;
+	kernelFiles::ZIPFile* windowIconsZIP;
 	EFI_MEMORY_DESCRIPTOR* mMap;
 	uint64_t mMapSize;
 	uint64_t mMapDescSize;

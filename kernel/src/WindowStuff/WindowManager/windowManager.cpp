@@ -6,7 +6,9 @@
 namespace WindowManager
 {
 
-    kernelFiles::ImageFile* windowIcons[countOfIcons];
+    kernelFiles::ImageFile* windowButtonIcons[countOfButtonIcons];
+
+    kernelFiles::ImageFile* internalWindowIcons[countOfWindowIcons];
 
     Window* getWindowAtMousePosition(int dis)
     {
@@ -427,7 +429,7 @@ namespace WindowManager
                 if (MousePosition.x >= x - 20 && MousePosition.x <= x && MousePosition.y >= y && MousePosition.y <= y + 20)
                     state = 2;
 
-                VirtualRenderer::DrawImage(windowIcons[windowIconEnum.CLOSE_N + state], x - 20, y + 1, 1, 1, border, virtualScreenBuffer);
+                VirtualRenderer::DrawImage(windowButtonIcons[windowButtonIconEnum.CLOSE_N + state], x - 20, y + 1, 1, 1, border, virtualScreenBuffer);
                 x -= 20;
             }
             {
@@ -437,7 +439,7 @@ namespace WindowManager
                 if (MousePosition.x >= x - 20 && MousePosition.x <= x && MousePosition.y >= y && MousePosition.y <= y + 20)
                     state = 2;
 
-                VirtualRenderer::DrawImage(windowIcons[windowIconEnum.MIN_N + state], x - 20, y + 1, 1, 1, border, virtualScreenBuffer);
+                VirtualRenderer::DrawImage(windowButtonIcons[windowButtonIconEnum.MIN_N + state], x - 20, y + 1, 1, 1, border, virtualScreenBuffer);
                 x -= 20;
             }
             {
@@ -447,7 +449,7 @@ namespace WindowManager
                 if (MousePosition.x >= x - 20 && MousePosition.x <= x && MousePosition.y >= y && MousePosition.y <= y + 20)
                     state = 2;
 
-                VirtualRenderer::DrawImage(windowIcons[windowIconEnum.HIDE_N + state], x - 20, y + 1, 1, 1, border, virtualScreenBuffer);
+                VirtualRenderer::DrawImage(windowButtonIcons[windowButtonIconEnum.HIDE_N + state], x - 20, y + 1, 1, 1, border, virtualScreenBuffer);
                 x -= 20;
             }
 

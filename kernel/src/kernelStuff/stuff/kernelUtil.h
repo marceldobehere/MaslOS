@@ -63,6 +63,7 @@ struct KernelInfo
 #include "../../Rendering/VirtualRenderer.h"
 
 #include "../../WindowStuff/Taskbar/taskbar.h"
+#include "../../WindowStuff/SubInstances/debugTerminalInstance/debugTerminalInstance.h"
 
 void PrepareACPI(BootInfo* bootInfo);
 

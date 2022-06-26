@@ -3,7 +3,8 @@
 enum InstanceType
 {
     Default,
-    Terminal
+    Terminal,
+    DebugTerminal
 };
 
 class DefaultInstance
