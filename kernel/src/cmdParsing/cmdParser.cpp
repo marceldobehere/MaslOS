@@ -343,10 +343,22 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
         if (StrEquals(val, "on") || StrEquals(val, "shown"))
         {
             osData.showDebugterminal = true;
+            osData.windowPointerThing->UpdatePointerRect(
+                osData.debugTerminalWindow->position.x - 1, 
+                osData.debugTerminalWindow->position.y - 23, 
+                osData.debugTerminalWindow->position.x + osData.debugTerminalWindow->size.width, 
+                osData.debugTerminalWindow->position.y + osData.debugTerminalWindow->size.height
+                );
         }
         else if (StrEquals(val, "off") || StrEquals(val, "hidden"))
         {
             osData.showDebugterminal = false;
+            osData.windowPointerThing->UpdatePointerRect(
+                osData.debugTerminalWindow->position.x - 1, 
+                osData.debugTerminalWindow->position.y - 23, 
+                osData.debugTerminalWindow->position.x + osData.debugTerminalWindow->size.width, 
+                osData.debugTerminalWindow->position.y + osData.debugTerminalWindow->size.height
+                );
         }
         else
             LogError("value has to be \"on\", \"shown\", \"off\" or \"hidden\"!", window);

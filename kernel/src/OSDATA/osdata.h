@@ -15,6 +15,7 @@ struct OSData
     bool booting;
     KernelInfo* kernelInfo;
     List<Window*> windows;
+    List<Task*> osTasks;
     kernelFiles::ZIPFile* windowButtonZIP;
     kernelFiles::ZIPFile* windowIconZIP;
     //Window* realMainWindow;

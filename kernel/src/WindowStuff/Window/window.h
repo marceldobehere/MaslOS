@@ -53,6 +53,15 @@ struct Position
     }
 };
 
+enum WindowActionEnum
+{
+    _NONE,
+    CLOSE,
+    MIN_MAX,
+    HIDE,
+};
+
+
 class Window
 {
     private:
@@ -74,7 +83,8 @@ class Window
     uint32_t defaultTitleColor;
     uint32_t selectedTitleColor;
     uint32_t defaultTitleBackgroundColor;
-    bool showTitleBar, showBorder, moveable;
+    bool showTitleBar, showBorder, moveable, hidden;
+    bool oldHidden;
     
     bool moveToFront;
     const char* title;
@@ -90,6 +100,8 @@ class Window
 
     void Log(const char* message, uint32_t col);
     void Log(const char* message, const char* var, uint32_t col);
+
+    WindowActionEnum GetCurrentAction();
 };
 
 

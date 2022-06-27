@@ -5,6 +5,7 @@ enum TaskType
     NONE,
     SLEEP,
     HANDLEENTER,
+    CLOSEWINDOW,
 };
 
 

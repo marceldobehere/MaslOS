@@ -4,6 +4,7 @@
 #include "../kernelStuff/other_IO/pit/pit.h"
 #include "../OSDATA/osdata.h"
 #include "../Rendering/VirtualRenderer.h"
+#include "../tasks/closeWindow/taskWindowClose.h"
 
 #define PS2XSign        0b00010000
 #define PS2YSign        0b00100000
@@ -430,35 +431,87 @@ bool activeDragOn = false;
 
 void HandleClick(bool L, bool R, bool M)
 {
+    AddToStack();
     //activeWindow->renderer->Println("Click");
     if (L)
     {
-        Window* window = WindowManager::getWindowAtMousePosition();
         Window* oldActive = activeWindow;
-        activeWindow = window;
-        dragWindow = window;
-        startDrag = false;
-        if (window != NULL)
+        WindowActionEnum action = WindowActionEnum::_NONE;
+        if (WindowManager::currentActionWindow != NULL)
         {
-            activeDragOn = false;
-            for (int i = 0; i < 4; i++)
-            {
-                activeDrag[i] = dragArr[i];
-                activeDragOn |= activeDrag[i];
-            }
+            action = WindowManager::currentActionWindow->GetCurrentAction();
+            if (action == WindowActionEnum::_NONE)
+                WindowManager::currentActionWindow = NULL;
+        }
 
-            diff.x = MousePosition.x;
-            diff.y = MousePosition.y;
-            window->moveToFront = true;
-            //osData.windowPointerThing->UpdateWindowBorder(osData.windows[osData.windows.getCount() - 1]);
+        if (action != WindowActionEnum::_NONE) // Window Button Clicked
+        {
+            if (action == WindowActionEnum::CLOSE)
+            {
+                if (osData.debugTerminalWindow != WindowManager::currentActionWindow)
+                {
+                    // osData.debugTerminalWindow->Log("Count: {}", to_string(osData.osTasks.getCount()), Colors.yellow);
+                    // osData.debugTerminalWindow->Log("Cap: {}", to_string(osData.osTasks.getCapacity()), Colors.yellow);
+                    osData.osTasks.add(NewWindowCloseTask(WindowManager::currentActionWindow));
+                }
+                else
+                {
+                    osData.showDebugterminal = false;
+                    osData.windowPointerThing->UpdatePointerRect(
+                        osData.debugTerminalWindow->position.x - 1, 
+                        osData.debugTerminalWindow->position.y - 23, 
+                        osData.debugTerminalWindow->position.x + osData.debugTerminalWindow->size.width, 
+                        osData.debugTerminalWindow->position.y + osData.debugTerminalWindow->size.height
+                        );
+                }
+            }
+            else if (action == WindowActionEnum::HIDE)
+            {
+                WindowManager::currentActionWindow->hidden = true;
+                if (activeWindow == WindowManager::currentActionWindow)
+                    activeWindow = NULL;
+            }
+        }
+        else if (Taskbar::activeTabWindow != NULL) // Taskbar Button Clicked
+        {
+            activeWindow = Taskbar::activeTabWindow;
+            Taskbar::activeTabWindow->moveToFront = true;
+            activeWindow->hidden = false;
         }
         else
         {
-            //osData.windowPointerThing->UpdateWindowBorder(osData.windows[osData.windows.getCount() - 1]);
+            Window* window = WindowManager::getWindowAtMousePosition();
+            Window* oldActive = activeWindow;
+            activeWindow = window;
+            dragWindow = window;
+            startDrag = false;
+            if (window != NULL)
+            {
+                activeDragOn = false;
+                for (int i = 0; i < 4; i++)
+                {
+                    activeDrag[i] = dragArr[i];
+                    activeDragOn |= activeDrag[i];
+                }
+
+                diff.x = MousePosition.x;
+                diff.y = MousePosition.y;
+                window->moveToFront = true;
+                //osData.windowPointerThing->UpdateWindowBorder(osData.windows[osData.windows.getCount() - 1]);
+            }
+            else
+            {
+
+                //osData.windowPointerThing->UpdateWindowBorder(osData.windows[osData.windows.getCount() - 1]);
+            }
         }
+        
         if (oldActive != NULL)
+        {
             osData.windowPointerThing->UpdateWindowBorder(oldActive);
-    }   
+        }
+    }  
+    RemoveFromStack(); 
 }
 
 

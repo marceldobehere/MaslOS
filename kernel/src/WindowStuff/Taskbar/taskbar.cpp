@@ -14,6 +14,7 @@ namespace Taskbar
     uint32_t defaultTabTextColor;
     uint32_t selectedTabTextColor;
     SyncedList<Window*>* taskWindowList;
+    Window* activeTabWindow;
 
     int8_t Scounter = 0;
 
@@ -87,7 +88,7 @@ namespace Taskbar
             int iconSize = 24;
             int ydiff = ((height)-iconSize)/2;
             int textStart = iconSize + 12;
-
+            Window* tempWindow = NULL;
             for (int i = 0; i < wCount; i++)
             {
                 if (x + size > width)
@@ -95,11 +96,18 @@ namespace Taskbar
 
                 Window* window = taskWindowList->elementAt(i);
 
+                if (window == osData.debugTerminalWindow && !osData.showDebugterminal)
+                    continue;
+
+
                 bool hover = window == activeWindow;
 
-                if (!hover && MousePosition.x >= x && MousePosition.x < (x + size) && MousePosition.y >= ypos && MousePosition.y < GlobalRenderer->framebuffer->Height)
+                if (MousePosition.x >= x && MousePosition.x < (x + size) && MousePosition.y >= ypos && MousePosition.y < GlobalRenderer->framebuffer->Height)
+                {
                     hover = true;
-                
+                    tempWindow = window;
+                }
+
                 if (hover)
                     renderer->Clear(x, 2, x + size, height - 3, selectedTabBackgroundColor); // Clear whole Rect
                 else
@@ -127,7 +135,7 @@ namespace Taskbar
                     free((void*)stitle);
                 }
 
-                
+                activeTabWindow = tempWindow;
 
 
 
@@ -141,6 +149,12 @@ namespace Taskbar
     }
 
 
+    // Window* GetItemAtMousePosition()
+    // {
+        
+
+
+    // }
 
     
 }

@@ -137,6 +137,7 @@ void HandleKeyboard(uint8_t scancode)
     }
     else if (scancode == ARR_DOWN)
     {
+
         // int64_t index = osData.windows.getIndexOf(activeWindow);
         // if (index == -1)
         // {
@@ -145,6 +146,26 @@ void HandleKeyboard(uint8_t scancode)
         // }
         // if (osData.windows[index]->newSize.width >= 10)
         //     osData.windows[index]->newSize.width -= 10;
+
+        {
+            Window* oldActive = activeWindow;
+            Window* mainWindow = (Window*)malloc(sizeof(Window));
+            TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
+            *terminal = TerminalInstance(&guestUser, mainWindow);
+            *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(10, 40), "Terminal Window", true, true, true);
+            osData.windows.add(mainWindow);
+            mainWindow->renderer->Cls();
+            KeyboardPrintStart(mainWindow);
+
+            activeWindow = mainWindow;          
+            mainWindow->moveToFront = true;
+            osData.mainTerminalWindow = mainWindow;
+
+            if (oldActive != NULL)
+            {
+                osData.windowPointerThing->UpdateWindowBorder(oldActive);
+            }
+        }
     }
 
 

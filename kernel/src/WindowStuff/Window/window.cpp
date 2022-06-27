@@ -13,6 +13,8 @@ Window::Window(DefaultInstance* instance, Size size, Position position, const ch
     this->size = size;
     this->newPosition = position;
     this->newSize = size;
+    this->hidden = false;
+    oldHidden = hidden;
     //this->parentRenderer = parentRenderer;
     //this->parentFrameBuffer = parentRenderer->framebuffer;
     //this->borderColor = Colors.gray;
@@ -57,6 +59,29 @@ Window::Window(DefaultInstance* instance, Size size, Position position, const ch
     RemoveFromStack();
 }
 
+
+WindowActionEnum Window::GetCurrentAction()
+{
+    if (hidden)
+        return WindowActionEnum::_NONE;
+
+    int64_t x = position.x + size.width;
+    int64_t y = position.y - 22;
+
+    if (MousePosition.x >= x - 20 && MousePosition.x <= x && MousePosition.y >= y && MousePosition.y <= y + 20)
+        return WindowActionEnum::CLOSE;
+    x -= 20;
+
+    if (MousePosition.x >= x - 20 && MousePosition.x <= x && MousePosition.y >= y && MousePosition.y <= y + 20)
+        return WindowActionEnum::MIN_MAX;
+    x -= 20;
+
+    if (MousePosition.x >= x - 20 && MousePosition.x <= x && MousePosition.y >= y && MousePosition.y <= y + 20)
+        return WindowActionEnum::HIDE;
+    x -= 20;
+    
+    return WindowActionEnum::_NONE;
+}
 
 void Window::Free()
 {

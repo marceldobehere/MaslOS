@@ -10,6 +10,9 @@ namespace WindowManager
 
     kernelFiles::ImageFile* internalWindowIcons[countOfWindowIcons];
 
+
+    Window* currentActionWindow;
+
     Window* getWindowAtMousePosition(int dis)
     {
         AddToStack();
@@ -101,6 +104,8 @@ namespace WindowManager
             taskbar->BufferSize = taskbar->Height * taskbar->Width * 4;
             taskbar->BaseAddress = malloc(taskbar->BufferSize);
         }
+
+        currentActionWindow = NULL;
 
         Clear();
 
@@ -231,6 +236,24 @@ namespace WindowManager
     void WindowPointerBufferThing::RenderWindowRect(Window* window, int x1, int y1, int x2, int y2)
     {
         AddToStack();
+
+        if (window == NULL)
+        {
+            RemoveFromStack();
+            return;
+        }
+
+        if (window->hidden)
+        {
+            RemoveFromStack();
+            return;
+        }
+
+        if (window == osData.debugTerminalWindow && !osData.showDebugterminal)
+        {
+            RemoveFromStack();
+            return;
+        }
 
         int64_t _x1 = window->position.x;
         int64_t _y1 = window->position.y;
@@ -428,6 +451,8 @@ namespace WindowManager
                     state = 1;
                 if (MousePosition.x >= x - 20 && MousePosition.x <= x && MousePosition.y >= y && MousePosition.y <= y + 20)
                     state = 2;
+                if (state == 2)
+                    currentActionWindow = window;
 
                 VirtualRenderer::DrawImage(windowButtonIcons[windowButtonIconEnum.CLOSE_N + state], x - 20, y + 1, 1, 1, border, virtualScreenBuffer);
                 x -= 20;
@@ -438,6 +463,8 @@ namespace WindowManager
                     state = 1;
                 if (MousePosition.x >= x - 20 && MousePosition.x <= x && MousePosition.y >= y && MousePosition.y <= y + 20)
                     state = 2;
+                if (state == 2)
+                    currentActionWindow = window;
 
                 VirtualRenderer::DrawImage(windowButtonIcons[windowButtonIconEnum.MIN_N + state], x - 20, y + 1, 1, 1, border, virtualScreenBuffer);
                 x -= 20;
@@ -448,6 +475,8 @@ namespace WindowManager
                     state = 1;
                 if (MousePosition.x >= x - 20 && MousePosition.x <= x && MousePosition.y >= y && MousePosition.y <= y + 20)
                     state = 2;
+                if (state == 2)
+                    currentActionWindow = window;
 
                 VirtualRenderer::DrawImage(windowButtonIcons[windowButtonIconEnum.HIDE_N + state], x - 20, y + 1, 1, 1, border, virtualScreenBuffer);
                 x -= 20;
@@ -658,6 +687,9 @@ if (window != NULL)
 
 
         //osData.debugTerminalWindow->Log("             : ################", Colors.black);
+        osData.debugTerminalWindow->renderer->CursorPosition.x = 0;
+        osData.debugTerminalWindow->renderer->CursorPosition.y -= 48;
+
         osData.debugTerminalWindow->renderer->Clear(
             osData.debugTerminalWindow->renderer->CursorPosition.x,
             osData.debugTerminalWindow->renderer->CursorPosition.y,
@@ -683,8 +715,7 @@ if (window != NULL)
             Colors.black);
         osData.debugTerminalWindow->Log("Heap count: {}", to_string(heapCount), Colors.yellow);
 
-        osData.debugTerminalWindow->renderer->CursorPosition.x = 0;
-        osData.debugTerminalWindow->renderer->CursorPosition.y -= 48;
+        
         
     }
 

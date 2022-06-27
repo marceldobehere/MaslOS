@@ -1,6 +1,7 @@
 #include "task.h"
 #include "sleep/taskSleep.h"
 #include "enterHandler/taskEnterHandler.h"
+#include "closeWindow/taskWindowClose.h"
 #include "../memory/heap.h"
 
 
@@ -48,6 +49,12 @@ void DoTask(Task* task)
             enter->Do();
             break;
         }
+        case TaskType::CLOSEWINDOW:
+        {
+            TaskWindowClose* close = (TaskWindowClose*)task;
+            close->Do();
+            break;
+        }
     }
 }
 
@@ -72,6 +79,13 @@ void FreeTask(Task* task)
             TaskEnterHandler* enter = (TaskEnterHandler*)task;
             enter->Free();
             free((void*)enter);
+            break;
+        }
+        case TaskType::CLOSEWINDOW:
+        {
+            TaskWindowClose* close = (TaskWindowClose*)task;
+            close->Free();
+            free((void*)close);
             break;
         }
     }  

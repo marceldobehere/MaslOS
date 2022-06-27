@@ -19,12 +19,14 @@ extern "C" void _start(BootInfo* bootInfo)
     osData.enableStackTrace = RECORD_STACK_TRACE;
     AddToStack();
     osData.crashCount = 0;
-
+    //
     //while(true);
 
     KernelInfo kernelInfo = InitializeKernel(bootInfo);
     PageTableManager* pageTableManager = kernelInfo.pageTableManager;
     //AddToStack();
+    osData.osTasks = List<Task*>(4);
+
 
     osData.kernelInfo = &kernelInfo;
     osData.exit = false;
@@ -126,7 +128,9 @@ extern "C" void _start(BootInfo* bootInfo)
 
     debugTerminalWindow->Log("Kernel Initialised Successfully!");
 
-
+    debugTerminalWindow->Log("<STAT>");
+    debugTerminalWindow->Log("<STAT>");
+    debugTerminalWindow->Log("<STAT>");
 
     activeWindow->renderer->Cls();
     KeyboardPrintStart(mainWindow);
@@ -204,6 +208,17 @@ extern "C" void _start(BootInfo* bootInfo)
             if (window == osData.debugTerminalWindow && !osData.showDebugterminal)
                 continue;
             
+            if (window->hidden != window->oldHidden)
+            {
+                window->oldHidden = window->hidden;
+                osData.windowPointerThing->UpdatePointerRect(
+                    window->position.x - 1, 
+                    window->position.y - 23, 
+                    window->position.x + window->size.width, 
+                    window->position.y + window->size.height
+                    );
+            }
+
             {
                 int x1 = window->position.x - 1;
                 int y1 = window->position.y - 23;
@@ -309,6 +324,20 @@ extern "C" void _start(BootInfo* bootInfo)
             //PIT::Sleep(10);
             //asm("hlt");
         }
+
+        for (int i = 0; i < osData.osTasks.getCount(); i++)
+        {
+            Task* task = osData.osTasks[i];
+            DoTask(task);
+            if (task->GetDone())
+            {
+                osData.osTasks.removeAt(i);
+                FreeTask(task);
+                i--;
+            }
+        }
+
+
         //GlobalRenderer->Print("C");
         //asm("hlt");
     }

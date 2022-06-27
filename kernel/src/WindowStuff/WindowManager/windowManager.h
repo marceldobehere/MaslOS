@@ -57,6 +57,7 @@ namespace WindowManager
 
 
 
+    extern Window* currentActionWindow;
 
 
     extern kernelFiles::ImageFile* windowButtonIcons[];
