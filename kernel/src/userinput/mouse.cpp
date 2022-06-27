@@ -436,12 +436,17 @@ void HandleClick(bool L, bool R, bool M)
     if (L)
     {
         Window* oldActive = activeWindow;
+        Window* window = WindowManager::getWindowAtMousePosition();
+
         WindowActionEnum action = WindowActionEnum::_NONE;
         if (WindowManager::currentActionWindow != NULL)
         {
-            action = WindowManager::currentActionWindow->GetCurrentAction();
-            if (action == WindowActionEnum::_NONE)
-                WindowManager::currentActionWindow = NULL;
+            if (WindowManager::currentActionWindow == window)
+            {
+                action = WindowManager::currentActionWindow->GetCurrentAction();
+                if (action == WindowActionEnum::_NONE)
+                    WindowManager::currentActionWindow = NULL;
+            }
         }
 
         if (action != WindowActionEnum::_NONE) // Window Button Clicked
@@ -472,15 +477,9 @@ void HandleClick(bool L, bool R, bool M)
                     activeWindow = NULL;
             }
         }
-        else if (Taskbar::activeTabWindow != NULL) // Taskbar Button Clicked
-        {
-            activeWindow = Taskbar::activeTabWindow;
-            Taskbar::activeTabWindow->moveToFront = true;
-            activeWindow->hidden = false;
-        }
         else
         {
-            Window* window = WindowManager::getWindowAtMousePosition();
+            
             Window* oldActive = activeWindow;
             activeWindow = window;
             dragWindow = window;
@@ -503,6 +502,17 @@ void HandleClick(bool L, bool R, bool M)
             {
 
                 //osData.windowPointerThing->UpdateWindowBorder(osData.windows[osData.windows.getCount() - 1]);
+
+
+                if (Taskbar::activeTabWindow != NULL) // Taskbar Button Clicked
+                {
+                    activeWindow = Taskbar::activeTabWindow;
+                    Taskbar::activeTabWindow->moveToFront = true;
+                    activeWindow->hidden = false;
+                }
+
+
+
             }
         }
         
