@@ -7,19 +7,26 @@ MaslOS is love, MaslOS is life.
 
 
 
-## How to run
-for now just download the whole repo and run the JUST RUN OS file.
-
-ya need qemu tho.
-
-## How to build
-install qemu if ya haven't
-
-install cmake if ya haven't
-
-install nasm if ya haven't
-
-make sure mtools is on version 4.0.27 or lower. newer versions aren't working just yet
+## How to run (Linux)
+Install QEMU if you haven't.
+Then download/clone the repo and run the `Just RUN OS.sh` file.
 
 
-Go into the MaslOS Folder and run ./RUN.sh
+
+## How to run (Windows)
+Install QEMU if you haven't.
+Add QEMU To your PATH variable. [If ya have trouble installing it and don't know how to set the PATH variable, click here](https://linuxhint.com/qemu-windows/)
+Then download/clone the repo and run the `Just RUN OS (Windows).cmd` file.
+
+
+
+
+## How to build (Linux)
+Install QEMU if you haven't.
+install CMAKE if you haven't.
+install NASM if you haven't.
+
+(make sure mtools is on version 4.0.27 or lower. newer versions aren't working just yet)
+
+
+Go into the MaslOS Folder and run `./RUN.sh`
