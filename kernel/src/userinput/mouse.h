@@ -7,12 +7,14 @@
 #include "../Rendering/Cols.h"
 #include "../kernelStuff/kernelFiles/ImageStruct.h"
 #include "../kernelStuff/kernelFiles/ZIPStruct.h"
+#include "../customClasses/list.h"
 
 extern int mouseCycleSkip;
 
 extern kernelFiles::ZIPFile* mouseZIP;
 extern kernelFiles::ImageFile* currentMouseImage;
 extern const char* currentMouseImageName;
+extern List<MousePacket> mousePackets;
 
 void Mousewait();
 
@@ -28,7 +30,10 @@ void MouseWrite(uint8_t value);
 
 void HandlePS2Mouse(uint8_t data);
 
-void ProcessMousePacket();
+void ProcessMousePacket(MousePacket packet);
+void ProcessMousePackets(int limit);
+void ProcessMousePackets();
+
 
 
 void DrawMousePointer();

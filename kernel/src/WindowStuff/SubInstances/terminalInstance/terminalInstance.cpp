@@ -40,6 +40,10 @@ void TerminalInstance::HandleEnter()
         //GlobalRenderer->Print("> ");
         //GlobalRenderer->Println(userData);
     }
+    else
+    {
+        mode = commandMode::none;
+    }
     printUser = true;
     RemoveFromStack();
 }

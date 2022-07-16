@@ -34,6 +34,7 @@ template <typename T> class List
 template class List<int>;
 template class List<Window*>;
 template class List<Task*>;
+template class List<MousePacket>;
 
 /*
 template <typename T> class Array

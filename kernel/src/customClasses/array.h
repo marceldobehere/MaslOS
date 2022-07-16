@@ -3,6 +3,7 @@
 #include "../tasks/task.h"
 #include "../OSDATA/MStack/MStackS.h"
 #include "../WindowStuff/Window/window.h"
+#include "../userinput/mousePacket.h"
 
 
 template <typename T> class Array
@@ -26,3 +27,4 @@ template <typename T> class Array
 template class Array<int>;
 template class Array<Window*>;
 template class Array<Task*>;
+template class Array<MousePacket>;

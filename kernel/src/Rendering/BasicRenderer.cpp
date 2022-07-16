@@ -242,11 +242,12 @@ void BasicRenderer::Println(const char *chrs, const char *var, uint32_t col)
 void BasicRenderer::Clear(uint32_t col, bool resetCursor)
 {
     uint64_t fbBase = (uint64_t)framebuffer->BaseAddress;
-    uint64_t fbSize = framebuffer->BufferSize;
-    uint32_t* end = (uint32_t*)(fbBase + fbSize);
-  
-    for (uint32_t* addr = (uint32_t*)fbBase; addr < end; addr++)
-        *(addr) = col;
+    uint64_t bytesPerScanline = framebuffer->PixelsPerScanLine * 4;
+    uint64_t fbHeight = framebuffer->Height;
+
+    for (int64_t y = 0; y < framebuffer->Height; y++)
+        for (int64_t x = 0; x < framebuffer->Width; x++)
+            *((uint32_t*)(fbBase + (4 * x) + (bytesPerScanline * y))) = col;
 
     if (resetCursor)
         CursorPosition = {0, 0};
@@ -258,8 +259,8 @@ void BasicRenderer::Clear(int64_t x1, int64_t y1, int64_t x2, int64_t y2, uint32
     uint64_t bytesPerScanline = framebuffer->PixelsPerScanLine * 4;
     uint64_t fbHeight = framebuffer->Height;
 
-    for (int64_t x = x1; x <= x2; x++)
-        for (int64_t y = y1; y <= y2; y++)
+    for (int64_t y = y1; y <= y2; y++)
+        for (int64_t x = x1; x <= x2; x++)
         {
             if (x >= 0 && y >= 0 && x < framebuffer->Width && y < framebuffer->Height)
                 *((uint32_t*)(fbBase + (4 * x) + (bytesPerScanline * y))) = col;

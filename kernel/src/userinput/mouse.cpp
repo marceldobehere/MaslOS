@@ -92,7 +92,7 @@ uint32_t mouseColFront = Colors.white, mouseColBack = Colors.black;
 
 bool clicks[3] = {false, false, false};
 uint64_t clickTimes[3] = {0, 0, 0};
-
+List<MousePacket> mousePackets;
 
 MPoint IMousePosition;
 MPoint MousePosition;
@@ -339,6 +339,8 @@ void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName)
     outb(0x64, 0xA8);
     Mousewait();
 
+    mousePackets = List<MousePacket>(4);
+
     for (int i = 0; i < 3; i++)
     {
         clicks[i] = false;
@@ -377,13 +379,11 @@ void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName)
 }
 
 uint8_t MouseCycle = 0;
-uint8_t MousePacket[4];
-bool MousePacketReady = false;
+uint8_t mousePacketArr[4];
 
 
 void HandlePS2Mouse(uint8_t data)
 {
-    ProcessMousePacket();
     if (mouseCycleSkip != 0)
     {
         MouseCycle = mouseCycleSkip;
@@ -395,33 +395,30 @@ void HandlePS2Mouse(uint8_t data)
     {
         case 0:
         {
-            // if(MousePacketReady)
-            //     break;
             if (data & 0b00001000 == 0)
                 break;
 
-            MousePacket[0] = data;
+            mousePacketArr[0] = data;
             MouseCycle++;
             break;
         }
         case 1:
         {
-            MousePacket[1] = data;
+            mousePacketArr[1] = data;
             MouseCycle++;
             break;
         }
         case 2:
         {
-            MousePacket[2] = data;
-            MousePacketReady = true;
+            mousePacketArr[2] = data;
             MouseCycle = 0;
+            mousePackets.add(MousePacket(mousePacketArr));
             break;
         }
         default:
         {
             MouseCycle = 0;
             break;
-
         }
     }
 }
@@ -547,15 +544,21 @@ void HandleHold(bool L, bool R, bool M)
                 {
                     if (activeDrag[0])
                     {
-                        window->newSize.width -= (MousePosition.x - diff.x);
-                        if (window->newSize.width >= 80)
-                            window->newPosition.x += (MousePosition.x - diff.x);
+                        int32_t tempDiff = (MousePosition.x - diff.x); 
+                        if (window->newSize.width - tempDiff < 80)
+                            tempDiff = window->newSize.width - 80;
+
+                        window->newSize.width -= tempDiff;
+                        window->newPosition.x += tempDiff;
                     }
                     if (activeDrag[1])
                     {
-                        window->newSize.height -= (MousePosition.y - diff.y);
-                        if (window->newSize.height >= 20)
-                            window->newPosition.y += (MousePosition.y - diff.y);
+                        int32_t tempDiff = (MousePosition.y - diff.y); 
+                        if (window->newSize.height - tempDiff < 20)
+                            tempDiff = window->newSize.height - 20;
+
+                        window->newSize.height -= tempDiff;
+                        window->newPosition.y += tempDiff;
                     }
                     if (activeDrag[2])
                     {
@@ -567,65 +570,68 @@ void HandleHold(bool L, bool R, bool M)
                     }
                 }
 
-
-
                 diff.x = MousePosition.x;
                 diff.y = MousePosition.y;
             }
         }
-
-
-
-
     }
 }
 
 
 
-
-
-void ProcessMousePacket()
+void ProcessMousePackets()
 {
-    if(!MousePacketReady)
-        return;
-    //MousePacketReady = false;
+    ProcessMousePackets(5);
+}
 
-    //GlobalRenderer->Print("A");
+void ProcessMousePackets(int limit)
+{
+    int l = mousePackets.getCount();
+    if (l > limit)
+        l = limit;
+    for (int i = 0; i < l; i++)
+    {
+        ProcessMousePacket(mousePackets[0]);
+        mousePackets.removeAt(0);
+    }
+}
 
+void ProcessMousePacket(MousePacket packet)
+{
     bool xNegative, yNegative, xOverflow, yOverflow, leftButton, middleButton, rightButton;
 
-    if(MousePacket[0] & PS2XSign)
+    if(packet.data[0] & PS2XSign)
         xNegative = true;
     else
         xNegative = false;
 
-    if(MousePacket[0] & PS2YSign)
+    if(packet.data[0] & PS2YSign)
         yNegative = true;
     else
         yNegative = false;
 
-    if(MousePacket[0] & PS2XOverflow)
+    if(packet.data[0] & PS2XOverflow)
         xOverflow = true;
     else
         xOverflow = false;
 
-    if(MousePacket[0] & PS2YOverflow)
+    if(packet.data[0] & PS2YOverflow)
         yOverflow = true;
     else
         yOverflow = false;
 
 
-    if(MousePacket[0] & PS2LeftButton)
+    if(packet.data[0] & PS2LeftButton)
         leftButton = true;
     else
         leftButton = false;
 
-    if(MousePacket[0] & PS2RightButton)
+    if(packet.data[0] & PS2RightButton)
         rightButton = true;
     else
         rightButton = false;
 
-    if(MousePacket[0] & PS2MiddleButton)
+    if(packet.data[0] & PS2MiddleButton)
         middleButton = true;
     else
         middleButton = false;
@@ -633,29 +639,29 @@ void ProcessMousePacket()
 
     if (!xNegative)
     {
-        IMousePosition.x += MousePacket[1];
+        IMousePosition.x += packet.data[1];
         if (xOverflow)
             IMousePosition.x += 255;
     }
     else
     {
-        MousePacket[1] = 256 - MousePacket[1];
-        IMousePosition.x -= MousePacket[1];
+        packet.data[1] = 256 - packet.data[1];
+        IMousePosition.x -= packet.data[1];
         if (xOverflow)
             IMousePosition.x -= 255;
     }
 
     if (yNegative)
     {
-        MousePacket[2] = 256 - MousePacket[2];
-        IMousePosition.y += MousePacket[2];
+        packet.data[2] = 256 - packet.data[2];
+        IMousePosition.y += packet.data[2];
         if (yOverflow)
             IMousePosition.y += 255;
     }
     else
     {
         //MousePacket[2] = 256 - MousePacket[2];
-        IMousePosition.y -= MousePacket[2];
+        IMousePosition.y -= packet.data[2];
         if (yOverflow)
             IMousePosition.y -= 255;
     }
@@ -680,8 +686,6 @@ void ProcessMousePacket()
 
 
     //DrawMousePointer();
-
-    MousePacketReady = false;
 
     // {
     //     LoadFromBuffer(oldIMousePosition);
@@ -726,9 +730,9 @@ void ProcessMousePacket()
     }
 
 
-    if(tClicks[0] || tClicks[1] || tClicks[1])
+    if(tClicks[0] || tClicks[1] || tClicks[2])
         HandleClick(tClicks[0], tClicks[1], tClicks[2]);
 
-    if(tHolds[0] || tHolds[1] || tHolds[1])
+    if(tHolds[0] || tHolds[1] || tHolds[2])
         HandleHold(tHolds[0], tHolds[1], tHolds[2]);
 }

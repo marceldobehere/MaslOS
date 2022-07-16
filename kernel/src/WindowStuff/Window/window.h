@@ -76,7 +76,9 @@ class Window
     Size newSize;
     Position newPosition;
     BasicRenderer* renderer;
+    BasicRenderer* brenderer;
     Framebuffer* framebuffer;
+    Framebuffer* backbuffer;
     Framebuffer* parentFrameBuffer;
     uint32_t defaultBorderColor;
     uint32_t selectedBorderColor;
@@ -90,6 +92,7 @@ class Window
     const char* title;
     Window(DefaultInstance* instance, Size size, Position position, const char* title, bool showTitleBar, bool showBorder, bool moveable);
 
+    void BlitBackbuffer();
     void Resize(Size _newSize);
     void RenderDeprecated();
     void Render(Framebuffer* from, Framebuffer* to, Position pos, Size size, Window* window);

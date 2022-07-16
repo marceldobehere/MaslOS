@@ -131,6 +131,7 @@ extern "C" void _start(BootInfo* bootInfo)
     debugTerminalWindow->Log("<STAT>");
     debugTerminalWindow->Log("<STAT>");
     debugTerminalWindow->Log("<STAT>");
+    debugTerminalWindow->Log("<STAT>");
 
     activeWindow->renderer->Cls();
     KeyboardPrintStart(mainWindow);
@@ -156,6 +157,9 @@ extern "C" void _start(BootInfo* bootInfo)
             oldTime = currTime;
             frame = 0;
         }
+
+        ProcessMousePackets();
+
 
         if (bgm != osData.drawBackground)
         {
@@ -235,6 +239,20 @@ extern "C" void _start(BootInfo* bootInfo)
                 Size nSize = window->newSize;
                 Position nPos = window->newPosition;
 
+
+                if (window->size != nSize)
+                {
+                    window->Resize(nSize);
+                    {
+                        x2 = window->position.x - 1;
+                        y2 = window->position.y - 23;
+                        sx2 = window->size.width + 3;
+                        sy2 = window->size.height + 25;
+
+                        update = true;
+                    }
+                }
+                
                 if (window->position != nPos)
                 {
                     window->position = nPos;
@@ -247,36 +265,27 @@ extern "C" void _start(BootInfo* bootInfo)
                     update = true;
                 }
 
-                if (window->size != nSize)
-                {
-                    {
-                        window->Resize(nSize);
-
-                        x2 = window->position.x - 1;
-                        y2 = window->position.y - 23;
-                        sx2 = window->size.width + 3;
-                        sy2 = window->size.height + 25;
-
-                        update = true;
-                    }
-                }
-            
-
-
-
                 if (update)
                 {
-                    osData.windowPointerThing->UpdatePointerRect(x1, y1, x2 + sx2, y2 + sy2);
+                    int rx1 = min(x1, x2);
+                    int ry1 = min(y1, y2);
+                    int rx2 = max(x1 + sx1, x2 + sx2);
+                    int ry2 = max(y1 + sy1, y2 + sy2);
 
-                    osData.windowPointerThing->UpdatePointerRect(x2, y2 + sy2, x1 + sx1, y1 + sy1);
+                    int AR = (rx2 - rx1) * (ry2 - ry1);
+                    int A1 = sx1 * sy1;
+                    int A2 = sx2 * sy2;
 
-                    osData.windowPointerThing->UpdatePointerRect(x2 + sx2, y1, x1 + sx1, y2 + sy2);
-
-                    osData.windowPointerThing->UpdatePointerRect(x1, y2, x2, y1 + sy1);
-
-                    osData.windowPointerThing->RenderWindow(window);
+                    if (AR <= A1+A2)
+                    {
+                        osData.windowPointerThing->UpdatePointerRect(rx1, ry1, rx2, ry2);
+                    }
+                    else
+                    {
+                        osData.windowPointerThing->UpdatePointerRect(x1, y1, x1 + sx1, y1 + sy1);
+                        osData.windowPointerThing->UpdatePointerRect(x2, y2, x2 + sx2, y2 + sy2);
+                    }
                 }
-
             }
         }
 

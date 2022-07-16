@@ -2,6 +2,10 @@
 #include <efilib.h>
 #include <elf.h>
 
+typedef int bool;
+#define true 1
+#define false 0
+
 typedef unsigned long long size_t;
 
 typedef struct
@@ -160,12 +164,12 @@ ImageFile* LoadImage(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, 
 	// for (int i = 0; i < 3; i++)
 	// 	arr2[i] = (((uint32_t)arr[(i*4)+3]) << 24) | (((uint32_t)arr[(i*4)+2]) << 16) | (((uint32_t)arr[(i*4)+1]) << 8) | (((uint32_t)arr[(i*4)+0]) << 0);
 
-	Print(L"Image Data:\n\r");
-	Print(L" - Width:  %d\n\r", arr[0]);
-	Print(L" - Height: %d\n\r", arr[1]);
-	Print(L" - xOff:   %d\n\r", arr[2]);
-	Print(L" - yOff:   %d\n\r", arr[3]);
-	Print(L" - Size:   %d\n\r", imgSize);
+	//Print(L"Image Data:\n\r");
+	//Print(L" - Width:  %d\n\r", arr[0]);
+	//Print(L" - Height: %d\n\r", arr[1]);
+	//Print(L" - xOff:   %d\n\r", arr[2]);
+	//Print(L" - yOff:   %d\n\r", arr[3]);
+	//Print(L" - Size:   %d\n\r", imgSize);
 
 	image->width = arr[0];
 	image->height = arr[1];
@@ -208,14 +212,14 @@ ZIPFile* LoadZIP(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, EFI_
 	//zipEFI->SetPosition(zipEFI, index);
 	zipEFI->Read(zipEFI, &size, &zip->size);
 	index += 8;
-	Print(L"Filesize: %d bytes\n\r", zip->size);
+	//Print(L"Filesize: %d bytes\n\r", zip->size);
 	
 	zipEFI->SetPosition(zipEFI, index);
 	size = 4;
 	zipEFI->Read(zipEFI, &size, &zip->fileCount);
 	index += 4;
 
-	Print(L"Filecount: %d files\n\r", zip->fileCount);
+	//Print(L"Filecount: %d files\n\r", zip->fileCount);
 
 	
 	SystemTable->BootServices->AllocatePool(EfiLoaderData, sizeof(NormalFile) * zip->fileCount, (void**)&zip->files);
@@ -256,125 +260,94 @@ ZIPFile* LoadZIP(EFI_FILE* Directory, CHAR16* Path, EFI_HANDLE ImageHandle, EFI_
 
 
 	return zip;
-
-	// UINTN size = 3*4;
-	// int32_t arr[3];
-	// img->Read(img, &size, arr);
-
-	// // int32_t arr2[3] = {0, 0, 0};
-
-	// // for (int i = 0; i < 3; i++)
-	// // 	arr2[i] = (((uint32_t)arr[(i*4)+3]) << 24) | (((uint32_t)arr[(i*4)+2]) << 16) | (((uint32_t)arr[(i*4)+1]) << 8) | (((uint32_t)arr[(i*4)+0]) << 0);
-
-	// Print(L"Image Data:\n\r");
-	// Print(L" - Width:  %d\n\r", arr[0]);
-	// Print(L" - Height: %d\n\r", arr[1]);
-	// Print(L" - Size:   %d\n\r", arr[2]);
-
-	// image->width = arr[0];
-	// image->height = arr[1];
-
-
-	// {
-	// 	img->SetPosition(img, 4*3);
-	// 	SystemTable->BootServices->AllocatePool(EfiLoaderData, arr[2], (void**)&image->imageBuffer);
-	// 	size = arr[2];
-	// 	img->Read(img, &size, (char*)image->imageBuffer);
-	// }
-
-	// // size = 10; //(UINTN)(arr[2] * 0 + 100);
-	// // char data[arr[2]];
-	// // img->Read(img, &size, data);
-	// //Print(L" - First Byte:   %d\n\r", *((char*)image->imageBuffer));
-	// return image;
 }
 
 
-	Framebuffer framebuffer;
+Framebuffer framebuffer;
 
-	Framebuffer* InitializeGOP()
+Framebuffer* InitializeGOP()
+{
+	EFI_GUID gopGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
+	EFI_GRAPHICS_OUTPUT_PROTOCOL* gop;
+	EFI_STATUS status;
+
+	status = uefi_call_wrapper(BS->LocateProtocol, 3, &gopGuid, NULL, (void**)&gop);
+
+	if (EFI_ERROR(status))
 	{
-		EFI_GUID gopGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
-		EFI_GRAPHICS_OUTPUT_PROTOCOL* gop;
-		EFI_STATUS status;
+		Print(L"Unable to locate GOP!!!\n\r");
+		return NULL;
+	}
+	else
+	{
+		Print(L"GOP Located.\n\r");
+	}
 
-		status = uefi_call_wrapper(BS->LocateProtocol, 3, &gopGuid, NULL, (void**)&gop);
+	EFI_GRAPHICS_OUTPUT_MODE_INFORMATION* info;
+	UINTN SizeOfInfo, numModes, nativeMode;
 
-		if (EFI_ERROR(status))
-		{
-			Print(L"Unable to locate GOP!!!\n\r");
-			return NULL;
-		}
-		else
-		{
-			Print(L"GOP Located.\n\r");
-		}
+	status = uefi_call_wrapper(gop->QueryMode, 4, gop, gop->Mode==NULL?0:gop->Mode->Mode, &SizeOfInfo, &info);
 
-		EFI_GRAPHICS_OUTPUT_MODE_INFORMATION* info;
-		UINTN SizeOfInfo, numModes, nativeMode;
+	numModes = 0;
 
-		status = uefi_call_wrapper(gop->QueryMode, 4, gop, gop->Mode==NULL?0:gop->Mode->Mode, &SizeOfInfo, &info);
-
-		numModes = 0;
-
-		if (status == EFI_NOT_STARTED)
-			status = uefi_call_wrapper(gop->SetMode, 2, gop, 0);
-		if (EFI_ERROR(status))
-			Print(L"Unable to get native resolution mode!\n\r");
-		else
-		{
-			nativeMode = gop->Mode->Mode;
-			numModes = gop->Mode->MaxMode;
-		}
-		UINTN MODE = nativeMode;
-		for (UINTN i = 0; i < numModes; i++)
-		{
-			status = uefi_call_wrapper(gop->QueryMode, 4, gop, i, &SizeOfInfo, &info);
-			Print(L"mode %03d width %d height %d format %x %s.\n\r",
-				i,
-				info->HorizontalResolution,
-				info->VerticalResolution,
-				info->PixelFormat,
-				i == nativeMode ? "(current)" : ""			
-			);
-			if (info->HorizontalResolution == 1280 && info->VerticalResolution == 720)
-				MODE = i;
-		}
+	if (status == EFI_NOT_STARTED)
+		status = uefi_call_wrapper(gop->SetMode, 2, gop, 0);
+	if (EFI_ERROR(status))
+		Print(L"Unable to get native resolution mode!\n\r");
+	else
+	{
+		nativeMode = gop->Mode->Mode;
+		numModes = gop->Mode->MaxMode;
+	}
+	UINTN MODE = nativeMode;
+	for (UINTN i = 0; i < numModes; i++)
+	{
+		status = uefi_call_wrapper(gop->QueryMode, 4, gop, i, &SizeOfInfo, &info);
+		Print(L"mode %03d width %d height %d format %x %s.\n\r",
+			i,
+			info->HorizontalResolution,
+			info->VerticalResolution,
+			info->PixelFormat,
+			i == nativeMode ? "(current)" : ""			
+		);
+		if (info->HorizontalResolution == 1280 && info->VerticalResolution == 720)
+			MODE = i;
+	}
 
 
 
-		if (EFI_ERROR(status))
-		{
-			Print(L"Unable to locate GOP!!!\n\r");
-			return NULL;
-		}
-		else
-		{
-			Print(L"GOP Located.\n\r");
-		}
+	if (EFI_ERROR(status))
+	{
+		Print(L"Unable to locate GOP!!!\n\r");
+		return NULL;
+	}
+	else
+	{
+		Print(L"GOP Located.\n\r");
+	}
 
 
 
-		status = uefi_call_wrapper(gop->SetMode, 2, gop, MODE);
+	status = uefi_call_wrapper(gop->SetMode, 2, gop, MODE);
 
-		if (EFI_ERROR(status))
-		{
-			Print(L"Unable to set mode %03d\n\r", 0);
-			return NULL;
-		}
-		else
-		{
-			Print(L"GOP Located.\n\r");
-		}
+	if (EFI_ERROR(status))
+	{
+		Print(L"Unable to set mode %03d\n\r", 0);
+		return NULL;
+	}
+	else
+	{
+		Print(L"GOP set to correct mode.\n\r");
+	}
 
-		framebuffer.BaseAddress = (void*)gop->Mode->FrameBufferBase;
-		framebuffer.BufferSize = gop->Mode->FrameBufferSize;
-		framebuffer.Width = gop->Mode->Info->HorizontalResolution;
-		framebuffer.Height = gop->Mode->Info->VerticalResolution;
-		framebuffer.PixelsPerScanLine = gop->Mode->Info->PixelsPerScanLine;
+	framebuffer.BaseAddress = (void*)gop->Mode->FrameBufferBase;
+	framebuffer.BufferSize = gop->Mode->FrameBufferSize;
+	framebuffer.Width = gop->Mode->Info->HorizontalResolution;
+	framebuffer.Height = gop->Mode->Info->VerticalResolution;
+	framebuffer.PixelsPerScanLine = gop->Mode->Info->PixelsPerScanLine;
 
 
-		return &framebuffer;
+	return &framebuffer;
 }
 
 
@@ -425,7 +398,9 @@ UINTN strcmp(CHAR8* a, CHAR8* b, UINTN len)
 }
 
 
-EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
+EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) 
+{
+	bool error = false;
 
 	InitializeLib(ImageHandle, SystemTable);
 	Print(L"Loading Kernel...\n\r");
@@ -434,6 +409,7 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 	if (Kernel == NULL)
 	{
 		Print(L"Could not load Kernel!!!\n\r");
+		error = true;
 	}
 	else
 	{
@@ -478,7 +454,7 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 		if (header.e_version != EV_CURRENT)
 			Print(L"Kernel header format is bad! (6)\n\r");
 
-		
+		error = true;
 	}
 	else
 	{
@@ -533,63 +509,63 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 
 	PSF1_FONT* newFont = LoadPSF1Font(NULL, L"zap-light16.psf", ImageHandle, SystemTable);
 	if (newFont == NULL)
-		Print(L"Font was not loaded!\n\r");
+		{Print(L"Font was not loaded!\n\r");error = true;}
 	else
 		Print(L"Font loaded. Char size: %d\n\r", newFont->psf1_Header->charsize);
 
 
 	ImageFile* image = LoadImage(NULL, L"test.mbif", ImageHandle, SystemTable);
 	if (image == NULL)
-		Print(L"Image was not loaded!\n\r");
+		{Print(L"Image was not loaded!\n\r");error = true;}
 	else
 		Print(L"Image loaded. Char size: %d\n\r", (image->height*image->width*4));
 
 
 	ImageFile* bgImage = LoadImage(NULL, L"background.mbif", ImageHandle, SystemTable);
 	if (bgImage == NULL)
-		Print(L"Image was not loaded!\n\r");	
+		{Print(L"Image was not loaded!\n\r");error = true;}
 	else
 		Print(L"Image loaded. Char size: %d\n\r", (bgImage->height*bgImage->width*4));
 	
 
 	ImageFile* bootImage = LoadImage(NULL, L"boot.mbif", ImageHandle, SystemTable);
 	if (bootImage == NULL)
-		Print(L"Image was not loaded!\n\r");	
+		{Print(L"Image was not loaded!\n\r");error = true;}
 	else
 		Print(L"Image loaded. Char size: %d\n\r", (bootImage->height*bootImage->width*4));
 
 
 	ImageFile* MButtonImage = LoadImage(NULL, L"MButton.mbif", ImageHandle, SystemTable);
 	if (MButtonImage == NULL)
-		Print(L"Image was not loaded!\n\r");	
+		{Print(L"Image was not loaded!\n\r");error = true;}	
 	else
 		Print(L"Image loaded. Char size: %d\n\r", (MButtonImage->height*MButtonImage->width*4));
 
 
 	ImageFile* MButtonImageS = LoadImage(NULL, L"MButton_S.mbif", ImageHandle, SystemTable);
 	if (MButtonImageS == NULL)
-		Print(L"Image was not loaded!\n\r");	
+		{Print(L"Image was not loaded!\n\r");error = true;}	
 	else
 		Print(L"Image loaded. Char size: %d\n\r", (MButtonImageS->height*MButtonImageS->width*4));
 
 
 	ZIPFile* mouseZIP = LoadZIP(NULL, L"mouse.mbzf", ImageHandle, SystemTable);
 	if (mouseZIP == NULL)
-		Print(L"Mouse ZIP was not loaded!\n\r");
+		{Print(L"Mouse ZIP was not loaded!\n\r");error = true;}
 	else
 		Print(L"Mouse ZIP loaded. Char size: %d\n\r", (mouseZIP->size));
 
 
 	ZIPFile* windowIconZIP = LoadZIP(NULL, L"window_icons.mbzf", ImageHandle, SystemTable);
 	if (windowIconZIP == NULL)
-		Print(L"Window Icon ZIP was not loaded!\n\r");
+		{Print(L"Window Icon ZIP was not loaded!\n\r");error = true;}
 	else
 		Print(L"Window Icon ZIP loaded. Char size: %d\n\r", (windowIconZIP->size));
 
 
 	ZIPFile* windowButtonZIP = LoadZIP(NULL, L"window_buttons.mbzf", ImageHandle, SystemTable);
 	if (windowButtonZIP == NULL)
-		Print(L"Window Button ZIP was not loaded!\n\r");
+		{Print(L"Window Button ZIP was not loaded!\n\r");error = true;}
 	else
 		Print(L"Window Button ZIP loaded. Char size: %d\n\r", (windowButtonZIP->size));
 
@@ -647,6 +623,15 @@ EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 	Print(L"Exiting EFI Bootservices...\n\r");
 
 	SystemTable->BootServices->ExitBootServices(ImageHandle, MapKey);
+
+	if (!error)
+		Print(L"\n\rNo errors!\n\rBooting into Kernel...");
+	else
+	{
+		Print(L"\n\rThere were errors!\n\rCannot boot into Kernel!");
+		while (true)
+			;
+	}
 
 	KernelStart(&bootInfo);
 

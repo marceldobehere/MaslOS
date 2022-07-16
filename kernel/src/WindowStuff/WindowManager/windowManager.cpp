@@ -595,7 +595,10 @@ if (window != NULL)
 
 
 
-
+    void WindowPointerBufferThing::UpdateWindowRect(Window* window)
+    {
+        UpdatePointerRect(window->position.x - 1, window->position.y - 24, window->position.x + window->size.width + 1, window->position.y + window->size.height + 1);
+    }
 
     void WindowPointerBufferThing::RenderWindow(Window* window)
     {
@@ -666,29 +669,29 @@ if (window != NULL)
 
         {
             uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress;
-            uint32_t*  aPixel = (uint32_t*) actualScreenBuffer->BaseAddress;
+            
             uint32_t*  cPixel = (uint32_t*) copyOfScreenBuffer->BaseAddress;
 
-            int64_t count = actualScreenBuffer->Height*actualScreenBuffer->Width;
-            for (int64_t i = 0; i < count; i++)
-            {
-                uint32_t col = **vPixel;
-                if (*cPixel != col)
+            uint64_t h = actualScreenBuffer->Height, w = actualScreenBuffer->Width, bpl = actualScreenBuffer->PixelsPerScanLine;
+            for (uint64_t y = 0; y < h; y++)
+                for (uint64_t x = 0; x < w; x++)
                 {
-                    *cPixel = col;
-                    *aPixel = col;//counta + 0xff111111;
-                    counta++;
+                    uint32_t col = **vPixel;
+                    if (*cPixel != col)
+                    {
+                        *cPixel = col;
+                        *(((uint32_t*) actualScreenBuffer->BaseAddress) + x + y * bpl) = col;//counta + 0xff111111;
+                        counta++;
+                    }
+                    vPixel++;
+                    cPixel++;
                 }
-                vPixel++;
-                aPixel++;
-                cPixel++;
-            }
         }
 
 
         //osData.debugTerminalWindow->Log("             : ################", Colors.black);
         osData.debugTerminalWindow->renderer->CursorPosition.x = 0;
-        osData.debugTerminalWindow->renderer->CursorPosition.y -= 48;
+        osData.debugTerminalWindow->renderer->CursorPosition.y -= 64;
 
         osData.debugTerminalWindow->renderer->Clear(
             osData.debugTerminalWindow->renderer->CursorPosition.x,
@@ -714,6 +717,14 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
         osData.debugTerminalWindow->Log("Heap count: {}", to_string(heapCount), Colors.yellow);
+
+        osData.debugTerminalWindow->renderer->Clear(
+            osData.debugTerminalWindow->renderer->CursorPosition.x,
+            osData.debugTerminalWindow->renderer->CursorPosition.y,
+            osData.debugTerminalWindow->renderer->CursorPosition.x + 240,
+            osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
+            Colors.black);
+        osData.debugTerminalWindow->Log("Mouse Packet Count: {}", to_string(mousePackets.getCount()), Colors.yellow);
 
         
         

@@ -51,10 +51,24 @@ Window::Window(DefaultInstance* instance, Size size, Position position, const ch
         framebuffer->BufferSize = size.height * size.width * 4;
         framebuffer->BaseAddress = malloc(framebuffer->BufferSize);
     }
+        {
+        backbuffer = (Framebuffer*)malloc(sizeof(Framebuffer));
+        *backbuffer = Framebuffer();
+        backbuffer->Height = size.height;
+        backbuffer->Width = size.width;
+        backbuffer->PixelsPerScanLine = size.width;
+        backbuffer->BufferSize = size.height * size.width * 4;
+        backbuffer->BaseAddress = malloc(backbuffer->BufferSize);
+    }
 
     {
         renderer = (BasicRenderer*)malloc(sizeof(Framebuffer));
         *renderer = BasicRenderer(framebuffer, GlobalRenderer->psf1_font);
+    }
+    
+    {
+        brenderer = (BasicRenderer*)malloc(sizeof(Framebuffer));
+        *brenderer = BasicRenderer(backbuffer, GlobalRenderer->psf1_font);
     }
     RemoveFromStack();
 }
@@ -88,8 +102,23 @@ void Window::Free()
     AddToStack();
     free(framebuffer->BaseAddress);
     free(framebuffer);
+    free(backbuffer->BaseAddress);
+    free(backbuffer);
     free(renderer);
+    free(brenderer);
     RemoveFromStack();
+}
+
+void Window::BlitBackbuffer()
+{
+    uint32_t* fb = (uint32_t*)framebuffer->BaseAddress;
+    uint32_t* bbe = (uint32_t*)backbuffer->BaseAddress;
+    for (uint32_t* bb = (uint32_t*)backbuffer->BaseAddress; bb < bbe;)
+    {
+        *fb = *bb;
+        fb++;
+        bb++;
+    }
 }
 
 void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size, Window* window)
