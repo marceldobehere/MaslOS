@@ -106,6 +106,10 @@ void Window::Free()
     free(backbuffer);
     free(renderer);
     free(brenderer);
+    if (instance != NULL)
+    {
+        instance->DefaultFree();
+    }
     RemoveFromStack();
 }
 
