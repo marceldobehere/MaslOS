@@ -13,4 +13,5 @@ class DefaultInstance
 
     public:
         InstanceType instanceType = InstanceType::Default;
+        void DefaultFree();
 };
