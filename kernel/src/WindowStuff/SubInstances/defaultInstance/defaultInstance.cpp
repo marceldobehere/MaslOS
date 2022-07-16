@@ -18,6 +18,12 @@ void DefaultInstance::DefaultFree()
         }
         case InstanceType::Terminal:
         {
+            ((TerminalInstance*)this)->Free();
+            free(this);
+            break;
+        }
+        default: 
+        {
             free(this);
             break;
         }

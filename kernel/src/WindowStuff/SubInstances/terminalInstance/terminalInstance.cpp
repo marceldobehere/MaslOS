@@ -5,7 +5,6 @@ TerminalInstance::TerminalInstance(OSUser* user, Window* window)
 {
     this->currentUser = user;
     this->window = window;
-    tasks = List<Task*>(4);
     mode = commandMode::none;
     instanceType = InstanceType::Terminal;
     userlen = 0;
@@ -20,6 +19,11 @@ TerminalInstance::TerminalInstance(OSUser* user, Window* window)
 bool TerminalInstance::GetBusy()
 {
     return tasks.getCount() != 0;
+}
+
+void TerminalInstance::Free()
+{
+    tasks.free();
 }
 
 void TerminalInstance::HandleEnter()

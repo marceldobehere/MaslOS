@@ -14,14 +14,14 @@ template <typename T> void List<T>::init(uint64_t capacity)
     RemoveFromStack();
 }
 
-template <typename T> List<T>::List(uint64_t capacity) : arr(Array<T>(0))
+template <typename T> List<T>::List(uint64_t capacity) : arr(Array<T>(4))
 {
     AddToStack();
     init(capacity);
     RemoveFromStack();
 }
 
-template <typename T> List<T>::List() : arr(Array<T>(0))
+template <typename T> List<T>::List() : arr(Array<T>(4))
 {
     AddToStack();
     init(4);

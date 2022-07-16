@@ -18,7 +18,7 @@ class TerminalInstance : public DefaultInstance
         bool printUser;
 
     public:
-    List<Task*> tasks;
+    List<Task*> tasks = List<Task*>(4);
     OSUser* currentUser;
     char lastTerminalInput[256];
     char terminalInput[256];
@@ -27,6 +27,7 @@ class TerminalInstance : public DefaultInstance
     TerminalInstance(OSUser* user, Window* window);
     void HandleEnter();
     void PrintUserIfNeeded();
+    void Free();
     commandMode mode;
 
 };

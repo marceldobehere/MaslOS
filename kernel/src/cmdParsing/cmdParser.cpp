@@ -489,6 +489,72 @@ void GetCmd(const char* name, OSUser* user, Window* window)
     {
         window->renderer->Println("Time since boot: {} ms.", to_string(PIT::TimeSinceBootMS()), Colors.bgreen);
     }
+    else if (StrEquals(name, "heap stats"))
+    {
+        window->renderer->Println("Heap Statistics:", Colors.yellow);
+        {
+            uint64_t totalSegCount = 0, freeSegCount = 0, usedSegCount = 0, totalSegSpace = 0, freeSegSpace = 0, usedSegSpace = 0; 
+            for (HeapSegHdr* current = (HeapSegHdr*) heapStart; current != NULL; current = current->next)
+            {
+                if (current->free)
+                {
+                    freeSegCount += 1;
+                    freeSegSpace += current->length;
+                }
+                else
+                {
+                    usedSegCount += 1;
+                    usedSegSpace += current->length;
+                }
+
+                totalSegCount += 1;
+                totalSegSpace += current->length;
+            }
+            window->renderer->Println("> Total Amount of Heapsegments: {}", to_string(totalSegCount), Colors.yellow);
+            window->renderer->Println("> Amount of Free Heapsegments:  {}", to_string(freeSegCount), Colors.yellow);
+            window->renderer->Println("> Amount of Used Heapsegments:  {}", to_string(usedSegCount), Colors.yellow);
+            window->renderer->Println();
+            window->renderer->Println("> Total Heap Space:             {} Bytes", to_string(totalSegSpace), Colors.yellow);
+            window->renderer->Println("> Free Heap Space:              {} Bytes", to_string(freeSegSpace), Colors.yellow);
+            window->renderer->Println("> Used Heap Space:              {} Bytes", to_string(usedSegSpace), Colors.yellow);
+        }
+    }
+    else if (StrEquals(name, "heap stats detail"))
+    {
+        window->renderer->Println("Heap Statistics (Detailed):", Colors.yellow);
+        {
+            uint64_t totalSegCount = 0, freeSegCount = 0, usedSegCount = 0, totalSegSpace = 0, freeSegSpace = 0, usedSegSpace = 0; 
+            for (HeapSegHdr* current = (HeapSegHdr*) heapStart; current != NULL; current = current->next)
+            {
+                dispVar vars[] = {dispVar(totalSegCount), dispVar(current->length)};
+                if (current->free)
+                {
+                    freeSegCount += 1;
+                    freeSegSpace += current->length;
+                    window->renderer->Println("> Heap# {0} - Size: {1} Bytes", vars, Colors.green);
+                }
+                else
+                {
+                    usedSegCount += 1;
+                    usedSegSpace += current->length;
+                    window->renderer->Println("> Heap# {0} - Size: {1} Bytes", vars,  Colors.bred);
+                }
+
+                totalSegCount += 1;
+                totalSegSpace += current->length;
+            }
+            window->renderer->Println();
+            window->renderer->Println("-----------------------------------");
+            window->renderer->Println();
+            window->renderer->Println("> Total Amount of Heapsegments: {}", to_string(totalSegCount), Colors.yellow);
+            window->renderer->Println("> Amount of Free Heapsegments:  {}", to_string(freeSegCount), Colors.yellow);
+            window->renderer->Println("> Amount of Used Heapsegments:  {}", to_string(usedSegCount), Colors.yellow);
+            window->renderer->Println();
+            window->renderer->Println("> Total Heap Space:             {} Bytes", to_string(totalSegSpace), Colors.yellow);
+            window->renderer->Println("> Free Heap Space:              {} Bytes", to_string(freeSegSpace), Colors.yellow);
+            window->renderer->Println("> Used Heap Space:              {} Bytes", to_string(usedSegSpace), Colors.yellow);
+        }
+    }
     else
     {
         LogError("Parameter \"{}\" does not exist.", name, window);

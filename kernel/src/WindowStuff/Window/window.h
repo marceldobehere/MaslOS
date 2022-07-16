@@ -91,7 +91,7 @@ class Window
     bool moveToFront;
     const char* title;
     Window(DefaultInstance* instance, Size size, Position position, const char* title, bool showTitleBar, bool showBorder, bool moveable);
-
+    
     void BlitBackbuffer();
     void Resize(Size _newSize);
     void RenderDeprecated();

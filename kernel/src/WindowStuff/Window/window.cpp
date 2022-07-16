@@ -51,7 +51,8 @@ Window::Window(DefaultInstance* instance, Size size, Position position, const ch
         framebuffer->BufferSize = size.height * size.width * 4;
         framebuffer->BaseAddress = malloc(framebuffer->BufferSize);
     }
-        {
+    
+    {
         backbuffer = (Framebuffer*)malloc(sizeof(Framebuffer));
         *backbuffer = Framebuffer();
         backbuffer->Height = size.height;
@@ -62,12 +63,12 @@ Window::Window(DefaultInstance* instance, Size size, Position position, const ch
     }
 
     {
-        renderer = (BasicRenderer*)malloc(sizeof(Framebuffer));
+        renderer = (BasicRenderer*)malloc(sizeof(BasicRenderer));
         *renderer = BasicRenderer(framebuffer, GlobalRenderer->psf1_font);
     }
     
     {
-        brenderer = (BasicRenderer*)malloc(sizeof(Framebuffer));
+        brenderer = (BasicRenderer*)malloc(sizeof(BasicRenderer));
         *brenderer = BasicRenderer(backbuffer, GlobalRenderer->psf1_font);
     }
     RemoveFromStack();
@@ -319,7 +320,10 @@ void Window::Resize(Size _newSize)
 
     {
         Framebuffer* oldFramebuffer = framebuffer;
+        Framebuffer* oldBackbuffer = backbuffer;
         BasicRenderer* oldRenderer = renderer;
+        BasicRenderer* oldBrenderer = brenderer;
+
         {
             framebuffer = (Framebuffer*)malloc(sizeof(Framebuffer));
             *framebuffer = Framebuffer();
@@ -329,10 +333,25 @@ void Window::Resize(Size _newSize)
             framebuffer->BufferSize = _newSize.height * _newSize.width * 4;
             framebuffer->BaseAddress = malloc(framebuffer->BufferSize);
         }
+        
+        {
+            backbuffer = (Framebuffer*)malloc(sizeof(Framebuffer));
+            *backbuffer = Framebuffer();
+            backbuffer->Height = _newSize.height;
+            backbuffer->Width = _newSize.width;
+            backbuffer->PixelsPerScanLine = _newSize.width;
+            backbuffer->BufferSize = _newSize.height * _newSize.width * 4;
+            backbuffer->BaseAddress = malloc(backbuffer->BufferSize);
+        }
 
         {
-            renderer = (BasicRenderer*)malloc(sizeof(Framebuffer));
+            renderer = (BasicRenderer*)malloc(sizeof(BasicRenderer));
             *renderer = BasicRenderer(framebuffer, GlobalRenderer->psf1_font);
+        }
+        
+        {
+            brenderer = (BasicRenderer*)malloc(sizeof(BasicRenderer));
+            *brenderer = BasicRenderer(backbuffer, GlobalRenderer->psf1_font);
         }
 
         renderer->Clear(Colors.black);
@@ -341,7 +360,10 @@ void Window::Resize(Size _newSize)
 
         free((void*)oldFramebuffer->BaseAddress);
         free((void*)oldFramebuffer);
+        free((void*)oldBackbuffer->BaseAddress);
+        free((void*)oldBackbuffer);
         free((void*)oldRenderer);
+        free((void*)oldBrenderer);
     }
     this->newSize = _newSize;
     this->size = _newSize;

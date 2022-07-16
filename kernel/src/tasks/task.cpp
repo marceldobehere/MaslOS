@@ -64,7 +64,7 @@ void FreeTask(Task* task)
     {
         case TaskType::NONE:
         {
-
+            free((void*)task);
             break;
         }
         case TaskType::SLEEP:

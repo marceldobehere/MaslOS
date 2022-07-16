@@ -247,7 +247,6 @@ void* _malloc(size_t size)
 {
     AddToStack();
     void* res = malloc(size);
-
     RemoveFromStack();
     return res;
 }
@@ -290,7 +289,7 @@ void ExpandHeap(size_t length)
 
     newSegment->next = NULL;
     newSegment->length = length - sizeof(HeapSegHdr);
-    newSegment->CombineBackward();
     heapCount++;
+    newSegment->CombineBackward();
     RemoveFromStack();
 }

@@ -252,7 +252,7 @@ extern "C" void _start(BootInfo* bootInfo)
                         update = true;
                     }
                 }
-                
+
                 if (window->position != nPos)
                 {
                     window->position = nPos;
@@ -334,15 +334,14 @@ extern "C" void _start(BootInfo* bootInfo)
             //asm("hlt");
         }
 
-        for (int i = 0; i < osData.osTasks.getCount(); i++)
+        while(osData.osTasks.getCount() > 0)
         {
-            Task* task = osData.osTasks[i];
+            Task* task = osData.osTasks[0];
             DoTask(task);
             if (task->GetDone())
             {
-                osData.osTasks.removeAt(i);
+                osData.osTasks.removeFirst();
                 FreeTask(task);
-                i--;
             }
         }
 
