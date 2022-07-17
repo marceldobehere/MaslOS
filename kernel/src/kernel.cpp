@@ -119,7 +119,21 @@ extern "C" void _start(BootInfo* bootInfo)
         KeyboardPrintStart(window);
     }
  
-
+    NewTerminalInstance* newTerminaltest;
+    {
+        Window* window = (Window*)malloc(sizeof(Window));
+        NewTerminalInstance* terminal = (NewTerminalInstance*)malloc(sizeof(NewTerminalInstance));
+        *terminal = NewTerminalInstance(&guestUser, window);
+        *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(500, 60), "Testing new Terminal", true, true, true);
+        osData.windows.add(window);
+            
+        newTerminaltest = terminal;
+        terminal->Clear();
+        terminal->WriteText("This \\B1100FFis a \\FFF00FFtest!");
+        terminal->WriteText("Oh ma go\nsh");
+        //osData.windows[1]->renderer->Println("Hello, world!");
+        //KeyboardPrintStart(window);
+    }
     
 
     
@@ -143,11 +157,15 @@ extern "C" void _start(BootInfo* bootInfo)
     bool updateBorder = true;
     bool bgm = osData.drawBackground;
     int frame = 0;
+    int tFrame = 0;
     uint64_t oldTime = PIT::TimeSinceBootMS();
     //double fps = 1;
     uint64_t fps = 1;
     while(!osData.exit)
     {
+        if (++tFrame >= 1000)
+            tFrame = 0;
+
         frame++;  
         if (frame >= 30)
         {
@@ -160,6 +178,11 @@ extern "C" void _start(BootInfo* bootInfo)
 
         ProcessMousePackets();
 
+        {
+            newTerminaltest->scrollX = 60 - ((tFrame % 300) * 2);
+            newTerminaltest->scrollY = 50 - ((tFrame/3 % 250) * 1);
+            newTerminaltest->Render();
+        }
 
         if (bgm != osData.drawBackground)
         {

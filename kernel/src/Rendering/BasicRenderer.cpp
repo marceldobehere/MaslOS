@@ -8,6 +8,17 @@
 
 BasicRenderer *GlobalRenderer;
 
+void BasicRenderer::putChar(char chr, int64_t xoff, int64_t yoff, uint32_t fg, uint32_t bg)
+{
+    delChar(xoff, yoff, bg);
+    uint32_t tcol = color;
+    bool toverwrite = overwrite;
+    color = fg;
+    putChar(chr, xoff, yoff);
+    overwrite = toverwrite;
+    color = tcol;
+}
+
 void BasicRenderer::putChar(char chr, int64_t xoff, int64_t yoff)
 {
     unsigned int *pixPtr = (unsigned int *)framebuffer->BaseAddress;
@@ -34,9 +45,10 @@ void BasicRenderer::delChar(int64_t xoff, int64_t yoff, uint32_t col)
 {
     unsigned int *pixPtr = (unsigned int *)framebuffer->BaseAddress;
 
-    for (unsigned long y = yoff; y < yoff + 16; y++)
-        for (unsigned long x = xoff; x < xoff + 8; x++)
-            *(unsigned int *)(pixPtr + x + (y * framebuffer->PixelsPerScanLine)) = col;
+    for (int64_t y = yoff; y < yoff + 16; y++)
+        for (int64_t x = xoff; x < xoff + 8; x++)
+            if (x >= 0 && x < framebuffer->Width && y >= 0 && y < framebuffer->Height)
+                *(uint32_t*)(pixPtr + x + (y * framebuffer->PixelsPerScanLine)) = col;
 }
 
 void BasicRenderer::delChar(int64_t xoff, int64_t yoff)

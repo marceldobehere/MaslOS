@@ -124,7 +124,21 @@ namespace Taskbar
 
 
                 {
-                    const char* stitle = StrSubstr(window->title, 0, ((size-8) - textStart) / 8);
+                    char* stitle = StrSubstr(window->title, 0, ((size-8) - textStart) / 8);
+
+                    int strLen1 = ((size-8) - textStart) / 8;
+                    int strLen2 = StrLen(window->title);
+
+                    if (strLen1 < strLen2)
+                    {
+                        int amount = min(3, strLen1);
+                        int index = strLen1 - 1;
+                        for (int i = 0; i < amount; i++)
+                        {
+                            stitle[index] = '.';
+                            index--;
+                        }
+                    }
 
                     if (hover)
                         renderer->color = selectedTabTextColor;

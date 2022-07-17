@@ -1,6 +1,8 @@
 #include "defaultInstance.h"
 #include "../terminalInstance/terminalInstance.h"
+#include "../newTerminalInstance/newTerminalInstance.h"
 #include "../../../memory/heap.h"
+
 
 void DefaultInstance::DefaultFree()
 {
@@ -19,6 +21,12 @@ void DefaultInstance::DefaultFree()
         case InstanceType::Terminal:
         {
             ((TerminalInstance*)this)->Free();
+            free(this);
+            break;
+        }
+        case InstanceType::NewTerminal:
+        {
+            ((NewTerminalInstance*)this)->Free();
             free(this);
             break;
         }

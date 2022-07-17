@@ -52,7 +52,7 @@ struct KernelInfo
 
 #include "../other_IO/pit/pit.h"
 
-#include "../../customClasses/array.h"
+//#include "../../customClasses/array.h"
 #include "../../customClasses/list.h"
 
 #include "../kernelFiles/kernelFiles.h"
@@ -64,6 +64,7 @@ struct KernelInfo
 
 #include "../../WindowStuff/Taskbar/taskbar.h"
 #include "../../WindowStuff/SubInstances/debugTerminalInstance/debugTerminalInstance.h"
+#include "../../WindowStuff/SubInstances/newTerminalInstance/newTerminalInstance.h"
 
 void PrepareACPI(BootInfo* bootInfo);
 

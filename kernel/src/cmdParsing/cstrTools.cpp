@@ -63,6 +63,13 @@ char* StrSubstr(const char* og, int index, int len)
     return newStr;
 }
 
+int32_t StrLen(const char* og)
+{
+    int32_t len;
+    for (len = 0; og[len] != 0; len++);
+    return len;
+}
+
 char* StrSubstr(const char* og, int index)
 {
     //AddToStack();

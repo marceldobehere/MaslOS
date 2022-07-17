@@ -36,6 +36,8 @@ Window::Window(DefaultInstance* instance, Size size, Position position, const ch
         icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.DEFAULT];
     else if (instance->instanceType == InstanceType::Terminal)
         icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.TERMINAL];
+    else if (instance->instanceType == InstanceType::NewTerminal)
+        icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.TERMINAL];
     else if (instance->instanceType == InstanceType::DebugTerminal)
         icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.DEBUG];
     else
@@ -117,7 +119,7 @@ void Window::Free()
 void Window::BlitBackbuffer()
 {
     uint32_t* fb = (uint32_t*)framebuffer->BaseAddress;
-    uint32_t* bbe = (uint32_t*)backbuffer->BaseAddress;
+    uint32_t* bbe = (uint32_t*)((uint64_t)backbuffer->BaseAddress + backbuffer->BufferSize);
     for (uint32_t* bb = (uint32_t*)backbuffer->BaseAddress; bb < bbe;)
     {
         *fb = *bb;
