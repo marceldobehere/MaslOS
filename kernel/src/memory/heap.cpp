@@ -43,6 +43,7 @@ void HeapSegHdr::CombineForward()
     length = length + next->length + sizeof(HeapSegHdr);
     //GlobalRenderer->Print("-");
     next = next->next;
+    text = "<FREE>";
     heapCount--;
     //GlobalRenderer->Print(">");
     RemoveFromStack();
@@ -105,6 +106,7 @@ HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
     newSplitHdr->free = free;
     newSplitHdr->magicNum = HeapMagicNum;
     length = splitLength;
+    newSplitHdr->text = "<FREE>";
 
     //GlobalRenderer->Println("this len: {}", to_string(length), Colors.bgreen);
 
@@ -150,6 +152,7 @@ void InitializeHeap(void* heapAddress, size_t pageCount)
     startSeg->next = NULL;
     startSeg->last = NULL;
     startSeg->free = true;
+    startSeg->text = "<FREE>";
     startSeg->magicNum = HeapMagicNum;
     lastHdr = startSeg;
     heapCount = 1;
@@ -157,7 +160,12 @@ void InitializeHeap(void* heapAddress, size_t pageCount)
     RemoveFromStack();
 }
 
-void* malloc(size_t size)
+void* malloc(size_t size) 
+{
+    return malloc(size, "");
+}
+
+void* malloc(size_t size, const char* text)
 {
     AddToStack();
     
@@ -193,12 +201,14 @@ void* malloc(size_t size)
                     continue;
                 }
                 current->free = false;
+                current->text = text;
                 RemoveFromStack();
                 return (void*)((uint64_t)current + sizeof(HeapSegHdr));
             }
             if (current->length == size)
             {
                 current->free = false;
+                current->text = text;
                 RemoveFromStack();
                 return (void*)((uint64_t)current + sizeof(HeapSegHdr));
             }
@@ -209,7 +219,7 @@ void* malloc(size_t size)
     }
     //GlobalRenderer->Println("Requesting more RAM.");
     ExpandHeap(size);
-    void* res = malloc(size);
+    void* res = malloc(size, text);
     RemoveFromStack();
     return res;
 }
@@ -224,6 +234,7 @@ void free(void* address)
         if (!segment->free)
         {
             segment->free = true;
+            segment->text = "<FREE>";
             //GlobalRenderer->Print("A");
             //GlobalRenderer->Print("<");
             segment->CombineForward();
@@ -258,6 +269,15 @@ void _free(void* address)
     RemoveFromStack();
 }
 
+void* _malloc(size_t size, const char* text)
+{
+    AddToStack();
+    void* res = malloc(size, text);
+    RemoveFromStack();
+    return res;
+}
+
+
 void ExpandHeap(size_t length)
 {
     AddToStack();
@@ -288,6 +308,7 @@ void ExpandHeap(size_t length)
     newSegment->magicNum = HeapMagicNum;
 
     newSegment->next = NULL;
+    newSegment->text = "<FREE>";
     newSegment->length = length - sizeof(HeapSegHdr);
     heapCount++;
     newSegment->CombineBackward();

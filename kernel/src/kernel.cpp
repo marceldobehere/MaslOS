@@ -95,8 +95,8 @@ extern "C" void _start(BootInfo* bootInfo)
 
     Window* mainWindow;
     {
-        mainWindow = (Window*)malloc(sizeof(Window));
-        TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
+        mainWindow = (Window*)malloc(sizeof(Window), "Main window");
+        TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance), "Terminal Instance for main window");
         *terminal = TerminalInstance(&adminUser, mainWindow);
         *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(5, 30), "Main Window", true, true, true);
         osData.windows.add(mainWindow);
@@ -107,8 +107,8 @@ extern "C" void _start(BootInfo* bootInfo)
 
 
     {
-        Window* window = (Window*)malloc(sizeof(Window));
-        TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
+        Window* window = (Window*)malloc(sizeof(Window), "Window");
+        TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance), "Terminal Instance");
         *terminal = TerminalInstance(&guestUser, window);
         *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(700, 60), "Testing Window", true, true, true);
         osData.windows.add(window);
@@ -121,8 +121,8 @@ extern "C" void _start(BootInfo* bootInfo)
  
     NewTerminalInstance* newTerminaltest;
     {
-        Window* window = (Window*)malloc(sizeof(Window));
-        NewTerminalInstance* terminal = (NewTerminalInstance*)malloc(sizeof(NewTerminalInstance));
+        Window* window = (Window*)malloc(sizeof(Window), "Window");
+        NewTerminalInstance* terminal = (NewTerminalInstance*)malloc(sizeof(NewTerminalInstance), "Terminal Instance");
         *terminal = NewTerminalInstance(&guestUser, window);
         *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(500, 60), "Testing new Terminal", true, true, true);
         osData.windows.add(window);
@@ -179,8 +179,8 @@ extern "C" void _start(BootInfo* bootInfo)
         ProcessMousePackets();
 
         {
-            newTerminaltest->scrollX = 60 - ((tFrame % 300) * 2);
-            newTerminaltest->scrollY = 50 - ((tFrame/3 % 250) * 1);
+            //newTerminaltest->scrollX = 60 - ((tFrame % 300) * 2);
+            //newTerminaltest->scrollY = 50 - ((tFrame/3 % 250) * 1);
             newTerminaltest->Render();
         }
 

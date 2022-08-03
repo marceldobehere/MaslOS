@@ -19,6 +19,8 @@ namespace WindowManager
         //GlobalRenderer->Println("Mouse POS Check");
         for (int64_t i = osData.windows.getCount() - 1; i >= 0; i--)
         {
+            if (osData.windows[i]->hidden)
+                continue;
             //GlobalRenderer->Println("Check: {}", to_string(i), Colors.yellow);
             Position tl = osData.windows[i]->position;
             Position br = Position(tl.x + osData.windows[i]->size.width, tl.y + osData.windows[i]->size.height);
@@ -650,8 +652,46 @@ if (window != NULL)
         //    RenderWindow(osData.windows[i]);
     } 
 
+    uint8_t testInterlace = 4;
+    uint8_t testCounterX = 0;
+    uint8_t testCounterY = 0;
+
+
+    uint64_t WindowPointerBufferThing::RenderActualSquare(int _x1, int _y1, int _x2, int _y2)
+    {
+        AddToStack();
+        uint64_t counta = 0;
+        uint64_t h = actualScreenBuffer->Height, w = actualScreenBuffer->Width, bpl = actualScreenBuffer->PixelsPerScanLine;
+        uint64_t xdiff = _x2 - _x1;
+        uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress + _x1 + w * _y1;
+        uint32_t*  cPixel = (uint32_t*)  copyOfScreenBuffer->BaseAddress + _x1 + w * _y1;
+
+        // DRAW SQUARE
+        for     (uint64_t y1 = _y1; y1 <= _y2; y1++)
+        {
+            for (uint64_t x1 = _x1; x1 <= _x2; x1++)
+            {
+                uint32_t col = **vPixel;
+                if (*cPixel != col)
+                {
+                    *cPixel = col;
+                    *(((uint32_t*) actualScreenBuffer->BaseAddress) + x1 + y1 * bpl) = col; //counta + 0xff111111;
+                    counta++;
+                }
+                vPixel++;
+                cPixel++;
+            }
+            vPixel += w - (xdiff+1);
+            cPixel += w - (xdiff+1);
+        }
+
+        RemoveFromStack();
+        return counta;
+    }
+
     void WindowPointerBufferThing::Render()
     {
+        AddToStack();
         uint64_t counta = 0;
 
         // {
@@ -668,24 +708,44 @@ if (window != NULL)
         // }
 
         {
-            uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress;
-            
-            uint32_t*  cPixel = (uint32_t*) copyOfScreenBuffer->BaseAddress;
-
             uint64_t h = actualScreenBuffer->Height, w = actualScreenBuffer->Width, bpl = actualScreenBuffer->PixelsPerScanLine;
-            for (uint64_t y = 0; y < h; y++)
-                for (uint64_t x = 0; x < w; x++)
+
+            uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress + testCounterX;
+            uint32_t*  cPixel = (uint32_t*)  copyOfScreenBuffer->BaseAddress + testCounterX;
+
+            vPixel += w * testCounterY;
+            cPixel += w * testCounterY;
+
+
+            for (int64_t y = testCounterY; y < h; y += testInterlace)
+            {
+                for (int64_t x = testCounterX; x < w; x += testInterlace)
                 {
                     uint32_t col = **vPixel;
                     if (*cPixel != col)
                     {
-                        *cPixel = col;
-                        *(((uint32_t*) actualScreenBuffer->BaseAddress) + x + y * bpl) = col;//counta + 0xff111111;
-                        counta++;
+                        // BEFORE
+                        // x -= testCounterX;
+                        // y -= testCounterY;
+                        // uint32_t** vPixel1 = vPixel;
+                        // uint32_t*  cPixel1 = cPixel;
+                        // vPixel -= testCounterX + (testCounterY * w);
+                        // cPixel -= testCounterX + (testCounterY * w); 
+
+                        counta += RenderActualSquare(max(x - testInterlace * 3, 0), max(y - testInterlace * 3, 0), min(x + testInterlace * 4, w - 1), min(y + testInterlace * 4, h - 1));
+
+                        // AFTER
+                        // x += testCounterX;
+                        // y += testCounterY;
+                        // vPixel = vPixel1;
+                        // cPixel = cPixel1;
                     }
-                    vPixel++;
-                    cPixel++;
-                }
+                    vPixel += testInterlace;
+                    cPixel += testInterlace;
+                } 
+                vPixel += w * (testInterlace - 1);
+                cPixel += w * (testInterlace - 1);
+            }
         }
 
 
@@ -727,7 +787,17 @@ if (window != NULL)
         osData.debugTerminalWindow->Log("Mouse Packet Count: {}", to_string(mousePackets.getCount()), Colors.yellow);
 
         
-        
+
+
+     
+        if(++testCounterX >= testInterlace)
+        {
+            testCounterX = 0;
+            if(++testCounterY >= testInterlace)
+                testCounterY = 0;
+        }   
+
+        RemoveFromStack();
     }
 
 

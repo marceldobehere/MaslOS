@@ -376,6 +376,22 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
     {
         mouseCycleSkip = to_int(val);
     }
+    else if (StrEquals(name, "test interlace"))
+    {
+        int interlace = to_int(val);
+        if (interlace < 1)
+            LogError("Interlace cannot be less than 1", window);
+        else if (interlace > 8)
+            LogError("Interlace cannot be higher than 5", window);
+        else
+        {
+            int inter = 1;
+            for (int i = 0; i < interlace - 1; i++)
+                inter *= 2;
+            
+            WindowManager::testInterlace = inter;
+        }
+    }
     else if (StrEquals(name, "mouse image"))
     {
         currentMouseImageName = StrCopy(val);
@@ -526,18 +542,18 @@ void GetCmd(const char* name, OSUser* user, Window* window)
             uint64_t totalSegCount = 0, freeSegCount = 0, usedSegCount = 0, totalSegSpace = 0, freeSegSpace = 0, usedSegSpace = 0; 
             for (HeapSegHdr* current = (HeapSegHdr*) heapStart; current != NULL; current = current->next)
             {
-                dispVar vars[] = {dispVar(totalSegCount), dispVar(current->length)};
+                dispVar vars[] = {dispVar(totalSegCount), dispVar(current->length), dispVar(current->text)};
                 if (current->free)
                 {
                     freeSegCount += 1;
                     freeSegSpace += current->length;
-                    window->renderer->Println("> Heap# {0} - Size: {1} Bytes", vars, Colors.green);
+                    window->renderer->Println("> Heap# {0} - Size: {1} Bytes, Title: \"{2}\"", vars, Colors.green);
                 }
                 else
                 {
                     usedSegCount += 1;
                     usedSegSpace += current->length;
-                    window->renderer->Println("> Heap# {0} - Size: {1} Bytes", vars,  Colors.bred);
+                    window->renderer->Println("> Heap# {0} - Size: {1} Bytes, Title: \"{2}\"", vars, Colors.bred);
                 }
 
                 totalSegCount += 1;
