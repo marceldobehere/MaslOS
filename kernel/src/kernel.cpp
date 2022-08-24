@@ -163,6 +163,7 @@ extern "C" void _start(BootInfo* bootInfo)
     uint64_t fps = 1;
     while(!osData.exit)
     {
+        AddToStack();
         if (++tFrame >= 1000)
             tFrame = 0;
 
@@ -171,18 +172,26 @@ extern "C" void _start(BootInfo* bootInfo)
         {
             uint64_t currTime = PIT::TimeSinceBootMS();
             //fps = ((frame - 1)*1000.0) / (currTime - oldTime);
-            fps = ((frame - 1)*1000) / (currTime - oldTime);
+            if ((currTime - oldTime) == 0)
+            {
+                fps = 9999;
+            }
+            else
+                fps = ((frame - 1)*1000) / (currTime - oldTime);
             oldTime = currTime;
             frame = 0;
         }
+        RemoveFromStack();
 
         ProcessMousePackets();
 
+        AddToStack();
         {
             //newTerminaltest->scrollX = 60 - ((tFrame % 300) * 2);
             //newTerminaltest->scrollY = 50 - ((tFrame/3 % 250) * 1);
-            newTerminaltest->Render();
+            //newTerminaltest->Render();
         }
+        RemoveFromStack();
 
         if (bgm != osData.drawBackground)
         {
@@ -227,7 +236,7 @@ extern "C" void _start(BootInfo* bootInfo)
             }
         }
 
-
+        AddToStack();
         for (int i = 0; i < osData.windows.getCount(); i++)
         {            
             Window* window = osData.windows[i];
@@ -311,15 +320,18 @@ extern "C" void _start(BootInfo* bootInfo)
                 }
             }
         }
+        RemoveFromStack();
 
+        AddToStack();
         Taskbar::RenderTaskbar();
         MPoint mPos = MousePosition;
         DrawMousePointer2(osData.windowPointerThing->virtualScreenBuffer, mPos);
         osData.windowPointerThing->fps = fps;
         osData.windowPointerThing->Render();
         osData.windowPointerThing->UpdatePointerRect(mPos.x - 32, mPos.y - 32, mPos.x + 32, mPos.y + 32);
+        RemoveFromStack();
 
-
+        AddToStack();
         //double endTime = PIT::TimeSinceBoot + 0.02;
         for (int ax = 0; ax < 10; ax++)
         {
@@ -356,6 +368,7 @@ extern "C" void _start(BootInfo* bootInfo)
             //PIT::Sleep(10);
             //asm("hlt");
         }
+        
 
         while(osData.osTasks.getCount() > 0)
         {
@@ -367,7 +380,7 @@ extern "C" void _start(BootInfo* bootInfo)
                 FreeTask(task);
             }
         }
-
+        RemoveFromStack();
 
         //GlobalRenderer->Print("C");
         //asm("hlt");

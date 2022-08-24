@@ -88,11 +88,43 @@ namespace WindowManager
         void UpdatePointerRect(int x1, int y1, int x2, int y2);
         void UpdateWindowRect(Window *window);
         void RenderWindow(Window *window);
-        uint64_t RenderActualSquare(int _x1, int _y1, int _x2, int _y2);
+        //inline uint64_t RenderActualSquare(int _x1, int _y1, int _x2, int _y2);
         void RenderWindowRect(Window *window, int x1, int y1, int x2, int y2);
         void RenderWindows();
         void Clear();
         void Render();
         void UpdateWindowBorder(Window *window);
+    
+        inline uint64_t RenderActualSquare(int _x1, int _y1, int _x2, int _y2)
+        {
+            //AddToStack();
+            uint64_t counta = 0;
+            uint64_t h = actualScreenBuffer->Height, w = actualScreenBuffer->Width, bpl = actualScreenBuffer->PixelsPerScanLine;
+            uint64_t xdiff = _x2 - _x1;
+            uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress + _x1 + w * _y1;
+            uint32_t*  cPixel = (uint32_t*)  copyOfScreenBuffer->BaseAddress + _x1 + w * _y1;
+
+            // DRAW SQUARE
+            for     (uint64_t y1 = _y1; y1 <= _y2; y1++)
+            {
+                for (uint64_t x1 = _x1; x1 <= _x2; x1++)
+                {
+                    uint32_t col = **vPixel;
+                    if (*cPixel != col)
+                    {
+                        *cPixel = col;
+                        *(((uint32_t*) actualScreenBuffer->BaseAddress) + x1 + y1 * bpl) = col; //counta + 0xff111111;
+                        counta++;
+                    }
+                    vPixel++;
+                    cPixel++;
+                }
+                vPixel += w - (xdiff+1);
+                cPixel += w - (xdiff+1);
+            }
+
+            //RemoveFromStack();
+            return counta;
+        }
     };
 }
