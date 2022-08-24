@@ -28,4 +28,16 @@ namespace PCI
     void EnumerateDevice(uint64_t busAddress, uint64_t device);
 
     void EnumerateFunction(uint64_t deviceAddress, uint64_t function);
+
+    extern const char* unknownString;
+
+    const char* GetVendorName(uint16_t vendorID);
+
+    const char* GetDeviceName(uint16_t vendorID, uint16_t deviceID);
+
+    const char* GetClassName(uint8_t classCode);
+
+    const char* GetSubclassName(uint8_t classCode, uint8_t subclassCode);
+
+    const char* GetProgIFName(uint8_t classCode, uint8_t subclassCode, uint8_t progIFCode);
 }

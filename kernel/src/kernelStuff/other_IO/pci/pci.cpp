@@ -76,9 +76,73 @@ namespace PCI
 
         BasicRenderer* renderer = osData.debugTerminalWindow->renderer;
 
-        renderer->Print(ConvertHexToString(pciDeviceHeader->Vendor_ID));
-        renderer->Print(" ");
-        renderer->Print(ConvertHexToString(pciDeviceHeader->Device_ID));
+
+        {
+            const char* vendorName = GetVendorName(pciDeviceHeader->Vendor_ID);
+            if (vendorName != unknownString)
+                renderer->Print(vendorName);
+            else
+            {
+                renderer->Print("<");
+                renderer->Print(ConvertHexToString(pciDeviceHeader->Vendor_ID));
+                renderer->Print(">");
+            }
+            renderer->Print(" / ");
+        }
+
+        {
+            const char* deviceName = GetDeviceName(pciDeviceHeader->Vendor_ID, pciDeviceHeader->Device_ID);
+            if (deviceName != unknownString)
+                renderer->Print(deviceName);
+            else
+            {
+                renderer->Print("<");
+                renderer->Print(ConvertHexToString(pciDeviceHeader->Device_ID));
+                renderer->Print(">");
+            }
+            renderer->Print(" / ");
+        }
+
+        {
+            const char* className = GetClassName(pciDeviceHeader->Class);
+            if (className != unknownString)
+                renderer->Print(className);
+            else
+            {
+                renderer->Print("<");
+                renderer->Print(ConvertHexToString(pciDeviceHeader->Class));
+                renderer->Print(">");
+            }
+            renderer->Print(" / ");
+        }
+
+        {
+            const char* subclassName = GetSubclassName(pciDeviceHeader->Class, pciDeviceHeader->SubClass);
+            if (subclassName != unknownString)
+                renderer->Print(subclassName);
+            else
+            {
+                renderer->Print("<");
+                renderer->Print(ConvertHexToString(pciDeviceHeader->SubClass));
+                renderer->Print(">");
+            }
+            renderer->Print(" / ");
+        }
+
+        {
+            const char* progIFName = GetProgIFName(pciDeviceHeader->Class, pciDeviceHeader->SubClass, pciDeviceHeader->Prog_IF);
+            if (progIFName != unknownString)
+                renderer->Print(progIFName);
+            else
+            {
+                renderer->Print("<");
+                renderer->Print(ConvertHexToString(pciDeviceHeader->Prog_IF));
+                renderer->Print(">");
+            }
+            //renderer->Print(" / ");
+        }
+        
+
         renderer->Println();
         RemoveFromStack();
     }

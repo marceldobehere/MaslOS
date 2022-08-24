@@ -36,6 +36,9 @@ void PrepareACPI(BootInfo* bootInfo)
 
     PCI::EnumeratePCI(mcfg);
 
+
+    
+
     RemoveFromStack();
 }
 
