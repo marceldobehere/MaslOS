@@ -1,4 +1,5 @@
 #include "MStackM.h"
+//#include "../osdata.h"
 
 void PrintMStackTrace(MStack stack[], int64_t size, BasicRenderer* renderer, uint32_t col)
 {
@@ -51,26 +52,33 @@ void PrintMStackTrace(MStack stack[], int64_t size)
     PrintMStackTrace(stack, size, GlobalRenderer, Colors.white);
 }
 
-void AddToTheMStack(MStack thing)
+namespace MStackData
 {
-    if (osData.stackPointer < 1000)
-    {
-        osData.stackArr[osData.stackPointer] = thing;
-        osData.stackPointer++;
-    }
-    else
-        Panic("Stack overflow");
+    MStack stackArr[1000];
+    int64_t stackPointer = 0;
 }
 
-void RemoveTheLastElementFromTheMStack()
-{
-    if (osData.stackPointer > 0)
-        osData.stackPointer--;
-    else
-    {
-        osData.stackPointer = 900;
-        Panic("Stack underflow");
-    }
-}
+
+// void AddToTheMStack(MStack thing)
+// {
+//     if (osData.stackPointer < 1000)
+//     {
+//         osData.stackArr[osData.stackPointer] = thing;
+//         osData.stackPointer++;
+//     }
+//     else
+//         Panic("Stack overflow");
+// }
+
+// void RemoveTheLastElementFromTheMStack()
+// {
+//     if (osData.stackPointer > 0)
+//         osData.stackPointer--;
+//     else
+//     {
+//         osData.stackPointer = 900;
+//         Panic("Stack underflow");
+//     }
+// }
 
 

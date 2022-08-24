@@ -12,9 +12,9 @@ if (osData.enableStackTrace)
 extern "C" void _start(BootInfo* bootInfo)
 {  
     osData.booting = false;
-    osData.stackPointer = 0;
+    MStackData::stackPointer = 0;
     for (int i = 0; i < 1000; i++)
-        osData.stackArr[i] = MStack();
+        MStackData::stackArr[i] = MStack();
     
     osData.enableStackTrace = RECORD_STACK_TRACE;
     AddToStack();
@@ -218,7 +218,12 @@ extern "C" void _start(BootInfo* bootInfo)
             {
                 activeWindow->moveToFront = false;
                 int index = osData.windows.getIndexOf(activeWindow);
-                if (index != -1)
+                if (index == osData.windows.getCount() - 1)
+                {
+                    osData.windowPointerThing->UpdateWindowBorder(activeWindow);
+                    osData.windowPointerThing->RenderWindow(activeWindow);
+                }
+                else if (index != -1)
                 {
                     Window* oldActive = osData.windows[osData.windows.getCount() - 1];
                     osData.windows.removeAt(index);

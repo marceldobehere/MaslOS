@@ -1,8 +1,10 @@
 #pragma once
 #include "MStack/MStackS.h"
 
+//#include "../kernelStuff/stuff/stackmacro.h"
 #include "../kernelStuff/stuff/kernelUtil.h"
 //#include "../customClasses/list.h"
+
 
 #include "../WindowStuff/WindowManager/windowManager.h"
 
@@ -23,8 +25,8 @@ struct OSData
     Window* mainTerminalWindow;
     Window* debugTerminalWindow;
     bool showDebugterminal;
-    MStack stackArr[1000];
-    int64_t stackPointer = 0;
+    // MStack stackArr[1000];
+    // int64_t stackPointer = 0;
     bool drawBackground;
     bool enableStackTrace;
     int64_t crashCount = 0;

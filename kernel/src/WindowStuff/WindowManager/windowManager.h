@@ -104,23 +104,26 @@ namespace WindowManager
             uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress + _x1 + w * _y1;
             uint32_t*  cPixel = (uint32_t*)  copyOfScreenBuffer->BaseAddress + _x1 + w * _y1;
 
+            int64_t wMinusSomeStuff = w - (xdiff+1);
+
             // DRAW SQUARE
             for     (uint64_t y1 = _y1; y1 <= _y2; y1++)
             {
+                uint64_t y1TimesBpl = y1 * bpl;
                 for (uint64_t x1 = _x1; x1 <= _x2; x1++)
                 {
                     uint32_t col = **vPixel;
                     if (*cPixel != col)
                     {
                         *cPixel = col;
-                        *(((uint32_t*) actualScreenBuffer->BaseAddress) + x1 + y1 * bpl) = col; //counta + 0xff111111;
+                        *(((uint32_t*) actualScreenBuffer->BaseAddress) + x1 + y1TimesBpl) = col; //counta + 0xff111111;
                         counta++;
                     }
                     vPixel++;
                     cPixel++;
                 }
-                vPixel += w - (xdiff+1);
-                cPixel += w - (xdiff+1);
+                vPixel += wMinusSomeStuff;
+                cPixel += wMinusSomeStuff;
             }
 
             //RemoveFromStack();

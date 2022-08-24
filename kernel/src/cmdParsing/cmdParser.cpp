@@ -382,7 +382,7 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
         if (interlace < 1)
             LogError("Interlace cannot be less than 1", window);
         else if (interlace > 8)
-            LogError("Interlace cannot be higher than 5", window);
+            LogError("Interlace cannot be higher than 8", window);
         else
         {
             int inter = 1;
@@ -495,7 +495,7 @@ void GetCmd(const char* name, OSUser* user, Window* window)
     }
     else if (StrEquals(name, "stack trace"))
     {
-        PrintMStackTrace(osData.stackArr, osData.stackPointer, window->renderer, user->colData.defaultTextColor);
+        PrintMStackTrace(MStackData::stackArr, MStackData::stackPointer, window->renderer, user->colData.defaultTextColor);
     }
     else if (StrEquals(name, "TSB S"))
     {

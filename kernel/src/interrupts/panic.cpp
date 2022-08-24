@@ -29,7 +29,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         GlobalRenderer->Println();
     }
 
-    PrintMStackTrace(osData.stackArr, osData.stackPointer);
+    PrintMStackTrace(MStackData::stackArr, MStackData::stackPointer);
     GlobalRenderer->Println();
     GlobalRenderer->Println();
 

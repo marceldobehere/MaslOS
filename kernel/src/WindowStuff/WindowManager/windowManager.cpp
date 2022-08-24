@@ -713,6 +713,9 @@ if (window != NULL)
             uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress + testCounterX;
             uint32_t*  cPixel = (uint32_t*)  copyOfScreenBuffer->BaseAddress + testCounterX;
 
+            uint8_t testInterlaceMinusOne = testInterlace - 1;
+            uint64_t wTimesInterlaceMinusOne = w * testInterlaceMinusOne;
+
             vPixel += w * testCounterY;
             cPixel += w * testCounterY;
 
@@ -732,7 +735,11 @@ if (window != NULL)
                         // vPixel -= testCounterX + (testCounterY * w);
                         // cPixel -= testCounterX + (testCounterY * w); 
 
-                        counta += RenderActualSquare(max(x - testInterlace * 3, 0), max(y - testInterlace * 3, 0), min(x + testInterlace * 4, w - 1), min(y + testInterlace * 4, h - 1));
+                        counta += RenderActualSquare(max(x - (testInterlace * 2 - 2), 0), max(y - (testInterlace * 2 - 2), 0), min(x + testInterlace * 4 - 1, w - 1), min(y + testInterlace * 2 - 1, h - 1));
+
+                        vPixel += testInterlace * 2;
+                        cPixel += testInterlace * 2;
+                        x      += testInterlace * 2;
 
                         // AFTER
                         // x += testCounterX;
@@ -743,8 +750,8 @@ if (window != NULL)
                     vPixel += testInterlace;
                     cPixel += testInterlace;
                 } 
-                vPixel += w * (testInterlace - 1);
-                cPixel += w * (testInterlace - 1);
+                vPixel += wTimesInterlaceMinusOne;
+                cPixel += wTimesInterlaceMinusOne;
             }
         }
 
