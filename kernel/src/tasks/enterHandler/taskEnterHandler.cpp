@@ -23,7 +23,7 @@ void TaskEnterHandler::Do()
 
 TaskEnterHandler* NewEnterTask(TerminalInstance* terminal)
 {
-    TaskEnterHandler* task = (TaskEnterHandler*)malloc(sizeof(TaskEnterHandler));
+    TaskEnterHandler* task = (TaskEnterHandler*)malloc(sizeof(TaskEnterHandler), "New Enter Handler Task");
     *task = TaskEnterHandler(terminal);
     return task;
 }

@@ -24,10 +24,10 @@ namespace Taskbar
         MButton = mButton;
         MButtonS = mButtonS;
         taskbarBuffer = osData.windowPointerThing->taskbar;
-        renderer = (BasicRenderer*)malloc(sizeof(BasicRenderer));
+        renderer = (BasicRenderer*)malloc(sizeof(BasicRenderer), "New Basic Renderer for Taskbar");
         *renderer = BasicRenderer(taskbarBuffer, GlobalRenderer->psf1_font);
         
-        taskWindowList = (SyncedList<Window*>*)malloc(sizeof(SyncedList<Window*>));
+        taskWindowList = (SyncedList<Window*>*)malloc(sizeof(SyncedList<Window*>), "new Synced List for Taskbar");
         *taskWindowList = SyncedList<Window*>(&osData.windows);
 
         backgroundColor =            0xff001530;

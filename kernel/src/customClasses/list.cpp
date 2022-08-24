@@ -218,7 +218,7 @@ template <typename T> Array<T>::Array(uint64_t size)
 {
     AddToStack();
     this->size = size;
-    arr = (T*)malloc(size * sizeof(T));
+    arr = (T*)malloc(size * sizeof(T), "Array Constructor");
     freed = false;
     RemoveFromStack();
 }
@@ -228,7 +228,7 @@ template <typename T> void Array<T>::reInit(uint64_t size)
     AddToStack();
     this->size = size;
     free();
-    arr = (T*)malloc(size * sizeof(T));
+    arr = (T*)malloc(size * sizeof(T), "Array re-init");
     freed = false;
     RemoveFromStack();
 }

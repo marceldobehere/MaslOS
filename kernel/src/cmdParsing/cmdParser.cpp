@@ -58,7 +58,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 
     if (StrEquals(input, "malloc"))
     {
-        malloc(0x5000);
+        malloc(0x5000, "Test malloc command");
         RemoveFromStack();
         return;
     }
@@ -669,7 +669,7 @@ StringArrData* SplitLine(const char* input)
     }
 
     //uint64_t datAddr = (uint64_t) GlobalAllocator->RequestPage();
-    int64_t datAddr = (uint64_t) malloc(totalsize);
+    int64_t datAddr = (uint64_t) malloc(totalsize, "Space for split command parameters");
     StringArrData* data = (StringArrData*) datAddr;
 
     //char** splitLine = (char**) GlobalAllocator->RequestPage(); //(char**)calloc(partCount, sizeof(char*));

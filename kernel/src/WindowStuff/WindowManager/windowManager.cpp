@@ -74,37 +74,37 @@ namespace WindowManager
 
         this->defaultColor = Colors.red;
         {
-            copyOfScreenBuffer = (Framebuffer*)malloc(sizeof(Framebuffer));
+            copyOfScreenBuffer = (Framebuffer*)malloc(sizeof(Framebuffer), "New Copy Framebuffer (struct)");
             copyOfScreenBuffer->Width = actualScreenBuffer->Width;
             copyOfScreenBuffer->Height = actualScreenBuffer->Height;
             copyOfScreenBuffer->PixelsPerScanLine = actualScreenBuffer->PixelsPerScanLine;
             copyOfScreenBuffer->BufferSize = actualScreenBuffer->BufferSize;
-            copyOfScreenBuffer->BaseAddress = malloc(copyOfScreenBuffer->BufferSize);
+            copyOfScreenBuffer->BaseAddress = malloc(copyOfScreenBuffer->BufferSize, "New Copy Framebuffer");
         }
 
         {
-            virtualScreenBuffer = (PointerFramebuffer*)malloc(sizeof(PointerFramebuffer));
+            virtualScreenBuffer = (PointerFramebuffer*)malloc(sizeof(PointerFramebuffer), "New Virtual Screenbuffer (struct)");
             virtualScreenBuffer->Width = actualScreenBuffer->Width;
             virtualScreenBuffer->Height = actualScreenBuffer->Height;
             virtualScreenBuffer->BufferSize = virtualScreenBuffer->Width * virtualScreenBuffer->Height * sizeof(uint32_t*);
-            virtualScreenBuffer->BaseAddress = malloc(virtualScreenBuffer->BufferSize);
+            virtualScreenBuffer->BaseAddress = malloc(virtualScreenBuffer->BufferSize, "New Virtual Screenbuffer");
         }
 
         {
-            copyOfVirtualBuffer = (PointerFramebuffer*)malloc(sizeof(PointerFramebuffer));
+            copyOfVirtualBuffer = (PointerFramebuffer*)malloc(sizeof(PointerFramebuffer), "New Copy Virtual Screenbuffer (struct)");
             copyOfVirtualBuffer->Width = virtualScreenBuffer->Width;
             copyOfVirtualBuffer->Height = virtualScreenBuffer->Height;
             copyOfVirtualBuffer->BufferSize = virtualScreenBuffer->BufferSize;
-            copyOfVirtualBuffer->BaseAddress = malloc(copyOfVirtualBuffer->BufferSize);
+            copyOfVirtualBuffer->BaseAddress = malloc(copyOfVirtualBuffer->BufferSize, "New Copy Virtual Screenbuffer");
         }
 
         {
-            taskbar = (Framebuffer*)malloc(sizeof(Framebuffer));
+            taskbar = (Framebuffer*)malloc(sizeof(Framebuffer), "New Taskbar Framebuffer (struct)");
             taskbar->Width = actualScreenBuffer->Width;
             taskbar->Height = 40;
             taskbar->PixelsPerScanLine = taskbar->Width;
             taskbar->BufferSize = taskbar->Height * taskbar->Width * 4;
-            taskbar->BaseAddress = malloc(taskbar->BufferSize);
+            taskbar->BaseAddress = malloc(taskbar->BufferSize, "New Taskbar Framebuffer");
         }
 
         currentActionWindow = NULL;
@@ -751,7 +751,7 @@ if (window != NULL)
 
         //osData.debugTerminalWindow->Log("             : ################", Colors.black);
         osData.debugTerminalWindow->renderer->CursorPosition.x = 0;
-        osData.debugTerminalWindow->renderer->CursorPosition.y -= 64;
+        osData.debugTerminalWindow->renderer->CursorPosition.y -= 96;
 
         osData.debugTerminalWindow->renderer->Clear(
             osData.debugTerminalWindow->renderer->CursorPosition.x,
@@ -786,8 +786,21 @@ if (window != NULL)
             Colors.black);
         osData.debugTerminalWindow->Log("Mouse Packet Count: {}", to_string(mousePackets.getCount()), Colors.yellow);
 
-        
+        osData.debugTerminalWindow->renderer->Clear(
+            osData.debugTerminalWindow->renderer->CursorPosition.x,
+            osData.debugTerminalWindow->renderer->CursorPosition.y,
+            osData.debugTerminalWindow->renderer->CursorPosition.x + 240,
+            osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
+            Colors.black);
+        osData.debugTerminalWindow->Log("Malloc Count: {}", to_string(mallocCount), Colors.yellow);
 
+        osData.debugTerminalWindow->renderer->Clear(
+            osData.debugTerminalWindow->renderer->CursorPosition.x,
+            osData.debugTerminalWindow->renderer->CursorPosition.y,
+            osData.debugTerminalWindow->renderer->CursorPosition.x + 240,
+            osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
+            Colors.black);
+        osData.debugTerminalWindow->Log("Free Count: {}", to_string(freeCount), Colors.yellow);
 
      
         if(++testCounterX >= testInterlace)

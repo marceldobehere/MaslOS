@@ -34,3 +34,6 @@ void ExpandHeap(size_t length);
 extern void* heapStart;
 
 extern int64_t heapCount;
+
+extern int64_t mallocCount;
+extern int64_t freeCount;

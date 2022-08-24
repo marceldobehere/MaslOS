@@ -34,7 +34,7 @@ void TaskSleep::Do()
 
 TaskSleep* NewSleepTask(uint64_t ms)
 {
-    TaskSleep* task = (TaskSleep*)malloc(sizeof(TaskSleep));
+    TaskSleep* task = (TaskSleep*)malloc(sizeof(TaskSleep), "New Sleep Task");
     *task = TaskSleep(ms);
     return task;
 }

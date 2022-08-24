@@ -12,7 +12,7 @@ namespace kernelFiles
             RemoveFromStack();
             return NULL;
         }
-        ImageFile* image = (ImageFile*)malloc(sizeof(ImageFile));
+        ImageFile* image = (ImageFile*)malloc(sizeof(ImageFile), "Converting Default Kernel File to Image File");
 
         //GlobalRenderer->Println("ADDR: {}", ConvertHexToString((uint64_t)&File->fileData), Colors.yellow);
         char* data = (char*) File->fileData;
@@ -32,7 +32,7 @@ namespace kernelFiles
 
         image->size = *((int64_t*)&data[4*4]);
 
-        image->imageBuffer = malloc(image->size);
+        image->imageBuffer = malloc(image->size, "Buffer for Image File");
         for (int i = 24; i < image->size+24; i++)
             ((char*)image->imageBuffer)[i-24] = data[i];
 
@@ -43,7 +43,7 @@ namespace kernelFiles
 
     Framebuffer* ConvertImageToFramebuffer(ImageFile* image)
     {
-        Framebuffer* fb = (Framebuffer*)malloc(sizeof(Framebuffer));
+        Framebuffer* fb = (Framebuffer*)malloc(sizeof(Framebuffer), "Converting Image to Framebuffer");
 
         fb->Width = image->width;
         fb->Height = image->height;

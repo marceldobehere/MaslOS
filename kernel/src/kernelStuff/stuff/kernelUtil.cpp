@@ -110,7 +110,7 @@ void PrepareWindows(Framebuffer* img)
     VirtualRenderer::psf1_font = GlobalRenderer->psf1_font;
 
     osData.windows = List<Window*>();
-    osData.windowPointerThing = (WindowManager::WindowPointerBufferThing*)malloc(sizeof(WindowManager::WindowPointerBufferThing));
+    osData.windowPointerThing = (WindowManager::WindowPointerBufferThing*)malloc(sizeof(WindowManager::WindowPointerBufferThing), "Alloc WindowPointerBufferThing");
     *osData.windowPointerThing = WindowManager::WindowPointerBufferThing(GlobalRenderer->framebuffer, img, Colors.blue);
 
     // Window* realMainWindow;
@@ -129,8 +129,8 @@ void PrepareWindows(Framebuffer* img)
 
     Window* debugTerminalWindow;
     {
-        debugTerminalWindow = (Window*)malloc(sizeof(Window));
-        DebugTerminalInstance* dterminal = (DebugTerminalInstance*)malloc(sizeof(DebugTerminalInstance));
+        debugTerminalWindow = (Window*)malloc(sizeof(Window), "Debug Terminal Window");
+        DebugTerminalInstance* dterminal = (DebugTerminalInstance*)malloc(sizeof(DebugTerminalInstance), "Debug Terminal Instance");
         *dterminal = DebugTerminalInstance(debugTerminalWindow);
         
         *(debugTerminalWindow) = Window(dterminal, Size(400, 600), Position(600, 20), "Debug Terminal", true, true, true);

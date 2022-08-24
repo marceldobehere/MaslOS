@@ -55,7 +55,7 @@ void TaskWindowClose::Do()
 
 TaskWindowClose* NewWindowCloseTask(Window* window)
 {
-    TaskWindowClose* task = (TaskWindowClose*)malloc(sizeof(TaskWindowClose));
+    TaskWindowClose* task = (TaskWindowClose*)malloc(sizeof(TaskWindowClose), "New Window Close Task");
     *task = TaskWindowClose(window);
     return task;
 }

@@ -149,8 +149,8 @@ void HandleKeyboard(uint8_t scancode)
 
         {
             Window* oldActive = activeWindow;
-            Window* mainWindow = (Window*)malloc(sizeof(Window));
-            TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance));
+            Window* mainWindow = (Window*)malloc(sizeof(Window), "Main Window");
+            TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance), "Terminal Instance");
             *terminal = TerminalInstance(&guestUser, NULL);
             *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(10, 40), "Terminal Window", true, true, true);
             osData.windows.add(mainWindow);

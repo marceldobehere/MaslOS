@@ -45,32 +45,32 @@ Window::Window(DefaultInstance* instance, Size size, Position position, const ch
 
 
     {
-        framebuffer = (Framebuffer*)malloc(sizeof(Framebuffer));
+        framebuffer = (Framebuffer*)malloc(sizeof(Framebuffer), "new Framebuffer (struct) for Window");
         *framebuffer = Framebuffer();
         framebuffer->Height = size.height;
         framebuffer->Width = size.width;
         framebuffer->PixelsPerScanLine = size.width;
         framebuffer->BufferSize = size.height * size.width * 4;
-        framebuffer->BaseAddress = malloc(framebuffer->BufferSize);
+        framebuffer->BaseAddress = malloc(framebuffer->BufferSize, "New Framebuffer for Window");
     }
     
     {
-        backbuffer = (Framebuffer*)malloc(sizeof(Framebuffer));
+        backbuffer = (Framebuffer*)malloc(sizeof(Framebuffer), "New Backbuffer (struct) for Window");
         *backbuffer = Framebuffer();
         backbuffer->Height = size.height;
         backbuffer->Width = size.width;
         backbuffer->PixelsPerScanLine = size.width;
         backbuffer->BufferSize = size.height * size.width * 4;
-        backbuffer->BaseAddress = malloc(backbuffer->BufferSize);
+        backbuffer->BaseAddress = malloc(backbuffer->BufferSize, "New Backbuffer for Window");
     }
 
     {
-        renderer = (BasicRenderer*)malloc(sizeof(BasicRenderer));
+        renderer = (BasicRenderer*)malloc(sizeof(BasicRenderer), "New Basic Renderer for Window");
         *renderer = BasicRenderer(framebuffer, GlobalRenderer->psf1_font);
     }
     
     {
-        brenderer = (BasicRenderer*)malloc(sizeof(BasicRenderer));
+        brenderer = (BasicRenderer*)malloc(sizeof(BasicRenderer), "New Basic Renderer for Backbuffer in Window");
         *brenderer = BasicRenderer(backbuffer, GlobalRenderer->psf1_font);
     }
     RemoveFromStack();
@@ -327,32 +327,32 @@ void Window::Resize(Size _newSize)
         BasicRenderer* oldBrenderer = brenderer;
 
         {
-            framebuffer = (Framebuffer*)malloc(sizeof(Framebuffer));
+            framebuffer = (Framebuffer*)malloc(sizeof(Framebuffer), "New Framebuffer (struct) for Window (resize)");
             *framebuffer = Framebuffer();
             framebuffer->Height = _newSize.height;
             framebuffer->Width = _newSize.width;
             framebuffer->PixelsPerScanLine = _newSize.width;
             framebuffer->BufferSize = _newSize.height * _newSize.width * 4;
-            framebuffer->BaseAddress = malloc(framebuffer->BufferSize);
+            framebuffer->BaseAddress = malloc(framebuffer->BufferSize, "New Framebuffer for Window (resize)");
         }
         
         {
-            backbuffer = (Framebuffer*)malloc(sizeof(Framebuffer));
+            backbuffer = (Framebuffer*)malloc(sizeof(Framebuffer), "New Backbuffer (struct) for Window (resize)");
             *backbuffer = Framebuffer();
             backbuffer->Height = _newSize.height;
             backbuffer->Width = _newSize.width;
             backbuffer->PixelsPerScanLine = _newSize.width;
             backbuffer->BufferSize = _newSize.height * _newSize.width * 4;
-            backbuffer->BaseAddress = malloc(backbuffer->BufferSize);
+            backbuffer->BaseAddress = malloc(backbuffer->BufferSize, "New Backbuffer for Window (resize)");
         }
 
         {
-            renderer = (BasicRenderer*)malloc(sizeof(BasicRenderer));
+            renderer = (BasicRenderer*)malloc(sizeof(BasicRenderer), "New Basic Renderer for Framebuffer (resize)");
             *renderer = BasicRenderer(framebuffer, GlobalRenderer->psf1_font);
         }
         
         {
-            brenderer = (BasicRenderer*)malloc(sizeof(BasicRenderer));
+            brenderer = (BasicRenderer*)malloc(sizeof(BasicRenderer), "New Basic Renderer for Backbuffer (resize)");
             *brenderer = BasicRenderer(backbuffer, GlobalRenderer->psf1_font);
         }
 

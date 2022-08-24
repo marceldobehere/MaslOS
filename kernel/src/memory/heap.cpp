@@ -11,6 +11,8 @@ void* heapStart;
 void* heapEnd;
 HeapSegHdr* lastHdr;
 
+int64_t mallocCount = 0;
+int64_t freeCount = 0;
 
 
 void HeapSegHdr::CombineForward()
@@ -162,7 +164,7 @@ void InitializeHeap(void* heapAddress, size_t pageCount)
 
 void* malloc(size_t size) 
 {
-    return malloc(size, "");
+    return malloc(size, "<NO TEXT GIVEN>");
 }
 
 void* malloc(size_t size, const char* text)
@@ -202,6 +204,7 @@ void* malloc(size_t size, const char* text)
                 }
                 current->free = false;
                 current->text = text;
+                mallocCount++;
                 RemoveFromStack();
                 return (void*)((uint64_t)current + sizeof(HeapSegHdr));
             }
@@ -209,6 +212,7 @@ void* malloc(size_t size, const char* text)
             {
                 current->free = false;
                 current->text = text;
+                mallocCount++;
                 RemoveFromStack();
                 return (void*)((uint64_t)current + sizeof(HeapSegHdr));
             }
@@ -220,6 +224,7 @@ void* malloc(size_t size, const char* text)
     //GlobalRenderer->Println("Requesting more RAM.");
     ExpandHeap(size);
     void* res = malloc(size, text);
+    mallocCount++;
     RemoveFromStack();
     return res;
 }
@@ -233,6 +238,7 @@ void free(void* address)
     {
         if (!segment->free)
         {
+            freeCount++;
             segment->free = true;
             segment->text = "<FREE>";
             //GlobalRenderer->Print("A");

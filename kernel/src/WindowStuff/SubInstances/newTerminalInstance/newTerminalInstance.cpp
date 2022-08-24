@@ -18,7 +18,7 @@ void ClearListList(List<List<ConsoleChar>*>* list)
 List<ConsoleChar>* NewTerminalInstance::AddNewLine()
 {
     AddToStack();
-    List<ConsoleChar>* list = (List<ConsoleChar>*)malloc(sizeof(List<ConsoleChar>));
+    List<ConsoleChar>* list = (List<ConsoleChar>*)malloc(sizeof(List<ConsoleChar>), "New List of console chars");
     *list = List<ConsoleChar>(1);
     textData.add(list);
     RemoveFromStack();
