@@ -1,6 +1,7 @@
 #include "pci.h"
 #include "../../../paging/PageTableManager.h"
 #include "../../../OSDATA/osdata.h"
+#include "../ahci/ahci.h"
 
 namespace PCI
 {
@@ -141,9 +142,35 @@ namespace PCI
             }
             //renderer->Print(" / ");
         }
-        
-
         renderer->Println();
+
+        switch (pciDeviceHeader->Class)
+        {
+            case 0x01:
+            {
+                switch (pciDeviceHeader->SubClass)
+                {
+                    case 0x06:
+                    {
+                        switch (pciDeviceHeader->Prog_IF)
+                        {
+                            case 0x01:
+                            {
+                                new AHCI::AHCIDriver(pciDeviceHeader);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+
+
+
+
+
         RemoveFromStack();
     }
 

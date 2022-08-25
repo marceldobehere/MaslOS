@@ -37,3 +37,7 @@ extern int64_t heapCount;
 
 extern int64_t mallocCount;
 extern int64_t freeCount;
+
+inline void* operator new(size_t size) {return malloc(size);}
+inline void* operator new[](size_t size) {return malloc(size);}
+inline void operator delete(void* p) {free(p);}
