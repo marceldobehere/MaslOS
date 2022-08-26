@@ -69,41 +69,61 @@ namespace AHCI
 
     bool Port::Read(uint64_t sector, uint32_t sectorCount, void* buffer)
     {
-        uint32_t sectorL = (uint32_t)sector;
-        uint32_t sectorH = (uint32_t) (sector >> 32);
+uint32_t sectorL = (uint32_t)sector;
+        uint32_t sectorH = (uint32_t)(sector >> 32);
+        uint32_t sectorCountCopy = sectorCount;
         
         hbaPort->interruptStatus = (uint32_t)-1;
 
         HBACommandHeader* cmdHeader = (HBACommandHeader*)(uint64_t)hbaPort->commandListBase;
         cmdHeader->commandFISLenght = sizeof(FIS_REG_H2D) / sizeof(uint32_t); // command FIS size
         cmdHeader->write = 0;
-        cmdHeader->prdtLength = 1;
+        cmdHeader->prdtLength = ((sectorCount - 1) / 16) + 1;
 
         HBACommandTable* commandTable = (HBACommandTable*)((uint64_t)cmdHeader->commandTableBaseAddress);
         _memset(commandTable, 0, sizeof(HBACommandTable) + (cmdHeader->prdtLength - 1) * sizeof(HBAPRDTEntry));
 
-        commandTable->prdtEntry[0].dataBaseAddress = (uint32_t)(uint64_t)buffer;
-        commandTable->prdtEntry[0].dataBaseAddressUpper = (uint32_t)((uint64_t)buffer >> 32);
-        commandTable->prdtEntry[0].byteCount = (sectorCount << 9) - 1; // 512 bytes per sector
-        commandTable->prdtEntry[0].interruptOnCompletion = 1;
+        int i = 0;
+        for (i = 0; i < cmdHeader->prdtLength - 1; i++)
+        {
+            commandTable->prdtEntry[i].dataBaseAddress = (uint32_t)(uint64_t)buffer;
+            commandTable->prdtEntry[i].dataBaseAddressUpper = (uint32_t)((uint64_t)buffer >> 32);
+            commandTable->prdtEntry[i].byteCount = 0x2000 - 1;
+            commandTable->prdtEntry[i].interruptOnCompletion = 1;
+            buffer = (uint8_t*)buffer + 0x2000;
+            sectorCount -= 16;
+        }
+
+        commandTable->prdtEntry[i].dataBaseAddress = (uint32_t)(uint64_t)buffer;
+        commandTable->prdtEntry[i].dataBaseAddressUpper = (uint32_t)((uint64_t)buffer >> 32);
+        commandTable->prdtEntry[i].byteCount = (sectorCount << 9) - 1; // 512 bytes per sector
+        //osData.debugTerminalWindow->Log("Writing {} Bytes.", to_string((uint64_t)(commandTable->prdtEntry[i].byteCount + 1)), Colors.bgreen);
+        commandTable->prdtEntry[i].interruptOnCompletion = 1;
         
         FIS_REG_H2D* cmdFIS = (FIS_REG_H2D*)(&commandTable->commandFIS);
         cmdFIS->fisType = FIS_TYPE_REG_H2D;
         cmdFIS->commandControl = 1;
         cmdFIS->command = ATA_CMD_READ_DMA_EX;
 
+        // cmdFIS->lba0 = (uint8_t)sectorL;
+        // cmdFIS->lba1 = (uint8_t)(sectorL >> 8);
+        // cmdFIS->lba2 = (uint8_t)(sectorL >> 16);
+        // cmdFIS->lba3 = (uint8_t)sectorH;
+        // cmdFIS->lba4 = (uint8_t)(sectorH >> 8);
+        // cmdFIS->lba5 = (uint8_t)(sectorH >> 16);
+
         cmdFIS->lba0 = (uint8_t)sectorL;
         cmdFIS->lba1 = (uint8_t)(sectorL >> 8);
         cmdFIS->lba2 = (uint8_t)(sectorL >> 16);
-        cmdFIS->lba3 = (uint8_t)sectorH;
-        cmdFIS->lba4 = (uint8_t)(sectorH >> 8);
-        cmdFIS->lba5 = (uint8_t)(sectorH >> 16);
+        cmdFIS->lba3 = (uint8_t)(sectorL >> 24);
+        cmdFIS->lba4 = (uint8_t)sectorH;
+        cmdFIS->lba5 = (uint8_t)(sectorH >> 8);
 
         cmdFIS->deviceRegister = 1<<6; // Set to LBA Mode
 
-        cmdFIS->countLow = sectorCount && 0xFF;
-        cmdFIS->countHigh = (sectorCount >> 8) && 0xFF;
-
+        cmdFIS->countLow = sectorCountCopy & 0xFF;
+        cmdFIS->countHigh = (sectorCountCopy >> 8) & 0xFF;
+        
         uint64_t spin = 0;
         while((hbaPort->taskFileData & (ATA_DEV_BUSY | ATA_DEV_DRQ)) && spin < 1000000)
             spin++;
@@ -120,8 +140,92 @@ namespace AHCI
             if (hbaPort->interruptStatus & HBA_PxIS_TFES) 
                 return false;
         }
+
+        if (hbaPort->interruptStatus & HBA_PxIS_TFES) 
+                return false;
+
         return true;
     }
+    bool Port::TestWrite(uint64_t sector, uint32_t sectorCount, void* buffer)
+    {
+        uint32_t sectorL = (uint32_t)sector;
+        uint32_t sectorH = (uint32_t)(sector >> 32);
+        uint32_t sectorCountCopy = sectorCount;
+        
+        hbaPort->interruptStatus = (uint32_t)-1;
+
+        HBACommandHeader* cmdHeader = (HBACommandHeader*)(uint64_t)hbaPort->commandListBase;
+        cmdHeader->commandFISLenght = sizeof(FIS_REG_H2D) / sizeof(uint32_t); // command FIS size
+        cmdHeader->write = 1;
+        cmdHeader->prdtLength = ((sectorCount - 1) / 16) + 1;
+
+        HBACommandTable* commandTable = (HBACommandTable*)((uint64_t)cmdHeader->commandTableBaseAddress);
+        _memset(commandTable, 0, sizeof(HBACommandTable) + (cmdHeader->prdtLength - 1) * sizeof(HBAPRDTEntry));
+
+        int i = 0;
+        for (i = 0; i < cmdHeader->prdtLength - 1; i++)
+        {
+            commandTable->prdtEntry[i].dataBaseAddress = (uint32_t)(uint64_t)buffer;
+            commandTable->prdtEntry[i].dataBaseAddressUpper = (uint32_t)((uint64_t)buffer >> 32);
+            commandTable->prdtEntry[i].byteCount = 0x2000 - 1;
+            commandTable->prdtEntry[i].interruptOnCompletion = 1;
+            buffer = (uint8_t*)buffer + 0x2000;
+            sectorCount -= 16;
+        }
+
+        commandTable->prdtEntry[i].dataBaseAddress = (uint32_t)(uint64_t)buffer;
+        commandTable->prdtEntry[i].dataBaseAddressUpper = (uint32_t)((uint64_t)buffer >> 32);
+        commandTable->prdtEntry[i].byteCount = (sectorCount << 9) - 1; // 512 bytes per sector
+        //osData.debugTerminalWindow->Log("Writing {} Bytes.", to_string((uint64_t)(commandTable->prdtEntry[i].byteCount + 1)), Colors.bgreen);
+        commandTable->prdtEntry[i].interruptOnCompletion = 1;
+        
+        FIS_REG_H2D* cmdFIS = (FIS_REG_H2D*)(&commandTable->commandFIS);
+        cmdFIS->fisType = FIS_TYPE_REG_H2D;
+        cmdFIS->commandControl = 1;
+        cmdFIS->command = ATA_CMD_WRITE_DMA_EX;
+
+        // cmdFIS->lba0 = (uint8_t)sectorL;
+        // cmdFIS->lba1 = (uint8_t)(sectorL >> 8);
+        // cmdFIS->lba2 = (uint8_t)(sectorL >> 16);
+        // cmdFIS->lba3 = (uint8_t)sectorH;
+        // cmdFIS->lba4 = (uint8_t)(sectorH >> 8);
+        // cmdFIS->lba5 = (uint8_t)(sectorH >> 16);
+
+        cmdFIS->lba0 = (uint8_t)sectorL;
+        cmdFIS->lba1 = (uint8_t)(sectorL >> 8);
+        cmdFIS->lba2 = (uint8_t)(sectorL >> 16);
+        cmdFIS->lba3 = (uint8_t)(sectorL >> 24);
+        cmdFIS->lba4 = (uint8_t)sectorH;
+        cmdFIS->lba5 = (uint8_t)(sectorH >> 8);
+
+        cmdFIS->deviceRegister = 1<<6; // Set to LBA Mode
+
+        cmdFIS->countLow = sectorCountCopy & 0xFF;
+        cmdFIS->countHigh = (sectorCountCopy >> 8) & 0xFF;
+        
+        uint64_t spin = 0;
+        while((hbaPort->taskFileData & (ATA_DEV_BUSY | ATA_DEV_DRQ)) && spin < 1000000)
+            spin++;
+        if (spin == 1000000)
+            return false;
+        //osData.debugTerminalWindow->Log("Spin: {}", to_string(spin), Colors.bblue);
+
+        hbaPort->commandIssue = 1;
+        
+        while (true)
+        {
+            if (hbaPort->commandIssue == 0) 
+                break;
+            if (hbaPort->interruptStatus & HBA_PxIS_TFES) 
+                return false;
+        }
+
+        if (hbaPort->interruptStatus & HBA_PxIS_TFES) 
+                return false;
+
+        return true;
+    }
+
 
     AHCIDriver::AHCIDriver (PCI::PCIDeviceHeader* pciBaseAddress)
     {
@@ -134,7 +238,7 @@ namespace AHCI
 
         ProbePorts();
 
-        osData.debugTerminalWindow->Log("Checking Ports:",  Colors.bred);
+        osData.debugTerminalWindow->Log("Checking {} Ports:", to_string(PortCount), Colors.bred);
 
         for (int i = 0; i < PortCount; i++)
         {
@@ -151,23 +255,64 @@ namespace AHCI
 
             port->Configure();
 
-            // Test Read 
-            // Buffer only has 4096 bytes
-            osData.debugTerminalWindow->Log("Preparing To Read Disk...");
-            port->buffer = (uint8_t*)GlobalAllocator->RequestPage();
-            _memset(port->buffer, 0, 0x1000);
-            if (port->Read(0, 4, port->buffer))
+            if (i == 1)
             {
-                osData.debugTerminalWindow->Log("Raw Data:");
-                for (int t = 0; t < 512; t++)
+                // Test Read 
+                // Buffer only has 4096 bytes
+                port->buffer = (uint8_t*)GlobalAllocator->RequestPage();
+                
+                // Read 1
+                osData.debugTerminalWindow->Log("Preparing To Read From Disk {}...", to_string(i), Colors.yellow);
+                _memset(port->buffer, 0, 0x1000);
+                if (port->Read(1, 1, port->buffer))
                 {
-                    osData.debugTerminalWindow->renderer->Print(port->buffer[t]);
+                    osData.debugTerminalWindow->Log("Raw Data:");
+                    for (int t = 0; t < 256; t++)
+                    {
+                        osData.debugTerminalWindow->renderer->Print(port->buffer[t]);
+                    }
+                    osData.debugTerminalWindow->renderer->Println();
                 }
-                osData.debugTerminalWindow->renderer->Println();
-            }
-            else
-            {
-                osData.debugTerminalWindow->Log("Reading Disk failed!");
+                else
+                {
+                    osData.debugTerminalWindow->Log("Reading Disk failed!");
+                }
+
+                // Write
+                osData.debugTerminalWindow->Log("Preparing To Write To Disk {}...", to_string(i), Colors.yellow);
+                _memset(port->buffer, 'E', 0x1000);
+                if (port->TestWrite(0, 4, port->buffer))
+                {
+                    osData.debugTerminalWindow->Log("Raw Data:");
+                    for (int t = 0; t < 128; t++)
+                    {
+                        osData.debugTerminalWindow->renderer->Print(port->buffer[t]);
+                    }
+                    osData.debugTerminalWindow->renderer->Println();
+                }
+                else
+                {
+                    osData.debugTerminalWindow->Log("Writing to Disk failed!");
+                }
+
+                // Read 2
+                osData.debugTerminalWindow->Log("Preparing To Read From Disk {}...", to_string(i), Colors.yellow);
+                _memset(port->buffer, 0, 0x1000);
+                if (port->Read(1, 1, port->buffer))
+                {
+                    osData.debugTerminalWindow->Log("Raw Data:");
+                    for (int t = 0; t < 256; t++)
+                    {
+                        osData.debugTerminalWindow->renderer->Print(port->buffer[t]);
+                    }
+                    osData.debugTerminalWindow->renderer->Println();
+                }
+                else
+                {
+                    osData.debugTerminalWindow->Log("Reading Disk failed!");
+                }
+
+
             }
         }
     }
