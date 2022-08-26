@@ -1,20 +1,175 @@
 #include "ahci.h"
 #include "../../../OSDATA/osdata.h"
 #include "../../../paging/PageTableManager.h"
+#include "../../../memory/heap.h"
+#include "../../memory/memory.h"
 
 namespace AHCI 
 {
+    #define HBA_PORT_DEV_PRESENT 0x3
+    #define HBA_PORT_IPM_ACTIVE  0x1
+    #define HBA_PxCMD_CR  0x8000
+    #define HBA_PxCMD_FRE 0x0010
+    #define HBA_PxCMD_ST  0x0001
+    #define HBA_PxCMD_FR  0x4000
+    #define HBA_PxIS_TFES (1 << 30)
+
+    void Port::Configure()
+    {
+        StopCMD();
+
+        void* newBase = GlobalAllocator->RequestPage();
+        hbaPort->commandListBase = (uint32_t)(uint64_t)newBase;
+        hbaPort->commandListBaseUpper = (uint32_t)((uint64_t)newBase >> 32);
+        _memset((void*)(uint64_t)hbaPort->commandListBase, 0, 1024);
+
+        void* fisBase = GlobalAllocator->RequestPage();
+        hbaPort->fisBaseAddress = (uint32_t)(uint64_t)fisBase;
+        hbaPort->fisBaseAddressUpper = (uint32_t)((uint64_t)fisBase >> 32);
+        _memset(fisBase, 0, 256);
+        
+        HBACommandHeader* cmdHeader = (HBACommandHeader*)((uint64_t)hbaPort->commandListBase + ((uint64_t)hbaPort->commandListBaseUpper << 32));
+
+        for (int i = 0; i < 32; i++)
+        {
+            cmdHeader[i].prdtLength = 8;
+
+            void* cmdTableAddress = GlobalAllocator->RequestPage();
+            uint64_t address = (uint64_t)cmdTableAddress + (i << 8);
+            cmdHeader[i].commandTableBaseAddress = (uint32_t)(uint64_t)address;
+            cmdHeader[i].commandTableBaseAddressUpper = (uint32_t)((uint64_t)address >> 32);
+            _memset(cmdTableAddress, 0, 256);
+        }
+
+        StartCMD();
+    }
+
+    void Port::StopCMD()
+    {
+        hbaPort->cmdStatus &= ~HBA_PxCMD_ST;
+        hbaPort->cmdStatus &= ~HBA_PxCMD_FRE;
+
+        while (true)
+        {
+            if (hbaPort->cmdStatus & HBA_PxCMD_FR)
+                continue;
+            if (hbaPort->cmdStatus & HBA_PxCMD_CR)
+                continue;
+            break;
+        }
+    }
+
+    void Port::StartCMD()
+    {
+        while (hbaPort->cmdStatus & HBA_PxCMD_CR);
+
+        hbaPort->cmdStatus |= HBA_PxCMD_FRE;
+        hbaPort->cmdStatus |= HBA_PxCMD_ST;
+    }
+
+    bool Port::Read(uint64_t sector, uint32_t sectorCount, void* buffer)
+    {
+        uint32_t sectorL = (uint32_t)sector;
+        uint32_t sectorH = (uint32_t) (sector >> 32);
+        
+        hbaPort->interruptStatus = (uint32_t)-1;
+
+        HBACommandHeader* cmdHeader = (HBACommandHeader*)(uint64_t)hbaPort->commandListBase;
+        cmdHeader->commandFISLenght = sizeof(FIS_REG_H2D) / sizeof(uint32_t); // command FIS size
+        cmdHeader->write = 0;
+        cmdHeader->prdtLength = 1;
+
+        HBACommandTable* commandTable = (HBACommandTable*)((uint64_t)cmdHeader->commandTableBaseAddress);
+        _memset(commandTable, 0, sizeof(HBACommandTable) + (cmdHeader->prdtLength - 1) * sizeof(HBAPRDTEntry));
+
+        commandTable->prdtEntry[0].dataBaseAddress = (uint32_t)(uint64_t)buffer;
+        commandTable->prdtEntry[0].dataBaseAddressUpper = (uint32_t)((uint64_t)buffer >> 32);
+        commandTable->prdtEntry[0].byteCount = (sectorCount << 9) - 1; // 512 bytes per sector
+        commandTable->prdtEntry[0].interruptOnCompletion = 1;
+        
+        FIS_REG_H2D* cmdFIS = (FIS_REG_H2D*)(&commandTable->commandFIS);
+        cmdFIS->fisType = FIS_TYPE_REG_H2D;
+        cmdFIS->commandControl = 1;
+        cmdFIS->command = ATA_CMD_READ_DMA_EX;
+
+        cmdFIS->lba0 = (uint8_t)sectorL;
+        cmdFIS->lba1 = (uint8_t)(sectorL >> 8);
+        cmdFIS->lba2 = (uint8_t)(sectorL >> 16);
+        cmdFIS->lba3 = (uint8_t)sectorH;
+        cmdFIS->lba4 = (uint8_t)(sectorH >> 8);
+        cmdFIS->lba5 = (uint8_t)(sectorH >> 16);
+
+        cmdFIS->deviceRegister = 1<<6; // Set to LBA Mode
+
+        cmdFIS->countLow = sectorCount && 0xFF;
+        cmdFIS->countHigh = (sectorCount >> 8) && 0xFF;
+
+        uint64_t spin = 0;
+        while((hbaPort->taskFileData & (ATA_DEV_BUSY | ATA_DEV_DRQ)) && spin < 1000000)
+            spin++;
+        if (spin == 1000000)
+            return false;
+        //osData.debugTerminalWindow->Log("Spin: {}", to_string(spin), Colors.bblue);
+
+        hbaPort->commandIssue = 1;
+        
+        while (true)
+        {
+            if (hbaPort->commandIssue == 0) 
+                break;
+            if (hbaPort->interruptStatus & HBA_PxIS_TFES) 
+                return false;
+        }
+        return true;
+    }
+
     AHCIDriver::AHCIDriver (PCI::PCIDeviceHeader* pciBaseAddress)
     {
         this->PCIBaseAddress = pciBaseAddress;
         osData.debugTerminalWindow->Log("AHCIDriver has been created!", Colors.orange);
 
-        ABAR = (HBAMemory*)((PCI::PCIHeader0*)pciBaseAddress)->BAR5;
+        ABAR = (HBAMemory*)(uint64_t)((PCI::PCIHeader0*)(uint64_t)pciBaseAddress)->BAR5;
 
         GlobalPageTableManager.MapMemory(ABAR, ABAR);
 
         ProbePorts();
 
+        osData.debugTerminalWindow->Log("Checking Ports:",  Colors.bred);
+
+        for (int i = 0; i < PortCount; i++)
+        {
+            Port* port = Ports[i];
+            PortType portType = port->portType;
+
+            if (portType == PortType::SATA)
+                osData.debugTerminalWindow->Log("* SATA drive",  Colors.orange);
+            else if (portType == PortType::SATAPI)
+                osData.debugTerminalWindow->Log("* SATAPI drive",  Colors.orange);
+            else
+                osData.debugTerminalWindow->Log("* Not interested",  Colors.orange);
+
+
+            port->Configure();
+
+            // Test Read 
+            // Buffer only has 4096 bytes
+            osData.debugTerminalWindow->Log("Preparing To Read Disk...");
+            port->buffer = (uint8_t*)GlobalAllocator->RequestPage();
+            _memset(port->buffer, 0, 0x1000);
+            if (port->Read(0, 4, port->buffer))
+            {
+                osData.debugTerminalWindow->Log("Raw Data:");
+                for (int t = 0; t < 512; t++)
+                {
+                    osData.debugTerminalWindow->renderer->Print(port->buffer[t]);
+                }
+                osData.debugTerminalWindow->renderer->Println();
+            }
+            else
+            {
+                osData.debugTerminalWindow->Log("Reading Disk failed!");
+            }
+        }
     }
 
     AHCIDriver::~AHCIDriver()
@@ -22,8 +177,6 @@ namespace AHCI
         
     }
 
-    #define HBA_PORT_DEV_PRESENT 0x3
-    #define HBA_PORT_IPM_ACTIVE 0x1
     #define SATA_SIG_ATAAPI 0xEB140101
     #define SATA_SIG_ATA    0x00000101
     #define SATA_SIG_SEMB   0xC33C0101
@@ -34,18 +187,30 @@ namespace AHCI
     {
         uint32_t portsImplemented = ABAR->portsImplemented;
 
+        PortCount = 0;
+
+        //osData.debugTerminalWindow->Log("Probing Ports:",  Colors.bred);
         for (int i = 0; i < 32; i++)
         {
             if (portsImplemented & (1 << i))
             {
                 PortType portType = CheckPortType(&ABAR->ports[i]);
 
-                if (portType == PortType::SATA)
-                    osData.debugTerminalWindow->Log("SATA drive",  Colors.orange);
-                else if (portType == PortType::SATAPI)
-                    osData.debugTerminalWindow->Log("SATAPI drive",  Colors.orange);
-                else
-                    osData.debugTerminalWindow->Log("Not interested",  Colors.orange);
+                // if (portType == PortType::SATA)
+                //     osData.debugTerminalWindow->Log("* SATA drive",  Colors.orange);
+                // else if (portType == PortType::SATAPI)
+                //     osData.debugTerminalWindow->Log("* SATAPI drive",  Colors.orange);
+                // else
+                //     osData.debugTerminalWindow->Log("* Not interested",  Colors.orange);
+
+                if (portType == PortType::SATA || portType == PortType::SATAPI)
+                {
+                    Ports[PortCount] = new Port();
+                    Ports[PortCount]->portType = portType;
+                    Ports[PortCount]->hbaPort = &ABAR->ports[i];
+                    Ports[PortCount]->portNumber = PortCount;
+                    PortCount++;
+                }
             }
 
         }

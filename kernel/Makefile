@@ -42,6 +42,11 @@ $(OBJDIR)/kernelStuff/other_IO/pit/pit.o: $(SRCDIR)/kernelStuff/other_IO/pit/pit
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 
+$(OBJDIR)/kernelStuff/other_IO/ahci/ahci.o: $(SRCDIR)/kernelStuff/other_IO/ahci/ahci.cpp
+	@ echo X==== COMPILING AHCI $^
+	@ mkdir -p $(@D)
+	$(CC) $(CFLAGS) -c $^ -o $@
+
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@ echo !==== COMPILING $^
