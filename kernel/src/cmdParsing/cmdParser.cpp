@@ -279,6 +279,19 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                 free(buffer);
                 
             }
+            else if (StrEquals(data->data[2], "get"))
+            {
+                int num = to_int(data->data[1]);
+
+                if (StrEquals(data->data[3], "max sector count"))
+                {
+                    window->renderer->Println("Max Sector Count: {}", to_string((uint64_t)osData.diskInterfaces[num]->GetMaxSectorCount()), (*user)->colData.defaultTextColor);
+                }
+                else
+                {
+                    LogError("No valid arguments for get function passed!", window);
+                }
+            }
             else
                 LogError("No valid arguments passed!", window);
         }

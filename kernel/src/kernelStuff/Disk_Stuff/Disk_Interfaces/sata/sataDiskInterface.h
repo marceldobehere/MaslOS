@@ -13,6 +13,6 @@ namespace DiskInterface
         SataDiskInterface(AHCI::Port* port);
         bool Read(uint64_t sector, uint32_t sectorCount, void* buffer);
         bool Write(uint64_t sector, uint32_t sectorCount, void* buffer);
-        
+        uint32_t GetMaxSectorCount();
     };
 }

@@ -4,6 +4,11 @@
 
 namespace DiskInterface
 {
+    uint32_t RamDiskInterface::GetMaxSectorCount()
+    {
+        return SectorCount;
+    }
+
     RamDiskInterface::RamDiskInterface(uint64_t sectorCount)
     {
         InterfaceType = DiskInterface::Ram;

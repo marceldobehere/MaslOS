@@ -3,6 +3,11 @@
 
 namespace DiskInterface
 {
+    uint32_t SataDiskInterface::GetMaxSectorCount()
+    {
+        return Port->GetMaxSectorCount();
+    }
+
     SataDiskInterface::SataDiskInterface(AHCI::Port* port)
     {
         InterfaceType = DiskInterface::Sata;

@@ -68,9 +68,58 @@ namespace AHCI
         hbaPort->cmdStatus |= HBA_PxCMD_ST;
     }
 
+    SATA_Ident Port::Identifydrive()
+    {
+        /***Make the Command Header***/
+        HBACommandHeader* cmdhead=(HBACommandHeader*)(uint64_t)hbaPort->commandListBase;//kmalloc(sizeof(HBA_CMD_HEADER));
+        //port->clb = (DWORD)cmdhead;
+        cmdhead->commandFISLenght = 5;
+        //cmdhead->a=0;
+        cmdhead->write = 0;
+        cmdhead->prdtLength = 1;
+        cmdhead->prefetchable = 1; //p
+        cmdhead->clearBusy = 1;
+
+        /***Make the Command Table***/
+        HBACommandTable* cmdtbl = (HBACommandTable*)GlobalAllocator->RequestPage();// kmalloc(sizeof(HBA_CMD_TBL));
+        cmdhead->commandTableBaseAddress = (uint32_t)(uint64_t)cmdtbl;
+        _memset((void*)cmdtbl, 0, sizeof(HBACommandTable));
+        cmdtbl->prdtEntry[0].dataBaseAddress = (uint32_t)(uint64_t)GlobalAllocator->RequestPage();
+        cmdtbl->prdtEntry[0].byteCount = 0x200 - 1;
+        cmdtbl->prdtEntry[0].interruptOnCompletion = 1;   // interrupt when identify complete
+        uint32_t data_base = cmdtbl->prdtEntry[0].dataBaseAddress;
+        _memset((void*)(uint64_t)data_base, 0, 4096);
+
+        /***Make the IDENTIFY DEVICE h2d FIS***/
+        FIS_REG_H2D* cmdfis = (FIS_REG_H2D*)(uint64_t)cmdtbl->commandFIS;
+        //printf("cmdfis %x ",cmdfis);
+        _memset((void*)cmdfis,0,sizeof(FIS_REG_H2D));
+        cmdfis->fisType = FIS_TYPE_REG_H2D;
+        cmdfis->commandControl = 1;
+        cmdfis->command = ATA_CMD_IDENTIFY;
+
+        /***Send the Command***/
+        hbaPort->commandIssue = 1;
+
+        /***Wait for a reply***/
+        while(1)
+        {
+            if(hbaPort->commandIssue == 0)
+                break;
+        }
+
+        uint32_t* baddr = (uint32_t*)(uint64_t)data_base;
+        SATA_Ident test = *((SATA_Ident*)baddr);
+
+        GlobalAllocator->FreePage((void*)(uint64_t)data_base);
+        GlobalAllocator->FreePage((void*)(uint64_t)cmdtbl);
+    
+        return test;
+    }
+
     bool Port::Read(uint64_t sector, uint32_t sectorCount, void* buffer)
     {
-uint32_t sectorL = (uint32_t)sector;
+        uint32_t sectorL = (uint32_t)sector;
         uint32_t sectorH = (uint32_t)(sector >> 32);
         uint32_t sectorCountCopy = sectorCount;
         
@@ -229,7 +278,10 @@ uint32_t sectorL = (uint32_t)sector;
 
     uint32_t Port::GetMaxSectorCount()
     {
-        return 0;
+        SATA_Ident test = Identifydrive();
+        //uint32_t cap = (((uint32_t)test.cur_capacity1) << 16) + test.cur_capacity0;
+        uint32_t cap = test.lba_capacity;
+        return cap;
     }
 
 

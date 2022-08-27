@@ -38,4 +38,21 @@ namespace DiskInterface
         //osData.mainTerminalWindow->Log("DISK IS GENERIC!!!");
         return false;
     }
+
+    uint32_t GenericDiskInterface::GetMaxSectorCount()
+    {
+        switch (InterfaceType)
+        {
+            case DiskInterface::Ram:
+            {
+                return ((RamDiskInterface*)this)->GetMaxSectorCount();
+            }
+            case DiskInterface::Sata:
+            {
+                return ((SataDiskInterface*)this)->GetMaxSectorCount();
+            }
+        }
+        //osData.mainTerminalWindow->Log("DISK IS GENERIC!!!");
+        return 0;
+    }
 }
