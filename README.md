@@ -7,6 +7,15 @@ MaslOS is love, MaslOS is life.
 
 
 
+## Features
+* ad
+* * ad2
+* * ad3
+* bruh
+
+
+
+
 ## How to run (Linux)
 Install QEMU if you haven't.
 
