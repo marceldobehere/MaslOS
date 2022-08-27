@@ -49,6 +49,8 @@ MaslOS is love, MaslOS is life.
 * * KernelFiles
 
 
+## Screenshots
+
 
 
 ## How to run (Linux)
