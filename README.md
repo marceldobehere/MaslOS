@@ -8,10 +8,45 @@ MaslOS is love, MaslOS is life.
 
 
 ## Features
-* ad
-* * ad2
-* * ad3
-* bruh
+* Display
+* * VGA Output with GOP
+* Desktop
+* * Background Image
+* * Taskbar
+* Window Manager
+* * Working Window Manager with dynamic windows
+* Apps
+* * Terminal
+* * (Experimental) Text Display Window
+* Audio
+* * (In planning) Audio Device Driver of some sorts
+* Keyboard
+* * PS/2 Keyboard support
+* Mouse
+* * PS/2 Mouse support
+* IO
+* * Disk
+* * * Disk Interfaces
+* * * * SATA
+* * * * SATAPI
+* * * * RAM Disk
+* * * Partiton Interfaces
+* * * * (In planning) Custom Partitioning System
+* * * Filesystem Interfaces
+* * * * (In planning) Custom Filesystem
+* Memory
+* * Dynamic Memory Management
+* * (In planning) Paging
+* OTHER IO
+* * PIT
+* * AHCI
+* * ACPI
+* * PCI
+* Other Features
+* * Stack Trace
+* * Panic Screen
+* * Crash command
+* * KernelFiles
 
 
 
