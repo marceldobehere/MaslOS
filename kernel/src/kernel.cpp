@@ -193,9 +193,9 @@ extern "C" void _start(BootInfo* bootInfo)
 
         AddToStack();
         {
-            //newTerminaltest->scrollX = 60 - ((tFrame % 300) * 2);
-            //newTerminaltest->scrollY = 50 - ((tFrame/3 % 250) * 1);
-            //newTerminaltest->Render();
+            // newTerminaltest->scrollX = 60 - ((tFrame % 300) * 2);
+            // newTerminaltest->scrollY = 50 - ((tFrame/3 % 250) * 1);
+            // newTerminaltest->Render();
         }
         RemoveFromStack();
 

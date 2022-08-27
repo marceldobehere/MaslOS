@@ -31,6 +31,8 @@ struct OSData
     bool enableStackTrace;
     int64_t crashCount = 0;
     WindowManager::WindowPointerBufferThing* windowPointerThing;
+
+    List<DiskInterface::GenericDiskInterface*> diskInterfaces;
 };
 
 extern OSData osData;

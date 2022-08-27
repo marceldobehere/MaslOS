@@ -36,7 +36,7 @@ void PrepareACPI(BootInfo* bootInfo)
 
     PCI::EnumeratePCI(mcfg);
 
-
+    osData.debugTerminalWindow->Log("Drive Count: {}", to_string(osData.diskInterfaces.getCount()), Colors.yellow);
     
 
     RemoveFromStack();
@@ -184,6 +184,8 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     InitKeyboard();
 
     initUsers();
+
+    osData.diskInterfaces = List<DiskInterface::GenericDiskInterface*>();
 
     osData.windowIconZIP = bootInfo->windowIconsZIP;
     osData.windowButtonZIP = bootInfo->windowButtonZIP;

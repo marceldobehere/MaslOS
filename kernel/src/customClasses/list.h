@@ -5,7 +5,7 @@
 #include "../WindowStuff/Window/window.h"
 #include "../userinput/mousePacket.h"
 #include "../WindowStuff/SubInstances/newTerminalInstance/consoleChar.h"
-
+#include "../kernelStuff/Disk_Stuff/Disk_Interfaces/generic/genericDiskInterface.h"
 
 template <typename T> class Array
 {
@@ -30,6 +30,7 @@ template class Array<Window*>;
 template class Array<Task*>;
 template class Array<MousePacket>;
 template class Array<ConsoleChar>;
+template class Array<DiskInterface::GenericDiskInterface*>;
 
 template <typename T> class List
 {
@@ -65,6 +66,7 @@ template class List<Window*>;
 template class List<Task*>;
 template class List<MousePacket>;
 template class List<ConsoleChar>;
+template class List<DiskInterface::GenericDiskInterface*>;
 
 template class Array<List<ConsoleChar>*>;
 

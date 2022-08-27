@@ -3,6 +3,7 @@
 #include "../../../paging/PageTableManager.h"
 #include "../../../memory/heap.h"
 #include "../../memory/memory.h"
+#include "../../Disk_Stuff/Disk_Interfaces/sata/sataDiskInterface.h"
 
 namespace AHCI 
 {
@@ -146,7 +147,7 @@ uint32_t sectorL = (uint32_t)sector;
 
         return true;
     }
-    bool Port::TestWrite(uint64_t sector, uint32_t sectorCount, void* buffer)
+    bool Port::Write(uint64_t sector, uint32_t sectorCount, void* buffer)
     {
         uint32_t sectorL = (uint32_t)sector;
         uint32_t sectorH = (uint32_t)(sector >> 32);
@@ -226,6 +227,11 @@ uint32_t sectorL = (uint32_t)sector;
         return true;
     }
 
+    uint32_t Port::GetMaxSectorCount()
+    {
+        return 0;
+    }
+
 
     AHCIDriver::AHCIDriver (PCI::PCIDeviceHeader* pciBaseAddress)
     {
@@ -255,65 +261,67 @@ uint32_t sectorL = (uint32_t)sector;
 
             port->Configure();
 
-            if (i == 1)
-            {
-                // Test Read 
-                // Buffer only has 4096 bytes
-                port->buffer = (uint8_t*)GlobalAllocator->RequestPage();
+            osData.diskInterfaces.add(new DiskInterface::SataDiskInterface(port));
+
+            // if (i == 1)
+            // {
+            //     // Test Read 
+            //     // Buffer only has 4096 bytes
+            //     port->buffer = (uint8_t*)GlobalAllocator->RequestPage();
                 
-                // Read 1
-                osData.debugTerminalWindow->Log("Preparing To Read From Disk {}...", to_string(i), Colors.yellow);
-                _memset(port->buffer, 0, 0x1000);
-                if (port->Read(1, 1, port->buffer))
-                {
-                    osData.debugTerminalWindow->Log("Raw Data:");
-                    for (int t = 0; t < 256; t++)
-                    {
-                        osData.debugTerminalWindow->renderer->Print(port->buffer[t]);
-                    }
-                    osData.debugTerminalWindow->renderer->Println();
-                }
-                else
-                {
-                    osData.debugTerminalWindow->Log("Reading Disk failed!");
-                }
+            //     // Read 1
+            //     osData.debugTerminalWindow->Log("Preparing To Read From Disk {}...", to_string(i), Colors.yellow);
+            //     _memset(port->buffer, 0, 0x1000);
+            //     if (port->Read(1, 1, port->buffer))
+            //     {
+            //         osData.debugTerminalWindow->Log("Raw Data:");
+            //         for (int t = 0; t < 256; t++)
+            //         {
+            //             osData.debugTerminalWindow->renderer->Print(port->buffer[t]);
+            //         }
+            //         osData.debugTerminalWindow->renderer->Println();
+            //     }
+            //     else
+            //     {
+            //         osData.debugTerminalWindow->Log("Reading Disk failed!");
+            //     }
 
-                // Write
-                osData.debugTerminalWindow->Log("Preparing To Write To Disk {}...", to_string(i), Colors.yellow);
-                _memset(port->buffer, 'E', 0x1000);
-                if (port->TestWrite(0, 4, port->buffer))
-                {
-                    osData.debugTerminalWindow->Log("Raw Data:");
-                    for (int t = 0; t < 128; t++)
-                    {
-                        osData.debugTerminalWindow->renderer->Print(port->buffer[t]);
-                    }
-                    osData.debugTerminalWindow->renderer->Println();
-                }
-                else
-                {
-                    osData.debugTerminalWindow->Log("Writing to Disk failed!");
-                }
+            //     // Write
+            //     osData.debugTerminalWindow->Log("Preparing To Write To Disk {}...", to_string(i), Colors.yellow);
+            //     _memset(port->buffer, 'E', 0x1000);
+            //     if (port->TestWrite(0, 4, port->buffer))
+            //     {
+            //         osData.debugTerminalWindow->Log("Raw Data:");
+            //         for (int t = 0; t < 128; t++)
+            //         {
+            //             osData.debugTerminalWindow->renderer->Print(port->buffer[t]);
+            //         }
+            //         osData.debugTerminalWindow->renderer->Println();
+            //     }
+            //     else
+            //     {
+            //         osData.debugTerminalWindow->Log("Writing to Disk failed!");
+            //     }
 
-                // Read 2
-                osData.debugTerminalWindow->Log("Preparing To Read From Disk {}...", to_string(i), Colors.yellow);
-                _memset(port->buffer, 0, 0x1000);
-                if (port->Read(1, 1, port->buffer))
-                {
-                    osData.debugTerminalWindow->Log("Raw Data:");
-                    for (int t = 0; t < 256; t++)
-                    {
-                        osData.debugTerminalWindow->renderer->Print(port->buffer[t]);
-                    }
-                    osData.debugTerminalWindow->renderer->Println();
-                }
-                else
-                {
-                    osData.debugTerminalWindow->Log("Reading Disk failed!");
-                }
+            //     // Read 2
+            //     osData.debugTerminalWindow->Log("Preparing To Read From Disk {}...", to_string(i), Colors.yellow);
+            //     _memset(port->buffer, 0, 0x1000);
+            //     if (port->Read(1, 1, port->buffer))
+            //     {
+            //         osData.debugTerminalWindow->Log("Raw Data:");
+            //         for (int t = 0; t < 256; t++)
+            //         {
+            //             osData.debugTerminalWindow->renderer->Print(port->buffer[t]);
+            //         }
+            //         osData.debugTerminalWindow->renderer->Println();
+            //     }
+            //     else
+            //     {
+            //         osData.debugTerminalWindow->Log("Reading Disk failed!");
+            //     }
 
 
-            }
+            // }
         }
     }
 

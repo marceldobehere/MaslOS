@@ -10,6 +10,7 @@
 #include "../OSDATA/osdata.h"
 #include "../kernelStuff/other_IO/pit/pit.h"
 #include "../tasks/sleep/taskSleep.h"
+#include "../kernelStuff/Disk_Stuff/Disk_Interfaces/ram/ramDiskInterface.h"
 
 void LogError(const char* msg, Window* window)
 {
@@ -234,6 +235,84 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             login(data->data[1], user, window);
         else
             LogInvalidArgumentCount(1, data->len-1, window);
+        
+        free(data);
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(data->data[0], "disk"))
+    {
+        if (data->len == 3)
+        {
+            if (StrEquals(data->data[1], "create"))
+            {
+                int size = to_int(data->data[2]);
+                osData.diskInterfaces.add(new DiskInterface::RamDiskInterface(size));
+                window->renderer->Println("Ram Disk with {} sectors created!", to_string(size), (*user)->colData.defaultTextColor);
+            }
+            else
+                LogError("No valid arguments passed!", window);
+        }
+        else if (data->len == 4)
+        {
+            if (StrEquals(data->data[2], "read"))
+            {
+                int num = to_int(data->data[1]);
+                int size = to_int(data->data[3]);
+
+                uint8_t* buffer = (uint8_t*)malloc((((size - 1) / 512) + 1) * 512, "Malloc for disk read buffer");
+
+                if (osData.diskInterfaces[num]->Read(0, ((size - 1) / 512) + 1, (void*)buffer))
+                {
+                    window->renderer->Println("Raw Data:");
+                    for (int i = 0; i < size; i++)
+                        window->renderer->Print(buffer[i]);
+                    window->renderer->Println();
+                }
+                else
+                {
+                    LogError("Disk read failed!", window);
+                }
+
+
+                free(buffer);
+                
+            }
+            else
+                LogError("No valid arguments passed!", window);
+        }
+        else if (data->len == 5)
+        {
+            if (StrEquals(data->data[2], "write"))
+            {   
+                int num = to_int(data->data[1]);
+                int size = to_int(data->data[4]);
+
+                // disk 0 write A 100
+                uint8_t* buffer = (uint8_t*)malloc((((size - 1) / 512) + 1) * 512, "Malloc for disk read buffer");
+
+                _memset(buffer, data->data[3][0], size);
+
+                if (osData.diskInterfaces[num]->Write(0, ((size - 1) / 512) + 1, (void*)buffer))
+                {
+                    window->renderer->Println("Disk write successful!");
+                }
+                else
+                {
+                    LogError("Disk write failed!", window);
+                }
+
+
+                free(buffer);
+            }
+            else
+                LogError("No valid arguments passed!", window);
+        }
+        else
+        {
+            LogError("No valid arguments passed!", window);
+        }
         
         free(data);
         RemoveFromStack();
@@ -499,11 +578,15 @@ void GetCmd(const char* name, OSUser* user, Window* window)
     }
     else if (StrEquals(name, "TSB S"))
     {
-        window->renderer->Println("Time since boot: {} s.", to_string(PIT::TimeSinceBootS()), Colors.bgreen);
+        window->renderer->Println("Time since boot: {} s.", to_string(PIT::TimeSinceBootS()), user->colData.defaultTextColor);
     }
     else if (StrEquals(name, "TSB MS"))
     {
-        window->renderer->Println("Time since boot: {} ms.", to_string(PIT::TimeSinceBootMS()), Colors.bgreen);
+        window->renderer->Println("Time since boot: {} ms.", to_string(PIT::TimeSinceBootMS()), user->colData.defaultTextColor);
+    }
+    else if (StrEquals(name, "disk count"))
+    {
+        window->renderer->Println("Disk Count: {}", to_string(osData.diskInterfaces.getCount()), user->colData.defaultTextColor);
     }
     else if (StrEquals(name, "heap stats"))
     {

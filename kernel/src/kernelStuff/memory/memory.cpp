@@ -48,3 +48,15 @@ void _memset(void* start, uint8_t value, uint64_t num)
     for (uint64_t i = 0; i < num; i++)
         *(uint8_t*)((uint64_t)start + i) = value;
 }
+
+void _memcpy(void* src, void* dest, uint64_t size)
+{
+    uint8_t* _src  = (uint8_t*)src;
+    uint8_t* _dest = (uint8_t*)dest;
+    while (size--)
+    {
+        *_dest = *_src;
+        _dest++;
+        _src++;
+    }
+}
