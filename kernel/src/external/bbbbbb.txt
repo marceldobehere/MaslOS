@@ -1,0 +1,51 @@
+int IDENTIFYdrive(HBA_PORT *port)
+{
+
+  /***Make the Command Header***/
+  HBA_CMD_HEADER *cmdhead=(HBA_CMD_HEADER*)port->clb;//kmalloc(sizeof(HBA_CMD_HEADER));
+  //port->clb = (DWORD)cmdhead;
+  cmdhead->cfl = 5;
+  //cmdhead->a=0;
+  cmdhead->w = 0;
+  cmdhead->prdtl = 1;
+  cmdhead->p = 1;
+  cmdhead->c = 1;
+
+  /***Make the Command Table***/
+  HBA_CMD_TBL *cmdtbl = (HBA_CMD_TBL*)kmalloc(sizeof(HBA_CMD_TBL));
+  cmdhead->ctba = (DWORD)cmdtbl;
+  memset((void*)cmdtbl, 0, sizeof(HBA_CMD_TBL));
+  cmdtbl->prdt_entry[0].dba = kmalloc(4096);
+  cmdtbl->prdt_entry[0].dbc = 0x1FF;
+  cmdtbl->prdt_entry[0].i = 1;   // interrupt when identify complete
+  data_base=cmdtbl->prdt_entry[0].dba;
+  memset((void*)data_base,0,4096);
+
+  /***Make the IDENTIFY DEVICE h2d FIS***/
+  FIS_REG_H2D *cmdfis = (FIS_REG_H2D*)cmdtbl->cfis;
+  //printf("cmdfis %x ",cmdfis);
+  memset((void*)cmdfis,0,sizeof(FIS_REG_H2D));
+  cmdfis->fis_type = FIS_TYPE_REG_H2D;
+  cmdfis->c = 1;
+  cmdfis->command = ATA_CMD_IDENTIFY;
+
+  /***Send the Command***/
+  port->ci=1;
+
+  /***Wait for a reply***/
+  while(1)
+  {
+    if(port->ci == 0)
+    {
+      break;
+    }
+    printf(" %x",port->ci);
+  }
+  uint32_t *baddr=data_base;
+  printf("\n\t The Data we Recieved from identify command:\n\t");
+  for(;*baddr;)
+  {
+    printf("%x ",*baddr);
+    ++baddr;
+  }
+  return 1;
