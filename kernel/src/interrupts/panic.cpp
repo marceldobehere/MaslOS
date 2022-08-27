@@ -7,7 +7,7 @@
 void Panic(const char* panicMessage, const char* var, bool lock)
 {
     AddToStack();
-    GlobalRenderer->Clear(Colors.red);
+    GlobalRenderer->ClearDotted(Colors.red);
     GlobalRenderer->Println();
     GlobalRenderer->Println();
     GlobalRenderer->Println("KERNEL PANIC AAAAAAAAAAAAAAAAAAAAAAAAAAA", Colors.white);

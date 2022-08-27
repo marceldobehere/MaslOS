@@ -284,6 +284,25 @@ void BasicRenderer::Clear(uint32_t col)
     BasicRenderer::Clear(col, true);
 }
 
+void BasicRenderer::ClearDotted(uint32_t col, bool resetCursor)
+{
+    uint64_t fbBase = (uint64_t)framebuffer->BaseAddress;
+    uint64_t bytesPerScanline = framebuffer->PixelsPerScanLine * 4;
+    uint64_t fbHeight = framebuffer->Height;
+
+    for (int64_t y = 0; y < framebuffer->Height; y += 2)
+        for (int64_t x = 0; x < framebuffer->Width; x++)
+            *((uint32_t*)(fbBase + (4 * x) + (bytesPerScanline * y))) = col;
+
+    if (resetCursor)
+        CursorPosition = {0, 0};
+}
+
+void BasicRenderer::ClearDotted(uint32_t col)
+{
+    ClearDotted(col, true);
+}
+
 void BasicRenderer::Cls()
 {
     BasicRenderer::Clear(0);
