@@ -49,10 +49,6 @@ MaslOS is love, MaslOS is life.
 * * KernelFiles
 
 
-## Screenshots
-
-
-
 ## How to run (Linux)
 Install QEMU if you haven't.
 
@@ -73,7 +69,6 @@ Then download/clone the repo and run the `Just RUN OS (Windows).cmd` file.
 
 
 
-
 ## How to build (Linux)
 Install QEMU if you haven't.
 
@@ -85,3 +80,9 @@ install NASM if you haven't.
 
 
 Go into the MaslOS Folder and run the `RUN.sh` file
+
+
+
+## Screenshots
+
+![The MaslOS Splashscreen](/images/boot.PNG "The MaslOS Splashscreen")
