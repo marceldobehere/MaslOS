@@ -86,8 +86,9 @@ Go into the MaslOS Folder and run the `RUN.sh` file
 ## Screenshots
 
 ![The MaslOS Splashscreen](/images/boot.PNG "The MaslOS Splashscreen")
-![The MaslOS Splashscreen](/images/desktop.PNG "The MaslOS Splashscreen")
-![The MaslOS Splashscreen](/images/desktop%20background.PNG "The MaslOS Splashscreen")
-![The MaslOS Splashscreen](/images/terminal%20test 1.PNG "The MaslOS Splashscreen")
-![The MaslOS Splashscreen](/images/yay.PNG "The MaslOS Splashscreen")
-![The MaslOS Splashscreen](/images/crash.PNG "The MaslOS Splashscreen")
+![The Desktop with some windows open](/images/desktop.PNG "The Desktop with some windows open")
+![The Desktop](/images/desktop%20background.PNG "The Desktop")
+![Playing around with the Terminals](/images/terminal%20test%201.PNG "Playing around with the Terminals")
+![A lot of windows](/images/yay.PNG "A lot of windows")
+![The Panic screen](/images/crash.PNG "The Panic screen")
+[More Images](/images)
