@@ -1,7 +1,11 @@
 #pragma once
 #include "../../../OSDATA/userdata.h"
 #include "../defaultInstance/defaultInstance.h"
+
+#include "../../Window/window.h"
+#define LIST_INCLUDE_TASK
 #include "../../../customClasses/list.h"
+#undef LIST_INCLUDE_TASK
 
 enum commandMode
 {

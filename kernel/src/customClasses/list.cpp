@@ -1,5 +1,6 @@
 #include "list.h"
 #include "../OSDATA/MStack/MStackM.h"
+#include "../memory/heap.h"
 
 
 template <typename T> void List<T>::init(uint64_t capacity)

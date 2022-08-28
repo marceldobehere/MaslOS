@@ -44,7 +44,7 @@ namespace DiskInterface
         for (int sect = 0; sect < sectorCountDiv8 - 1; sect++)
         {
             _memset(Port->buffer, 0, 0x1000);
-            memcpy(buf, Port->buffer, 0x1000);
+            _memcpy(buf, Port->buffer, 0x1000);
             if (!Port->Write(sector, 8, Port->buffer))
                 return false;
             buf += 0x1000;

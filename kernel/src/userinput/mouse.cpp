@@ -208,7 +208,7 @@ void FigureOutCorrectMouseImage()
             currentMouseImageName = "drag_U_d.mbif";
             dragArr[3] = true;
         }
-        else
+        else 
         {
             currentMouseImageName = "drag_x.mbif";
         }

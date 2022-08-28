@@ -3,6 +3,7 @@
 #include "../ram/ramDiskInterface.h"
 #include "../sata/sataDiskInterface.h"
 
+
 namespace DiskInterface
 {
     bool GenericDiskInterface::Read(uint64_t sector, uint32_t sectorCount, void* buffer)

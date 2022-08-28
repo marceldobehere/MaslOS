@@ -11,6 +11,7 @@
 #include "../kernelStuff/other_IO/pit/pit.h"
 #include "../tasks/sleep/taskSleep.h"
 #include "../kernelStuff/Disk_Stuff/Disk_Interfaces/ram/ramDiskInterface.h"
+#include "../kernelStuff/Disk_Stuff/Partition_Interfaces/mraps/mrapsPartitionInterface.h"
 
 void LogError(const char* msg, Window* window)
 {
@@ -290,6 +291,110 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                 else
                 {
                     LogError("No valid arguments for get function passed!", window);
+                }
+            }
+            else if (StrEquals(data->data[2], "partition"))
+            {
+                int num = to_int(data->data[1]);
+
+                if (StrEquals(data->data[3], "create"))
+                {
+                    DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[num];
+                    PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)new PartitionInterface::MRAPSPartitionInterface(diskInterface);
+
+                    if (diskInterface->partitionInterface != NULL)
+                        window->renderer->Println("Partition Interface creation Success!", (*user)->colData.defaultTextColor);
+                    else
+                        LogError("Partition Interface creation failed!", window);
+
+                }
+                else if (StrEquals(data->data[3], "init"))
+                {
+                    DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[num];
+                    PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
+                    if (partInterface != NULL)
+                    {
+                        const char* res = partInterface->InitAndSavePartitionTable();
+                        if (res == PartitionInterface::CommandResult.SUCCESS)
+                        {
+                            window->renderer->Println("Partition Init Success!", (*user)->colData.defaultTextColor);
+                        }
+                        else
+                            LogError("Partition Init failed! Error: \"{}\"", res, window);
+                    }
+                    else
+                        LogError("Drive has no Partition Manager!", window);
+                }
+                else if (StrEquals(data->data[3], "save"))
+                {
+                    DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[num];
+                    PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
+                    if (partInterface != NULL)
+                    {
+                        const char* res = partInterface->SavePartitionTable();
+                        if (res == PartitionInterface::CommandResult.SUCCESS)
+                        {
+                            window->renderer->Println("Partition Save Success!", (*user)->colData.defaultTextColor);
+                        }
+                        else
+                            LogError("Partition Save failed! Error: \"{}\"", res, window);
+                    }
+                    else
+                        LogError("Drive has no Partition Manager!", window);
+                }
+                else if (StrEquals(data->data[3], "load"))
+                {
+                    DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[num];
+                    PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
+                    if (partInterface != NULL)
+                    {
+                        const char* res = partInterface->LoadPartitionTable();
+                        if (res == PartitionInterface::CommandResult.SUCCESS)
+                        {
+                            window->renderer->Println("Partition Load Success!", (*user)->colData.defaultTextColor);
+                        }
+                        else
+                            LogError("Partition Load failed! Error: \"{}\"", res, window);
+                    }
+                    else
+                        LogError("Drive has no Partition Manager!", window);
+                }
+                else if (StrEquals(data->data[3], "list"))
+                {
+                    DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[num];
+                    PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
+                    if (partInterface != NULL)
+                    {
+                        const char* res = partInterface->LoadPartitionTable();
+                        if (res == PartitionInterface::CommandResult.SUCCESS)
+                        {
+                            window->renderer->Println("Partition Load Success!", (*user)->colData.defaultTextColor);
+                            uint64_t partCount = partInterface->partitionList.getCount();
+                            window->renderer->Println("Partition Count: {}", to_string(partCount), Colors.yellow);
+                            window->renderer->Println("Partition Data:", Colors.yellow);
+                            for (int i = 0; i < partCount; i++)
+                            {   
+                                PartitionInterface::PartitionInfo* info = partInterface->partitionList[i];
+                                window->renderer->Println(" + Partition {}:", to_string(i), Colors.orange);
+                                window->renderer->Println("    - Name:        \"{}\"", info->name, Colors.yellow);
+                                window->renderer->Println("    - Description: \"{}\"", info->description, Colors.yellow);
+                                window->renderer->Println("    - Drive Name:  \"{}\"", info->driveName, Colors.yellow);
+                                window->renderer->Println("    - Size:         {} Bytes", to_string(info->sizeInBytes), Colors.yellow);
+                                window->renderer->Println("    - Location:     0x{}", ConvertHexToString(info->locationInBytes), Colors.yellow);
+                                window->renderer->Println("    - Owner:        0x{}", ConvertHexToString((uint64_t)info->owner), Colors.yellow);
+                                window->renderer->Println("    - Type:         {}", to_string((uint8_t)info->type), Colors.yellow);
+                                window->renderer->Println("    - Hidden:       {}", info->hidden ? "True" : "False", Colors.yellow);
+                            }
+                        }
+                        else
+                            LogError("Partition Load failed! Error: \"{}\"", res, window);
+                    }
+                    else
+                        LogError("Drive has no Partition Manager!", window);
+                }
+                else
+                {
+                    LogError("No valid arguments for partition function passed!", window);
                 }
             }
             else

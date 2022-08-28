@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../customClasses/list.h"
-//#include "../Window/window.h"
+//#include "../../customClasses/list.h"
+#include "../Window/window.h"
 //#include "../../OSDATA/osdata.h"
 #include "../../Rendering/Cols.h"
 
