@@ -23,6 +23,7 @@ namespace DiskInterface
     bool SataDiskInterface::Read(uint64_t sector, uint32_t sectorCount, void* buffer)
     {
         AddToStack();
+        osData.mainTerminalWindow->Log("This Interface: 0x{}", ConvertHexToString((uint64_t)this), Colors.yellow);
         uint8_t* buf = (uint8_t*)buffer;
         int sectorCountDiv8 = ((sectorCount - 1) / 8) + 1;
         for (int sect = 0; sect < sectorCountDiv8 - 1; sect++)

@@ -161,6 +161,7 @@ namespace AHCI
         void StopCMD();
         bool Read(uint64_t sector, uint32_t sectorCount, void* buffer);
         bool Write(uint64_t sector, uint32_t sectorCount, void* buffer);
+        int FindCommandSlot();
         uint32_t GetMaxSectorCount();
         SATA_Ident Identifydrive();
     };

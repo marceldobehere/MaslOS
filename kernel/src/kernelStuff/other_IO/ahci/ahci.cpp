@@ -73,16 +73,19 @@ namespace AHCI
         /***Make the Command Header***/
         HBACommandHeader* cmdhead=(HBACommandHeader*)(uint64_t)hbaPort->commandListBase;//kmalloc(sizeof(HBA_CMD_HEADER));
         //port->clb = (DWORD)cmdhead;
-        cmdhead->commandFISLenght = 5;
+        //cmdhead->commandFISLenght = 5;
         //cmdhead->a=0;
         cmdhead->write = 0;
         cmdhead->prdtLength = 1;
-        cmdhead->prefetchable = 1; //p
+        //cmdhead->prefetchable = 1; //p
         cmdhead->clearBusy = 1;
 
+        cmdhead->commandFISLenght = sizeof(FIS_REG_H2D) / sizeof(uint32_t); // command FIS size
+        cmdhead->prdtLength = 1;
+
         /***Make the Command Table***/
-        HBACommandTable* cmdtbl = (HBACommandTable*)GlobalAllocator->RequestPage();// kmalloc(sizeof(HBA_CMD_TBL));
-        cmdhead->commandTableBaseAddress = (uint32_t)(uint64_t)cmdtbl;
+        HBACommandTable* cmdtbl = (HBACommandTable*)((uint64_t)cmdhead->commandTableBaseAddress);//(HBACommandTable*)GlobalAllocator->RequestPage();// kmalloc(sizeof(HBA_CMD_TBL));
+        //cmdhead->commandTableBaseAddress = (uint32_t)(uint64_t)cmdtbl;
         _memset((void*)cmdtbl, 0, sizeof(HBACommandTable));
         cmdtbl->prdtEntry[0].dataBaseAddress = (uint32_t)(uint64_t)GlobalAllocator->RequestPage();
         cmdtbl->prdtEntry[0].byteCount = 0x200 - 1;
@@ -112,20 +115,40 @@ namespace AHCI
         SATA_Ident test = *((SATA_Ident*)baddr);
 
         GlobalAllocator->FreePage((void*)(uint64_t)data_base);
-        GlobalAllocator->FreePage((void*)(uint64_t)cmdtbl);
+        //GlobalAllocator->FreePage((void*)(uint64_t)cmdtbl);
     
         return test;
     }
 
+    int Port::FindCommandSlot()
+    {
+        uint32_t cmdSlots = 32;
+        uint32_t slots = (hbaPort->sataControl | hbaPort->commandIssue);
+        for (int i = 0; i < cmdSlots; i++)
+        {
+            if ((slots & 1) == 0)
+                return i;
+            slots >>= 1;
+        }
+        return -1;
+    }
+
     bool Port::Read(uint64_t sector, uint32_t sectorCount, void* buffer)
     {
+        osData.mainTerminalWindow->Log("This Port: 0x{}", ConvertHexToString((uint64_t)this), Colors.yellow);
         uint32_t sectorL = (uint32_t)sector;
         uint32_t sectorH = (uint32_t)(sector >> 32);
         uint32_t sectorCountCopy = sectorCount;
         
         hbaPort->interruptStatus = (uint32_t)-1;
+        int slot = FindCommandSlot();
+        if (slot == -1)
+            return false;
+        
+        osData.mainTerminalWindow->Log("This Slot: {}", to_string(slot), Colors.yellow);
 
         HBACommandHeader* cmdHeader = (HBACommandHeader*)(uint64_t)hbaPort->commandListBase;
+        cmdHeader += slot;
         cmdHeader->commandFISLenght = sizeof(FIS_REG_H2D) / sizeof(uint32_t); // command FIS size
         cmdHeader->write = 0;
         cmdHeader->prdtLength = ((sectorCount - 1) / 16) + 1;
@@ -181,11 +204,11 @@ namespace AHCI
             return false;
         //osData.debugTerminalWindow->Log("Spin: {}", to_string(spin), Colors.bblue);
 
-        hbaPort->commandIssue = 1;
+        hbaPort->commandIssue = 1<<slot;
         
         while (true)
         {
-            if (hbaPort->commandIssue == 0) 
+            if ((hbaPort->commandIssue & (1<<slot)) == 0)
                 break;
             if (hbaPort->interruptStatus & HBA_PxIS_TFES) 
                 return false;
@@ -203,8 +226,12 @@ namespace AHCI
         uint32_t sectorCountCopy = sectorCount;
         
         hbaPort->interruptStatus = (uint32_t)-1;
+        int slot = FindCommandSlot();
+        if (slot == -1)
+            return false;
 
         HBACommandHeader* cmdHeader = (HBACommandHeader*)(uint64_t)hbaPort->commandListBase;
+        cmdHeader += slot; // A
         cmdHeader->commandFISLenght = sizeof(FIS_REG_H2D) / sizeof(uint32_t); // command FIS size
         cmdHeader->write = 1;
         cmdHeader->prdtLength = ((sectorCount - 1) / 16) + 1;
@@ -260,11 +287,11 @@ namespace AHCI
             return false;
         //osData.debugTerminalWindow->Log("Spin: {}", to_string(spin), Colors.bblue);
 
-        hbaPort->commandIssue = 1;
+        hbaPort->commandIssue = 1<<slot; // A
         
         while (true)
         {
-            if (hbaPort->commandIssue == 0) 
+            if ((hbaPort->commandIssue & (1<<slot)) == 0) // A
                 break;
             if (hbaPort->interruptStatus & HBA_PxIS_TFES) 
                 return false;
