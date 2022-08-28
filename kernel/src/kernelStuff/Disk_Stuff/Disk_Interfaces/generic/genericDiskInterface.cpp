@@ -56,4 +56,40 @@ namespace DiskInterface
         //osData.mainTerminalWindow->Log("DISK IS GENERIC!!!");
         return 0;
     }
+
+
+    bool GenericDiskInterface::ReadBytes(uint64_t address, uint64_t count, void* buffer)
+    {
+        switch (InterfaceType)
+        {
+            case DiskInterface::Ram:
+            {
+                return ((RamDiskInterface*)this)->ReadBytes(address, count, buffer);
+            }
+            case DiskInterface::Sata:
+            {
+                return ((SataDiskInterface*)this)->ReadBytes(address, count, buffer);
+            }
+        }
+        //osData.mainTerminalWindow->Log("DISK IS GENERIC!!!");
+        return false;
+    }
+    
+    
+    bool GenericDiskInterface::WriteBytes(uint64_t address, uint64_t count, void* buffer)
+    {
+        switch (InterfaceType)
+        {
+            case DiskInterface::Ram:
+            {
+                return ((RamDiskInterface*)this)->WriteBytes(address, count, buffer);
+            }
+            case DiskInterface::Sata:
+            {
+                return ((SataDiskInterface*)this)->WriteBytes(address, count, buffer);
+            }
+        }
+        //osData.mainTerminalWindow->Log("DISK IS GENERIC!!!");
+        return false;
+    }
 }

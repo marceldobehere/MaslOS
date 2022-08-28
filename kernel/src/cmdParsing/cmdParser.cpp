@@ -402,7 +402,32 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         }
         else if (data->len == 5)
         {
-            if (StrEquals(data->data[2], "write"))
+            if (StrEquals(data->data[2], "read"))
+            {
+                int num = to_int(data->data[1]);
+                int start = to_int(data->data[3]);
+                int count = to_int(data->data[4]);
+
+                // Disk 0 read 0 100
+                uint8_t* buffer = (uint8_t*)malloc(count, "Malloc for disk read buffer");
+
+                if (osData.diskInterfaces[num]->ReadBytes(start, count, (void*)buffer))
+                {
+                    window->renderer->Println("Raw Data:");
+                    for (int i = 0; i < count; i++)
+                        window->renderer->Print(buffer[i]);
+                    window->renderer->Println();
+                }
+                else
+                {
+                    LogError("Disk read failed!", window);
+                }
+
+
+                _free(buffer);
+                
+            }
+            else if (StrEquals(data->data[2], "write"))
             {   
                 int num = to_int(data->data[1]);
                 int size = to_int(data->data[4]);
@@ -426,7 +451,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                 }
 
 
-                free(buffer);
+                _free(buffer);
             }
             else if (StrEquals(data->data[2], "write_cached"))
             {   
@@ -455,6 +480,37 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                         LogError("Disk write failed!", window);
                     }
                 }
+                _free(buffer);
+            }
+            else
+                LogError("No valid arguments passed!", window);
+        }
+        else if (data->len == 6)
+        {
+            if (StrEquals(data->data[2], "write"))
+            {   
+                int num = to_int(data->data[1]);
+                int start = to_int(data->data[4]);
+                int count = to_int(data->data[5]);
+                
+                uint8_t val = data->data[3][0];
+                if (StrEquals(data->data[3], "NULL"))
+                    val = 0;
+
+                // disk 0 write A 10 52
+                uint8_t* buffer = (uint8_t*)malloc(count, "Malloc for disk read buffer");
+                _memset(buffer, val, count);
+
+                if (osData.diskInterfaces[num]->WriteBytes(start, count, (void*)buffer))
+                {
+                    window->renderer->Println("Disk write successful!");
+                }
+                else
+                {
+                    LogError("Disk write failed!", window);
+                }
+
+
                 free(buffer);
             }
             else

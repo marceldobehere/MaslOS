@@ -39,5 +39,27 @@ namespace DiskInterface
             _memcpy(buf + (s * 512), Buffer + (s * 512), 512);
         }
         return true;
-    } 
+    }
+
+    bool RamDiskInterface::ReadBytes(uint64_t address, uint64_t count, void* buffer)
+    {
+        if (address + count >= SectorCount * 512)
+            return false;
+
+        for (uint64_t i = 0; i < count; i++)
+            ((uint8_t*)buffer)[i] = Buffer[address + i];
+        
+        return true;
+    }
+
+    bool RamDiskInterface::WriteBytes(uint64_t address, uint64_t count, void* buffer)
+    {
+        if (address + count >= SectorCount * 512)
+            return false;
+
+        for (uint64_t i = 0; i < count; i++)
+            Buffer[address + i] = ((uint8_t*)buffer)[i];
+
+        return true;
+    }
 }
