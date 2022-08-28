@@ -406,11 +406,15 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             {   
                 int num = to_int(data->data[1]);
                 int size = to_int(data->data[4]);
+                
+                uint8_t val = data->data[3][0];
+                if (StrEquals(data->data[3], "NULL"))
+                    val = 0;
 
                 // disk 0 write A 100
                 uint8_t* buffer = (uint8_t*)malloc((((size - 1) / 512) + 1) * 512, "Malloc for disk read buffer");
-
-                _memset(buffer, data->data[3][0], size);
+                _memset(buffer, 0, (((size - 1) / 512) + 1) * 512);
+                _memset(buffer, val, size);
 
                 if (osData.diskInterfaces[num]->Write(0, ((size - 1) / 512) + 1, (void*)buffer))
                 {
@@ -422,6 +426,35 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                 }
 
 
+                free(buffer);
+            }
+            else if (StrEquals(data->data[2], "write_cached"))
+            {   
+                int num = to_int(data->data[1]);
+                int size = to_int(data->data[4]);
+                
+                uint8_t val = data->data[3][0];
+                if (StrEquals(data->data[3], "NULL"))
+                    val = 0;
+
+                // disk 0 write A 100
+                uint8_t* buffer = (uint8_t*)malloc((((size - 1) / 512) + 1) * 512, "Malloc for disk read buffer");
+                _memset(buffer, 0, (((size - 1) / 512) + 1) * 512);
+
+                if (!osData.diskInterfaces[num]->Read(0, ((size - 1) / 512) + 1, (void*)buffer))
+                    LogError("Disk read failed!", window);
+                {
+                    _memset(buffer, val, size);
+
+                    if (osData.diskInterfaces[num]->Write(0, ((size - 1) / 512) + 1, (void*)buffer))
+                    {
+                        window->renderer->Println("Disk write successful!");
+                    }
+                    else
+                    {
+                        LogError("Disk write failed!", window);
+                    }
+                }
                 free(buffer);
             }
             else

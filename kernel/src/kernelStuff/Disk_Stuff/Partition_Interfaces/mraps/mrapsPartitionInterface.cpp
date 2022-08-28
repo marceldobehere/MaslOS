@@ -29,7 +29,7 @@ namespace PartitionInterface
         partitionList.add(new PartitionInfo("Partition Table Partition", "This is the Partition Table which stores all the partition data.", "partition_manager", PartitionType::PartitionData, 512 * 19, 512, true, (void*)this));
         partitionList.add(new PartitionInfo("Empty Partition", "This is the default generated Partition made my MRAPS.", "empty_test", PartitionType::Undefined, (driveSize - (512 * 20)), 20 * 512, false, (void*)this));
 
-        return CommandResult.SUCCESS;
+        return SavePartitionTable();
     }
 
 
