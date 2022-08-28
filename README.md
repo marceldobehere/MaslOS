@@ -31,7 +31,7 @@ MaslOS is love, MaslOS is life.
       - SATAPI
       - RAM Disk
     + Partiton Interfaces
-      - (In planning) Custom Partitioning System
+      - (In implementation) MRAPS (Marcels really awesome partitioning system)
     + Filesystem Interfaces
       - (In planning) Custom Filesystem
 * Memory
