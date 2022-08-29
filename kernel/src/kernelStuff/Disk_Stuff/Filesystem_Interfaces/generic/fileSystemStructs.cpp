@@ -8,4 +8,6 @@ namespace FilesystemInterface
         "Generic",
         "MRAFS"
     };
+
+    _FSCommandResult FSCommandResult;
 }
