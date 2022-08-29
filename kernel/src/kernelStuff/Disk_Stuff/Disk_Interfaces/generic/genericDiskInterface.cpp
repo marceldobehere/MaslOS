@@ -8,6 +8,8 @@ namespace DiskInterface
 {
     bool GenericDiskInterface::Read(uint64_t sector, uint32_t sectorCount, void* buffer)
     {
+        if (sectorCount== 0)
+            return true;
         switch (InterfaceType)
         {
             case DiskInterface::Ram:
@@ -25,6 +27,8 @@ namespace DiskInterface
 
     bool GenericDiskInterface::Write(uint64_t sector, uint32_t sectorCount, void* buffer)
     {
+        if (sectorCount== 0)
+            return true;
         switch (InterfaceType)
         {
             case DiskInterface::Ram:
@@ -60,6 +64,8 @@ namespace DiskInterface
 
     bool GenericDiskInterface::ReadBytes(uint64_t address, uint64_t count, void* buffer)
     {
+        if (count == 0)
+            return true;
         switch (InterfaceType)
         {
             case DiskInterface::Ram:
@@ -78,6 +84,8 @@ namespace DiskInterface
     
     bool GenericDiskInterface::WriteBytes(uint64_t address, uint64_t count, void* buffer)
     {
+        if (count == 0)
+            return true;
         switch (InterfaceType)
         {
             case DiskInterface::Ram:

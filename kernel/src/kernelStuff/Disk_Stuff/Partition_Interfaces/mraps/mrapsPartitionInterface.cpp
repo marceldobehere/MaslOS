@@ -222,6 +222,8 @@ namespace PartitionInterface
             return CommandResult.ERROR_INVALID_PARTITION_OWNER;
         if (address + sizeInBytes >= partition->sizeInBytes)
             return CommandResult.ERROR_PARTITION_TOO_SMALL;
+        if (sizeInBytes == 0)
+            return CommandResult.SUCCESS;
         if(!diskInterface->ReadBytes(partition->locationInBytes + address, sizeInBytes, buffer))
             return CommandResult.ERROR_READ_FAILED;
 
@@ -238,6 +240,8 @@ namespace PartitionInterface
             return CommandResult.ERROR_CANNOT_EDIT_TABLE_PARTITION;
         if (address + sizeInBytes >= partition->sizeInBytes)
             return CommandResult.ERROR_PARTITION_TOO_SMALL;
+        if (sizeInBytes == 0)
+            return CommandResult.SUCCESS;
         if(!diskInterface->WriteBytes(partition->locationInBytes + address, sizeInBytes, buffer))
             return CommandResult.ERROR_WRITE_FAILED;
 

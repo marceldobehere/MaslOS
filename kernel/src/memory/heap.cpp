@@ -178,10 +178,7 @@ void* malloc(size_t size, const char* text)
     }
 
     if (size == 0)
-    {
-        RemoveFromStack();
-        return NULL;
-    }
+        size = 0x10;
 
     HeapSegHdr* current = (HeapSegHdr*) heapStart;
     while(true)
