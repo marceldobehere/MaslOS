@@ -135,7 +135,7 @@ namespace AHCI
 
     bool Port::Read(uint64_t sector, uint32_t sectorCount, void* buffer)
     {
-        osData.mainTerminalWindow->Log("This Port: 0x{}", ConvertHexToString((uint64_t)this), Colors.yellow);
+        //osData.mainTerminalWindow->Log("This Port: 0x{}", ConvertHexToString((uint64_t)this), Colors.yellow);
         uint32_t sectorL = (uint32_t)sector;
         uint32_t sectorH = (uint32_t)(sector >> 32);
         uint32_t sectorCountCopy = sectorCount;
@@ -145,7 +145,7 @@ namespace AHCI
         if (slot == -1)
             return false;
         
-        osData.mainTerminalWindow->Log("This Slot: {}", to_string(slot), Colors.yellow);
+        //osData.mainTerminalWindow->Log("This Slot: {}", to_string(slot), Colors.yellow);
 
         HBACommandHeader* cmdHeader = (HBACommandHeader*)(uint64_t)hbaPort->commandListBase;
         cmdHeader += slot;

@@ -36,7 +36,48 @@ void LogInvalidArgumentCount(int expected, int found, Window* window)
 }
 
 
-
+void EditPartitionSetting(PartitionInterface::PartitionInfo* part, const char* param, const char* val, OSUser* user, Window* window)
+{
+    if (StrEquals(param, "hidden"))
+    {
+        if (StrEquals(val, "true") || StrEquals(val, "TRUE"))
+        {
+            part->hidden = true;
+            window->renderer->Println("Parameter changed!");
+        }
+        else if (StrEquals(val, "false") || StrEquals(val, "FALSE"))
+        {
+            part->hidden = false;
+            window->renderer->Println("Parameter changed!");
+        }
+        else
+            LogError("Invalid Value for Paramter!", window);
+    }
+    else if (StrEquals(param, "name"))
+    {
+        free((void*)part->name);
+        part->name = StrCopy(val);
+        part->nameLen = StrLen(val);
+        window->renderer->Println("Parameter changed!");
+    }
+    else if (StrEquals(param, "description"))
+    {
+        free((void*)part->description);
+        part->description = StrCopy(val);
+        part->descriptionLen = StrLen(val);
+        window->renderer->Println("Parameter changed!");
+    }
+    else if (StrEquals(param, "drive name"))
+    {
+        free((void*)part->driveName);
+        part->driveName = StrCopy(val);
+        part->driveNameLen = StrLen(val);
+        window->renderer->Println("Parameter changed!");
+    }
+    else
+        LogError("Invalid Parameter!", window);
+    
+}
 
 void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 {
@@ -365,29 +406,28 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                     PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
                     if (partInterface != NULL)
                     {
-                        const char* res = partInterface->LoadPartitionTable();
-                        if (res == PartitionInterface::CommandResult.SUCCESS)
-                        {
-                            window->renderer->Println("Partition Load Success!", (*user)->colData.defaultTextColor);
-                            uint64_t partCount = partInterface->partitionList.getCount();
-                            window->renderer->Println("Partition Count: {}", to_string(partCount), Colors.yellow);
-                            window->renderer->Println("Partition Data:", Colors.yellow);
-                            for (int i = 0; i < partCount; i++)
-                            {   
-                                PartitionInterface::PartitionInfo* info = partInterface->partitionList[i];
-                                window->renderer->Println(" + Partition {}:", to_string(i), Colors.orange);
-                                window->renderer->Println("    - Name:        \"{}\"", info->name, Colors.yellow);
-                                window->renderer->Println("    - Description: \"{}\"", info->description, Colors.yellow);
-                                window->renderer->Println("    - Drive Name:  \"{}\"", info->driveName, Colors.yellow);
-                                window->renderer->Println("    - Size:         {} Bytes", to_string(info->sizeInBytes), Colors.yellow);
-                                window->renderer->Println("    - Location:     0x{}", ConvertHexToString(info->locationInBytes), Colors.yellow);
-                                window->renderer->Println("    - Owner:        0x{}", ConvertHexToString((uint64_t)info->owner), Colors.yellow);
-                                window->renderer->Println("    - Type:         {}", to_string((uint8_t)info->type), Colors.yellow);
-                                window->renderer->Println("    - Hidden:       {}", info->hidden ? "True" : "False", Colors.yellow);
+                        uint64_t partCount = partInterface->partitionList.getCount();
+                        window->renderer->Println("Partition Count: {}", to_string(partCount), Colors.yellow);
+                        window->renderer->Println("Partition Data:", Colors.yellow);
+                        for (int i = 0; i < partCount; i++)
+                        {   
+                            PartitionInterface::PartitionInfo* info = partInterface->partitionList[i];
+                            window->renderer->Println(" + Partition {}:", to_string(i), Colors.orange);
+                            window->renderer->Println("    - Name:        \"{}\"", info->name, Colors.yellow);
+                            window->renderer->Println("    - Description: \"{}\"", info->description, Colors.yellow);
+                            window->renderer->Println("    - Drive Name:  \"{}\"", info->driveName, Colors.yellow);
+                            window->renderer->Println("    - Size:         {} Bytes", to_string(info->sizeInBytes), Colors.yellow);
+                            //window->renderer->Println("    - Location:     0x{}", ConvertHexToString(info->locationInBytes), Colors.yellow);
+                            {
+                                window->renderer->Print("    - Location:     0x{} ", ConvertHexToString(info->locationInBytes), Colors.yellow);
+                                window->renderer->Print("({} - ", to_string(info->locationInBytes), Colors.yellow);
+                                window->renderer->Print("{})", to_string(info->locationInBytes + info->sizeInBytes - 1), Colors.yellow);
+                                window->renderer->Println();
                             }
+                            window->renderer->Println("    - Owner:        0x{}", ConvertHexToString((uint64_t)info->owner), Colors.yellow);
+                            window->renderer->Println("    - Type:         {}", to_string((uint8_t)info->type), Colors.yellow);
+                            window->renderer->Println("    - Hidden:       {}", info->hidden ? "True" : "False", Colors.yellow);
                         }
-                        else
-                            LogError("Partition Load failed! Error: \"{}\"", res, window);
                     }
                     else
                         LogError("Drive has no Partition Manager!", window);
@@ -402,7 +442,59 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         }
         else if (data->len == 5)
         {
-            if (StrEquals(data->data[2], "read"))
+            if (StrEquals(data->data[2], "partition"))
+            {
+                int diskNum = to_int(data->data[1]);
+                int partNum = to_int(data->data[4]);
+                DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[diskNum];
+                PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
+                if (partInterface == NULL)
+                    LogError("Drive has no Partition Manager!", window);
+                else if (partNum < 0 || partNum >= partInterface->partitionList.getCount())
+                    LogError("Invalid Partition selected!", window);
+                else
+                {
+                    if (StrEquals(data->data[3], "delete"))
+                    {
+                        const char* res = partInterface->DeletePartition(partInterface->partitionList[partNum]);
+                        if (res == PartitionInterface::CommandResult.SUCCESS)
+                            window->renderer->Println("Partition Deletion Success!", (*user)->colData.defaultTextColor);
+                        else
+                            LogError("Partition Deletion failed! Error: \"{}\"", res, window);
+
+                    }
+                    else if (StrEquals(data->data[3], "wipe"))
+                    {
+                        const char* res = partInterface->WipePartitionContents(partInterface->partitionList[partNum]);
+                        if (res == PartitionInterface::CommandResult.SUCCESS)
+                            window->renderer->Println("Partition Wipe Success!", (*user)->colData.defaultTextColor);
+                        else
+                            LogError("Partition Wipe failed! Error: \"{}\"", res, window);
+                    }
+                    else if (StrEquals(data->data[3], "show"))
+                    {
+                        PartitionInterface::PartitionInfo* info = partInterface->partitionList[partNum];
+                        window->renderer->Println(" + Partition {}:", to_string(partNum), Colors.orange);
+                        window->renderer->Println("    - Name:        \"{}\"", info->name, Colors.yellow);
+                        window->renderer->Println("    - Description: \"{}\"", info->description, Colors.yellow);
+                        window->renderer->Println("    - Drive Name:  \"{}\"", info->driveName, Colors.yellow);
+                        window->renderer->Println("    - Size:         {} Bytes", to_string(info->sizeInBytes), Colors.yellow);
+                        //window->renderer->Println("    - Location:     0x{}", ConvertHexToString(info->locationInBytes), Colors.yellow);
+                        {
+                            window->renderer->Print("    - Location:     0x{} ", ConvertHexToString(info->locationInBytes), Colors.yellow);
+                            window->renderer->Print("({} - ", to_string(info->locationInBytes), Colors.yellow);
+                            window->renderer->Print("{})", to_string(info->locationInBytes + info->sizeInBytes - 1), Colors.yellow);
+                            window->renderer->Println();
+                        }
+                        window->renderer->Println("    - Owner:        0x{}", ConvertHexToString((uint64_t)info->owner), Colors.yellow);
+                        window->renderer->Println("    - Type:         {}", to_string((uint8_t)info->type), Colors.yellow);
+                        window->renderer->Println("    - Hidden:       {}", info->hidden ? "True" : "False", Colors.yellow);
+                    }
+                    else
+                        LogError("No valid arguments passed!", window);
+                }
+            }
+            else if (StrEquals(data->data[2], "read"))
             {
                 int num = to_int(data->data[1]);
                 int start = to_int(data->data[3]);
@@ -487,7 +579,33 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         }
         else if (data->len == 6)
         {
-            if (StrEquals(data->data[2], "write"))
+            if (StrEquals(data->data[2], "partition"))
+            {
+                int diskNum = to_int(data->data[1]);
+                int partNum = to_int(data->data[4]);
+                DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[diskNum];
+                PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
+                if (partInterface == NULL)
+                    LogError("Drive has no Partition Manager!", window);
+                else if (partNum < 0 || partNum >= partInterface->partitionList.getCount())
+                    LogError("Invalid Partition selected!", window);
+                else
+                {
+                    if (StrEquals(data->data[3], "resize"))
+                    {
+                        uint64_t newSize = to_int(data->data[5]);
+                        const char* res = partInterface->ResizePartition(partInterface->partitionList[partNum], newSize);
+                        if (res == PartitionInterface::CommandResult.SUCCESS)
+                            window->renderer->Println("Partition Resize Success!", (*user)->colData.defaultTextColor);
+                        else
+                            LogError("Partition Resize failed! Error: \"{}\"", res, window);
+
+                    }
+                    else
+                        LogError("No valid arguments passed!", window);
+                }
+            }
+            else if (StrEquals(data->data[2], "write"))
             {   
                 int num = to_int(data->data[1]);
                 int start = to_int(data->data[4]);
@@ -516,6 +634,80 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             else
                 LogError("No valid arguments passed!", window);
         }
+        else if (data->len == 7)
+        {
+            if (StrEquals(data->data[2], "partition"))
+            {
+                int diskNum = to_int(data->data[1]);
+                int partNum = to_int(data->data[4]);
+                DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[diskNum];
+                PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
+                if (partInterface == NULL)
+                    LogError("Drive has no Partition Manager!", window);
+                else if (partNum < 0 || partNum >= partInterface->partitionList.getCount())
+                    LogError("Invalid Partition selected!", window);
+                else
+                {
+                    if (StrEquals(data->data[3], "create"))
+                    {
+                        int newSize = to_int(data->data[5]);
+                        PartitionInterface::PartitionInfo* partInfo = partInterface->partitionList[partNum];
+                        const char* res = partInterface->CreatePartition(partInfo, newSize);
+                        if (res == PartitionInterface::CommandResult.SUCCESS)
+                        {
+                            free((void*)partInfo->name);
+                            partInfo->name = StrCopy(data->data[6]);
+                            partInfo->nameLen = StrLen(data->data[6]);
+
+                            window->renderer->Println("Partition Creation Success!", (*user)->colData.defaultTextColor);
+                        }
+                        else
+                            LogError("Partition Creation failed! Error: \"{}\"", res, window);
+                    }
+                    else if (StrEquals(data->data[3], "edit"))
+                    {
+                        const char* param = data->data[5];
+                        const char* val = data->data[6];
+                        // EDIT PARAM VAL
+                        EditPartitionSetting(partInterface->partitionList[partNum], param, val, *user, window);
+                    }
+                    else if (StrEquals(data->data[3], "read"))
+                    {
+                        uint64_t addr = to_int(data->data[5]);
+                        uint64_t count = to_int(data->data[6]);
+                        uint8_t* buffer = (uint8_t*)malloc(count, "Buffer For Partition Read Command");
+
+                        const char* res = partInterface->ReadPartition(partInterface->partitionList[partNum], addr, count, buffer);
+                        if (res == PartitionInterface::CommandResult.SUCCESS)
+                        {
+                            window->renderer->Println("Raw Data:");
+                            for (int i = 0; i < count; i++)
+                                window->renderer->Print(buffer[i]);
+                            window->renderer->Println();
+                        }
+                        else
+                            LogError("Partition Read failed! Error: \"{}\"", res, window);
+                        
+                        free(buffer);
+                    }
+                    else if (StrEquals(data->data[3], "write"))
+                    {
+                        uint64_t addr = to_int(data->data[6]);
+                        const char* buffer = data->data[5];
+
+                        const char* res = partInterface->WritePartition(partInterface->partitionList[partNum], addr, StrLen(buffer), (void*)buffer);
+                        if (res == PartitionInterface::CommandResult.SUCCESS)
+                            window->renderer->Println("Partition Write Success!");
+                        else
+                            LogError("Partition Write failed! Error: \"{}\"", res, window);
+                    }
+                    else
+                        LogError("No valid arguments passed!", window);
+                }
+            }
+            else
+                LogError("No valid arguments passed!", window);
+        }
         else
         {
             LogError("No valid arguments passed!", window);
@@ -532,6 +724,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     RemoveFromStack();
     return;
 }
+
 
 void login(const char* name, OSUser** user, Window* window)
 {

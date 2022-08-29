@@ -23,7 +23,7 @@ namespace DiskInterface
     bool SataDiskInterface::Read(uint64_t sector, uint32_t sectorCount, void* buffer)
     {
         AddToStack();
-        osData.mainTerminalWindow->Log("This Interface: 0x{}", ConvertHexToString((uint64_t)this), Colors.yellow);
+        //osData.mainTerminalWindow->Log("This Interface: 0x{}", ConvertHexToString((uint64_t)this), Colors.yellow);
         uint8_t* buf = (uint8_t*)buffer;
         int sectorCountDiv8 = ((sectorCount - 1) / 8) + 1;
         for (int sect = 0; sect < sectorCountDiv8 - 1; sect++)
@@ -86,7 +86,7 @@ namespace DiskInterface
     {
         if (count == 0)
             return true;
-        if (address + count >= SectorCount * 512)
+        if (address + count > SectorCount * 512)
             return false;
         AddToStack();
         uint32_t tempSectorCount = ((((address + count) + 511) / 512) - (address / 512));
@@ -115,7 +115,7 @@ namespace DiskInterface
         
         if (count == 0)
             return true;
-        if (address + count >= SectorCount * 512)
+        if (address + count > SectorCount * 512)
             return false;
         AddToStack();
         uint32_t tempSectorCount = ((((address + count) + 511) / 512) - (address / 512));
@@ -193,8 +193,8 @@ namespace DiskInterface
             {
                 //uint8_t* buffer2 = (uint8_t*)malloc(512, "Malloc for Read Buffer (1/2)");
                 _memset(buffer2, 0, 512);
-                //window->Log("Writing to Sector: {}", to_string((address + count) / 512), Colors.yellow);
-                if (!Read(((address + count) / 512), 1, buffer2))
+                //window->Log("Writing to Sector: {}", to_string((address + count - 1) / 512), Colors.yellow);
+                if (!Read(((address + count - 1) / 512), 1, buffer2))
                 {
                     _free(buffer2);
                     RemoveFromStack();
@@ -217,7 +217,7 @@ namespace DiskInterface
                 for (uint64_t i = 0; i < specialCount; i++)
                     buffer2[i] = ((uint8_t*)buffer)[i + addrOffset];
 
-                if (!Write(((address + count) / 512), 1, buffer2))
+                if (!Write(((address + count - 1) / 512), 1, buffer2))
                 {
                     _free(buffer2);
                     RemoveFromStack();

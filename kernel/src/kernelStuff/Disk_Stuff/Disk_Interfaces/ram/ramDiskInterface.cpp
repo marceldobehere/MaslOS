@@ -43,7 +43,7 @@ namespace DiskInterface
 
     bool RamDiskInterface::ReadBytes(uint64_t address, uint64_t count, void* buffer)
     {
-        if (address + count >= SectorCount * 512)
+        if (address + count > SectorCount * 512)
             return false;
 
         for (uint64_t i = 0; i < count; i++)
@@ -54,7 +54,7 @@ namespace DiskInterface
 
     bool RamDiskInterface::WriteBytes(uint64_t address, uint64_t count, void* buffer)
     {
-        if (address + count >= SectorCount * 512)
+        if (address + count > SectorCount * 512)
             return false;
 
         for (uint64_t i = 0; i < count; i++)
