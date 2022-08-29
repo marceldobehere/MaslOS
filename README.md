@@ -27,8 +27,7 @@ MaslOS is love, MaslOS is life.
 * IO
   + Disk
     + Disk Interfaces
-      - SATA
-      - SATAPI
+      - SATA / SATAPI
       - RAM Disk
     + Partitioning Interfaces
       - MRAPS (Marcels really awesome partitioning system)
