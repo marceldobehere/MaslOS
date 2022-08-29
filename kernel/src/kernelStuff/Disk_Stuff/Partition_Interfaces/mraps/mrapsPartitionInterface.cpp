@@ -331,6 +331,9 @@ namespace PartitionInterface
                 info->type = (PartitionType)*((uint8_t*)tempBuffer);
                 tempBuffer += 1;
 
+                info->fsType = (FilesystemInterface::FilesystemInterfaceType)*((uint8_t*)tempBuffer);
+                tempBuffer += 1;
+
                 info->owner = (void*)this;
 
                 partitionList.add(info);
@@ -357,6 +360,7 @@ namespace PartitionInterface
                 totalSize += sizeof(info->sizeInBytes);
                 totalSize += sizeof(info->locationInBytes);
                 totalSize += sizeof(info->type);
+                totalSize += sizeof(info->fsType);
             }
         }
 
@@ -413,6 +417,9 @@ namespace PartitionInterface
                 tempBuffer += 8;
 
                 *((uint8_t*)tempBuffer) = info->type;
+                tempBuffer += 1;
+
+                *((uint8_t*)tempBuffer) = info->fsType;
                 tempBuffer += 1;
             }
         }

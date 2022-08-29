@@ -6,6 +6,13 @@
 
 namespace DiskInterface
 {
+    const char* DiskInterfaceTypeStr[3] 
+    {
+        "Generic",
+        "RAM",
+        "SATA / SATAPI"
+    };
+
     bool GenericDiskInterface::Read(uint64_t sector, uint32_t sectorCount, void* buffer)
     {
         if (sectorCount== 0)

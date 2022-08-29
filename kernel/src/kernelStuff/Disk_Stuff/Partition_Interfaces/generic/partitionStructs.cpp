@@ -4,6 +4,34 @@
 
 namespace PartitionInterface
 {
+
+    const char* PartitionInterfaceTypeStr[3] 
+    {
+        "None",
+        "Generic",
+        "MRAPS"
+    };
+
+
+
+    /*
+        Undefined = 0,
+        //Empty = 1,
+        Normal = 2,
+        Reserved = 3,
+        Boot = 4,
+        PartitionData = 5
+    */
+    const char* PartitionTypeStr[6] 
+    {
+        "Undefined",
+        "Empty",
+        "Normal",
+        "Reserved",
+        "Boot",
+        "PartitionData"
+    };
+
     _CommandResult CommandResult;
 
     PartitionInfo::PartitionInfo()
@@ -19,6 +47,7 @@ namespace PartitionInterface
         this->locationInBytes = 0;
         this->owner = 0;
         this->hidden = false;
+        this->fsType = FilesystemInterface::None;
     }
 
     void PartitionInfo::PartitionInfo::Destroy()
@@ -46,5 +75,6 @@ namespace PartitionInterface
         this->locationInBytes = locationInBytes;
         this->owner = owner;
         this->hidden = hidden;
+        this->fsType = FilesystemInterface::None;
     }
 }

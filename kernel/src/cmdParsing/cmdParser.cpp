@@ -425,7 +425,8 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                                 window->renderer->Println();
                             }
                             window->renderer->Println("    - Owner:        0x{}", ConvertHexToString((uint64_t)info->owner), Colors.yellow);
-                            window->renderer->Println("    - Type:         {}", to_string((uint8_t)info->type), Colors.yellow);
+                            window->renderer->Println("    - Type:         {}", PartitionInterface::PartitionTypeStr[(uint8_t)info->type], Colors.yellow);
+                            window->renderer->Println("    - FS Type:      {}", FilesystemInterface::FilesystemInterfaceTypeStr[(uint8_t)info->fsType], Colors.yellow);
                             window->renderer->Println("    - Hidden:       {}", info->hidden ? "True" : "False", Colors.yellow);
                         }
                     }
@@ -487,7 +488,8 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                             window->renderer->Println();
                         }
                         window->renderer->Println("    - Owner:        0x{}", ConvertHexToString((uint64_t)info->owner), Colors.yellow);
-                        window->renderer->Println("    - Type:         {}", to_string((uint8_t)info->type), Colors.yellow);
+                        window->renderer->Println("    - Type:         {}", PartitionInterface::PartitionTypeStr[(uint8_t)info->type], Colors.yellow);
+                        window->renderer->Println("    - FS Type:      {}", FilesystemInterface::FilesystemInterfaceTypeStr[(uint8_t)info->fsType], Colors.yellow);
                         window->renderer->Println("    - Hidden:       {}", info->hidden ? "True" : "False", Colors.yellow);
                     }
                     else

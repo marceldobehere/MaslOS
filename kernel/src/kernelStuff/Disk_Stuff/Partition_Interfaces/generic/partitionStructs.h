@@ -1,13 +1,18 @@
 #pragma once
 #include <stdint.h>
 
+#include "../../Filesystem_Interfaces/generic/fileSystemStructs.h"
+
 namespace PartitionInterface
 {
     enum PartitionInterfaceType : uint8_t
     {
-        generic = 0,
-        mraps = 1 
+        none = 0,
+        generic = 1,
+        mraps = 2
     };
+
+    extern const char* PartitionInterfaceTypeStr[];
 
     enum PartitionType : uint8_t
     {
@@ -18,6 +23,8 @@ namespace PartitionInterface
         Boot = 4,
         PartitionData = 5
     };
+
+    extern const char* PartitionTypeStr[];
 
     struct _CommandResult
     {
@@ -53,6 +60,7 @@ namespace PartitionInterface
         const char* driveName;
 
         PartitionType type;
+        FilesystemInterface::FilesystemInterfaceType fsType;
         uint64_t sizeInBytes;
         uint64_t locationInBytes;
         void* owner;

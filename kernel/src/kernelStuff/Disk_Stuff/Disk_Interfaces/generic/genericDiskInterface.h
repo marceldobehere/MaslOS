@@ -14,6 +14,8 @@ namespace DiskInterface
         Sata = 2
     };
 
+    extern const char* DiskInterfaceTypeStr[];
+
     class GenericDiskInterface
     {
     private:
