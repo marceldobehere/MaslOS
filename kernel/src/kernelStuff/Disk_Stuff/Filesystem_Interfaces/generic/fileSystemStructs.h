@@ -31,11 +31,13 @@ namespace FilesystemInterface
     struct BaseInfo
     {
         const char* path;
-        const uint16_t pathLen;
+        uint16_t pathLen;
         bool writeProtected;
         bool hidden;
         bool systemFile;
         
+        BaseInfo(const char* path, bool writeProtected, bool hidden, bool systemFile);
+        BaseInfo();
     };
 
     struct FileInfo
@@ -44,11 +46,14 @@ namespace FilesystemInterface
 
         uint64_t sizeInBytes;
         uint64_t locationInBytes;
+
+        FileInfo(BaseInfo baseInfo, uint64_t sizeInBytes, uint64_t locationInBytes);
     };
 
     struct FolderInfo
     {
         BaseInfo baseInfo;
 
+        FolderInfo(BaseInfo baseInfo);
     };
 }

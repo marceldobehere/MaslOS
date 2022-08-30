@@ -259,12 +259,37 @@ namespace FilesystemInterface
         fsFolderList.clear();
         fsFileList.clear();
 
+        // {
+        //     FSPartitionInfo* newInfo = new FSPartitionInfo();
+        //     newInfo->free = true;
+        //     newInfo->locationInBytes = 0;
+        //     newInfo->sizeInBytes = partitionInfo->sizeInBytes;
+        //     fsPartitionList.add(newInfo);
+        // }
+
+        {
+            FSPartitionInfo* newInfo = new FSPartitionInfo();
+            newInfo->free = false;
+            newInfo->locationInBytes = 0;
+            newInfo->sizeInBytes = 4;
+            fsPartitionList.add(newInfo);
+        }
         {
             FSPartitionInfo* newInfo = new FSPartitionInfo();
             newInfo->free = true;
-            newInfo->locationInBytes = 0;
-            newInfo->sizeInBytes = partitionInfo->sizeInBytes;
+            newInfo->locationInBytes = 4;
+            newInfo->sizeInBytes = partitionInfo->sizeInBytes - 4;
             fsPartitionList.add(newInfo);
+        }
+
+        {
+            FileInfo* info = new FileInfo(BaseInfo("Test File.txt", false, false, false), 4, 0);
+            fsFileList.add(info);
+        }
+
+        {
+            FolderInfo* info = new FolderInfo(BaseInfo("Test Folder", false, false, false));
+            fsFolderList.add(info);
         }
 
         return SaveFSTable();
@@ -350,25 +375,60 @@ namespace FilesystemInterface
                 *((uint8_t*)tBuffer) = (uint8_t)fsPartInfo->free;
                 tBuffer += 1;
             }
-            // for (uint32_t i = 0; i < fsFileCount; i++)
-            // {
-            //     FileInfo* fsFileInfo = fsFileList[i]; 
-            //     totalSize += sizeof(fsFileInfo->baseInfo.hidden);
-            //     totalSize += sizeof(fsFileInfo->baseInfo.systemFile);
-            //     totalSize += sizeof(fsFileInfo->baseInfo.writeProtected);
-            //     totalSize += sizeof(fsFileInfo->baseInfo.pathLen) + fsFileInfo->baseInfo.pathLen;
+            for (uint32_t i = 0; i < fsFileCount; i++)
+            {
+                FileInfo* fsFileInfo = fsFileList[i]; 
 
-            //     totalSize += sizeof(fsFileInfo->locationInBytes);
-            //     totalSize += sizeof(fsFileInfo->sizeInBytes);
-            // }
-            // for (uint32_t i = 0; i < fsFolderCount; i++)
-            // {
-            //     FolderInfo* fsFolderInfo = fsFolderList[i]; 
-            //     totalSize += sizeof(fsFolderInfo->baseInfo.hidden);
-            //     totalSize += sizeof(fsFolderInfo->baseInfo.systemFile);
-            //     totalSize += sizeof(fsFolderInfo->baseInfo.writeProtected);
-            //     totalSize += sizeof(fsFolderInfo->baseInfo.pathLen) + fsFolderInfo->baseInfo.pathLen;
-            // }
+                *((uint8_t*)tBuffer) = (uint8_t)fsFileInfo->baseInfo.hidden;
+                tBuffer += 1;
+                *((uint8_t*)tBuffer) = (uint8_t)fsFileInfo->baseInfo.systemFile;
+                tBuffer += 1;
+                *((uint8_t*)tBuffer) = (uint8_t)fsFileInfo->baseInfo.writeProtected;
+                tBuffer += 1;
+
+                *((uint16_t*)tBuffer) = (uint16_t)fsFileInfo->baseInfo.pathLen;
+                tBuffer += 2;
+
+                //osData.mainTerminalWindow->Log("File Path:          \"{}\"", fsFileInfo->baseInfo.path, Colors.orange);
+                //osData.mainTerminalWindow->Log("File Path Len:      \"{}\"", to_string(fsFileInfo->baseInfo.pathLen), Colors.orange);
+                for (uint16_t index = 0; index < fsFileInfo->baseInfo.pathLen; index++)
+                {
+                    *((uint8_t*)tBuffer) = (uint8_t)fsFileInfo->baseInfo.path[index];
+                    tBuffer += 1;
+                }
+                
+                *((uint64_t*)tBuffer) = fsFileInfo->locationInBytes;
+                tBuffer += 8;
+
+                *((uint64_t*)tBuffer) = fsFileInfo->sizeInBytes;
+                tBuffer += 8;
+            }
+            for (uint32_t i = 0; i < fsFolderCount; i++)
+            {
+                FolderInfo* fsFolderInfo = fsFolderList[i]; 
+
+                *((uint8_t*)tBuffer) = (uint8_t)fsFolderInfo->baseInfo.hidden;
+                tBuffer += 1;
+                *((uint8_t*)tBuffer) = (uint8_t)fsFolderInfo->baseInfo.systemFile;
+                tBuffer += 1;
+                *((uint8_t*)tBuffer) = (uint8_t)fsFolderInfo->baseInfo.writeProtected;
+                tBuffer += 1;
+                *((uint16_t*)tBuffer) = (uint16_t)fsFolderInfo->baseInfo.pathLen;
+                tBuffer += 2;
+                
+                //osData.mainTerminalWindow->Log("Folder Path:        \"{}\"", fsFolderInfo->baseInfo.path, Colors.orange);
+                //osData.mainTerminalWindow->Log("Folder Path Len:    \"{}\"", to_string(fsFolderInfo->baseInfo.pathLen), Colors.orange);
+                for (uint16_t index = 0; index < fsFolderInfo->baseInfo.pathLen; index++)
+                {
+                    *((uint8_t*)tBuffer) = (uint8_t)fsFolderInfo->baseInfo.path[index];
+                    tBuffer += 1;
+                }
+            }
+
+            uint64_t diff = ((((uint64_t)buffer ) + totalSize) - ((uint64_t)tBuffer));
+            if (diff != 0)
+                osData.mainTerminalWindow->Log("Diff:               {}", to_string(diff), Colors.red);
+            
         }
 
         const char* res = partitionInterface->WritePartition(partitionInfo, 0, totalSize, buffer);
