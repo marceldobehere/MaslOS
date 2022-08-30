@@ -5,10 +5,23 @@ namespace FilesystemInterface
 {
     class MrafsFilesystemInterface : public GenericFilesystemInterface
     {
+        struct FSPartitionInfo
+        {
+            uint64_t sizeInBytes;
+            uint64_t locationInBytes;
+            bool free;
+        };
+        
+        const uint64_t maxFSTableSize = 5000000;
+
+
     private:
 
     public:
-        FilesystemInterfaceType InterfaceType = FilesystemInterface::Mrafs;
+        //FilesystemInterfaceType InterfaceType = FilesystemInterface::Mrafs;
+        List<void*> fsPartitionList = List<void*>(10);
+        List<FileInfo*> fsFileList = List<FileInfo*>(10);
+        List<FolderInfo*> fsFolderList = List<FolderInfo*>(10);
         //void* partitionInterface = NULL;
         MrafsFilesystemInterface(PartitionInterface::GenericPartitionInterface* partitionInterface, PartitionInterface::PartitionInfo* partitionInfo);
         
@@ -38,6 +51,7 @@ namespace FilesystemInterface
         const char* ReadFile(const char* path, uint64_t byteCount, void* buffer);
         const char* WriteFile(const char* path, uint64_t byteCount, void* buffer);
 
+        const char* InitAndSaveFSTable();
         const char* SaveFSTable();
         const char* LoadFSTable();
     };

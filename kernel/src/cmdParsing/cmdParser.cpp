@@ -12,6 +12,7 @@
 #include "../tasks/sleep/taskSleep.h"
 #include "../kernelStuff/Disk_Stuff/Disk_Interfaces/ram/ramDiskInterface.h"
 #include "../kernelStuff/Disk_Stuff/Partition_Interfaces/mraps/mrapsPartitionInterface.h"
+#include "../kernelStuff/Disk_Stuff/Filesystem_Interfaces/mrafs/mrafsFileSystemInterface.h"
 
 void LogError(const char* msg, Window* window)
 {
@@ -427,6 +428,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                             window->renderer->Println("    - Owner:        0x{}", ConvertHexToString((uint64_t)info->owner), Colors.yellow);
                             window->renderer->Println("    - Type:         {}", PartitionInterface::PartitionTypeStr[(uint8_t)info->type], Colors.yellow);
                             window->renderer->Println("    - FS Type:      {}", FilesystemInterface::FilesystemInterfaceTypeStr[(uint8_t)info->fsType], Colors.yellow);
+                            window->renderer->Println("    - FS Interface: 0x{}", ConvertHexToString((uint64_t)info->fsInterface), Colors.yellow);
                             window->renderer->Println("    - Hidden:       {}", info->hidden ? "True" : "False", Colors.yellow);
                         }
                     }
@@ -490,6 +492,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                         window->renderer->Println("    - Owner:        0x{}", ConvertHexToString((uint64_t)info->owner), Colors.yellow);
                         window->renderer->Println("    - Type:         {}", PartitionInterface::PartitionTypeStr[(uint8_t)info->type], Colors.yellow);
                         window->renderer->Println("    - FS Type:      {}", FilesystemInterface::FilesystemInterfaceTypeStr[(uint8_t)info->fsType], Colors.yellow);
+                        window->renderer->Println("    - FS Interface: 0x{}", ConvertHexToString((uint64_t)info->fsInterface), Colors.yellow);
                         window->renderer->Println("    - Hidden:       {}", info->hidden ? "True" : "False", Colors.yellow);
                     }
                     else
@@ -584,27 +587,87 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             if (StrEquals(data->data[2], "partition"))
             {
                 int diskNum = to_int(data->data[1]);
-                int partNum = to_int(data->data[4]);
-                DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[diskNum];
-                PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
-                if (partInterface == NULL)
-                    LogError("Drive has no Partition Manager!", window);
-                else if (partNum < 0 || partNum >= partInterface->partitionList.getCount())
-                    LogError("Invalid Partition selected!", window);
+                if (StrEquals(data->data[4], "fs"))
+                {
+                    int partNum = to_int(data->data[3]);
+                    DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[diskNum];
+                    PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
+                    if (partInterface == NULL)
+                        LogError("Drive has no Partition Manager!", window);
+                    else if (partNum < 0 || partNum >= partInterface->partitionList.getCount())
+                        LogError("Invalid Partition selected!", window);
+                    else
+                    {
+                        if (StrEquals(data->data[5], "create"))
+                        {
+                            FilesystemInterface::GenericFilesystemInterface* fsInterface = (FilesystemInterface::GenericFilesystemInterface*)new FilesystemInterface::MrafsFilesystemInterface(partInterface, partInterface->partitionList[partNum]);
+
+                            if (fsInterface != NULL)
+                                window->renderer->Println("Filesystem Interface Creation Success!");
+                            else
+                                LogError("Filesystem Interface Creation failed!", window);
+                        }
+                        else
+                        {
+                            FilesystemInterface::GenericFilesystemInterface* fsInterface = (FilesystemInterface::GenericFilesystemInterface*)partInterface->partitionList[partNum]->fsInterface;
+                            if (fsInterface != NULL)
+                            {
+                                if (StrEquals(data->data[5], "init"))
+                                {
+                                    const char* res = fsInterface->InitAndSaveFSTable();
+                                    if (res == FilesystemInterface::FSCommandResult.SUCCESS)
+                                        window->renderer->Println("Filesystem Interface Init Success!");
+                                    else
+                                        LogError("Filesystem Interface Init failed! Error: {}", res, window);
+                                }
+                                else if (StrEquals(data->data[5], "save"))
+                                {
+                                    const char* res = fsInterface->SaveFSTable();
+                                    if (res == FilesystemInterface::FSCommandResult.SUCCESS)
+                                        window->renderer->Println("Filesystem Interface Save Success!");
+                                    else
+                                        LogError("Filesystem Interface Save failed! Error: {}", res, window);
+                                }
+                                else if (StrEquals(data->data[5], "load"))
+                                {
+                                    const char* res = fsInterface->LoadFSTable();
+                                    if (res == FilesystemInterface::FSCommandResult.SUCCESS)
+                                        window->renderer->Println("Filesystem Interface Load Success!");
+                                    else
+                                        LogError("Filesystem Interface Load failed! Error: {}", res, window);
+                                }
+                                else
+                                    LogError("No valid arguments passed!", window);
+                            }
+                            else
+                                LogError("Filesystem Interface not found!", window);
+                        }
+                    }
+                }
                 else
                 {
-                    if (StrEquals(data->data[3], "resize"))
-                    {
-                        uint64_t newSize = to_int(data->data[5]);
-                        const char* res = partInterface->ResizePartition(partInterface->partitionList[partNum], newSize);
-                        if (res == PartitionInterface::CommandResult.SUCCESS)
-                            window->renderer->Println("Partition Resize Success!", (*user)->colData.defaultTextColor);
-                        else
-                            LogError("Partition Resize failed! Error: \"{}\"", res, window);
-
-                    }
+                    int partNum = to_int(data->data[4]);
+                    DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[diskNum];
+                    PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
+                    if (partInterface == NULL)
+                        LogError("Drive has no Partition Manager!", window);
+                    else if (partNum < 0 || partNum >= partInterface->partitionList.getCount())
+                        LogError("Invalid Partition selected!", window);
                     else
-                        LogError("No valid arguments passed!", window);
+                    {
+                        if (StrEquals(data->data[3], "resize"))
+                        {
+                            uint64_t newSize = to_int(data->data[5]);
+                            const char* res = partInterface->ResizePartition(partInterface->partitionList[partNum], newSize);
+                            if (res == PartitionInterface::CommandResult.SUCCESS)
+                                window->renderer->Println("Partition Resize Success!", (*user)->colData.defaultTextColor);
+                            else
+                                LogError("Partition Resize failed! Error: \"{}\"", res, window);
+
+                        }
+                        else
+                            LogError("No valid arguments passed!", window);
+                    }
                 }
             }
             else if (StrEquals(data->data[2], "write"))

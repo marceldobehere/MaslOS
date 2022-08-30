@@ -52,6 +52,9 @@ template <typename T> class List
 template class Array<int>;
 template class List<int>;
 
+template class Array<void*>;
+template class List<void*>;
+
 #include "../tasks/task.h"
 
 template class Array<Task*>;
@@ -78,6 +81,17 @@ template class List<List<ConsoleChar>*>;
 
 template class Array<PartitionInterface::PartitionInfo*>;
 template class  List<PartitionInterface::PartitionInfo*>;
+
+#include "../kernelStuff/Disk_Stuff/Filesystem_Interfaces/generic/fileSystemStructs.h"
+
+template class Array<FilesystemInterface::BaseInfo*>;
+template class  List<FilesystemInterface::BaseInfo*>;
+
+template class Array<FilesystemInterface::FileInfo*>;
+template class  List<FilesystemInterface::FileInfo*>;
+
+template class Array<FilesystemInterface::FolderInfo*>;
+template class  List<FilesystemInterface::FolderInfo*>;
 
 // #include "../kernelStuff/Disk_Stuff/Partition_Interfaces/generic/genericPartitionInterface.h"
 

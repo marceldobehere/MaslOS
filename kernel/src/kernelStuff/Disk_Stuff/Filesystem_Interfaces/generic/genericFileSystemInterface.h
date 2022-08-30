@@ -43,6 +43,7 @@ namespace FilesystemInterface
         const char* ReadFile(const char* path, uint64_t byteCount, void* buffer);
         const char* WriteFile(const char* path, uint64_t byteCount, void* buffer);
 
+        const char* InitAndSaveFSTable();
         const char* SaveFSTable();
         const char* LoadFSTable();
     };

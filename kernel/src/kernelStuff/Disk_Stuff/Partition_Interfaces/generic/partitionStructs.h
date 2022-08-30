@@ -61,6 +61,7 @@ namespace PartitionInterface
 
         PartitionType type;
         FilesystemInterface::FilesystemInterfaceType fsType;
+        void* fsInterface = NULL;
         uint64_t sizeInBytes;
         uint64_t locationInBytes;
         void* owner;

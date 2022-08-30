@@ -56,6 +56,7 @@ namespace PartitionInterface
         free((void*)description);
         free((void*)driveName);
         free((void*)this);
+        this->fsInterface = NULL;
     }
     
     PartitionInfo::PartitionInfo(const char* name, const char* description, const char* driveName, PartitionType type, uint64_t sizeInBytes, uint64_t locationInBytes, bool hidden, void* owner)
@@ -76,5 +77,6 @@ namespace PartitionInterface
         this->owner = owner;
         this->hidden = hidden;
         this->fsType = FilesystemInterface::None;
+        this->fsInterface = NULL;
     }
 }

@@ -218,6 +218,18 @@ namespace FilesystemInterface
         return FSCommandResult.ERROR_GENERIC_INTERFACE;
     }
 
+    
+    const char* GenericFilesystemInterface::InitAndSaveFSTable()
+    {
+        switch (this->InterfaceType)
+        {
+            case FilesystemInterfaceType::Mrafs:
+            {
+                return ((MrafsFilesystemInterface*)this)->InitAndSaveFSTable();
+            }
+        }
+        return FSCommandResult.ERROR_GENERIC_INTERFACE;
+    }
 
     const char* GenericFilesystemInterface::SaveFSTable()
     {

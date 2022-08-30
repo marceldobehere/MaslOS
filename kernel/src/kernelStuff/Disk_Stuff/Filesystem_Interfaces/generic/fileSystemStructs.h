@@ -23,22 +23,32 @@ namespace FilesystemInterface
         const char* ERROR_NO_PARTITION = "ERROR: THE FILESYSTEM IS NOT ATTACHED TO A PARTITION";
         const char* ERROR_NO_PARTITION_INTERFACE = "ERROR: THE FILESYSTEM IS NOT ATTACHED TO A PARTITION INTERFACE";
         const char* ERROR_INVALID_PARTITION_OWNER = "ERROR: INVALID PARTITION OWNER";
+        const char* ERROR_FS_TABLE_TOO_BIG = "ERROR: FILESYSTEM TABLE TOO BIG";
     };
 
     extern _FSCommandResult FSCommandResult;
 
     struct BaseInfo
     {
-
+        const char* path;
+        const uint16_t pathLen;
+        bool writeProtected;
+        bool hidden;
+        bool systemFile;
+        
     };
 
     struct FileInfo
     {
         BaseInfo baseInfo;
+
+        uint64_t sizeInBytes;
+        uint64_t locationInBytes;
     };
 
     struct FolderInfo
     {
         BaseInfo baseInfo;
+
     };
 }
