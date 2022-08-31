@@ -636,6 +636,74 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                                     else
                                         LogError("Filesystem Interface Load failed! Error: {}", res, window);
                                 }
+                                else if (StrEquals(data->data[5], "list"))
+                                {
+                                    const char* res = fsInterface->LoadFSTable();
+                                    if (res == FilesystemInterface::FSCommandResult.SUCCESS)
+                                    {
+                                        //window->renderer->Println("Filesystem Interface Load Success!");
+                                        
+                                        if (fsInterface->InterfaceType == FilesystemInterface::FilesystemInterfaceType::Mrafs)
+                                        {
+                                            FilesystemInterface::MrafsFilesystemInterface* mrafsInterface = (FilesystemInterface::MrafsFilesystemInterface*)fsInterface;
+
+                                            {
+                                                uint64_t partCount = mrafsInterface->fsPartitionList.getCount();
+                                                window->renderer->Println("Partition Count: {}", to_string(partCount), Colors.yellow);
+                                                window->renderer->Println("Partition Data:", Colors.yellow);
+                                                for (int i = 0; i < partCount; i++)
+                                                {   
+                                                    FilesystemInterface::MrafsFilesystemInterface::FSPartitionInfo* info = (FilesystemInterface::MrafsFilesystemInterface::FSPartitionInfo*)mrafsInterface->fsPartitionList[i];
+                                                    window->renderer->Println(" + Partition {}:", to_string(i), Colors.orange);
+                                                    window->renderer->Println("    - Free:        {}", info->free ? "true" : "false", Colors.yellow);
+                                                    window->renderer->Println("    - Location:    0x{}", ConvertHexToString((uint64_t)info->locationInBytes), Colors.yellow);
+                                                    window->renderer->Println("    - Size:        {} Bytes", to_string(info->sizeInBytes), Colors.yellow);
+                                                }
+                                            }
+
+                                            {
+                                                uint64_t partCount = mrafsInterface->fsFileList.getCount();
+                                                window->renderer->Println("File Count: {}", to_string(partCount), Colors.yellow);
+                                                window->renderer->Println("File Data:", Colors.yellow);
+                                                for (int i = 0; i < partCount; i++)
+                                                {   
+                                                    FilesystemInterface::FileInfo* info = mrafsInterface->fsFileList[i];
+                                                    window->renderer->Println(" + File {}:", to_string(i), Colors.orange);
+                                                    window->renderer->Println("    - Path:        \"{}\"", info->baseInfo.path, Colors.yellow);
+                                                    window->renderer->Println("    - Hidden:      {}", info->baseInfo.hidden ? "true" : "false", Colors.yellow);
+                                                    window->renderer->Println("    - System File: {}", info->baseInfo.systemFile ? "true" : "false", Colors.yellow);
+                                                    window->renderer->Println("    - Readonly:    {}", info->baseInfo .writeProtected ? "true" : "false", Colors.yellow);
+
+                                                    window->renderer->Println("    - Location:    0x{}", ConvertHexToString((uint64_t)info->locationInBytes), Colors.yellow);
+                                                    window->renderer->Println("    - Size:        {} Bytes", to_string(info->sizeInBytes), Colors.yellow);
+                                                }
+                                            }
+
+                                            {
+                                                uint64_t partCount = mrafsInterface->fsFolderList.getCount();
+                                                window->renderer->Println("Folder Count: {}", to_string(partCount), Colors.yellow);
+                                                window->renderer->Println("Folder Data:", Colors.yellow);
+                                                for (int i = 0; i < partCount; i++)
+                                                {   
+                                                    FilesystemInterface::FolderInfo* info = mrafsInterface->fsFolderList[i];
+                                                    window->renderer->Println(" + Folder {}:", to_string(i), Colors.orange);
+                                                    window->renderer->Println("    - Path:        \"{}\"", info->baseInfo.path, Colors.yellow);
+                                                    window->renderer->Println("    - Hidden:      {}", info->baseInfo.hidden ? "true" : "false", Colors.yellow);
+                                                    window->renderer->Println("    - System File: {}", info->baseInfo.systemFile ? "true" : "false", Colors.yellow);
+                                                    window->renderer->Println("    - Readonly:    {}", info->baseInfo .writeProtected ? "true" : "false", Colors.yellow);
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            LogError("Filesystem Interface is not MRAFS! Error: {}", res, window);
+                                        }
+                                        
+
+                                    }
+                                    else
+                                        LogError("Filesystem Interface Load failed! Error: {}", res, window);
+                                }
                                 else
                                     LogError("No valid arguments passed!", window);
                             }

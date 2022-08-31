@@ -5,6 +5,10 @@ namespace FilesystemInterface
 {
     class MrafsFilesystemInterface : public GenericFilesystemInterface
     {
+    private:
+
+    public:
+    
         struct FSPartitionInfo
         {
             uint64_t sizeInBytes;
@@ -13,11 +17,7 @@ namespace FilesystemInterface
         };
         
         const uint64_t maxFSTableSize = 5000000;
-
-
-    private:
-
-    public:
+    
         //FilesystemInterfaceType InterfaceType = FilesystemInterface::Mrafs;
         List<void*> fsPartitionList = List<void*>(10);
         List<FileInfo*> fsFileList = List<FileInfo*>(10);
