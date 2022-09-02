@@ -181,18 +181,6 @@ namespace FilesystemInterface
         return FSCommandResult.ERROR_GENERIC_INTERFACE;
     }
 
-    const char* GenericFilesystemInterface::WriteFile(const char* path, void** buffer)
-    {
-        switch (this->InterfaceType)
-        {
-            case FilesystemInterfaceType::Mrafs:
-            {
-                return ((MrafsFilesystemInterface*)this)->WriteFile(path, buffer);
-            }
-        }
-        return FSCommandResult.ERROR_GENERIC_INTERFACE;
-    }
-
 
     const char* GenericFilesystemInterface::ReadFile(const char* path, uint64_t byteCount, void* buffer)
     {

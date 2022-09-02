@@ -16,6 +16,211 @@ namespace FilesystemInterface
         fsFileList.clear();
     }
 
+    int64_t MrafsFilesystemInterface::GetIndexOfPartitionFromLocation(uint64_t location)
+    {
+        if (partitionInterface == NULL)
+            return -1;
+        if (partitionInfo == NULL)
+            return -1;
+        if (partitionInfo->owner != partitionInterface)
+            return -1;
+
+        uint64_t count = fsPartitionList.getCount();
+        for (uint64_t index = 0; index < count; index++)
+            if (((FSPartitionInfo*)fsPartitionList[index])->locationInBytes == location)
+                return index;
+
+        return -1;
+    }
+
+    int64_t MrafsFilesystemInterface::GetIndexOfFreeFilePartition(uint64_t sizeInBytes)
+    {
+        if (partitionInterface == NULL)
+            return -1;
+        if (partitionInfo == NULL)
+            return -1;
+        if (partitionInfo->owner != partitionInterface)
+            return -1;
+
+        uint64_t count = fsPartitionList.getCount();
+        for (uint64_t index = 0; index < count; index++)
+        {
+            FSPartitionInfo* part = (FSPartitionInfo*)fsPartitionList[index];
+            if (!part->free)
+                continue;
+            if (part->sizeInBytes < sizeInBytes)
+                continue;
+                
+            return index;
+        }
+
+        return -1;
+    }
+
+    MrafsFilesystemInterface::FSPartitionInfo* MrafsFilesystemInterface::CreateFilePartition(uint64_t size)
+    {
+        if (partitionInterface == NULL)
+            return NULL;
+        if (partitionInfo == NULL)
+            return NULL;
+        if (partitionInfo->owner != partitionInterface)
+            return NULL;
+
+        int64_t fIndex = GetIndexOfFreeFilePartition(size);
+        if (fIndex == -1)
+            return NULL;
+        
+        FSPartitionInfo* info = (FSPartitionInfo*)fsPartitionList[fIndex];
+        info->free = false;
+        if (info->sizeInBytes > size)
+        {
+            if (ResizeFilePartition(info, size) != FSCommandResult.SUCCESS)
+                return NULL;
+        }
+
+        return info;
+    }
+
+    const char* MrafsFilesystemInterface::ResizeFilePartition(FSPartitionInfo* partition, uint64_t newSize)
+    {
+        if (partitionInterface == NULL)
+            return FSCommandResult.ERROR_NO_PARTITION_INTERFACE;
+        if (partitionInfo == NULL)
+            return FSCommandResult.ERROR_NO_PARTITION;
+        if (partitionInfo->owner != partitionInterface)
+            return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
+        if (partition == NULL)
+            return FSCommandResult.ERROR_NO_PARTITION;
+        int64_t pIndex = fsPartitionList.getIndexOf(partition);
+        if (pIndex == -1)
+            return FSCommandResult.ERROR_PARTITION_NOT_FOUND;
+        
+        if (newSize == partition->sizeInBytes)
+            return FSCommandResult.SUCCESS;
+        
+        if (newSize > partition->sizeInBytes)
+        {
+            if (pIndex >= fsPartitionList.getCount() - 1)
+                return FSCommandResult.ERROR_PARTITION_TOO_SMALL;
+            FSPartitionInfo* info = ( FSPartitionInfo*)fsPartitionList[pIndex + 1];
+            if (!info->free)
+                return FSCommandResult.ERROR_PARTITION_TOO_SMALL;
+
+            if (newSize == (partition->sizeInBytes + info->sizeInBytes))
+            {
+                partition->sizeInBytes = newSize;
+                free(fsPartitionList[pIndex + 1]);
+                fsPartitionList.removeAt(pIndex + 1);
+                return FSCommandResult.SUCCESS;
+            }
+            else
+            {
+                uint64_t sizeDiff = newSize - partition->sizeInBytes;
+                info->sizeInBytes -= sizeDiff;
+                info->locationInBytes += sizeDiff;
+                partition->sizeInBytes += sizeDiff;
+            }
+            
+            return FSCommandResult.SUCCESS;
+        }
+
+        if (newSize < partition->sizeInBytes)
+        {
+            uint64_t sizeDiff = partition->sizeInBytes - newSize;
+
+            partition->sizeInBytes -= sizeDiff;
+
+            FSPartitionInfo* info = (FSPartitionInfo*)malloc(sizeof(FSPartitionInfo), "malloc for FSPartitionInfo");
+            info->free = true;
+            info->sizeInBytes = sizeDiff;
+            info->locationInBytes = partition->locationInBytes + partition->sizeInBytes;
+            fsPartitionList.insertAt(info, pIndex + 1);
+            return FSCommandResult.SUCCESS;
+        }
+
+
+        return FSCommandResult.SUCCESS;
+    }
+
+    const char* MrafsFilesystemInterface::DeleteFilePartition(FSPartitionInfo* partition)
+    {
+        if (partitionInterface == NULL)
+            return FSCommandResult.ERROR_NO_PARTITION_INTERFACE;
+        if (partitionInfo == NULL)
+            return FSCommandResult.ERROR_NO_PARTITION;
+        if (partitionInfo->owner != partitionInterface)
+            return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
+        if (partition == NULL)
+            return FSCommandResult.ERROR_NO_PARTITION;
+        int64_t pIndex = fsPartitionList.getIndexOf(partition);
+        if (pIndex == -1)
+            return FSCommandResult.ERROR_PARTITION_NOT_FOUND;
+
+        partition->free = true;
+
+        if (pIndex < fsPartitionList.getCount() - 1)
+        {
+            FSPartitionInfo* pTemp = (FSPartitionInfo*)fsPartitionList[pIndex + 1];
+            if (pTemp->free)
+            {
+                const char* res = ResizeFilePartition(partition, partition->sizeInBytes + pTemp->sizeInBytes);
+                if (res != FSCommandResult.SUCCESS)
+                    return res;
+            }
+        }
+
+        if (pIndex > 0)
+        {
+            FSPartitionInfo* pTemp = (FSPartitionInfo*)fsPartitionList[pIndex - 1];
+            if (pTemp->free)
+            {
+                const char* res = ResizeFilePartition(pTemp, partition->sizeInBytes + pTemp->sizeInBytes);
+                if (res != FSCommandResult.SUCCESS)
+                    return res;
+                
+                return FSCommandResult.SUCCESS;
+            }
+            else
+            {
+                fsPartitionList.removeAt(pIndex);
+                free(partition);
+            }
+        }
+        else
+        {
+            fsPartitionList.removeAt(pIndex);
+            free(partition);
+        }
+        
+        return FSCommandResult.SUCCESS;
+    }
+
+    FileInfo* MrafsFilesystemInterface::GetFile(const char* path)
+    {
+        uint64_t count = fsFileList.getCount();
+        for (uint64_t index = 0; index < count; index++)
+        {
+            FileInfo* info = fsFileList[index];
+            if (StrEquals(info->baseInfo.path, path))
+                return info;
+        }
+
+        return NULL;
+    }
+
+    FolderInfo* MrafsFilesystemInterface::GetFolder(const char* path)
+    {
+        uint64_t count = fsFolderList.getCount();
+        for (uint64_t index = 0; index < count; index++)
+        {
+            FolderInfo* info = fsFolderList[index];
+            if (StrEquals(info->baseInfo.path, path))
+                return info;
+        }
+
+        return NULL;
+    }
+
 
     const char* MrafsFilesystemInterface::CreateFile(const char* path)
     {
@@ -25,9 +230,15 @@ namespace FilesystemInterface
             return FSCommandResult.ERROR_NO_PARTITION;
         if (partitionInfo->owner != partitionInterface)
             return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
+        
+        FileInfo* file = GetFile(path);
+        if (file != NULL)
+            return FSCommandResult.ERROR_FILE_ALREADY_EXISTS;
+        
+        file = new FileInfo(BaseInfo(path, false, false, false), 0, 0);
+        fsFileList.add(file);
 
-
-        return FSCommandResult.ERROR_FUNCTION_NOT_IMPLEMENTED;
+        return SaveFSTable();//return FSCommandResult.SUCCESS;
     }
     
     const char* MrafsFilesystemInterface::CreateFolder(const char* path)
@@ -39,8 +250,14 @@ namespace FilesystemInterface
         if (partitionInfo->owner != partitionInterface)
             return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
 
+        FolderInfo* folder = GetFolder(path);
+        if (folder != NULL)
+            return FSCommandResult.ERROR_FILE_ALREADY_EXISTS;
+        
+        folder = new FolderInfo(BaseInfo(path, false, false, false));
+        fsFolderList.add(folder);
 
-        return FSCommandResult.ERROR_FUNCTION_NOT_IMPLEMENTED;
+        return SaveFSTable();//return FSCommandResult.SUCCESS;
     }
 
 
@@ -53,8 +270,27 @@ namespace FilesystemInterface
         if (partitionInfo->owner != partitionInterface)
             return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
 
+        FileInfo* file = GetFile(path);
+        if (file == NULL)
+            return FSCommandResult.ERROR_FILE_NOT_FOUND;
+        
+        int64_t pIndex = GetIndexOfPartitionFromLocation(file->locationInBytes);
+        if (pIndex == -1)
+            return FSCommandResult.ERROR_FILE_NOT_FOUND;
+        
+        FSPartitionInfo* info = (FSPartitionInfo*) fsPartitionList[pIndex];
 
-        return FSCommandResult.ERROR_FUNCTION_NOT_IMPLEMENTED;
+        int64_t fIndex = fsFileList.getIndexOf(file);
+        if (fIndex == -1)
+            return FSCommandResult.ERROR_FILE_NOT_FOUND;
+
+        DeleteFilePartition(info);
+        file->sizeInBytes = 0;
+        file->locationInBytes = 0;
+        free(file);
+        fsFileList.removeAt(fIndex);
+        
+        return SaveFSTable();//return FSCommandResult.SUCCESS;
     }
 
     const char* MrafsFilesystemInterface::DeleteFolder(const char* path)
@@ -66,8 +302,18 @@ namespace FilesystemInterface
         if (partitionInfo->owner != partitionInterface)
             return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
 
+        FolderInfo* folder = GetFolder(path);
+        if (folder == NULL)
+            return FSCommandResult.ERROR_FOLDER_NOT_FOUND;
 
-        return FSCommandResult.ERROR_FUNCTION_NOT_IMPLEMENTED;
+        int64_t fIndex = fsFolderList.getIndexOf(folder);
+        if (fIndex == -1)
+            return FSCommandResult.ERROR_FOLDER_NOT_FOUND;
+
+        free(folder);
+        fsFileList.removeAt(fIndex);
+        
+        return SaveFSTable();//return FSCommandResult.SUCCESS;
     }
 
 
@@ -79,6 +325,11 @@ namespace FilesystemInterface
             return FSCommandResult.ERROR_NO_PARTITION;
         if (partitionInfo->owner != partitionInterface)
             return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
+
+        if (StrEquals(oldPath, newPath))
+            return FSCommandResult.ERROR_PATH_IS_THE_SAME;
+        
+
 
 
         return FSCommandResult.ERROR_FUNCTION_NOT_IMPLEMENTED;
@@ -92,6 +343,9 @@ namespace FilesystemInterface
             return FSCommandResult.ERROR_NO_PARTITION;
         if (partitionInfo->owner != partitionInterface)
             return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
+
+        if (StrEquals(oldPath, newPath))
+            return FSCommandResult.ERROR_PATH_IS_THE_SAME;
 
 
         return FSCommandResult.ERROR_FUNCTION_NOT_IMPLEMENTED;
@@ -107,6 +361,9 @@ namespace FilesystemInterface
         if (partitionInfo->owner != partitionInterface)
             return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
 
+        if (StrEquals(oldPath, newPath))
+            return FSCommandResult.ERROR_PATH_IS_THE_SAME;
+
 
         return FSCommandResult.ERROR_FUNCTION_NOT_IMPLEMENTED;
     }
@@ -119,6 +376,9 @@ namespace FilesystemInterface
             return FSCommandResult.ERROR_NO_PARTITION;
         if (partitionInfo->owner != partitionInterface)
             return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
+
+        if (StrEquals(oldPath, newPath))
+            return FSCommandResult.ERROR_PATH_IS_THE_SAME;
 
 
         return FSCommandResult.ERROR_FUNCTION_NOT_IMPLEMENTED;
@@ -134,8 +394,7 @@ namespace FilesystemInterface
         if (partitionInfo->owner != partitionInterface)
             return false;
 
-
-        return false;
+        return GetFile(path) != NULL;
     }
 
     bool MrafsFilesystemInterface::FolderExists(const char* path)
@@ -147,7 +406,7 @@ namespace FilesystemInterface
         if (partitionInfo->owner != partitionInterface)
             return false;
 
-        return false;
+        return GetFolder(path) != NULL;
     }
 
 
@@ -160,7 +419,7 @@ namespace FilesystemInterface
         if (partitionInfo->owner != partitionInterface)
             return NULL;
 
-        return NULL;
+        return GetFile(path);
     }
 
     FolderInfo* MrafsFilesystemInterface::GetFolderInfo(const char* path)
@@ -172,7 +431,7 @@ namespace FilesystemInterface
         if (partitionInfo->owner != partitionInterface)
             return NULL;
 
-        return NULL;
+        return GetFolder(path);
     }
 
 
@@ -198,23 +457,22 @@ namespace FilesystemInterface
             return FSCommandResult.ERROR_NO_PARTITION;
         if (partitionInfo->owner != partitionInterface)
             return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
+        
+        FileInfo* info = GetFile(path);
+        if (info == NULL)
+            return FSCommandResult.ERROR_FILE_NOT_FOUND;
 
+        uint8_t* data = (uint8_t*)malloc(info->sizeInBytes, "Malloc for File read");
 
-        return FSCommandResult.ERROR_FUNCTION_NOT_IMPLEMENTED;
+        *((uint8_t**)buffer) = data;
+
+        const char* res = partitionInterface->ReadPartition(partitionInfo, info->locationInBytes, info->sizeInBytes, data);
+        if (res != PartitionInterface::CommandResult.SUCCESS)
+            return res;
+
+        return FSCommandResult.SUCCESS;
     }
 
-    const char* MrafsFilesystemInterface::WriteFile(const char* path, void** buffer)
-    {
-        if (partitionInterface == NULL)
-            return FSCommandResult.ERROR_NO_PARTITION_INTERFACE;
-        if (partitionInfo == NULL)
-            return FSCommandResult.ERROR_NO_PARTITION;
-        if (partitionInfo->owner != partitionInterface)
-            return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
-
-
-        return FSCommandResult.ERROR_FUNCTION_NOT_IMPLEMENTED;
-    }
 
 
     const char* MrafsFilesystemInterface::ReadFile(const char* path, uint64_t byteCount, void* buffer)
@@ -226,8 +484,18 @@ namespace FilesystemInterface
         if (partitionInfo->owner != partitionInterface)
             return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
 
+        FileInfo* info = GetFile(path);
+        if (info == NULL)
+            return FSCommandResult.ERROR_FILE_NOT_FOUND;
 
-        return FSCommandResult.ERROR_FUNCTION_NOT_IMPLEMENTED;
+        if (byteCount > info->sizeInBytes)
+            return FSCommandResult.ERROR_FILE_TOO_SMALL;
+
+        const char* res = partitionInterface->ReadPartition(partitionInfo, info->locationInBytes, byteCount, buffer);
+        if (res != PartitionInterface::CommandResult.SUCCESS)
+            return res;
+        
+        return FSCommandResult.SUCCESS;
     }
 
     const char* MrafsFilesystemInterface::WriteFile(const char* path, uint64_t byteCount, void* buffer)
@@ -239,8 +507,34 @@ namespace FilesystemInterface
         if (partitionInfo->owner != partitionInterface)
             return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
 
+        FileInfo* info = GetFile(path);
+        if (info == NULL)
+            return FSCommandResult.ERROR_FILE_NOT_FOUND;
 
-        return FSCommandResult.ERROR_FUNCTION_NOT_IMPLEMENTED;
+        if (byteCount == info->sizeInBytes)
+        {
+            const char* res = partitionInterface->WritePartition(partitionInfo, info->locationInBytes, byteCount, buffer);
+            if (res != PartitionInterface::CommandResult.SUCCESS)
+                return res;
+            return SaveFSTable();//return FSCommandResult.SUCCESS;       
+        }
+        else
+        {
+            int64_t pIndex = GetIndexOfPartitionFromLocation(info->locationInBytes);
+            if (pIndex == -1)
+                return FSCommandResult.ERROR_PARTITION_NOT_FOUND;
+            FSPartitionInfo* partInfo = (FSPartitionInfo*)fsPartitionList[pIndex];
+            DeleteFilePartition(partInfo);
+            FSPartitionInfo* nPartInfo = CreateFilePartition(byteCount);
+            if (nPartInfo == NULL)
+                return FSCommandResult.ERROR_PARTITION_TOO_SMALL;
+            info->locationInBytes = nPartInfo->locationInBytes;
+            info->sizeInBytes = byteCount;
+            return SaveFSTable();//return FSCommandResult.SUCCESS;    
+        }
+        
+
+        return SaveFSTable();//return FSCommandResult.SUCCESS;
     }
 
 
@@ -276,30 +570,37 @@ namespace FilesystemInterface
             newInfo->sizeInBytes = maxFSTableSize;
             fsPartitionList.add(newInfo);
         }
-        {
-            FSPartitionInfo* newInfo = new FSPartitionInfo();
-            newInfo->free = false;
-            newInfo->locationInBytes = maxFSTableSize;
-            newInfo->sizeInBytes = 4;
-            fsPartitionList.add(newInfo);
-        }
+        // {
+        //     FSPartitionInfo* newInfo = new FSPartitionInfo();
+        //     newInfo->free = false;
+        //     newInfo->locationInBytes = maxFSTableSize;
+        //     newInfo->sizeInBytes = 4;
+        //     fsPartitionList.add(newInfo);
+        // }
+        // {
+        //     FSPartitionInfo* newInfo = new FSPartitionInfo();
+        //     newInfo->free = true;
+        //     newInfo->locationInBytes = maxFSTableSize + 4;
+        //     newInfo->sizeInBytes = partitionInfo->sizeInBytes - (maxFSTableSize + 4);
+        //     fsPartitionList.add(newInfo);
+        // }
         {
             FSPartitionInfo* newInfo = new FSPartitionInfo();
             newInfo->free = true;
-            newInfo->locationInBytes = maxFSTableSize + 4;
-            newInfo->sizeInBytes = partitionInfo->sizeInBytes - (maxFSTableSize + 4);
+            newInfo->locationInBytes = maxFSTableSize;
+            newInfo->sizeInBytes = partitionInfo->sizeInBytes - maxFSTableSize;
             fsPartitionList.add(newInfo);
         }
 
-        {
-            FileInfo* info = new FileInfo(BaseInfo("Test File.txt", false, false, false), 4, maxFSTableSize);
-            fsFileList.add(info);
-        }
+        // {
+        //     FileInfo* info = new FileInfo(BaseInfo("Test File.txt", false, false, false), 4, maxFSTableSize);
+        //     fsFileList.add(info);
+        // }
 
-        {
-            FolderInfo* info = new FolderInfo(BaseInfo("Test Folder", false, false, false));
-            fsFolderList.add(info);
-        }
+        // {
+        //     FolderInfo* info = new FolderInfo(BaseInfo("Test Folder", false, false, false));
+        //     fsFolderList.add(info);
+        // }
 
         return SaveFSTable();
     }
@@ -350,10 +651,10 @@ namespace FilesystemInterface
         //sizeof(FileInfo);
         //sizeof(FolderInfo);
         //sizeof(FSPartitionInfo);
-        osData.mainTerminalWindow->Log("Total Size:         {} Bytes", to_string(totalSize), Colors.yellow);
-        osData.mainTerminalWindow->Log("FS Partition Count: {}", to_string((uint64_t)fsPartCount), Colors.yellow);
-        osData.mainTerminalWindow->Log("File Count:         {}", to_string((uint64_t)fsFileCount), Colors.yellow);
-        osData.mainTerminalWindow->Log("Folder Count:       {}", to_string((uint64_t)fsFolderCount), Colors.yellow);
+        // osData.mainTerminalWindow->Log("Total Size:         {} Bytes", to_string(totalSize), Colors.yellow);
+        // osData.mainTerminalWindow->Log("FS Partition Count: {}", to_string((uint64_t)fsPartCount), Colors.yellow);
+        // osData.mainTerminalWindow->Log("File Count:         {}", to_string((uint64_t)fsFileCount), Colors.yellow);
+        // osData.mainTerminalWindow->Log("Folder Count:       {}", to_string((uint64_t)fsFolderCount), Colors.yellow);
 
         if (totalSize > maxFSTableSize)
             return FSCommandResult.ERROR_FS_TABLE_TOO_BIG;
@@ -492,10 +793,10 @@ namespace FilesystemInterface
             free(buffer);
         }
 
-        osData.mainTerminalWindow->Log("Total Size:         {} Bytes", to_string(totalSize), Colors.yellow);
-        osData.mainTerminalWindow->Log("FS Partition Count: {}", to_string((uint64_t)fsPartCount), Colors.yellow);
-        osData.mainTerminalWindow->Log("File Count:         {}", to_string((uint64_t)fsFileCount), Colors.yellow);
-        osData.mainTerminalWindow->Log("Folder Count:       {}", to_string((uint64_t)fsFolderCount), Colors.yellow);
+        // osData.mainTerminalWindow->Log("Total Size:         {} Bytes", to_string(totalSize), Colors.yellow);
+        // osData.mainTerminalWindow->Log("FS Partition Count: {}", to_string((uint64_t)fsPartCount), Colors.yellow);
+        // osData.mainTerminalWindow->Log("File Count:         {}", to_string((uint64_t)fsFileCount), Colors.yellow);
+        // osData.mainTerminalWindow->Log("Folder Count:       {}", to_string((uint64_t)fsFolderCount), Colors.yellow);
 
         if (totalSize > maxFSTableSize)
             return FSCommandResult.ERROR_FS_TABLE_TOO_BIG;

@@ -38,7 +38,6 @@ namespace FilesystemInterface
         const char** GetFiles(const char* path);
 
         const char* ReadFile(const char* path, void** buffer);
-        const char* WriteFile(const char* path, void** buffer);
 
         const char* ReadFile(const char* path, uint64_t byteCount, void* buffer);
         const char* WriteFile(const char* path, uint64_t byteCount, void* buffer);
