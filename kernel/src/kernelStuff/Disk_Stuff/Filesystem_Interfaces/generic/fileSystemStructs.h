@@ -46,6 +46,8 @@ namespace FilesystemInterface
         
         BaseInfo(const char* path, bool writeProtected, bool hidden, bool systemFile);
         BaseInfo();
+
+        void Destroy();
     };
 
     struct FileInfo
@@ -56,6 +58,8 @@ namespace FilesystemInterface
         uint64_t locationInBytes;
 
         FileInfo(BaseInfo baseInfo, uint64_t sizeInBytes, uint64_t locationInBytes);
+
+        void Destroy();
     };
 
     struct FolderInfo
@@ -63,5 +67,7 @@ namespace FilesystemInterface
         BaseInfo baseInfo;
 
         FolderInfo(BaseInfo baseInfo);
+
+        void Destroy();
     };
 }

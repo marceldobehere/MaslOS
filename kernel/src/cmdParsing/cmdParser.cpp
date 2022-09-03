@@ -769,9 +769,40 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         }
         else if (data->len == 7)
         {
-            if (StrEquals(data->data[2], "partition"))
+            int diskNum = to_int(data->data[1]);
+            if (StrEquals(data->data[4], "fs"))
             {
-                int diskNum = to_int(data->data[1]);
+                int partNum = to_int(data->data[3]);
+                DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[diskNum];
+                PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
+                if (partInterface == NULL)
+                    LogError("Drive has no Partition Manager!", window);
+                else if (partNum < 0 || partNum >= partInterface->partitionList.getCount())
+                    LogError("Invalid Partition selected!", window);
+                else
+                { 
+                    FilesystemInterface::GenericFilesystemInterface* fsInterface = (FilesystemInterface::GenericFilesystemInterface*)partInterface->partitionList[partNum]->fsInterface;
+                    if (fsInterface != NULL)
+                    {
+                        if (StrEquals(data->data[5], "read"))
+                        {
+                            uint8_t* buffer = NULL;
+                            uint64_t byteCount = fsInterface->ReadFile(data->data[6], (void**)&buffer);
+                            window->renderer->Println("Size: {} Bytes", to_string(byteCount), (*user)->colData.defaultTextColor);
+                            window->renderer->Println("Raw Data:");
+                            for (uint64_t i = 0; i < byteCount; i++)
+                                window->renderer->Print(buffer[i]);
+                            window->renderer->Println();
+                        }
+                        else
+                            LogError("No valid arguments passed!", window);
+                    }
+                    else
+                        LogError("Filesystem Interface not found!", window);
+                }
+            }
+            else if (StrEquals(data->data[2], "partition"))
+            {
                 int partNum = to_int(data->data[4]);
                 DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[diskNum];
                 PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
@@ -836,6 +867,150 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                     }
                     else
                         LogError("No valid arguments passed!", window);
+                }
+            }
+            else
+                LogError("No valid arguments passed!", window);
+        }
+        else if (data->len == 8)
+        {
+            int diskNum = to_int(data->data[1]);
+            if (StrEquals(data->data[4], "fs"))
+            {
+                int partNum = to_int(data->data[3]);
+                DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[diskNum];
+                PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
+                if (partInterface == NULL)
+                    LogError("Drive has no Partition Manager!", window);
+                else if (partNum < 0 || partNum >= partInterface->partitionList.getCount())
+                    LogError("Invalid Partition selected!", window);
+                else
+                { 
+                    FilesystemInterface::GenericFilesystemInterface* fsInterface = (FilesystemInterface::GenericFilesystemInterface*)partInterface->partitionList[partNum]->fsInterface;
+                    if (fsInterface != NULL)
+                    {
+                        if (StrEquals(data->data[5], "create"))
+                        {
+                            if (StrEquals(data->data[6], "file"))
+                            {
+                                const char* res = fsInterface->CreateFile(data->data[7]);
+                                if (res == FilesystemInterface::FSCommandResult.SUCCESS)
+                                    window->renderer->Println("File Creation Success!");
+                                else
+                                    LogError("File Creation failed! Error: \"{}\"", res, window);
+                            }
+                            else if (StrEquals(data->data[6], "folder"))
+                            {
+                                const char* res = fsInterface->CreateFolder(data->data[7]);
+                                if (res == FilesystemInterface::FSCommandResult.SUCCESS)
+                                    window->renderer->Println("Folder Creation Success!");
+                                else
+                                    LogError("Folder Creation failed! Error: \"{}\"", res, window);
+                            }
+                            else
+                                LogError("No valid arguments passed!", window);
+                        }
+                        else if (StrEquals(data->data[5], "delete"))
+                        {
+                            if (StrEquals(data->data[6], "file"))
+                            {
+                                const char* res = fsInterface->DeleteFile(data->data[7]);
+                                if (res == FilesystemInterface::FSCommandResult.SUCCESS)
+                                    window->renderer->Println("File Deletion Success!");
+                                else
+                                    LogError("File Deletion failed! Error: \"{}\"", res, window);
+                            }
+                            else if (StrEquals(data->data[6], "folder"))
+                            {
+                                const char* res = fsInterface->DeleteFolder(data->data[7]);
+                                if (res == FilesystemInterface::FSCommandResult.SUCCESS)
+                                    window->renderer->Println("Folder Deletion Success!");
+                                else
+                                    LogError("Folder Deletion failed! Error: \"{}\"", res, window);
+                            }
+                            else
+                                LogError("No valid arguments passed!", window);
+                        }
+                        else if (StrEquals(data->data[5], "read"))
+                        {
+                            uint64_t byteCount = to_int(data->data[7]);
+                            uint8_t* buffer = (uint8_t*)malloc(byteCount, "Malloc for File read");
+                            const char* res = fsInterface->ReadFile(data->data[6], byteCount, buffer);
+                            if (res == FilesystemInterface::FSCommandResult.SUCCESS)
+                            {
+                                window->renderer->Println("Raw Data:");
+                                for (uint64_t i = 0; i < byteCount; i++)
+                                    window->renderer->Print(buffer[i]);
+                                window->renderer->Println();
+                            }
+                            else
+                                LogError("File Read failed! Error: \"{}\"", res, window);
+                            free(buffer);
+                        }
+                        else if (StrEquals(data->data[5], "write"))
+                        {
+                            uint64_t byteCount = StrLen(data->data[7]);
+                            const char* res = fsInterface->WriteFile(data->data[6], byteCount, data->data[7]);
+                            if (res == FilesystemInterface::FSCommandResult.SUCCESS)
+                                window->renderer->Println("File Write Success!");
+                            else
+                                LogError("File Write failed! Error: \"{}\"", res, window);
+                        }
+                        else if (StrEquals(data->data[5], "exists"))
+                        {
+                            if (StrEquals(data->data[6], "file"))
+                            {
+                                if (fsInterface->FileExists(data->data[7]))
+                                    window->renderer->Println("File exists!");
+                                else
+                                    window->renderer->Println("File doesn't exists!");
+                            }
+                            else if (StrEquals(data->data[6], "folder"))
+                            {
+                                if (fsInterface->FolderExists(data->data[7]))
+                                    window->renderer->Println("Folder exists!");
+                                else
+                                    window->renderer->Println("Folder doesn't exists!");
+                            }
+                            else
+                                LogError("No valid arguments passed!", window);
+                        }
+                        else if (StrEquals(data->data[5], "get"))
+                        {
+                            if (StrEquals(data->data[6], "files"))
+                            {
+                                uint64_t fCount = 0;
+                                const char** files = fsInterface->GetFiles(data->data[7], &fCount);
+                                window->renderer->Println("Files: (Count: {})", to_string(fCount), Colors.yellow);
+                                for (int i = 0; i < fCount; i++)
+                                {
+                                    window->renderer->Println(" - \"{}\"", files[i], Colors.yellow);
+                                    //free((void*)files[i]);
+                                }
+                                if (fCount != 0)
+                                    free(files);
+                            }
+                            else if (StrEquals(data->data[6], "folders"))
+                            {
+                                uint64_t fCount = 0;
+                                const char** folders = fsInterface->GetFolders(data->data[7], &fCount);
+                                window->renderer->Println("Folders: (Count: {})", to_string(fCount), Colors.yellow);
+                                for (int i = 0; i < fCount; i++)
+                                {
+                                    window->renderer->Println(" - \"{}\"", folders[i], Colors.yellow);
+                                    free((void*)folders[i]);
+                                }
+                                if (fCount != 0)
+                                    free(folders);
+                            }
+                            else
+                                LogError("No valid arguments passed!", window);
+                        }
+                        else
+                            LogError("No valid arguments passed!", window);
+                    }
+                    else
+                        LogError("Filesystem Interface not found!", window);
                 }
             }
             else

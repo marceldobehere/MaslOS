@@ -157,19 +157,31 @@ namespace FilesystemInterface
     }
 
 
-    const char** GenericFilesystemInterface::GetFiles(const char* path)
+    const char** GenericFilesystemInterface::GetFiles(const char* path, uint64_t* outCount)
     {
         switch (this->InterfaceType)
         {
             case FilesystemInterfaceType::Mrafs:
             {
-                return ((MrafsFilesystemInterface*)this)->GetFiles(path);
+                return ((MrafsFilesystemInterface*)this)->GetFiles(path, outCount);
             }
         }
         return NULL;
     }
 
-    const char* GenericFilesystemInterface::ReadFile(const char* path, void** buffer)
+    const char** GenericFilesystemInterface::GetFolders(const char* path, uint64_t* outCount)
+    {
+        switch (this->InterfaceType)
+        {
+            case FilesystemInterfaceType::Mrafs:
+            {
+                return ((MrafsFilesystemInterface*)this)->GetFolders(path, outCount);
+            }
+        }
+        return NULL;
+    }
+
+    uint64_t GenericFilesystemInterface::ReadFile(const char* path, void** buffer)
     {
         switch (this->InterfaceType)
         {
@@ -178,7 +190,7 @@ namespace FilesystemInterface
                 return ((MrafsFilesystemInterface*)this)->ReadFile(path, buffer);
             }
         }
-        return FSCommandResult.ERROR_GENERIC_INTERFACE;
+        return 0;
     }
 
 

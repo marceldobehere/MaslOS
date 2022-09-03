@@ -5,6 +5,10 @@
 
 bool StrEquals(const char* a, const char* b)
 {
+    int diff = StrLen(a) - StrLen(b);
+    if (diff != 0)
+        return false;
+    
     AddToStack();
     int index = 0;
     while (!(a[index] == 0 && b[index] == 0))
@@ -124,3 +128,43 @@ char* StrSubstr(const char* og, int index)
     // return res;
 }
 
+bool StrStartsWith(const char* og, const char* with)
+{
+    int diff = StrLen(og) - StrLen(with);
+    if (diff < 0)
+        return false;
+    
+    for (;*with != 0; og++, with++)
+        if (*og != *with)
+            return false;
+
+    return true;
+}
+
+char* StrCombine(const char* a, const char* b)
+{
+    int lenA = StrLen(a);
+    int lenB = StrLen(b);
+    
+    int totalLen = lenA + lenB;
+    char* tempStr = (char*) malloc(totalLen + 1, "Malloc for Combined String");
+    tempStr[totalLen] = 0;
+
+    for (int i = 0; i < lenA; i++)
+        tempStr[i] = a[i];
+    for (int i = 0; i < lenB; i++)
+        tempStr[i + lenA] = b[i];
+
+    return tempStr;
+}
+
+uint64_t StrCountChr(const char* og, char chr)
+{
+    uint64_t count = 0;
+
+    for (; *og != 0; og++)
+        if (*og == chr)
+            count++;
+
+    return count;
+}

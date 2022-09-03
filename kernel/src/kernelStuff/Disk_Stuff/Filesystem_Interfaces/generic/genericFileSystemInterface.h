@@ -35,9 +35,10 @@ namespace FilesystemInterface
         FileInfo* GetFileInfo(const char* path);
         FolderInfo* GetFolderInfo(const char* path);
 
-        const char** GetFiles(const char* path);
+        const char** GetFiles(const char* path, uint64_t* outCount);
+        const char** GetFolders(const char* path, uint64_t* outCount);
 
-        const char* ReadFile(const char* path, void** buffer);
+        uint64_t ReadFile(const char* path, void** buffer);
 
         const char* ReadFile(const char* path, uint64_t byteCount, void* buffer);
         const char* WriteFile(const char* path, uint64_t byteCount, void* buffer);

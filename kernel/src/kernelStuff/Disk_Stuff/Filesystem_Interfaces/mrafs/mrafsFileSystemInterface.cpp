@@ -15,6 +15,28 @@ namespace FilesystemInterface
         fsFolderList.clear();
         fsFileList.clear();
     }
+    void MrafsFilesystemInterface::ClearLists()
+    {
+        {
+            uint64_t count = fsFileList.getCount();
+            while (count--)
+            {
+                fsFileList[0]->Destroy();
+                fsFileList.removeAt(0);
+            }
+        }
+
+        {
+            uint64_t count = fsFolderList.getCount();
+            while (count--)
+            {
+                fsFolderList[0]->Destroy();
+                fsFolderList.removeAt(0);
+            }
+        }
+
+        fsPartitionList.clear();
+    }
 
     int64_t MrafsFilesystemInterface::GetIndexOfPartitionFromLocation(uint64_t location)
     {
@@ -41,15 +63,20 @@ namespace FilesystemInterface
             return -1;
         if (partitionInfo->owner != partitionInterface)
             return -1;
-
+        //osData.mainTerminalWindow->Log("BRUH 0");
         uint64_t count = fsPartitionList.getCount();
+        //osData.mainTerminalWindow->Log("BRUH 0, Count: {}", to_string(count), Colors.yellow);
         for (uint64_t index = 0; index < count; index++)
         {
+            //osData.mainTerminalWindow->Log("BRUH 1, Index: {}", to_string(index), Colors.yellow);
             FSPartitionInfo* part = (FSPartitionInfo*)fsPartitionList[index];
+            //osData.mainTerminalWindow->Log("BRUH 1, Free: {}", part->free ? "true" : "false", Colors.yellow);
             if (!part->free)
                 continue;
+            //osData.mainTerminalWindow->Log("BRUH 1, Size: {}", to_string(part->sizeInBytes), Colors.yellow);
             if (part->sizeInBytes < sizeInBytes)
                 continue;
+            //osData.mainTerminalWindow->Log("BRUH 2");
                 
             return index;
         }
@@ -59,6 +86,8 @@ namespace FilesystemInterface
 
     MrafsFilesystemInterface::FSPartitionInfo* MrafsFilesystemInterface::CreateFilePartition(uint64_t size)
     {
+        //osData.mainTerminalWindow->Log("AAA 0");
+
         if (partitionInterface == NULL)
             return NULL;
         if (partitionInfo == NULL)
@@ -66,10 +95,14 @@ namespace FilesystemInterface
         if (partitionInfo->owner != partitionInterface)
             return NULL;
 
+        //osData.mainTerminalWindow->Log("AAA 1");
+        //osData.mainTerminalWindow->Log("BRUH Y, Count: {}", to_string(fsPartitionList.getCount()), Colors.yellow);
         int64_t fIndex = GetIndexOfFreeFilePartition(size);
         if (fIndex == -1)
             return NULL;
         
+        //osData.mainTerminalWindow->Log("AAA 2");
+
         FSPartitionInfo* info = (FSPartitionInfo*)fsPartitionList[fIndex];
         info->free = false;
         if (info->sizeInBytes > size)
@@ -177,19 +210,7 @@ namespace FilesystemInterface
                 const char* res = ResizeFilePartition(pTemp, partition->sizeInBytes + pTemp->sizeInBytes);
                 if (res != FSCommandResult.SUCCESS)
                     return res;
-                
-                return FSCommandResult.SUCCESS;
             }
-            else
-            {
-                fsPartitionList.removeAt(pIndex);
-                free(partition);
-            }
-        }
-        else
-        {
-            fsPartitionList.removeAt(pIndex);
-            free(partition);
         }
         
         return FSCommandResult.SUCCESS;
@@ -273,22 +294,30 @@ namespace FilesystemInterface
         FileInfo* file = GetFile(path);
         if (file == NULL)
             return FSCommandResult.ERROR_FILE_NOT_FOUND;
-        
-        int64_t pIndex = GetIndexOfPartitionFromLocation(file->locationInBytes);
-        if (pIndex == -1)
-            return FSCommandResult.ERROR_FILE_NOT_FOUND;
-        
-        FSPartitionInfo* info = (FSPartitionInfo*) fsPartitionList[pIndex];
 
         int64_t fIndex = fsFileList.getIndexOf(file);
         if (fIndex == -1)
             return FSCommandResult.ERROR_FILE_NOT_FOUND;
-
-        DeleteFilePartition(info);
+        
+        if (file->sizeInBytes != 0)
+        {
+            int64_t pIndex = GetIndexOfPartitionFromLocation(file->locationInBytes);
+            if (pIndex == -1)
+                return FSCommandResult.ERROR_FILE_NOT_FOUND;
+            
+            FSPartitionInfo* info = (FSPartitionInfo*) fsPartitionList[pIndex];
+            
+            if (info->sizeInBytes != 0)
+                DeleteFilePartition(info);
+        }
+        
         file->sizeInBytes = 0;
         file->locationInBytes = 0;
+
+        file->Destroy();
         free(file);
         fsFileList.removeAt(fIndex);
+
         
         return SaveFSTable();//return FSCommandResult.SUCCESS;
     }
@@ -310,8 +339,69 @@ namespace FilesystemInterface
         if (fIndex == -1)
             return FSCommandResult.ERROR_FOLDER_NOT_FOUND;
 
+
+        {
+            uint64_t fileCount = 0;
+            const char** files = GetFiles(folder->baseInfo.path, &fileCount);
+            if (fileCount != 0)
+            {
+                for (int i = 0; i < fileCount; i++)
+                {
+                    DeleteFile(files[i]);
+                    free((void*)files[i]);
+                }
+                free(files);
+            }
+        }
+
+        {
+            uint64_t folderCount = 0;
+            const char** folders = GetFolders(folder->baseInfo.path, &folderCount);
+            if (folderCount != 0)
+            {
+                for (int i = 0; i < folderCount; i++)
+                {
+                    DeleteFolder(folders[i]);
+                    free((void*)folders[i]);
+                }
+                free(folders);
+            }
+        }
+
+
+        // const char* basePath = StrCombine(folder->baseInfo.path, "/");
+
+        // {
+        //     uint64_t count = fsFileList.getCount();
+        //     for (int index = 0; index < count; index++)
+        //     {
+        //         FileInfo* info = fsFileList[index];
+        //         if (StrStartsWith(info->baseInfo.path, basePath))
+        //         {
+        //             DeleteFile(info->baseInfo.path);
+        //             index = -1;
+        //         }
+        //     }
+        // }
+
+        // {
+        //     uint64_t count = fsFolderList.getCount();
+        //     for (int index = 0; index < count; index++)
+        //     {
+        //         FolderInfo* info = fsFolderList[index];
+        //         if (StrStartsWith(info->baseInfo.path, basePath))
+        //         {
+        //             DeleteFolder(info->baseInfo.path);
+        //             index = -1;
+        //         }
+        //     }
+        // }
+
+        // free((void*)basePath);
+
+        folder->Destroy();
         free(folder);
-        fsFileList.removeAt(fIndex);
+        fsFolderList.removeAt(fIndex);
         
         return SaveFSTable();//return FSCommandResult.SUCCESS;
     }
@@ -435,8 +525,9 @@ namespace FilesystemInterface
     }
 
 
-    const char** MrafsFilesystemInterface::GetFiles(const char* path)
+    const char** MrafsFilesystemInterface::GetFiles(const char* path, uint64_t* outCount)
     {
+        *outCount = 0;
         if (partitionInterface == NULL)
             return NULL;
         if (partitionInfo == NULL)
@@ -444,23 +535,229 @@ namespace FilesystemInterface
         if (partitionInfo->owner != partitionInterface)
             return NULL;
 
+
+        if (StrEquals(path, "/"))
+        {
+            //osData.mainTerminalWindow->Log("Slash: {}", to_string(baseSlashCount), Colors.yellow);
+            uint64_t fCount = 0;
+            uint64_t fSize = 0;
+            {
+                uint64_t count = fsFileList.getCount();
+                for (int index = 0; index < count; index++)
+                {
+                    FileInfo* info = fsFileList[index];
+                    int diff = StrCountChr(info->baseInfo.path, '/'); 
+                    //osData.mainTerminalWindow->Log("Slash Diff: {}", to_string(diff), Colors.yellow);
+                    if (diff != 0)
+                        continue;
+                    
+                    fCount++;
+                    fSize += info->baseInfo.pathLen + 1;
+                }
+            }
+            const char** strList = NULL;
+            if (fCount != 0)
+            {
+                strList = (const char**)malloc(sizeof(const char*) * fCount, "Malloc for File list");
+                fCount = 0;
+                {
+                    uint64_t count = fsFileList.getCount();
+                    for (int index = 0; index < count; index++)
+                    {
+                        FileInfo* info = fsFileList[index];
+                        int diff = StrCountChr(info->baseInfo.path, '/'); 
+                        if (diff != 0)
+                            continue;
+                        
+                        strList[fCount] = StrCopy(info->baseInfo.path);
+                        fCount++;
+                    }
+                }
+            }
+            
+            *outCount = fCount;
+            return strList;
+        }
+        else
+        {
+            FolderInfo* folder = GetFolder(path);
+            if (folder == NULL)
+                return NULL;
+            
+            const char* basePath = StrCombine(folder->baseInfo.path, "/");
+            int baseSlashCount = StrCountChr(basePath, '/');
+            //osData.mainTerminalWindow->Log(basePath);
+            //osData.mainTerminalWindow->Log("Slash: {}", to_string(baseSlashCount), Colors.yellow);
+            uint64_t fCount = 0;
+            uint64_t fSize = 0;
+            {
+                uint64_t count = fsFileList.getCount();
+                for (int index = 0; index < count; index++)
+                {
+                    FileInfo* info = fsFileList[index];
+                    int diff = StrCountChr(info->baseInfo.path, '/') - baseSlashCount; 
+                    //osData.mainTerminalWindow->Log("Slash Diff: {}", to_string(diff), Colors.yellow);
+                    if (diff != 0)
+                        continue;
+                    if (StrStartsWith(info->baseInfo.path, basePath))
+                    {
+                        fCount++;
+                        fSize += info->baseInfo.pathLen + 1;
+                    }
+                }
+            }
+            const char** strList = NULL;
+            if (fCount != 0)
+            {
+                strList = (const char**)malloc(sizeof(const char*) * fCount, "Malloc for File list");
+                fCount = 0;
+                {
+                    uint64_t count = fsFileList.getCount();
+                    for (int index = 0; index < count; index++)
+                    {
+                        FileInfo* info = fsFileList[index];
+                        int diff = StrCountChr(info->baseInfo.path, '/') - baseSlashCount; 
+                        if (diff != 0)
+                            continue;
+                        if (StrStartsWith(info->baseInfo.path, basePath))
+                        {
+                            strList[fCount] = StrCopy(info->baseInfo.path);
+                            fCount++;
+                        }
+                    }
+                }
+            }
+            
+            
+            *outCount = fCount;
+            free((void*)basePath);
+            return strList;
+        }
+
+        return NULL;
+    }
+
+    const char** MrafsFilesystemInterface::GetFolders(const char* path, uint64_t* outCount)
+    {
+        *outCount = 0;
+        if (partitionInterface == NULL)
+            return NULL;
+        if (partitionInfo == NULL)
+            return NULL;
+        if (partitionInfo->owner != partitionInterface)
+            return NULL;
+
+        if (StrEquals(path, "/"))
+        {
+            uint64_t fCount = 0;
+            uint64_t fSize = 0;
+            {
+                uint64_t count = fsFolderList.getCount();
+                for (int index = 0; index < count; index++)
+                {
+                    FolderInfo* info = fsFolderList[index];
+                    int diff = StrCountChr(info->baseInfo.path, '/'); 
+                    if (diff != 0)
+                        continue;
+                    
+                    fCount++;
+                    fSize += info->baseInfo.pathLen + 1;
+                }
+            }
+            const char** strList = NULL;
+            if (fCount != 0)
+            {
+                strList = (const char**)malloc(sizeof(const char*) * fCount, "Malloc for File list");
+                fCount = 0;
+                {
+                    uint64_t count = fsFolderList.getCount();
+                    for (int index = 0; index < count; index++)
+                    {
+                        FolderInfo* info = fsFolderList[index];
+                        int diff = StrCountChr(info->baseInfo.path, '/'); 
+                        if (diff != 0)
+                            continue;
+
+                        strList[fCount] = StrCopy(info->baseInfo.path);
+                        fCount++;
+                    }
+                }
+            }
+
+            *outCount = fCount;
+
+            return strList;
+        }
+        else
+        {
+            FolderInfo* folder = GetFolder(path);
+            if (folder == NULL)
+                return NULL;
+            
+            const char* basePath = StrCombine(folder->baseInfo.path, "/");
+            int baseSlashCount = StrCountChr(basePath, '/');
+
+            uint64_t fCount = 0;
+            uint64_t fSize = 0;
+            {
+                uint64_t count = fsFolderList.getCount();
+                for (int index = 0; index < count; index++)
+                {
+                    FolderInfo* info = fsFolderList[index];
+                    int diff = StrCountChr(info->baseInfo.path, '/') - baseSlashCount; 
+                    if (diff != 0)
+                        continue;
+                    if (StrStartsWith(info->baseInfo.path, basePath))
+                    {
+                        fCount++;
+                        fSize += info->baseInfo.pathLen + 1;
+                    }
+                }
+            }
+            const char** strList = NULL;
+            if (fCount != 0)
+            {
+                strList = (const char**)malloc(sizeof(const char*) * fCount, "Malloc for File list");
+                fCount = 0;
+                {
+                    uint64_t count = fsFolderList.getCount();
+                    for (int index = 0; index < count; index++)
+                    {
+                        FolderInfo* info = fsFolderList[index];
+                        int diff = StrCountChr(info->baseInfo.path, '/') - baseSlashCount; 
+                        if (diff != 0)
+                            continue;
+                        if (StrStartsWith(info->baseInfo.path, basePath))
+                        {
+                            strList[fCount] = StrCopy(info->baseInfo.path);
+                            fCount++;
+                        }
+                    }
+                }
+            }
+
+            *outCount = fCount;
+            free((void*)basePath);
+
+            return strList;
+        }
 
         return NULL;
     }
 
 
-    const char* MrafsFilesystemInterface::ReadFile(const char* path, void** buffer)
+    uint64_t MrafsFilesystemInterface::ReadFile(const char* path, void** buffer)
     {
         if (partitionInterface == NULL)
-            return FSCommandResult.ERROR_NO_PARTITION_INTERFACE;
+            return 0;
         if (partitionInfo == NULL)
-            return FSCommandResult.ERROR_NO_PARTITION;
+            return 0;
         if (partitionInfo->owner != partitionInterface)
-            return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
+            return 0;
         
         FileInfo* info = GetFile(path);
         if (info == NULL)
-            return FSCommandResult.ERROR_FILE_NOT_FOUND;
+            return 0;
 
         uint8_t* data = (uint8_t*)malloc(info->sizeInBytes, "Malloc for File read");
 
@@ -468,9 +765,9 @@ namespace FilesystemInterface
 
         const char* res = partitionInterface->ReadPartition(partitionInfo, info->locationInBytes, info->sizeInBytes, data);
         if (res != PartitionInterface::CommandResult.SUCCESS)
-            return res;
+            return 0;
 
-        return FSCommandResult.SUCCESS;
+        return info->sizeInBytes;
     }
 
 
@@ -511,6 +808,9 @@ namespace FilesystemInterface
         if (info == NULL)
             return FSCommandResult.ERROR_FILE_NOT_FOUND;
 
+        //osData.mainTerminalWindow->Log("BRUH X, Count: {}", to_string(fsPartitionList.getCount()), Colors.yellow);
+        //osData.mainTerminalWindow->Log("BRUH X2, Count: {}", to_string(fsPartitionList.getCount()), Colors.yellow);
+
         if (byteCount == info->sizeInBytes)
         {
             const char* res = partitionInterface->WritePartition(partitionInfo, info->locationInBytes, byteCount, buffer);
@@ -520,16 +820,29 @@ namespace FilesystemInterface
         }
         else
         {
-            int64_t pIndex = GetIndexOfPartitionFromLocation(info->locationInBytes);
-            if (pIndex == -1)
-                return FSCommandResult.ERROR_PARTITION_NOT_FOUND;
-            FSPartitionInfo* partInfo = (FSPartitionInfo*)fsPartitionList[pIndex];
-            DeleteFilePartition(partInfo);
+            if(info->sizeInBytes != 0)
+            {
+                //osData.mainTerminalWindow->Log("BRUH X3, Count: {}", to_string(fsPartitionList.getCount()), Colors.yellow);
+                int64_t pIndex = GetIndexOfPartitionFromLocation(info->locationInBytes);
+                if (pIndex == -1)
+                    return FSCommandResult.ERROR_PARTITION_NOT_FOUND;
+                FSPartitionInfo* partInfo = (FSPartitionInfo*)fsPartitionList[pIndex];
+                //osData.mainTerminalWindow->Log("BRUH X3, Size: {}", to_string(partInfo->sizeInBytes), Colors.yellow);
+                if (partInfo->sizeInBytes != 0)
+                    DeleteFilePartition(partInfo);
+            }
+            //osData.mainTerminalWindow->Log("BRUH X4, Count: {}", to_string(fsPartitionList.getCount()), Colors.yellow);
             FSPartitionInfo* nPartInfo = CreateFilePartition(byteCount);
+            //osData.mainTerminalWindow->Log("BRUH X5, Count: {}", to_string(fsPartitionList.getCount()), Colors.yellow);
             if (nPartInfo == NULL)
                 return FSCommandResult.ERROR_PARTITION_TOO_SMALL;
             info->locationInBytes = nPartInfo->locationInBytes;
             info->sizeInBytes = byteCount;
+
+            const char* res = partitionInterface->WritePartition(partitionInfo, info->locationInBytes, byteCount, buffer);
+            if (res != PartitionInterface::CommandResult.SUCCESS)
+                return res;
+
             return SaveFSTable();//return FSCommandResult.SUCCESS;    
         }
         
@@ -548,10 +861,7 @@ namespace FilesystemInterface
             return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
 
 
-        // Add Code to like free the data from the pointers
-        fsPartitionList.clear();
-        fsFolderList.clear();
-        fsFileList.clear();
+        ClearLists();
 
         if (maxFSTableSize > partitionInfo->sizeInBytes)
             return FSCommandResult.ERROR_PARTITION_TOO_SMALL;
@@ -758,10 +1068,7 @@ namespace FilesystemInterface
         if (partitionInfo->owner != partitionInterface)
             return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
 
-        // Add Code to like free the data from the pointers
-        fsPartitionList.clear();
-        fsFolderList.clear();
-        fsFileList.clear();
+        ClearLists();
     
         uint64_t totalSize = 0;
         uint32_t fsPartCount = 0;

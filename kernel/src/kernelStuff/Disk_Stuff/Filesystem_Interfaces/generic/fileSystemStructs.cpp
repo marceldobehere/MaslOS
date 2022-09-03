@@ -1,5 +1,6 @@
 #include "fileSystemStructs.h"
 #include "../../../../cmdParsing/cstrTools.h"
+#include "../../../../memory/heap.h"
 
 namespace FilesystemInterface
 {
@@ -29,11 +30,20 @@ namespace FilesystemInterface
         hidden = false;
         systemFile = false;
     }
-
+    void BaseInfo::Destroy()
+    {
+        pathLen = 0;
+        free((void*)path);
+        path = 0;
+    }
 
     FolderInfo::FolderInfo(BaseInfo baseInfo)
     {
         this->baseInfo = baseInfo;
+    }
+    void FolderInfo::Destroy()
+    {
+        this->baseInfo.Destroy();
     }
 
     FileInfo::FileInfo(BaseInfo baseInfo, uint64_t sizeInBytes, uint64_t locationInBytes)
@@ -41,5 +51,9 @@ namespace FilesystemInterface
         this->baseInfo = baseInfo;
         this->sizeInBytes = sizeInBytes;
         this->locationInBytes = locationInBytes;
+    }
+    void FileInfo::Destroy()
+    {
+        this->baseInfo.Destroy();
     }
 }
