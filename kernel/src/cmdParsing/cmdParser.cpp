@@ -1016,6 +1016,75 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             else
                 LogError("No valid arguments passed!", window);
         }
+        else if (data->len == 9)
+        {
+            int diskNum = to_int(data->data[1]);
+            if (StrEquals(data->data[4], "fs"))
+            {
+                int partNum = to_int(data->data[3]);
+                DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[diskNum];
+                PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
+                if (partInterface == NULL)
+                    LogError("Drive has no Partition Manager!", window);
+                else if (partNum < 0 || partNum >= partInterface->partitionList.getCount())
+                    LogError("Invalid Partition selected!", window);
+                else
+                { 
+                    FilesystemInterface::GenericFilesystemInterface* fsInterface = (FilesystemInterface::GenericFilesystemInterface*)partInterface->partitionList[partNum]->fsInterface;
+                    if (fsInterface != NULL)
+                    {
+                        if (StrEquals(data->data[5], "copy"))
+                        {
+                            if (StrEquals(data->data[6], "file"))
+                            {
+                                const char* res = fsInterface->CopyFile(data->data[7], data->data[8]);
+                                if (res == FilesystemInterface::FSCommandResult.SUCCESS)
+                                    window->renderer->Println("File Copying Success!");
+                                else
+                                    LogError("File Copying failed! Error: \"{}\"", res, window);
+                            }
+                            else if (StrEquals(data->data[6], "folder"))
+                            {
+                                const char* res = fsInterface->CopyFolder(data->data[7], data->data[8]);
+                                if (res == FilesystemInterface::FSCommandResult.SUCCESS)
+                                    window->renderer->Println("Folder Copying Success!");
+                                else
+                                    LogError("Folder Copying failed! Error: \"{}\"", res, window);
+                            }
+                            else
+                                LogError("No valid arguments passed!", window);
+                        }
+                        else if (StrEquals(data->data[5], "rename"))
+                        {
+                            if (StrEquals(data->data[6], "file"))
+                            {
+                                const char* res = fsInterface->RenameFile(data->data[7], data->data[8]);
+                                if (res == FilesystemInterface::FSCommandResult.SUCCESS)
+                                    window->renderer->Println("File Renaming Success!");
+                                else
+                                    LogError("File Renaming failed! Error: \"{}\"", res, window);
+                            }
+                            else if (StrEquals(data->data[6], "folder"))
+                            {
+                                const char* res = fsInterface->RenameFolder(data->data[7], data->data[8]);
+                                if (res == FilesystemInterface::FSCommandResult.SUCCESS)
+                                    window->renderer->Println("Folder Renaming Success!");
+                                else
+                                    LogError("Folder Renaming failed! Error: \"{}\"", res, window);
+                            }
+                            else
+                                LogError("No valid arguments passed!", window);
+                        }
+                        else
+                            LogError("No valid arguments passed!", window);
+                    }
+                    else
+                        LogError("Filesystem Interface not found!", window);
+                }
+            }
+            else
+                LogError("No valid arguments passed!", window);
+        }
         else
         {
             LogError("No valid arguments passed!", window);

@@ -419,10 +419,43 @@ namespace FilesystemInterface
         if (StrEquals(oldPath, newPath))
             return FSCommandResult.ERROR_PATH_IS_THE_SAME;
         
+        FileInfo* file = GetFile(oldPath);
+        if (file == NULL)
+            return FSCommandResult.ERROR_FILE_NOT_FOUND;
+        if (FileExists(newPath))
+            return FSCommandResult.ERROR_FILE_ALREADY_EXISTS;
+        if (FolderExists(newPath))
+            return FSCommandResult.ERROR_FOLDER_ALREADY_EXISTS;
+        
+        {
+            const char* res = CreateFile(newPath);
+            if (res != FSCommandResult.SUCCESS)
+                return res;
+        }
 
+        FileInfo* newFile = GetFile(newPath);
+        if (newFile == NULL)
+            return FSCommandResult.ERROR_FILE_NOT_FOUND;
 
+        {
+            const char* tempPath = newFile->baseInfo.path;
+            uint16_t tempLen = newFile->baseInfo.pathLen;
+            newFile->baseInfo = file->baseInfo;
+            newFile->baseInfo.path = tempPath;
+            newFile->baseInfo.pathLen = tempLen;
+        }
 
-        return FSCommandResult.ERROR_FUNCTION_NOT_IMPLEMENTED;
+        {
+            uint8_t* buffer = NULL;
+            uint64_t byteCount = ReadFile(oldPath, (void**)&buffer);
+            if (byteCount != 0)
+            {
+                WriteFile(newPath, byteCount, buffer);
+                free(buffer);
+            }
+        }
+
+        return FSCommandResult.SUCCESS;
     }
 
     const char* MrafsFilesystemInterface::CopyFolder(const char* oldPath, const char* newPath)
@@ -454,8 +487,19 @@ namespace FilesystemInterface
         if (StrEquals(oldPath, newPath))
             return FSCommandResult.ERROR_PATH_IS_THE_SAME;
 
+        FileInfo* file = GetFile(oldPath);
+        if (file == NULL)
+            return FSCommandResult.ERROR_FILE_NOT_FOUND;
+        if (FileExists(newPath))
+            return FSCommandResult.ERROR_FILE_ALREADY_EXISTS;
+        if (FolderExists(newPath))
+            return FSCommandResult.ERROR_FOLDER_ALREADY_EXISTS;
+        
+        free((void*)file->baseInfo.path);
+        file->baseInfo.path = StrCopy(newPath);
+        file->baseInfo.pathLen = StrLen(file->baseInfo.path);
 
-        return FSCommandResult.ERROR_FUNCTION_NOT_IMPLEMENTED;
+        return SaveFSTable();
     }
 
     const char* MrafsFilesystemInterface::RenameFolder(const char* oldPath, const char* newPath)
