@@ -32,7 +32,7 @@ MaslOS is love, MaslOS is life.
     + Partitioning Interfaces
       - MRAPS (Marcels really awesome partitioning system)
     + Filesystem Interfaces
-      - (Work in progress) MRAFS (Marcels really awesome filesystem)
+      - (Almost done :p) MRAFS (Marcels really awesome filesystem)
 * Memory
   - Dynamic Memory Management
   - (In planning) Paging
