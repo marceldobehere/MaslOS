@@ -507,6 +507,8 @@ namespace FilesystemInterface
 
     const char* MrafsFilesystemInterface::RenameFile(const char* oldPath, const char* newPath)
     {
+        //osData.debugTerminalWindow->renderer->Print("0 - ");
+
         if (partitionInterface == NULL)
             return FSCommandResult.ERROR_NO_PARTITION_INTERFACE;
         if (partitionInfo == NULL)
@@ -514,20 +516,31 @@ namespace FilesystemInterface
         if (partitionInfo->owner != partitionInterface)
             return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
 
+        //osData.debugTerminalWindow->renderer->Print("1 - ");
+
         if (StrEquals(oldPath, newPath))
             return FSCommandResult.ERROR_PATH_IS_THE_SAME;
 
+        //osData.debugTerminalWindow->renderer->Print("2 - ");
+
         FileInfo* file = GetFile(oldPath);
+        //osData.debugTerminalWindow->renderer->Print("3 - ");
         if (file == NULL)
             return FSCommandResult.ERROR_FILE_NOT_FOUND;
+        //osData.debugTerminalWindow->renderer->Print("4 - ");
         if (FileExists(newPath))
             return FSCommandResult.ERROR_FILE_ALREADY_EXISTS;
+        //osData.debugTerminalWindow->renderer->Print("5 - ");
         if (FolderExists(newPath))
             return FSCommandResult.ERROR_FOLDER_ALREADY_EXISTS;
         
+        //osData.debugTerminalWindow->renderer->Print("A - ");
         free((void*)file->baseInfo.path);
+        //osData.debugTerminalWindow->renderer->Print("B - ");
         file->baseInfo.path = StrCopy(newPath);
+        //osData.debugTerminalWindow->renderer->Print("C - ");
         file->baseInfo.pathLen = StrLen(file->baseInfo.path);
+        //osData.debugTerminalWindow->renderer->Println("D");
 
         return SaveFSTable();
     }
@@ -544,8 +557,79 @@ namespace FilesystemInterface
         if (StrEquals(oldPath, newPath))
             return FSCommandResult.ERROR_PATH_IS_THE_SAME;
 
+        if (FolderExists(newPath))
+            return FSCommandResult.ERROR_FOLDER_ALREADY_EXISTS;
 
-        return FSCommandResult.ERROR_FUNCTION_NOT_IMPLEMENTED;
+        //osData.debugTerminalWindow->Log("Bruh 1");
+        //osData.debugTerminalWindow->Log("Old: \"{}\"", oldPath, Colors.yellow);
+        //osData.debugTerminalWindow->Log("New: \"{}\"", newPath, Colors.yellow);
+        
+        
+        
+        FolderInfo* folder = GetFolder(oldPath);
+        if (folder == NULL)
+            return FSCommandResult.ERROR_FOLDER_NOT_FOUND;
+
+        int64_t fIndex = fsFolderList.getIndexOf(folder);
+        if (fIndex == -1)
+            return FSCommandResult.ERROR_FOLDER_NOT_FOUND;
+
+        //osData.debugTerminalWindow->Log("Bruh 2");
+
+
+        {
+            uint64_t fileCount = 0;
+            const char** files = GetFiles(folder->baseInfo.path, &fileCount);
+            //osData.debugTerminalWindow->Log("File count: {}", to_string(fileCount), Colors.yellow);
+            if (fileCount != 0)
+            {
+                for (int i = 0; i < fileCount; i++)
+                {
+                    const char* filename = files[i];
+                    //osData.debugTerminalWindow->Log(" - Filename: \"{}\"", filename, Colors.yellow);
+                    FileInfo* fInfo = GetFile(filename);
+                    if (fInfo == NULL)
+                        continue;
+                    const char* newFilename = StrReplaceStartingStuffWith(filename, oldPath, newPath);
+                    RenameFile(filename, newFilename);
+                }
+                free(files);
+            }
+        }
+
+        //osData.debugTerminalWindow->Log("Bruh 3");
+
+        {
+            uint64_t folderCount = 0;
+            const char** folders = GetFolders(folder->baseInfo.path, &folderCount);
+            //osData.debugTerminalWindow->Log("Folder count: {}", to_string(folderCount), Colors.yellow);
+            if (folderCount != 0)
+            {
+                for (int i = 0; i < folderCount; i++)
+                {
+                    const char* foldername = folders[i];
+                    //osData.debugTerminalWindow->Log(" - Foldername: \"{}\"", foldername, Colors.yellow);
+                    FolderInfo* fInfo = GetFolder(foldername);
+                    if (fInfo == NULL)
+                        continue;
+                    const char* newFoldername = StrReplaceStartingStuffWith(foldername, oldPath, newPath);
+                    RenameFolder(foldername, newFoldername);
+                }
+                free(folders);
+            }
+        }
+
+        //osData.debugTerminalWindow->Log("Bruh 4");
+
+        {
+            free((void*)folder->baseInfo.path);
+            folder->baseInfo.path = StrCopy(newPath);
+            folder->baseInfo.pathLen = StrLen(folder->baseInfo.path);
+        }
+
+        //osData.debugTerminalWindow->Log("Bruh 5 (DONE)");
+
+        return SaveFSTable();
     }
 
 

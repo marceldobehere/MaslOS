@@ -76,9 +76,8 @@ int32_t StrLen(const char* og)
 
 char* StrSubstr(const char* og, int index)
 {
-    //AddToStack();
-    int len;
-    for (len = 0; og[len] != 0; len++);//GlobalRenderer->Print(og[len]);
+    AddToStack();
+    int len = StrLen(og);//GlobalRenderer->Print(og[len]);
 
     //GlobalRenderer->Println("\n\rLEN 0: {}", to_string((uint64_t)len), Colors.white);
 
@@ -93,39 +92,9 @@ char* StrSubstr(const char* og, int index)
     int length = len;
 
 
-    {
-        char* res = StrSubstr(og, index, len);
-        RemoveFromStack();
-        return res;
-    }
-
-    // GlobalRenderer->Println("LEN 1: {}", to_string((uint64_t)length), Colors.white);
-    // // char* res = StrSubstr(og, index, len);
-    
-    // // for (len = 0; res[len] != 0; len++);
-    // // GlobalRenderer->Println("LEN 2: {}", to_string((uint64_t)len), Colors.white);
-
-    // GlobalRenderer->Println("ADDR 1: {}", ConvertHexToString((uint64_t)og), Colors.white);
-    
-    // char* res = (char*)malloc(length + 1);
-    // for (int i = 0; i < length; i++)
-    //     res[i] = og[i+index];
-    // res[length] = 0;
-
-    // GlobalRenderer->Println("ADDR 2: {}", ConvertHexToString((uint64_t)og), Colors.white);
-    // GlobalRenderer->Println("ADDR 3: {}", ConvertHexToString((uint64_t)res), Colors.white);
-    // for (len = 0; og[len] != 0; len++)GlobalRenderer->Print(og[len]);
-    // GlobalRenderer->Println();
-
-    
-
-    // for (len = 0; res[len] != 0; len++)GlobalRenderer->Print(res[len]);
-    // GlobalRenderer->Println();
-
-
-
-    // RemoveFromStack();
-    // return res;
+    char* res = StrSubstr(og, index, len);
+    RemoveFromStack();
+    return res;
 }
 
 bool StrStartsWith(const char* og, const char* with)
@@ -167,4 +136,19 @@ uint64_t StrCountChr(const char* og, char chr)
             count++;
 
     return count;
+}
+
+char* StrReplaceStartingStuffWith(const char* og, const char* toReplace, const char* toReplaceWith)
+{
+    if (!StrStartsWith(og, toReplace))
+        return StrCopy(og);
+    
+    int len = StrLen(toReplace);
+    if (StrEquals(og, toReplace))
+        return StrCopy(toReplaceWith);
+
+    char* subStr = StrSubstr(og, len);
+    char* combined = StrCombine(toReplaceWith, subStr);
+    free(subStr);
+    return combined;
 }

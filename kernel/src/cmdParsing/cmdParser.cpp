@@ -1066,6 +1066,8 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                             }
                             else if (StrEquals(data->data[6], "folder"))
                             {
+                                //osData.debugTerminalWindow->renderer->Cls();
+                                //osData.debugTerminalWindow->Log("---Rename Folder Debug---");
                                 const char* res = fsInterface->RenameFolder(data->data[7], data->data[8]);
                                 if (res == FilesystemInterface::FSCommandResult.SUCCESS)
                                     window->renderer->Println("Folder Renaming Success!");
