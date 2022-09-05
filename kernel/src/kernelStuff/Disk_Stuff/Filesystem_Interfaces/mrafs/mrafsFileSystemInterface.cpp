@@ -261,6 +261,36 @@ namespace FilesystemInterface
 
         return SaveFSTable();//return FSCommandResult.SUCCESS;
     }
+
+    const char* MrafsFilesystemInterface::CreateFile(const char* path, uint64_t sizeInBytes)
+    {
+        if (partitionInterface == NULL)
+            return FSCommandResult.ERROR_NO_PARTITION_INTERFACE;
+        if (partitionInfo == NULL)
+            return FSCommandResult.ERROR_NO_PARTITION;
+        if (partitionInfo->owner != partitionInterface)
+            return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
+        
+        FileInfo* info = GetFile(path);
+        if (info != NULL)
+            return FSCommandResult.ERROR_FILE_ALREADY_EXISTS;
+        
+        info = new FileInfo(BaseInfo(path, false, false, false), 0, 0);
+        fsFileList.add(info);
+
+        //osData.mainTerminalWindow->Log("BRUH X4, Count: {}", to_string(fsPartitionList.getCount()), Colors.yellow);
+        FSPartitionInfo* nPartInfo = CreateFilePartition(sizeInBytes);
+        //osData.mainTerminalWindow->Log("BRUH X5, Count: {}", to_string(fsPartitionList.getCount()), Colors.yellow);
+        if (nPartInfo == NULL)
+            return FSCommandResult.ERROR_PARTITION_TOO_SMALL;
+        info->locationInBytes = nPartInfo->locationInBytes;
+        info->sizeInBytes = sizeInBytes;
+
+
+        // Clear like the data here i guess
+
+        return SaveFSTable();//return FSCommandResult.SUCCESS;  
+    }
     
     const char* MrafsFilesystemInterface::CreateFolder(const char* path)
     {
@@ -893,6 +923,46 @@ namespace FilesystemInterface
 
         return SaveFSTable();//return FSCommandResult.SUCCESS;
     }
+
+
+    const char* MrafsFilesystemInterface::ReadFileBuffer(const char* path, uint64_t address, uint64_t byteCount, void* buffer)
+    {
+        if (partitionInterface == NULL)
+            return FSCommandResult.ERROR_NO_PARTITION_INTERFACE;
+        if (partitionInfo == NULL)
+            return FSCommandResult.ERROR_NO_PARTITION;
+        if (partitionInfo->owner != partitionInterface)
+            return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
+
+        FileInfo* info = GetFile(path);
+        if (info == NULL)
+            return FSCommandResult.ERROR_FILE_NOT_FOUND;
+
+        if (address + byteCount > info->sizeInBytes)
+            return FSCommandResult.ERROR_FILE_TOO_SMALL;
+
+        return partitionInterface->ReadPartition(partitionInfo, address + info->locationInBytes, byteCount, buffer);
+    }
+
+    const char* MrafsFilesystemInterface::WriteFileBuffer(const char* path, uint64_t address, uint64_t byteCount, void* buffer)
+    {
+        if (partitionInterface == NULL)
+            return FSCommandResult.ERROR_NO_PARTITION_INTERFACE;
+        if (partitionInfo == NULL)
+            return FSCommandResult.ERROR_NO_PARTITION;
+        if (partitionInfo->owner != partitionInterface)
+            return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
+
+        FileInfo* info = GetFile(path);
+        if (info == NULL)
+            return FSCommandResult.ERROR_FILE_NOT_FOUND;
+
+        if (address + byteCount > info->sizeInBytes)
+            return FSCommandResult.ERROR_FILE_TOO_SMALL;
+
+        return partitionInterface->WritePartition(partitionInfo, address + info->locationInBytes, byteCount, buffer);
+    }
+
 
 
     const char* MrafsFilesystemInterface::InitAndSaveFSTable()

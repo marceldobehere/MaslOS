@@ -40,6 +40,7 @@ namespace FilesystemInterface
         FolderInfo* GetFolder(const char* path);
 
         const char* CreateFile(const char* path);
+        const char* CreateFile(const char* path, uint64_t sizeInBytes);
         const char* CreateFolder(const char* path);
 
         const char* DeleteFile(const char* path);
@@ -64,6 +65,9 @@ namespace FilesystemInterface
 
         const char* ReadFile(const char* path, uint64_t byteCount, void* buffer);
         const char* WriteFile(const char* path, uint64_t byteCount, void* buffer);
+
+        const char* ReadFileBuffer(const char* path, uint64_t address, uint64_t byteCount, void* buffer);
+        const char* WriteFileBuffer(const char* path, uint64_t address, uint64_t byteCount, void* buffer);
 
         const char* InitAndSaveFSTable();
         const char* SaveFSTable();

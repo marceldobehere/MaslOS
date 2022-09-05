@@ -21,6 +21,18 @@ namespace FilesystemInterface
         return FSCommandResult.ERROR_GENERIC_INTERFACE;
     }
 
+    const char* GenericFilesystemInterface::CreateFile(const char* path, uint64_t sizeInBytes)
+    {
+        switch (this->InterfaceType)
+        {
+            case FilesystemInterfaceType::Mrafs:
+            {
+                return ((MrafsFilesystemInterface*)this)->CreateFile(path, sizeInBytes);
+            }
+        }
+        return FSCommandResult.ERROR_GENERIC_INTERFACE;
+    }
+
     const char* GenericFilesystemInterface::CreateFolder(const char* path)
     {
         switch (this->InterfaceType)
@@ -213,6 +225,30 @@ namespace FilesystemInterface
             case FilesystemInterfaceType::Mrafs:
             {
                 return ((MrafsFilesystemInterface*)this)->WriteFile(path, byteCount, buffer);
+            }
+        }
+        return FSCommandResult.ERROR_GENERIC_INTERFACE;
+    }
+
+    const char* GenericFilesystemInterface::ReadFileBuffer(const char* path, uint64_t address, uint64_t byteCount, void* buffer)
+    {
+        switch (this->InterfaceType)
+        {
+            case FilesystemInterfaceType::Mrafs:
+            {
+                return ((MrafsFilesystemInterface*)this)->ReadFileBuffer(path, address, byteCount, buffer);
+            }
+        }
+        return FSCommandResult.ERROR_GENERIC_INTERFACE;
+    }
+
+    const char* GenericFilesystemInterface::WriteFileBuffer(const char* path, uint64_t address, uint64_t byteCount, void* buffer)
+    {
+        switch (this->InterfaceType)
+        {
+            case FilesystemInterfaceType::Mrafs:
+            {
+                return ((MrafsFilesystemInterface*)this)->WriteFileBuffer(path, address, byteCount, buffer);
             }
         }
         return FSCommandResult.ERROR_GENERIC_INTERFACE;
