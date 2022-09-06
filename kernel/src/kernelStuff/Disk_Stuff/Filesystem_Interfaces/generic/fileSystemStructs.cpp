@@ -44,6 +44,7 @@ namespace FilesystemInterface
     void FolderInfo::Destroy()
     {
         this->baseInfo.Destroy();
+        free(this);
     }
 
     FileInfo::FileInfo(BaseInfo baseInfo, uint64_t sizeInBytes, uint64_t locationInBytes)
@@ -55,5 +56,6 @@ namespace FilesystemInterface
     void FileInfo::Destroy()
     {
         this->baseInfo.Destroy();
+        free(this);
     }
 }

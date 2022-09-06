@@ -985,7 +985,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                                 for (int i = 0; i < fCount; i++)
                                 {
                                     window->renderer->Println(" - \"{}\"", files[i], Colors.yellow);
-                                    //free((void*)files[i]);
+                                    free((void*)files[i]);
                                 }
                                 if (fCount != 0)
                                     free(files);

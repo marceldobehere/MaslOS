@@ -22,7 +22,7 @@ namespace FilesystemInterface
             while (count--)
             {
                 fsFileList[0]->Destroy();
-                fsFileList.removeAt(0);
+                fsFileList.removeFirst();
             }
         }
 
@@ -31,11 +31,18 @@ namespace FilesystemInterface
             while (count--)
             {
                 fsFolderList[0]->Destroy();
-                fsFolderList.removeAt(0);
+                fsFolderList.removeFirst();
             }
         }
 
-        fsPartitionList.clear();
+        {
+            uint64_t count = fsPartitionList.getCount();
+            while (count--)
+            {
+                free(fsPartitionList[0]);
+                fsPartitionList.removeFirst();
+            }
+        }
     }
 
     int64_t MrafsFilesystemInterface::GetIndexOfPartitionFromLocation(uint64_t location)
@@ -535,6 +542,7 @@ namespace FilesystemInterface
                         continue;
                     const char* newFilename = StrReplaceStartingStuffWith(filename, oldPath, newPath);
                     CopyFile(filename, newFilename);
+                    free((void*)files[i]);
                 }
                 free(files);
             }
@@ -557,6 +565,7 @@ namespace FilesystemInterface
                         continue;
                     const char* newFoldername = StrReplaceStartingStuffWith(foldername, oldPath, newPath);
                     CopyFolder(foldername, newFoldername);
+                    free((void*)folders[i]);
                 }
                 free(folders);
             }
@@ -668,6 +677,7 @@ namespace FilesystemInterface
                         continue;
                     const char* newFilename = StrReplaceStartingStuffWith(filename, oldPath, newPath);
                     RenameFile(filename, newFilename);
+                    free((void*)filename);
                 }
                 free(files);
             }
@@ -690,6 +700,7 @@ namespace FilesystemInterface
                         continue;
                     const char* newFoldername = StrReplaceStartingStuffWith(foldername, oldPath, newPath);
                     RenameFolder(foldername, newFoldername);
+                    free((void*)foldername);
                 }
                 free(folders);
             }
