@@ -564,10 +564,15 @@ namespace FilesystemInterface
 
         //osData.debugTerminalWindow->Log("Bruh 4");
 
+        // {
+        //     free((void*)folder->baseInfo.path);
+        //     folder->baseInfo.path = StrCopy(newPath);
+        //     folder->baseInfo.pathLen = StrLen(folder->baseInfo.path);
+        // }
+
         {
-            free((void*)folder->baseInfo.path);
-            folder->baseInfo.path = StrCopy(newPath);
-            folder->baseInfo.pathLen = StrLen(folder->baseInfo.path);
+            FolderInfo* newFolder = new FolderInfo(BaseInfo(newPath, false, false, false));
+            fsFolderList.add(newFolder);
         }
 
         //osData.debugTerminalWindow->Log("Bruh 5 (DONE)");

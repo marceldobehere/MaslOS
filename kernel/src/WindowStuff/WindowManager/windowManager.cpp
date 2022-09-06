@@ -162,21 +162,33 @@ namespace WindowManager
         if (osData.drawBackground)
         {
             for (int y = y1; y <= y2; y++)
+            {
+                int64_t yIndex = (((y * background->Height)/virtualScreenBuffer->Height)*background->Width);
                 for (int x = x1; x <= x2; x++)
                 {
                     int64_t index = x + y * virtualScreenBuffer->Width;
-                    int64_t index2 = ((x * background->Width)/virtualScreenBuffer->Width) + (((y * background->Height)/virtualScreenBuffer->Height)*background->Width);
+                    int64_t index2 = ((x * background->Width)/virtualScreenBuffer->Width) + yIndex;
                     (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = &((uint32_t*)background->BaseAddress)[index2];//&defaultBackgroundColor;
                 }
+            }
         }
         else
         {
+            // uint32_t** tempBuffEnd = (uint32_t**)((uint64_t)virtualScreenBuffer->BaseAddress + virtualScreenBuffer->BufferSize);
+            // uint32_t* colPointer = &defaultBackgroundColor;
+            // for (uint32_t** tempBuff = (uint32_t**)virtualScreenBuffer->BaseAddress; tempBuff < tempBuffEnd; tempBuff++)
+            //     *tempBuff = colPointer;
+
+            uint32_t* colPointer = &defaultBackgroundColor;
             for (int y = y1; y <= y2; y++)
+            {
+                int64_t yIndex = y * virtualScreenBuffer->Width;
                 for (int x = x1; x <= x2; x++)
-                {
-                    int64_t index = x + y * virtualScreenBuffer->Width;
-                    (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = &defaultBackgroundColor;
-                }
+                {    
+                        //int64_t index = x + y * virtualScreenBuffer->Width;
+                        (((uint32_t**)virtualScreenBuffer->BaseAddress)[x + yIndex]) = colPointer;
+                }   
+            } 
         }
 
         int64_t ypos = virtualScreenBuffer->Height - taskbar->Height;
