@@ -7,12 +7,14 @@
 const uint32_t HeapMagicNum = 2406789212;
 
 int64_t heapCount = 0;
+int64_t usedHeapCount = 0;
 void* heapStart;
 void* heapEnd;
 HeapSegHdr* lastHdr;
 
 int64_t mallocCount = 0;
 int64_t freeCount = 0;
+int64_t activeMemFlagVal = 0;
 
 
 void HeapSegHdr::CombineForward()
@@ -136,6 +138,8 @@ void InitializeHeap(void* heapAddress, size_t pageCount)
     AddToStack();
     void* pos = heapAddress;
 
+    activeMemFlagVal = 0;
+
     for (size_t i = 0; i < pageCount; i++)
     {
         //uint64_t addr = (uint64_t)GlobalAllocator->RequestPage();
@@ -156,8 +160,10 @@ void InitializeHeap(void* heapAddress, size_t pageCount)
     startSeg->free = true;
     startSeg->text = "<FREE>";
     startSeg->magicNum = HeapMagicNum;
+    startSeg->activeMemFlagVal = activeMemFlagVal;
     lastHdr = startSeg;
     heapCount = 1;
+    usedHeapCount = 0;
 
     RemoveFromStack();
 }
@@ -201,7 +207,9 @@ void* malloc(size_t size, const char* text)
                 }
                 current->free = false;
                 current->text = text;
+                current->activeMemFlagVal = activeMemFlagVal;
                 mallocCount++;
+                usedHeapCount++;
                 RemoveFromStack();
                 return (void*)((uint64_t)current + sizeof(HeapSegHdr));
             }
@@ -209,7 +217,9 @@ void* malloc(size_t size, const char* text)
             {
                 current->free = false;
                 current->text = text;
+                current->activeMemFlagVal = activeMemFlagVal;
                 mallocCount++;
+                usedHeapCount++;
                 RemoveFromStack();
                 return (void*)((uint64_t)current + sizeof(HeapSegHdr));
             }
@@ -221,7 +231,7 @@ void* malloc(size_t size, const char* text)
     //GlobalRenderer->Println("Requesting more RAM.");
     ExpandHeap(size);
     void* res = malloc(size, text);
-    mallocCount++;
+    //mallocCount++;
     RemoveFromStack();
     return res;
 }
@@ -244,6 +254,7 @@ void free(void* address)
             //GlobalRenderer->Print("-");
             segment->CombineBackward();
             //GlobalRenderer->Print(">");
+            usedHeapCount--;
         }
         else
         {

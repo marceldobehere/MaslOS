@@ -638,7 +638,9 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                                 }
                                 else if (StrEquals(data->data[5], "list"))
                                 {
+                                    AddToStack();
                                     const char* res = fsInterface->LoadFSTable();
+                                    RemoveFromStack();
                                     if (res == FilesystemInterface::FSCommandResult.SUCCESS)
                                     {
                                         //window->renderer->Println("Filesystem Interface Load Success!");
@@ -647,6 +649,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                                         {
                                             FilesystemInterface::MrafsFilesystemInterface* mrafsInterface = (FilesystemInterface::MrafsFilesystemInterface*)fsInterface;
 
+                                            AddToStack();
                                             {
                                                 uint64_t partCount = mrafsInterface->fsPartitionList.getCount();
                                                 window->renderer->Println("Partition Count: {}", to_string(partCount), Colors.yellow);
@@ -660,7 +663,9 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                                                     window->renderer->Println("    - Size:        {} Bytes", to_string(info->sizeInBytes), Colors.yellow);
                                                 }
                                             }
-
+                                            RemoveFromStack();
+                                            
+                                            AddToStack();
                                             {
                                                 uint64_t partCount = mrafsInterface->fsFileList.getCount();
                                                 window->renderer->Println("File Count: {}", to_string(partCount), Colors.yellow);
@@ -669,16 +674,18 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                                                 {   
                                                     FilesystemInterface::FileInfo* info = mrafsInterface->fsFileList[i];
                                                     window->renderer->Println(" + File {}:", to_string(i), Colors.orange);
-                                                    window->renderer->Println("    - Path:        \"{}\"", info->baseInfo.path, Colors.yellow);
-                                                    window->renderer->Println("    - Hidden:      {}", info->baseInfo.hidden ? "true" : "false", Colors.yellow);
-                                                    window->renderer->Println("    - System File: {}", info->baseInfo.systemFile ? "true" : "false", Colors.yellow);
-                                                    window->renderer->Println("    - Readonly:    {}", info->baseInfo .writeProtected ? "true" : "false", Colors.yellow);
+                                                    window->renderer->Println("    - Path:        \"{}\"", info->baseInfo->path, Colors.yellow);
+                                                    window->renderer->Println("    - Hidden:      {}", info->baseInfo->hidden ? "true" : "false", Colors.yellow);
+                                                    window->renderer->Println("    - System File: {}", info->baseInfo->systemFile ? "true" : "false", Colors.yellow);
+                                                    window->renderer->Println("    - Readonly:    {}", info->baseInfo->writeProtected ? "true" : "false", Colors.yellow);
 
                                                     window->renderer->Println("    - Location:    0x{}", ConvertHexToString((uint64_t)info->locationInBytes), Colors.yellow);
                                                     window->renderer->Println("    - Size:        {} Bytes", to_string(info->sizeInBytes), Colors.yellow);
                                                 }
                                             }
-
+                                            RemoveFromStack();
+                                            
+                                            AddToStack();
                                             {
                                                 uint64_t partCount = mrafsInterface->fsFolderList.getCount();
                                                 window->renderer->Println("Folder Count: {}", to_string(partCount), Colors.yellow);
@@ -687,12 +694,13 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                                                 {   
                                                     FilesystemInterface::FolderInfo* info = mrafsInterface->fsFolderList[i];
                                                     window->renderer->Println(" + Folder {}:", to_string(i), Colors.orange);
-                                                    window->renderer->Println("    - Path:        \"{}\"", info->baseInfo.path, Colors.yellow);
-                                                    window->renderer->Println("    - Hidden:      {}", info->baseInfo.hidden ? "true" : "false", Colors.yellow);
-                                                    window->renderer->Println("    - System File: {}", info->baseInfo.systemFile ? "true" : "false", Colors.yellow);
-                                                    window->renderer->Println("    - Readonly:    {}", info->baseInfo .writeProtected ? "true" : "false", Colors.yellow);
+                                                    window->renderer->Println("    - Path:        \"{}\"", info->baseInfo->path, Colors.yellow);
+                                                    window->renderer->Println("    - Hidden:      {}", info->baseInfo->hidden ? "true" : "false", Colors.yellow);
+                                                    window->renderer->Println("    - System File: {}", info->baseInfo->systemFile ? "true" : "false", Colors.yellow);
+                                                    window->renderer->Println("    - Readonly:    {}", info->baseInfo->writeProtected ? "true" : "false", Colors.yellow);
                                                 }
                                             }
+                                            RemoveFromStack();
                                         }
                                         else
                                         {
@@ -793,6 +801,8 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                             for (uint64_t i = 0; i < byteCount; i++)
                                 window->renderer->Print(buffer[i]);
                             window->renderer->Println();
+                            if (byteCount != 0)
+                                free(buffer);
                         }
                         else
                             LogError("No valid arguments passed!", window);
@@ -1196,6 +1206,10 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
     {
         (*user)->userName = StrCopy(val);
     }
+    else if (StrEquals(name, "amfv") || StrEquals(name, "active memory flag value"))
+    {
+        activeMemFlagVal= to_int(val);
+    }
     else if (StrEquals(name, "debug terminal"))
     {
         if (StrEquals(val, "on") || StrEquals(val, "shown"))
@@ -1404,19 +1418,28 @@ void GetCmd(const char* name, OSUser* user, Window* window)
             uint64_t totalSegCount = 0, freeSegCount = 0, usedSegCount = 0, totalSegSpace = 0, freeSegSpace = 0, usedSegSpace = 0; 
             for (HeapSegHdr* current = (HeapSegHdr*) heapStart; current != NULL; current = current->next)
             {
-                dispVar vars[] = {dispVar(totalSegCount), dispVar(current->length), dispVar(current->text)};
+                dispVar vars[] = {dispVar(totalSegCount), dispVar(current->length), dispVar(current->text), dispVar(current->activeMemFlagVal)};
+                uint32_t col = Colors.gray;
                 if (current->free)
                 {
                     freeSegCount += 1;
                     freeSegSpace += current->length;
-                    window->renderer->Println("> Heap# {0} - Size: {1} Bytes, Title: \"{2}\"", vars, Colors.green);
+                    if (current->activeMemFlagVal == activeMemFlagVal && activeMemFlagVal != 0)
+                        col = Colors.bgreen;
+                    else
+                        col = Colors.green;
                 }
                 else
                 {
                     usedSegCount += 1;
                     usedSegSpace += current->length;
-                    window->renderer->Println("> Heap# {0} - Size: {1} Bytes, Title: \"{2}\"", vars, Colors.bred);
+                    if (current->activeMemFlagVal == activeMemFlagVal && activeMemFlagVal != 0)
+                        col = Colors.yellow;
+                    else
+                        col = Colors.bred;
                 }
+                
+                window->renderer->Println("> Heap# {0} - Size: {1} Bytes, Title: \"{2}\", AMFV: {3}", vars, col);
 
                 totalSegCount += 1;
                 totalSegSpace += current->length;

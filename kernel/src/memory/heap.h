@@ -10,6 +10,7 @@ struct HeapSegHdr
     HeapSegHdr* next;
     HeapSegHdr* last;
     const char* text = "<DEF>";
+    int64_t activeMemFlagVal = 0;
     bool free;
     void CombineForward();
     void CombineBackward();
@@ -35,8 +36,10 @@ extern void* heapStart;
 
 extern int64_t heapCount;
 
+extern int64_t usedHeapCount;
 extern int64_t mallocCount;
 extern int64_t freeCount;
+extern int64_t activeMemFlagVal;
 
 inline void* operator new(size_t size) {return malloc(size);}
 inline void* operator new[](size_t size) {return malloc(size);}

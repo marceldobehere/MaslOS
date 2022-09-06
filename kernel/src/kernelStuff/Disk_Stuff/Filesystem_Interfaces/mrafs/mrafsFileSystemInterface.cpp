@@ -229,7 +229,7 @@ namespace FilesystemInterface
         for (uint64_t index = 0; index < count; index++)
         {
             FileInfo* info = fsFileList[index];
-            if (StrEquals(info->baseInfo.path, path))
+            if (StrEquals(info->baseInfo->path, path))
                 return info;
         }
 
@@ -242,7 +242,7 @@ namespace FilesystemInterface
         for (uint64_t index = 0; index < count; index++)
         {
             FolderInfo* info = fsFolderList[index];
-            if (StrEquals(info->baseInfo.path, path))
+            if (StrEquals(info->baseInfo->path, path))
                 return info;
         }
 
@@ -263,7 +263,7 @@ namespace FilesystemInterface
         if (file != NULL)
             return FSCommandResult.ERROR_FILE_ALREADY_EXISTS;
         
-        file = new FileInfo(BaseInfo(path, false, false, false), 0, 0);
+        file = new FileInfo(new BaseInfo(path, false, false, false), 0, 0);
         fsFileList.add(file);
 
         return SaveFSTable();//return FSCommandResult.SUCCESS;
@@ -282,7 +282,7 @@ namespace FilesystemInterface
         if (info != NULL)
             return FSCommandResult.ERROR_FILE_ALREADY_EXISTS;
         
-        info = new FileInfo(BaseInfo(path, false, false, false), 0, 0);
+        info = new FileInfo(new BaseInfo(path, false, false, false), 0, 0);
         fsFileList.add(info);
 
         //osData.mainTerminalWindow->Log("BRUH X4, Count: {}", to_string(fsPartitionList.getCount()), Colors.yellow);
@@ -312,8 +312,10 @@ namespace FilesystemInterface
         if (folder != NULL)
             return FSCommandResult.ERROR_FILE_ALREADY_EXISTS;
         
-        folder = new FolderInfo(BaseInfo(path, false, false, false));
+
+        folder = new FolderInfo(new BaseInfo(path, false, false, false));
         fsFolderList.add(folder);
+
 
         return SaveFSTable();//return FSCommandResult.SUCCESS;
     }
@@ -352,7 +354,6 @@ namespace FilesystemInterface
         file->locationInBytes = 0;
 
         file->Destroy();
-        free(file);
         fsFileList.removeAt(fIndex);
 
         
@@ -379,7 +380,7 @@ namespace FilesystemInterface
 
         {
             uint64_t fileCount = 0;
-            const char** files = GetFiles(folder->baseInfo.path, &fileCount);
+            const char** files = GetFiles(folder->baseInfo->path, &fileCount);
             if (fileCount != 0)
             {
                 for (int i = 0; i < fileCount; i++)
@@ -393,7 +394,7 @@ namespace FilesystemInterface
 
         {
             uint64_t folderCount = 0;
-            const char** folders = GetFolders(folder->baseInfo.path, &folderCount);
+            const char** folders = GetFolders(folder->baseInfo->path, &folderCount);
             if (folderCount != 0)
             {
                 for (int i = 0; i < folderCount; i++)
@@ -406,16 +407,16 @@ namespace FilesystemInterface
         }
 
 
-        // const char* basePath = StrCombine(folder->baseInfo.path, "/");
+        // const char* basePath = StrCombine(folder->baseInfo->path, "/");
 
         // {
         //     uint64_t count = fsFileList.getCount();
         //     for (int index = 0; index < count; index++)
         //     {
         //         FileInfo* info = fsFileList[index];
-        //         if (StrStartsWith(info->baseInfo.path, basePath))
+        //         if (StrStartsWith(info->baseInfo->path, basePath))
         //         {
-        //             DeleteFile(info->baseInfo.path);
+        //             DeleteFile(info->baseInfo->path);
         //             index = -1;
         //         }
         //     }
@@ -426,9 +427,9 @@ namespace FilesystemInterface
         //     for (int index = 0; index < count; index++)
         //     {
         //         FolderInfo* info = fsFolderList[index];
-        //         if (StrStartsWith(info->baseInfo.path, basePath))
+        //         if (StrStartsWith(info->baseInfo->path, basePath))
         //         {
-        //             DeleteFolder(info->baseInfo.path);
+        //             DeleteFolder(info->baseInfo->path);
         //             index = -1;
         //         }
         //     }
@@ -436,8 +437,11 @@ namespace FilesystemInterface
 
         // free((void*)basePath);
 
+        fIndex = fsFolderList.getIndexOf(folder);
+        if (fIndex == -1)
+            return FSCommandResult.ERROR_FOLDER_NOT_FOUND;
+
         folder->Destroy();
-        free(folder);
         fsFolderList.removeAt(fIndex);
         
         return SaveFSTable();//return FSCommandResult.SUCCESS;
@@ -475,11 +479,18 @@ namespace FilesystemInterface
             return FSCommandResult.ERROR_FILE_NOT_FOUND;
 
         {
-            const char* tempPath = newFile->baseInfo.path;
-            uint16_t tempLen = newFile->baseInfo.pathLen;
-            newFile->baseInfo = file->baseInfo;
-            newFile->baseInfo.path = tempPath;
-            newFile->baseInfo.pathLen = tempLen;
+            // const char* tempPath = newFile->baseInfo->path;
+            // uint16_t tempLen = newFile->baseInfo->pathLen;
+            // newFile->baseInfo->hidden = file->baseInfo->hidden;
+            // newFile->baseInfo = file->baseInfo;
+            // newFile->baseInfo->path = tempPath;
+            // newFile->baseInfo->pathLen = tempLen;
+        }
+
+        {
+            newFile->baseInfo->hidden = file->baseInfo->hidden;
+            newFile->baseInfo->systemFile = file->baseInfo->systemFile;
+            newFile->baseInfo->writeProtected = file->baseInfo->writeProtected;
         }
 
         {
@@ -529,7 +540,7 @@ namespace FilesystemInterface
 
         {
             uint64_t fileCount = 0;
-            const char** files = GetFiles(folder->baseInfo.path, &fileCount);
+            const char** files = GetFiles(folder->baseInfo->path, &fileCount);
             //osData.debugTerminalWindow->Log("File count: {}", to_string(fileCount), Colors.yellow);
             if (fileCount != 0)
             {
@@ -542,6 +553,7 @@ namespace FilesystemInterface
                         continue;
                     const char* newFilename = StrReplaceStartingStuffWith(filename, oldPath, newPath);
                     CopyFile(filename, newFilename);
+                    free((void*)newFilename);
                     free((void*)files[i]);
                 }
                 free(files);
@@ -552,7 +564,7 @@ namespace FilesystemInterface
 
         {
             uint64_t folderCount = 0;
-            const char** folders = GetFolders(folder->baseInfo.path, &folderCount);
+            const char** folders = GetFolders(folder->baseInfo->path, &folderCount);
             //osData.debugTerminalWindow->Log("Folder count: {}", to_string(folderCount), Colors.yellow);
             if (folderCount != 0)
             {
@@ -565,6 +577,7 @@ namespace FilesystemInterface
                         continue;
                     const char* newFoldername = StrReplaceStartingStuffWith(foldername, oldPath, newPath);
                     CopyFolder(foldername, newFoldername);
+                    free((void*)newFoldername);
                     free((void*)folders[i]);
                 }
                 free(folders);
@@ -574,13 +587,13 @@ namespace FilesystemInterface
         //osData.debugTerminalWindow->Log("Bruh 4");
 
         // {
-        //     free((void*)folder->baseInfo.path);
-        //     folder->baseInfo.path = StrCopy(newPath);
-        //     folder->baseInfo.pathLen = StrLen(folder->baseInfo.path);
+        //     free((void*)folder->baseInfo->path);
+        //     folder->baseInfo->path = StrCopy(newPath);
+        //     folder->baseInfo->pathLen = StrLen(folder->baseInfo->path);
         // }
 
         {
-            FolderInfo* newFolder = new FolderInfo(BaseInfo(newPath, false, false, false));
+            FolderInfo* newFolder = new FolderInfo(new BaseInfo(newPath, false, false, false));
             fsFolderList.add(newFolder);
         }
 
@@ -620,11 +633,11 @@ namespace FilesystemInterface
             return FSCommandResult.ERROR_FOLDER_ALREADY_EXISTS;
         
         //osData.debugTerminalWindow->renderer->Print("A - ");
-        free((void*)file->baseInfo.path);
+        free((void*)file->baseInfo->path);
         //osData.debugTerminalWindow->renderer->Print("B - ");
-        file->baseInfo.path = StrCopy(newPath);
+        file->baseInfo->path = StrCopy(newPath);
         //osData.debugTerminalWindow->renderer->Print("C - ");
-        file->baseInfo.pathLen = StrLen(file->baseInfo.path);
+        file->baseInfo->pathLen = StrLen(file->baseInfo->path);
         //osData.debugTerminalWindow->renderer->Println("D");
 
         return SaveFSTable();
@@ -664,7 +677,7 @@ namespace FilesystemInterface
 
         {
             uint64_t fileCount = 0;
-            const char** files = GetFiles(folder->baseInfo.path, &fileCount);
+            const char** files = GetFiles(folder->baseInfo->path, &fileCount);
             //osData.debugTerminalWindow->Log("File count: {}", to_string(fileCount), Colors.yellow);
             if (fileCount != 0)
             {
@@ -677,6 +690,7 @@ namespace FilesystemInterface
                         continue;
                     const char* newFilename = StrReplaceStartingStuffWith(filename, oldPath, newPath);
                     RenameFile(filename, newFilename);
+                    free((void*)newFilename);
                     free((void*)filename);
                 }
                 free(files);
@@ -687,7 +701,7 @@ namespace FilesystemInterface
 
         {
             uint64_t folderCount = 0;
-            const char** folders = GetFolders(folder->baseInfo.path, &folderCount);
+            const char** folders = GetFolders(folder->baseInfo->path, &folderCount);
             //osData.debugTerminalWindow->Log("Folder count: {}", to_string(folderCount), Colors.yellow);
             if (folderCount != 0)
             {
@@ -700,6 +714,7 @@ namespace FilesystemInterface
                         continue;
                     const char* newFoldername = StrReplaceStartingStuffWith(foldername, oldPath, newPath);
                     RenameFolder(foldername, newFoldername);
+                    free((void*)newFoldername);
                     free((void*)foldername);
                 }
                 free(folders);
@@ -709,9 +724,9 @@ namespace FilesystemInterface
         //osData.debugTerminalWindow->Log("Bruh 4");
 
         {
-            free((void*)folder->baseInfo.path);
-            folder->baseInfo.path = StrCopy(newPath);
-            folder->baseInfo.pathLen = StrLen(folder->baseInfo.path);
+            free((void*)folder->baseInfo->path);
+            folder->baseInfo->path = StrCopy(newPath);
+            folder->baseInfo->pathLen = StrLen(folder->baseInfo->path);
         }
 
         //osData.debugTerminalWindow->Log("Bruh 5 (DONE)");
@@ -791,13 +806,13 @@ namespace FilesystemInterface
                 for (int index = 0; index < count; index++)
                 {
                     FileInfo* info = fsFileList[index];
-                    int diff = StrCountChr(info->baseInfo.path, '/'); 
+                    int diff = StrCountChr(info->baseInfo->path, '/'); 
                     //osData.mainTerminalWindow->Log("Slash Diff: {}", to_string(diff), Colors.yellow);
                     if (diff != 0)
                         continue;
                     
                     fCount++;
-                    fSize += info->baseInfo.pathLen + 1;
+                    fSize += info->baseInfo->pathLen + 1;
                 }
             }
             const char** strList = NULL;
@@ -810,11 +825,11 @@ namespace FilesystemInterface
                     for (int index = 0; index < count; index++)
                     {
                         FileInfo* info = fsFileList[index];
-                        int diff = StrCountChr(info->baseInfo.path, '/'); 
+                        int diff = StrCountChr(info->baseInfo->path, '/'); 
                         if (diff != 0)
                             continue;
                         
-                        strList[fCount] = StrCopy(info->baseInfo.path);
+                        strList[fCount] = StrCopy(info->baseInfo->path);
                         fCount++;
                     }
                 }
@@ -829,7 +844,7 @@ namespace FilesystemInterface
             if (folder == NULL)
                 return NULL;
             
-            const char* basePath = StrCombine(folder->baseInfo.path, "/");
+            const char* basePath = StrCombine(folder->baseInfo->path, "/");
             int baseSlashCount = StrCountChr(basePath, '/');
             //osData.mainTerminalWindow->Log(basePath);
             //osData.mainTerminalWindow->Log("Slash: {}", to_string(baseSlashCount), Colors.yellow);
@@ -840,14 +855,14 @@ namespace FilesystemInterface
                 for (int index = 0; index < count; index++)
                 {
                     FileInfo* info = fsFileList[index];
-                    int diff = StrCountChr(info->baseInfo.path, '/') - baseSlashCount; 
+                    int diff = StrCountChr(info->baseInfo->path, '/') - baseSlashCount; 
                     //osData.mainTerminalWindow->Log("Slash Diff: {}", to_string(diff), Colors.yellow);
                     if (diff != 0)
                         continue;
-                    if (StrStartsWith(info->baseInfo.path, basePath))
+                    if (StrStartsWith(info->baseInfo->path, basePath))
                     {
                         fCount++;
-                        fSize += info->baseInfo.pathLen + 1;
+                        fSize += info->baseInfo->pathLen + 1;
                     }
                 }
             }
@@ -861,12 +876,12 @@ namespace FilesystemInterface
                     for (int index = 0; index < count; index++)
                     {
                         FileInfo* info = fsFileList[index];
-                        int diff = StrCountChr(info->baseInfo.path, '/') - baseSlashCount; 
+                        int diff = StrCountChr(info->baseInfo->path, '/') - baseSlashCount; 
                         if (diff != 0)
                             continue;
-                        if (StrStartsWith(info->baseInfo.path, basePath))
+                        if (StrStartsWith(info->baseInfo->path, basePath))
                         {
-                            strList[fCount] = StrCopy(info->baseInfo.path);
+                            strList[fCount] = StrCopy(info->baseInfo->path);
                             fCount++;
                         }
                     }
@@ -901,12 +916,12 @@ namespace FilesystemInterface
                 for (int index = 0; index < count; index++)
                 {
                     FolderInfo* info = fsFolderList[index];
-                    int diff = StrCountChr(info->baseInfo.path, '/'); 
+                    int diff = StrCountChr(info->baseInfo->path, '/'); 
                     if (diff != 0)
                         continue;
                     
                     fCount++;
-                    fSize += info->baseInfo.pathLen + 1;
+                    fSize += info->baseInfo->pathLen + 1;
                 }
             }
             const char** strList = NULL;
@@ -919,11 +934,11 @@ namespace FilesystemInterface
                     for (int index = 0; index < count; index++)
                     {
                         FolderInfo* info = fsFolderList[index];
-                        int diff = StrCountChr(info->baseInfo.path, '/'); 
+                        int diff = StrCountChr(info->baseInfo->path, '/'); 
                         if (diff != 0)
                             continue;
 
-                        strList[fCount] = StrCopy(info->baseInfo.path);
+                        strList[fCount] = StrCopy(info->baseInfo->path);
                         fCount++;
                     }
                 }
@@ -939,7 +954,7 @@ namespace FilesystemInterface
             if (folder == NULL)
                 return NULL;
             
-            const char* basePath = StrCombine(folder->baseInfo.path, "/");
+            const char* basePath = StrCombine(folder->baseInfo->path, "/");
             int baseSlashCount = StrCountChr(basePath, '/');
 
             uint64_t fCount = 0;
@@ -949,13 +964,13 @@ namespace FilesystemInterface
                 for (int index = 0; index < count; index++)
                 {
                     FolderInfo* info = fsFolderList[index];
-                    int diff = StrCountChr(info->baseInfo.path, '/') - baseSlashCount; 
+                    int diff = StrCountChr(info->baseInfo->path, '/') - baseSlashCount; 
                     if (diff != 0)
                         continue;
-                    if (StrStartsWith(info->baseInfo.path, basePath))
+                    if (StrStartsWith(info->baseInfo->path, basePath))
                     {
                         fCount++;
-                        fSize += info->baseInfo.pathLen + 1;
+                        fSize += info->baseInfo->pathLen + 1;
                     }
                 }
             }
@@ -969,12 +984,12 @@ namespace FilesystemInterface
                     for (int index = 0; index < count; index++)
                     {
                         FolderInfo* info = fsFolderList[index];
-                        int diff = StrCountChr(info->baseInfo.path, '/') - baseSlashCount; 
+                        int diff = StrCountChr(info->baseInfo->path, '/') - baseSlashCount; 
                         if (diff != 0)
                             continue;
-                        if (StrStartsWith(info->baseInfo.path, basePath))
+                        if (StrStartsWith(info->baseInfo->path, basePath))
                         {
-                            strList[fCount] = StrCopy(info->baseInfo.path);
+                            strList[fCount] = StrCopy(info->baseInfo->path);
                             fCount++;
                         }
                     }
@@ -1226,10 +1241,10 @@ namespace FilesystemInterface
         for (uint32_t i = 0; i < fsFileCount; i++)
         {
             FileInfo* fsFileInfo = fsFileList[i]; 
-            totalSize += sizeof(fsFileInfo->baseInfo.hidden);
-            totalSize += sizeof(fsFileInfo->baseInfo.systemFile);
-            totalSize += sizeof(fsFileInfo->baseInfo.writeProtected);
-            totalSize += sizeof(fsFileInfo->baseInfo.pathLen) + fsFileInfo->baseInfo.pathLen;
+            totalSize += sizeof(fsFileInfo->baseInfo->hidden);
+            totalSize += sizeof(fsFileInfo->baseInfo->systemFile);
+            totalSize += sizeof(fsFileInfo->baseInfo->writeProtected);
+            totalSize += sizeof(fsFileInfo->baseInfo->pathLen) + fsFileInfo->baseInfo->pathLen;
 
             totalSize += sizeof(fsFileInfo->locationInBytes);
             totalSize += sizeof(fsFileInfo->sizeInBytes);
@@ -1237,10 +1252,10 @@ namespace FilesystemInterface
         for (uint32_t i = 0; i < fsFolderCount; i++)
         {
             FolderInfo* fsFolderInfo = fsFolderList[i]; 
-            totalSize += sizeof(fsFolderInfo->baseInfo.hidden);
-            totalSize += sizeof(fsFolderInfo->baseInfo.systemFile);
-            totalSize += sizeof(fsFolderInfo->baseInfo.writeProtected);
-            totalSize += sizeof(fsFolderInfo->baseInfo.pathLen) + fsFolderInfo->baseInfo.pathLen;
+            totalSize += sizeof(fsFolderInfo->baseInfo->hidden);
+            totalSize += sizeof(fsFolderInfo->baseInfo->systemFile);
+            totalSize += sizeof(fsFolderInfo->baseInfo->writeProtected);
+            totalSize += sizeof(fsFolderInfo->baseInfo->pathLen) + fsFolderInfo->baseInfo->pathLen;
         }
         
         //sizeof(FileInfo);
@@ -1284,21 +1299,21 @@ namespace FilesystemInterface
             {
                 FileInfo* fsFileInfo = fsFileList[i]; 
 
-                *((uint8_t*)tBuffer) = (uint8_t)fsFileInfo->baseInfo.hidden;
+                *((uint8_t*)tBuffer) = (uint8_t)fsFileInfo->baseInfo->hidden;
                 tBuffer += 1;
-                *((uint8_t*)tBuffer) = (uint8_t)fsFileInfo->baseInfo.systemFile;
+                *((uint8_t*)tBuffer) = (uint8_t)fsFileInfo->baseInfo->systemFile;
                 tBuffer += 1;
-                *((uint8_t*)tBuffer) = (uint8_t)fsFileInfo->baseInfo.writeProtected;
+                *((uint8_t*)tBuffer) = (uint8_t)fsFileInfo->baseInfo->writeProtected;
                 tBuffer += 1;
 
-                *((uint16_t*)tBuffer) = (uint16_t)fsFileInfo->baseInfo.pathLen;
+                *((uint16_t*)tBuffer) = (uint16_t)fsFileInfo->baseInfo->pathLen;
                 tBuffer += 2;
 
-                //osData.mainTerminalWindow->Log("File Path:          \"{}\"", fsFileInfo->baseInfo.path, Colors.orange);
-                //osData.mainTerminalWindow->Log("File Path Len:      \"{}\"", to_string(fsFileInfo->baseInfo.pathLen), Colors.orange);
-                for (uint16_t index = 0; index < fsFileInfo->baseInfo.pathLen; index++)
+                //osData.mainTerminalWindow->Log("File Path:          \"{}\"", fsFileInfo->baseInfo->path, Colors.orange);
+                //osData.mainTerminalWindow->Log("File Path Len:      \"{}\"", to_string(fsFileInfo->baseInfo->pathLen), Colors.orange);
+                for (uint16_t index = 0; index < fsFileInfo->baseInfo->pathLen; index++)
                 {
-                    *((uint8_t*)tBuffer) = (uint8_t)fsFileInfo->baseInfo.path[index];
+                    *((uint8_t*)tBuffer) = (uint8_t)fsFileInfo->baseInfo->path[index];
                     tBuffer += 1;
                 }
                 
@@ -1312,20 +1327,20 @@ namespace FilesystemInterface
             {
                 FolderInfo* fsFolderInfo = fsFolderList[i]; 
 
-                *((uint8_t*)tBuffer) = (uint8_t)fsFolderInfo->baseInfo.hidden;
+                *((uint8_t*)tBuffer) = (uint8_t)fsFolderInfo->baseInfo->hidden;
                 tBuffer += 1;
-                *((uint8_t*)tBuffer) = (uint8_t)fsFolderInfo->baseInfo.systemFile;
+                *((uint8_t*)tBuffer) = (uint8_t)fsFolderInfo->baseInfo->systemFile;
                 tBuffer += 1;
-                *((uint8_t*)tBuffer) = (uint8_t)fsFolderInfo->baseInfo.writeProtected;
+                *((uint8_t*)tBuffer) = (uint8_t)fsFolderInfo->baseInfo->writeProtected;
                 tBuffer += 1;
-                *((uint16_t*)tBuffer) = (uint16_t)fsFolderInfo->baseInfo.pathLen;
+                *((uint16_t*)tBuffer) = (uint16_t)fsFolderInfo->baseInfo->pathLen;
                 tBuffer += 2;
                 
-                //osData.mainTerminalWindow->Log("Folder Path:        \"{}\"", fsFolderInfo->baseInfo.path, Colors.orange);
-                //osData.mainTerminalWindow->Log("Folder Path Len:    \"{}\"", to_string(fsFolderInfo->baseInfo.pathLen), Colors.orange);
-                for (uint16_t index = 0; index < fsFolderInfo->baseInfo.pathLen; index++)
+                //osData.mainTerminalWindow->Log("Folder Path:        \"{}\"", fsFolderInfo->baseInfo->path, Colors.orange);
+                //osData.mainTerminalWindow->Log("Folder Path Len:    \"{}\"", to_string(fsFolderInfo->baseInfo->pathLen), Colors.orange);
+                for (uint16_t index = 0; index < fsFolderInfo->baseInfo->pathLen; index++)
                 {
-                    *((uint8_t*)tBuffer) = (uint8_t)fsFolderInfo->baseInfo.path[index];
+                    *((uint8_t*)tBuffer) = (uint8_t)fsFolderInfo->baseInfo->path[index];
                     tBuffer += 1;
                 }
             }
@@ -1421,24 +1436,25 @@ namespace FilesystemInterface
         {
             FileInfo* fsFileInfo = (FileInfo*)malloc(sizeof(FileInfo), "Filesystem File Info malloc");
             fsFileList.add(fsFileInfo);
+            fsFileInfo->baseInfo = (BaseInfo*)malloc(sizeof(BaseInfo), "Filesystem Base Info malloc");
 
-            fsFileInfo->baseInfo.hidden = *((uint8_t*)tBuffer);
+            fsFileInfo->baseInfo->hidden = *((uint8_t*)tBuffer);
             tBuffer += 1;
-            fsFileInfo->baseInfo.systemFile = *((uint8_t*)tBuffer);
+            fsFileInfo->baseInfo->systemFile = *((uint8_t*)tBuffer);
             tBuffer += 1;
-            fsFileInfo->baseInfo.writeProtected = *((uint8_t*)tBuffer);
+            fsFileInfo->baseInfo->writeProtected = *((uint8_t*)tBuffer);
             tBuffer += 1;
 
-            fsFileInfo->baseInfo.pathLen = *((uint16_t*)tBuffer);
+            fsFileInfo->baseInfo->pathLen = *((uint16_t*)tBuffer);
             tBuffer += 2;
 
-            //osData.mainTerminalWindow->Log("File Path:          \"{}\"", fsFileInfo->baseInfo.path, Colors.orange);
-            //osData.mainTerminalWindow->Log("File Path Len:      \"{}\"", to_string(fsFileInfo->baseInfo.pathLen), Colors.orange);
-            fsFileInfo->baseInfo.path = (char*)malloc(fsFileInfo->baseInfo.pathLen + 1, "Malloc for fs path string");
-            ((char*)fsFileInfo->baseInfo.path)[fsFileInfo->baseInfo.pathLen] = (uint8_t)0;
-            for (uint16_t index = 0; index < fsFileInfo->baseInfo.pathLen; index++)
+            //osData.mainTerminalWindow->Log("File Path:          \"{}\"", fsFileInfo->baseInfo->path, Colors.orange);
+            //osData.mainTerminalWindow->Log("File Path Len:      \"{}\"", to_string(fsFileInfo->baseInfo->pathLen), Colors.orange);
+            fsFileInfo->baseInfo->path = (char*)malloc(fsFileInfo->baseInfo->pathLen + 1, "Malloc for fs path string");
+            ((char*)fsFileInfo->baseInfo->path)[fsFileInfo->baseInfo->pathLen] = (uint8_t)0;
+            for (uint16_t index = 0; index < fsFileInfo->baseInfo->pathLen; index++)
             {
-                ((char*)fsFileInfo->baseInfo.path)[index] = *((uint8_t*)tBuffer);
+                ((char*)fsFileInfo->baseInfo->path)[index] = *((uint8_t*)tBuffer);
                 tBuffer += 1;
             }
             
@@ -1453,23 +1469,24 @@ namespace FilesystemInterface
         {
             FolderInfo* fsFolderInfo = (FolderInfo*)malloc(sizeof(FolderInfo), "Filesystem Folder Info malloc");
             fsFolderList.add(fsFolderInfo); 
+            fsFolderInfo->baseInfo = (BaseInfo*)malloc(sizeof(BaseInfo), "Filesystem Base Info malloc");
 
-            fsFolderInfo->baseInfo.hidden = *((uint8_t*)tBuffer);
+            fsFolderInfo->baseInfo->hidden = *((uint8_t*)tBuffer);
             tBuffer += 1;
-            fsFolderInfo->baseInfo.systemFile = *((uint8_t*)tBuffer);
+            fsFolderInfo->baseInfo->systemFile = *((uint8_t*)tBuffer);
             tBuffer += 1;
-            fsFolderInfo->baseInfo.writeProtected = *((uint8_t*)tBuffer);
+            fsFolderInfo->baseInfo->writeProtected = *((uint8_t*)tBuffer);
             tBuffer += 1;
-            fsFolderInfo->baseInfo.pathLen = *((uint16_t*)tBuffer);
+            fsFolderInfo->baseInfo->pathLen = *((uint16_t*)tBuffer);
             tBuffer += 2;
             
-            //osData.mainTerminalWindow->Log("Folder Path:        \"{}\"", fsFolderInfo->baseInfo.path, Colors.orange);
-            //osData.mainTerminalWindow->Log("Folder Path Len:    \"{}\"", to_string(fsFolderInfo->baseInfo.pathLen), Colors.orange);
-            fsFolderInfo->baseInfo.path = (char*)malloc(fsFolderInfo->baseInfo.pathLen + 1, "Malloc for fs path string");
-            ((char*)fsFolderInfo->baseInfo.path)[fsFolderInfo->baseInfo.pathLen] = (uint8_t)0;
-            for (uint16_t index = 0; index < fsFolderInfo->baseInfo.pathLen; index++)
+            //osData.mainTerminalWindow->Log("Folder Path:        \"{}\"", fsFolderInfo->baseInfo->path, Colors.orange);
+            //osData.mainTerminalWindow->Log("Folder Path Len:    \"{}\"", to_string(fsFolderInfo->baseInfo->pathLen), Colors.orange);
+            fsFolderInfo->baseInfo->path = (char*)malloc(fsFolderInfo->baseInfo->pathLen + 1, "Malloc for fs path string");
+            ((char*)fsFolderInfo->baseInfo->path)[fsFolderInfo->baseInfo->pathLen] = (uint8_t)0;
+            for (uint16_t index = 0; index < fsFolderInfo->baseInfo->pathLen; index++)
             {
-                ((char*)fsFolderInfo->baseInfo.path)[index] = *((uint8_t*)tBuffer);
+                ((char*)fsFolderInfo->baseInfo->path)[index] = *((uint8_t*)tBuffer);
                 tBuffer += 1;
             }
         }

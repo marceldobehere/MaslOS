@@ -22,32 +22,33 @@ namespace FilesystemInterface
         this->systemFile = systemFile;
     }
 
-    BaseInfo::BaseInfo()
-    {
-        path = StrCopy("");
-        pathLen = StrLen(path);
-        writeProtected = false;
-        hidden = false;
-        systemFile = false;
-    }
+    // BaseInfo::BaseInfo()
+    // {
+    //     path = StrCopy("");
+    //     pathLen = StrLen(path);
+    //     writeProtected = false;
+    //     hidden = false;
+    //     systemFile = false;
+    // }
     void BaseInfo::Destroy()
     {
         pathLen = 0;
         free((void*)path);
         path = 0;
+        free(this);
     }
 
-    FolderInfo::FolderInfo(BaseInfo baseInfo)
+    FolderInfo::FolderInfo(BaseInfo* baseInfo)
     {
         this->baseInfo = baseInfo;
     }
     void FolderInfo::Destroy()
     {
-        this->baseInfo.Destroy();
+        this->baseInfo->Destroy();
         free(this);
     }
 
-    FileInfo::FileInfo(BaseInfo baseInfo, uint64_t sizeInBytes, uint64_t locationInBytes)
+    FileInfo::FileInfo(BaseInfo* baseInfo, uint64_t sizeInBytes, uint64_t locationInBytes)
     {
         this->baseInfo = baseInfo;
         this->sizeInBytes = sizeInBytes;
@@ -55,7 +56,7 @@ namespace FilesystemInterface
     }
     void FileInfo::Destroy()
     {
-        this->baseInfo.Destroy();
+        this->baseInfo->Destroy();
         free(this);
     }
 }

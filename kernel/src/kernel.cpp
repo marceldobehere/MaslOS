@@ -148,6 +148,7 @@ extern "C" void _start(BootInfo* bootInfo)
     debugTerminalWindow->Log("<STAT>");
     debugTerminalWindow->Log("<STAT>");
     debugTerminalWindow->Log("<STAT>");
+    debugTerminalWindow->Log("<STAT>");
 
     activeWindow->renderer->Cls();
     KeyboardPrintStart(mainWindow);

@@ -52,21 +52,21 @@ namespace FilesystemInterface
 
     struct FileInfo
     {
-        BaseInfo baseInfo;
+        BaseInfo* baseInfo;
 
         uint64_t sizeInBytes;
         uint64_t locationInBytes;
 
-        FileInfo(BaseInfo baseInfo, uint64_t sizeInBytes, uint64_t locationInBytes);
+        FileInfo(BaseInfo* baseInfo, uint64_t sizeInBytes, uint64_t locationInBytes);
 
         void Destroy();
     };
 
     struct FolderInfo
     {
-        BaseInfo baseInfo;
+        BaseInfo* baseInfo;
 
-        FolderInfo(BaseInfo baseInfo);
+        FolderInfo(BaseInfo* baseInfo);
 
         void Destroy();
     };
