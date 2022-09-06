@@ -500,8 +500,79 @@ namespace FilesystemInterface
         if (StrEquals(oldPath, newPath))
             return FSCommandResult.ERROR_PATH_IS_THE_SAME;
 
+        if (FolderExists(newPath))
+            return FSCommandResult.ERROR_FOLDER_ALREADY_EXISTS;
 
-        return FSCommandResult.ERROR_FUNCTION_NOT_IMPLEMENTED;
+        //osData.debugTerminalWindow->Log("Bruh 1");
+        //osData.debugTerminalWindow->Log("Old: \"{}\"", oldPath, Colors.yellow);
+        //osData.debugTerminalWindow->Log("New: \"{}\"", newPath, Colors.yellow);
+        
+        
+        
+        FolderInfo* folder = GetFolder(oldPath);
+        if (folder == NULL)
+            return FSCommandResult.ERROR_FOLDER_NOT_FOUND;
+
+        int64_t fIndex = fsFolderList.getIndexOf(folder);
+        if (fIndex == -1)
+            return FSCommandResult.ERROR_FOLDER_NOT_FOUND;
+
+        //osData.debugTerminalWindow->Log("Bruh 2");
+
+
+        {
+            uint64_t fileCount = 0;
+            const char** files = GetFiles(folder->baseInfo.path, &fileCount);
+            //osData.debugTerminalWindow->Log("File count: {}", to_string(fileCount), Colors.yellow);
+            if (fileCount != 0)
+            {
+                for (int i = 0; i < fileCount; i++)
+                {
+                    const char* filename = files[i];
+                    //osData.debugTerminalWindow->Log(" - Filename: \"{}\"", filename, Colors.yellow);
+                    FileInfo* fInfo = GetFile(filename);
+                    if (fInfo == NULL)
+                        continue;
+                    const char* newFilename = StrReplaceStartingStuffWith(filename, oldPath, newPath);
+                    CopyFile(filename, newFilename);
+                }
+                free(files);
+            }
+        }
+
+        //osData.debugTerminalWindow->Log("Bruh 3");
+
+        {
+            uint64_t folderCount = 0;
+            const char** folders = GetFolders(folder->baseInfo.path, &folderCount);
+            //osData.debugTerminalWindow->Log("Folder count: {}", to_string(folderCount), Colors.yellow);
+            if (folderCount != 0)
+            {
+                for (int i = 0; i < folderCount; i++)
+                {
+                    const char* foldername = folders[i];
+                    //osData.debugTerminalWindow->Log(" - Foldername: \"{}\"", foldername, Colors.yellow);
+                    FolderInfo* fInfo = GetFolder(foldername);
+                    if (fInfo == NULL)
+                        continue;
+                    const char* newFoldername = StrReplaceStartingStuffWith(foldername, oldPath, newPath);
+                    CopyFolder(foldername, newFoldername);
+                }
+                free(folders);
+            }
+        }
+
+        //osData.debugTerminalWindow->Log("Bruh 4");
+
+        {
+            free((void*)folder->baseInfo.path);
+            folder->baseInfo.path = StrCopy(newPath);
+            folder->baseInfo.pathLen = StrLen(folder->baseInfo.path);
+        }
+
+        //osData.debugTerminalWindow->Log("Bruh 5 (DONE)");
+
+        return SaveFSTable();
     }
 
 

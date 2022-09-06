@@ -208,10 +208,10 @@ namespace WindowManager
         if (y1 >= virtualScreenBuffer->Height)
             y1 = virtualScreenBuffer->Height - 1;
 
-        if (x1 < 0)
-            x1 = 0;
-        if (y1 < 0)
-            y1 = 0;
+        if (x2 < 0)
+            x2 = 0;
+        if (y2 < 0)
+            y2 = 0;
         if (x2 >= virtualScreenBuffer->Width)
             x2 = virtualScreenBuffer->Width - 1;
         if (y2 >= virtualScreenBuffer->Height)
@@ -262,6 +262,12 @@ namespace WindowManager
         int64_t _x2 = _x1 + window->size.width - 1;
         int64_t _y2 = _y1 + window->size.height - 1;
 
+        if ((_x1 - 1) > x2 || (_x2 + 1) < x1 || (_y1 - 23) > y2 || (_y2 + 1) < y1)
+        {
+            RemoveFromStack();
+            return;
+        }
+
         { 
             if (y1 > _y1)
                 _y1 = y1;
@@ -274,6 +280,7 @@ namespace WindowManager
 
             if (x2 < _x2)
                 _x2 = x2;
+
 
             if (0 > _y1)
                 _y1 = 0;
@@ -307,8 +314,8 @@ namespace WindowManager
         {
             _x1 = window->position.x - 1;
             _y1 = window->position.y - 23;
-            _x2 = _x1 + window->size.width + 3;
-            _y2 = _y1 + window->size.height + 25;
+            _x2 = _x1 + window->size.width + 2;//3;
+            _y2 = _y1 + window->size.height + 24;//25;
         
             if (y1 > _y1)
                 _y1 = y1;
@@ -604,7 +611,11 @@ if (window != NULL)
 
     void WindowPointerBufferThing::RenderWindow(Window* window)
     {
-        RenderWindowRect(window, 0, 0, actualScreenBuffer->Width, actualScreenBuffer->Height);
+        RenderWindowRect(window, 
+            max(0, window->position.x - 1), max(0, window->position.y - 24), 
+            min(virtualScreenBuffer->Width - 1, window->position.x + window->size.width + 1),
+            min(virtualScreenBuffer->Height- 1, window->position.y + window->size.height + 1)
+        );//0, 0, actualScreenBuffer->Width - 1, actualScreenBuffer->Height - 1);
         // AddToStack();
         // uint32_t* pixel = (uint32_t*)window->framebuffer->BaseAddress;
 
@@ -706,7 +717,7 @@ if (window != NULL)
         //         vPixel++;
         //     }
         // }
-
+        if (testInterlace != 1)
         {
             uint64_t h = actualScreenBuffer->Height, w = actualScreenBuffer->Width, bpl = actualScreenBuffer->PixelsPerScanLine;
 
@@ -753,6 +764,30 @@ if (window != NULL)
                 vPixel += wTimesInterlaceMinusOne;
                 cPixel += wTimesInterlaceMinusOne;
             }
+        }
+        else
+        {
+            uint64_t h = actualScreenBuffer->Height, w = actualScreenBuffer->Width, bpl = actualScreenBuffer->PixelsPerScanLine;
+
+            uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress;
+            uint32_t*  cPixel = (uint32_t*)  copyOfScreenBuffer->BaseAddress;
+            uint32_t*  aPixel = (uint32_t*)  actualScreenBuffer->BaseAddress;
+
+
+            for (int64_t y = 0; y < h; y++)
+                for (int64_t x = 0; x < w; x++)
+                {
+                    uint32_t col = **vPixel;
+                    if (*cPixel != col)
+                    {
+                        *aPixel = col;
+                        *cPixel = col;
+                    }
+                    vPixel++;
+                    cPixel++;
+                    aPixel++;
+                } 
+            
         }
 
 
@@ -831,11 +866,17 @@ if (window != NULL)
         int x2 = x1 + window->size.width;
         int y2 = y1 + window->size.height;
         
-        osData.windowPointerThing->UpdatePointerRect(x1-1, y1-22, x1-1, y2);
-        osData.windowPointerThing->UpdatePointerRect(x2, y1-22, x2, y2);
+        osData.windowPointerThing->UpdatePointerRect(x1-1, y1-22, 
+                                                     x1-1, y2);
+        osData.windowPointerThing->UpdatePointerRect(x2,   y1-22, 
+                                                     x2,   y2);
 
-        osData.windowPointerThing->UpdatePointerRect(x1-1, y1-22, x2, y1-1);
-        osData.windowPointerThing->UpdatePointerRect(x1-1, y2, x2, y2);
+        osData.windowPointerThing->UpdatePointerRect(x1-1, y1-22, 
+                                                     x2,   y1-22);
+        osData.windowPointerThing->UpdatePointerRect(x1-1, y1-1, 
+                                                     x2,   y1-1);
+        osData.windowPointerThing->UpdatePointerRect(x1-1, y2, 
+                                                     x2,   y2);
     }
 }
 

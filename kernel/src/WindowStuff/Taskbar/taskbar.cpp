@@ -46,7 +46,7 @@ namespace Taskbar
     void RenderTaskbar()
     {
         Scounter++;
-        if (Scounter % 3 == 0)
+        if (Scounter % 5 != 0)
             return;
         else if (Scounter > 100)
             Scounter = 0;
