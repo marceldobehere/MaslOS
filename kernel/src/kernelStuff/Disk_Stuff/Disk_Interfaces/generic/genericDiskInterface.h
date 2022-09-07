@@ -11,7 +11,8 @@ namespace DiskInterface
     {
         Generic = 0,
         Ram = 1,
-        Sata = 2
+        Sata = 2,
+        File = 3
     };
 
     extern const char* DiskInterfaceTypeStr[];

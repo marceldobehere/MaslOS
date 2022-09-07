@@ -2,15 +2,17 @@
 #include "../../../../OSDATA/osdata.h"
 #include "../ram/ramDiskInterface.h"
 #include "../sata/sataDiskInterface.h"
+#include "../file/fileDiskInterface.h"
 
 
 namespace DiskInterface
 {
-    const char* DiskInterfaceTypeStr[3] 
+    const char* DiskInterfaceTypeStr[4] 
     {
         "Generic",
         "RAM",
-        "SATA / SATAPI"
+        "SATA / SATAPI",
+        "Disk"
     };
 
     bool GenericDiskInterface::Read(uint64_t sector, uint32_t sectorCount, void* buffer)
@@ -26,6 +28,10 @@ namespace DiskInterface
             case DiskInterface::Sata:
             {
                 return ((SataDiskInterface*)this)->Read(sector, sectorCount, buffer);
+            }
+            case DiskInterface::File:
+            {
+                return ((FileDiskInterface*)this)->Read(sector, sectorCount, buffer);
             }
         }
         //osData.mainTerminalWindow->Log("DISK IS GENERIC!!!");
@@ -46,6 +52,10 @@ namespace DiskInterface
             {
                 return ((SataDiskInterface*)this)->Write(sector, sectorCount, buffer);
             }
+            case DiskInterface::File:
+            {
+                return ((FileDiskInterface*)this)->Write(sector, sectorCount, buffer);
+            }
         }
         //osData.mainTerminalWindow->Log("DISK IS GENERIC!!!");
         return false;
@@ -62,6 +72,10 @@ namespace DiskInterface
             case DiskInterface::Sata:
             {
                 return ((SataDiskInterface*)this)->GetMaxSectorCount();
+            }
+            case DiskInterface::File:
+            {
+                return ((FileDiskInterface*)this)->GetMaxSectorCount();
             }
         }
         //osData.mainTerminalWindow->Log("DISK IS GENERIC!!!");
@@ -83,6 +97,10 @@ namespace DiskInterface
             {
                 return ((SataDiskInterface*)this)->ReadBytes(address, count, buffer);
             }
+            case DiskInterface::File:
+            {
+                return ((FileDiskInterface*)this)->ReadBytes(address, count, buffer);
+            }
         }
         //osData.mainTerminalWindow->Log("DISK IS GENERIC!!!");
         return false;
@@ -102,6 +120,10 @@ namespace DiskInterface
             case DiskInterface::Sata:
             {
                 return ((SataDiskInterface*)this)->WriteBytes(address, count, buffer);
+            }
+            case DiskInterface::File:
+            {
+                return ((FileDiskInterface*)this)->WriteBytes(address, count, buffer);
             }
         }
         //osData.mainTerminalWindow->Log("DISK IS GENERIC!!!");

@@ -11,6 +11,7 @@
 #include "../kernelStuff/other_IO/pit/pit.h"
 #include "../tasks/sleep/taskSleep.h"
 #include "../kernelStuff/Disk_Stuff/Disk_Interfaces/ram/ramDiskInterface.h"
+#include "../kernelStuff/Disk_Stuff/Disk_Interfaces/file/fileDiskInterface.h"
 #include "../kernelStuff/Disk_Stuff/Partition_Interfaces/mraps/mrapsPartitionInterface.h"
 #include "../kernelStuff/Disk_Stuff/Filesystem_Interfaces/mrafs/mrafsFileSystemInterface.h"
 
@@ -286,20 +287,32 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 
     if (StrEquals(data->data[0], "disk"))
     {
-        if (data->len == 3)
+        // if (data->len == 3)
+        // {
+        //     if (StrEquals(data->data[1], "create"))
+        //     {
+        //         int size = to_int(data->data[2]);
+        //         osData.diskInterfaces.add(new DiskInterface::RamDiskInterface(size));
+        //         window->renderer->Println("Ram Disk with {} sectors created!", to_string(size), (*user)->colData.defaultTextColor);
+        //     }
+        //     else
+        //         LogError("No valid arguments passed!", window);
+        // }
+        // else 
+        if (data->len == 4)
         {
             if (StrEquals(data->data[1], "create"))
             {
-                int size = to_int(data->data[2]);
-                osData.diskInterfaces.add(new DiskInterface::RamDiskInterface(size));
-                window->renderer->Println("Ram Disk with {} sectors created!", to_string(size), (*user)->colData.defaultTextColor);
+                if (StrEquals(data->data[2], "ram disk"))
+                {
+                    int size = to_int(data->data[3]);
+                    osData.diskInterfaces.add(new DiskInterface::RamDiskInterface(size));
+                    window->renderer->Println("Ram Disk with {} sectors created!", to_string(size), (*user)->colData.defaultTextColor);
+                }
+                else
+                    LogError("No valid arguments passed!", window);
             }
-            else
-                LogError("No valid arguments passed!", window);
-        }
-        else if (data->len == 4)
-        {
-            if (StrEquals(data->data[2], "read"))
+            else if (StrEquals(data->data[2], "read"))
             {
                 int num = to_int(data->data[1]);
                 int size = to_int(data->data[3]);
@@ -584,7 +597,53 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         }
         else if (data->len == 6)
         {
-            if (StrEquals(data->data[2], "partition"))
+            if (StrEquals(data->data[1], "create"))
+            {
+                if (StrEquals(data->data[2], "file disk"))
+                {
+                    int64_t diskID = to_int(data->data[3]);
+                    int64_t partID = to_int(data->data[4]);
+                    const char* filename = data->data[5];
+
+                    if (diskID < 0 || diskID >= osData.diskInterfaces.getCount())
+                        LogError("Invalid Disk selected!", window);
+                    else
+                    {
+                        DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[diskID];
+                        PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
+                        if (partInterface == NULL)
+                            LogError("Drive has no Partition Manager!", window);
+                        else if (partID < 0 || partID >= partInterface->partitionList.getCount())
+                            LogError("Invalid Partition selected!", window);
+                        else
+                        {
+                            FilesystemInterface::GenericFilesystemInterface* fsInterface = (FilesystemInterface::GenericFilesystemInterface*)partInterface->partitionList[partID]->fsInterface;
+                            if (fsInterface == NULL)
+                                LogError("Partition has no Filesystem!", window);
+                            else
+                            {
+                                if (!fsInterface->FileExists(filename))
+                                    LogError("The File was not found!", window);
+                                else
+                                {
+                                    osData.diskInterfaces.add(new DiskInterface::FileDiskInterface(filename, fsInterface));
+                                    window->renderer->Println("File Disk from file \"{}\" created!", filename, (*user)->colData.defaultTextColor);
+                                }
+                            }
+                        }
+                    }
+
+
+
+
+                    //int size = to_int(data->data[3]);
+                    //osData.diskInterfaces.add(new DiskInterface::RamDiskInterface(size));
+                    //window->renderer->Println("Ram Disk with {} sectors created!", to_string(size), (*user)->colData.defaultTextColor);
+                }
+                else
+                    LogError("No valid arguments passed!", window);
+            }
+            else if (StrEquals(data->data[2], "partition"))
             {
                 int diskNum = to_int(data->data[1]);
                 if (StrEquals(data->data[4], "fs"))
@@ -1043,7 +1102,21 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                     FilesystemInterface::GenericFilesystemInterface* fsInterface = (FilesystemInterface::GenericFilesystemInterface*)partInterface->partitionList[partNum]->fsInterface;
                     if (fsInterface != NULL)
                     {
-                        if (StrEquals(data->data[5], "copy"))
+                        if (StrEquals(data->data[5], "create"))
+                        {
+                            if (StrEquals(data->data[6], "file"))
+                            {
+                                int64_t size = to_int(data->data[8]);
+                                const char* res = fsInterface->CreateFile(data->data[7], size);
+                                if (res == FilesystemInterface::FSCommandResult.SUCCESS)
+                                    window->renderer->Println("File with a size of {} bytes got created successfully!", data->data[8], (*user)->colData.defaultTextColor);
+                                else
+                                    LogError("File Creation failed! Error: \"{}\"", res, window);
+                            }
+                            else
+                                LogError("No valid arguments passed!", window);
+                        }
+                        else if (StrEquals(data->data[5], "copy"))
                         {
                             if (StrEquals(data->data[6], "file"))
                             {
