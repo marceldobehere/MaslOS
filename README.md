@@ -29,10 +29,11 @@ MaslOS is love, MaslOS is life.
     + Disk Interfaces
       - SATA / SATAPI
       - RAM Disk
+      - File Disk
     + Partitioning Interfaces
       - MRAPS (Marcels really awesome partitioning system)
     + Filesystem Interfaces
-      - (Almost done :p) MRAFS (Marcels really awesome filesystem)
+      - MRAFS (Marcels really awesome filesystem)
 * Memory
   - Dynamic Memory Management
   - (In planning) Paging
