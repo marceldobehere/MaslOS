@@ -8,5 +8,3 @@ void Panic(const char* panicMessage);
 
 void Panic(const char* panicMessage, bool lock);
 
-
-

@@ -1283,6 +1283,10 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
     {
         activeMemFlagVal= to_int(val);
     }
+    else if (StrEquals(name, "mnfcc") || StrEquals(name, "max non fatal crash count"))
+    {
+        osData.maxNonFatalCrashCount = to_int(val);
+    }
     else if (StrEquals(name, "debug terminal"))
     {
         if (StrEquals(val, "on") || StrEquals(val, "shown"))
@@ -1437,6 +1441,10 @@ void GetCmd(const char* name, OSUser* user, Window* window)
     {
         dispVar vars[] = {dispVar((uint64_t)GlobalRenderer->framebuffer->Width), dispVar((uint64_t)GlobalRenderer->framebuffer->Height)};
         window->renderer->Println("Screen Resolution: {0}x{1}.", vars);
+    }
+    else if (StrEquals(name, "mnfcc") || StrEquals(name, "max non fatal crash count"))
+    {
+        window->renderer->Println("Max non-fatal crash count: {} crashes..", to_string(osData.maxNonFatalCrashCount), user->colData.defaultTextColor);
     }
     else if (StrEquals(name, "stack trace"))
     {

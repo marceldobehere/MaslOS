@@ -12,6 +12,7 @@ if (osData.enableStackTrace)
 extern "C" void _start(BootInfo* bootInfo)
 {  
     osData.booting = false;
+    osData.maxNonFatalCrashCount = 3;
     MStackData::stackPointer = 0;
     for (int i = 0; i < 1000; i++)
         MStackData::stackArr[i] = MStack();
