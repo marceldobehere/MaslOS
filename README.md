@@ -44,7 +44,9 @@ MaslOS is love, MaslOS is life.
   - PCI
 * Other Features
   - Stack Trace
-  - Panic Screen
+  + Crash handling
+    - Crash Window showing non fatal kernel panic / crash
+    - Emergency Kernel Panic
   - Crash command
   - KernelFiles
 
@@ -90,5 +92,7 @@ Go into the MaslOS Folder and run the `RUN.sh` file
 ![The Desktop](/images/desktop%20background.PNG "The Desktop")
 ![Playing around with the Terminals](/images/terminal%20test%201.PNG "Playing around with the Terminals")
 ![A lot of windows](/images/yay.PNG "A lot of windows")
-![The Panic screen](/images/crash.PNG "The Panic screen")
+![The Panic screen](/images/crash.PNG "A short test showing the filesystem working")
+![The Panic screen](/images/crash.PNG "The Crash window")
+![The Panic screen](/images/crash.PNG "The new Panic screen")
 [More Images](/images)
