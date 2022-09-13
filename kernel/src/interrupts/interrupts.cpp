@@ -11,7 +11,7 @@
 __attribute__((interrupt)) void PageFault_handler(struct interrupt_frame* frame)
 {
     AddToStack();
-    Panic("Page Fault Detected!", false);
+    Panic("Page Fault Detected!");
     RemoveFromStack();
 }
 
