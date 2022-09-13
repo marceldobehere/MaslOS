@@ -67,32 +67,42 @@ void Panic(const char* panicMessage, const char* var, bool lock)
 
     if (osData.maxNonFatalCrashCount-- > 0)
     {
-        Window* crashWindow;
+        if (osData.tempCrash)
         {
-            crashWindow = (Window*)malloc(sizeof(Window), "Crash Window");
-            Size size = Size(800, 16*10 + (MStackData::stackPointer * (16*4)));
-            Position pos = Position(((GlobalRenderer->framebuffer->Width - size.width) / 2), ((GlobalRenderer->framebuffer->Height) / 5));
-            *(crashWindow) = Window(NULL, size, pos, "Crash Window", true, true, true);
-            osData.windows.add(crashWindow);
-
-            activeWindow = crashWindow;
-            osData.mainTerminalWindow = crashWindow;
-            crashWindow->moveToFront = true;
+            for (int i = 0; i < osData.windows.getCount(); i++)
+                osData.windows[i]->hidden = true;
         }
-
+        else
         {
-            crashWindow->renderer->Clear(Colors.black);
-            crashWindow->renderer->Println("------------------------------------------------", Colors.bred);
-            crashWindow->renderer->Println("A (probably) non-fatal Kernel Panic has occured!", Colors.bred);
-            crashWindow->renderer->Println("------------------------------------------------", Colors.bred);
-            crashWindow->renderer->Println();
-            crashWindow->renderer->Println("Panic Message:", Colors.yellow);
-            crashWindow->renderer->Println(panicMessage, var, Colors.bred);
-            crashWindow->renderer->Println();
-            PrintMStackTrace(MStackData::stackArr, MStackData::stackPointer, crashWindow->renderer, Colors.yellow);
+            osData.tempCrash = true;
+            Window* crashWindow;
+            {
+                crashWindow = (Window*)malloc(sizeof(Window), "Crash Window");
+                Size size = Size(800, 16*10 + (MStackData::stackPointer * (16*4)));
+                Position pos = Position(((GlobalRenderer->framebuffer->Width - size.width) / 2), ((GlobalRenderer->framebuffer->Height) / 5));
+                *(crashWindow) = Window(NULL, size, pos, "Crash Window", true, true, true);
+                osData.windows.add(crashWindow);
+
+                activeWindow = crashWindow;
+                osData.mainTerminalWindow = crashWindow;
+                crashWindow->moveToFront = true;
+            }
+
+            {
+                crashWindow->renderer->Clear(Colors.black);
+                crashWindow->renderer->Println("------------------------------------------------", Colors.bred);
+                crashWindow->renderer->Println("A (probably) non-fatal Kernel Panic has occured!", Colors.bred);
+                crashWindow->renderer->Println("------------------------------------------------", Colors.bred);
+                crashWindow->renderer->Println();
+                crashWindow->renderer->Println("Panic Message:", Colors.yellow);
+                crashWindow->renderer->Println(panicMessage, var, Colors.bred);
+                crashWindow->renderer->Println();
+                PrintMStackTrace(MStackData::stackArr, MStackData::stackPointer, crashWindow->renderer, Colors.yellow);
+            }
+
+
+            osData.tempCrash = false;    
         }
-
-
     }
     else
     {

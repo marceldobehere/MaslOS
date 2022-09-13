@@ -40,6 +40,7 @@ struct OSData
     int64_t crashCount = 0;
     int maxNonFatalCrashCount = 0;
     bool crashed = false;
+    bool tempCrash = false;
     WindowManager::WindowPointerBufferThing* windowPointerThing;
 
     List<DiskInterface::GenericDiskInterface*> diskInterfaces;

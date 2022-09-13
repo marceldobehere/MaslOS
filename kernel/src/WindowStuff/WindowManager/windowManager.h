@@ -98,8 +98,30 @@ namespace WindowManager
         inline uint64_t RenderActualSquare(int _x1, int _y1, int _x2, int _y2)
         {
             //AddToStack();
-            uint64_t counta = 0;
+
             uint64_t h = actualScreenBuffer->Height, w = actualScreenBuffer->Width, bpl = actualScreenBuffer->PixelsPerScanLine;
+
+
+            if (_x1 < 0)
+                _x1 = 0;
+            if (_x2 < 0)
+                _x2 = 0;
+            if (_y1 < 0)
+                _y1 = 0;
+            if (_y2 < 0)
+                _y2 = 0;
+
+            if (_x1 >= w)
+                _x1 = w - 1;
+            if (_x2 >= w)
+                _x2 = w - 1;
+            if (_y1 >= h)
+                _y1 = h - 1;
+            if (_y2 >= h)
+                _y2 = h - 1;
+
+            //
+            uint64_t counta = 0;
             uint64_t xdiff = _x2 - _x1;
             uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress + _x1 + w * _y1;
             uint32_t*  cPixel = (uint32_t*)  copyOfScreenBuffer->BaseAddress + _x1 + w * _y1;

@@ -731,6 +731,7 @@ if (window != NULL)
         // }
         if (testInterlace != 1)
         {
+            AddToStack();
             uint64_t h = actualScreenBuffer->Height, w = actualScreenBuffer->Width, bpl = actualScreenBuffer->PixelsPerScanLine;
 
             uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress + testCounterX;
@@ -776,6 +777,7 @@ if (window != NULL)
                 vPixel += wTimesInterlaceMinusOne;
                 cPixel += wTimesInterlaceMinusOne;
             }
+            RemoveFromStack();
         }
         else
         {
