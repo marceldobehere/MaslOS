@@ -192,6 +192,8 @@ void* malloc(size_t size, const char* text)
         if (current->magicNum != HeapMagicNum)
         {
             Panic("Trying to access invalid HeapSegment Header!");
+            RemoveFromStack();
+            return NULL;
         }
         if (current->free)
         {
@@ -229,11 +231,19 @@ void* malloc(size_t size, const char* text)
         current = current->next;
     }
     //GlobalRenderer->Println("Requesting more RAM.");
-    ExpandHeap(size);
-    void* res = malloc(size, text);
-    //mallocCount++;
+
+    if (ExpandHeap(size))
+    {
+        void* res = malloc(size, text);
+        //mallocCount++;
+        RemoveFromStack();
+        return res;
+    }
+    // GlobalRenderer->ClearDotted(Colors.green);
+    // while (true);
+
     RemoveFromStack();
-    return res;
+    return NULL;
 }
 
 void free(void* address)
@@ -259,11 +269,15 @@ void free(void* address)
         else
         {
             Panic("Tried to free already free Segment!");
+            RemoveFromStack();
+            return;
         }
     }
     else
     {
         Panic("Tried to free invalid Segment!");
+        RemoveFromStack();
+        return;
     }
     RemoveFromStack();
 }
@@ -292,7 +306,7 @@ void* _malloc(size_t size, const char* text)
 }
 
 
-void ExpandHeap(size_t length)
+bool ExpandHeap(size_t length)
 {
     AddToStack();
     if (length % 0x1000)
@@ -309,22 +323,56 @@ void ExpandHeap(size_t length)
 
     for (size_t i = 0; i < pageCount; i++)
     {
-        GlobalPageTableManager.MapMemory(heapEnd, GlobalAllocator->RequestPage());
+        if (i == 1)
+        {
+            newSegment->free = true;
+            newSegment->last = lastHdr;
+            lastHdr->next = newSegment;
+            lastHdr = newSegment;
+            newSegment->magicNum = HeapMagicNum;
+            
+            newSegment->next = NULL;
+            newSegment->text = "<FREE>";
+            newSegment->length = 0x1000 - sizeof(HeapSegHdr);
+            heapCount++;
+            //newSegment->CombineBackward(); 
+            //GlobalRenderer->Println("ADD MEM", Colors.yellow);
+        }
+        if (i >= 1)
+        {
+            uint64_t tempI = i * 0x1000;
+            newSegment->length = tempI - sizeof(HeapSegHdr);
+        }
+
+        void* tempAddr = GlobalAllocator->RequestPage();
+        if (((uint64_t)tempAddr) == 0)
+        {
+            //GlobalRenderer->Println("<HEAP START>", Colors.yellow);
+            // we gotta add the stuff that we requested but didnt add because it return NULL here
+            
+            // GlobalRenderer->ClearDotted(Colors.bblue);
+            // while(true);
+            RemoveFromStack();
+            //GlobalRenderer->Println("<HEAP END>", Colors.yellow);
+            return false;
+        }
+        GlobalPageTableManager.MapMemory(heapEnd, tempAddr);
         heapEnd = (void*)((size_t)heapEnd + 0x1000);
     }
 
     //GlobalRenderer->Println("free RAM 2: {}", to_string(GlobalAllocator->GetFreeRAM()), Colors.white);
     
-    newSegment->free = true;
-    newSegment->last = lastHdr;
-    lastHdr->next = newSegment;
-    lastHdr = newSegment;
-    newSegment->magicNum = HeapMagicNum;
+    // newSegment->free = true;
+    // newSegment->last = lastHdr;
+    // lastHdr->next = newSegment;
+    // lastHdr = newSegment;
+    // newSegment->magicNum = HeapMagicNum;
 
-    newSegment->next = NULL;
-    newSegment->text = "<FREE>";
+    // newSegment->next = NULL;
+    // newSegment->text = "<FREE>";
     newSegment->length = length - sizeof(HeapSegHdr);
-    heapCount++;
+    // heapCount++;
     newSegment->CombineBackward();
     RemoveFromStack();
+    return true;
 }

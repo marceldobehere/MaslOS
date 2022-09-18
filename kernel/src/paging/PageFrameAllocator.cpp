@@ -78,7 +78,9 @@ void* PageFrameAllocator::RequestPage()
     //GlobalRenderer->Println("ERROR: NO MORE RAM AVAIABLE!", Colors.red);
     Panic("No more RAM avaiable!");
 
-    while (true);
+    // thats why it froooooooze ahhh
+    // while (true);
+
 
     return NULL; // Page Frame Swap to file
 }

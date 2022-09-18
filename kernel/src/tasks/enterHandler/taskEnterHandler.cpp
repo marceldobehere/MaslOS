@@ -15,7 +15,7 @@ void TaskEnterHandler::Do()
 {
     //GlobalRenderer->Println("ADDR: {}", ConvertHexToString((uint64_t)terminal), Colors.bblue);
     if (magic != 134127)
-        while(true);//Panic("INVALID TASK EXECUTED");
+        Panic("INVALID TASK EXECUTED");
     if (terminal != NULL)
         terminal->HandleEnter();
     done = true;

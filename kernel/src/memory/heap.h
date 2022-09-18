@@ -30,7 +30,7 @@ void _free(void* address);
 void* malloc(size_t size, const char* text);
 void* _malloc(size_t size, const char* text);
 
-void ExpandHeap(size_t length);
+bool ExpandHeap(size_t length);
 
 extern void* heapStart;
 

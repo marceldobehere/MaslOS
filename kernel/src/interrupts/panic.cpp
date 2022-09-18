@@ -58,6 +58,10 @@ void PrintRegisterDump(BasicRenderer* renderer)
 void Panic(const char* panicMessage, const char* var, bool lock)
 {
     AddToStack();
+    //GlobalRenderer->CursorPosition.x = 0;
+    //GlobalRenderer->CursorPosition.y = 0;
+    // oh god please no test podcast
+    //GlobalRenderer->Println("<BRUH START>", Colors.yellow);
     osData.crashed = true;
 
     // GlobalRenderer->Clear(Colors.black);
@@ -65,44 +69,73 @@ void Panic(const char* panicMessage, const char* var, bool lock)
     // GlobalRenderer->Println("Remaining Count 1: {}", to_string(osData.maxNonFatalCrashCount--), Colors.yellow);
     // while(true);
 
+    // btw this is an multi crash kernel panic
+    // since for some reason the cls somehow did the general protection fault multiple times so multiple crash windows -> so kernel panic
+    // since ya know the mnfcc
+
+    // ok so it crashes
+    // just get a good cmd working with good fs stuff and a programming lang
+
     if (osData.maxNonFatalCrashCount-- > 0)
     {
+        //GlobalRenderer->Println("BRUH 1", Colors.yellow);
         if (osData.tempCrash)
         {
+            //GlobalRenderer->Println("BRUH 2", Colors.yellow);
             for (int i = 0; i < osData.windows.getCount(); i++)
                 osData.windows[i]->hidden = true;
+            //GlobalRenderer->Println("BRUH 3", Colors.yellow);
         }
         else
         {
             osData.tempCrash = true;
+            //GlobalRenderer->Println("BRUH 4", Colors.yellow);
             Window* crashWindow;
             {
                 crashWindow = (Window*)malloc(sizeof(Window), "Crash Window");
                 Size size = Size(800, 16*10 + (MStackData::stackPointer * (16*4)));
                 Position pos = Position(((GlobalRenderer->framebuffer->Width - size.width) / 2), ((GlobalRenderer->framebuffer->Height) / 5));
-                *(crashWindow) = Window(NULL, size, pos, "Crash Window", true, true, true);
-                osData.windows.add(crashWindow);
+                
+                if (crashWindow != NULL)
+                {
+                    //GlobalRenderer->Println("BRUH 4.5", Colors.yellow);
+                    *(crashWindow) = Window(NULL, size, pos, "Crash Window", true, true, true);
+                    //GlobalRenderer->Println("BRUH 4.6", Colors.yellow);
+                    osData.windows.add(crashWindow);
+                    //GlobalRenderer->Println("BRUH 4.7", Colors.yellow);
 
-                activeWindow = crashWindow;
-                osData.mainTerminalWindow = crashWindow;
-                crashWindow->moveToFront = true;
+                    activeWindow = crashWindow;
+                    osData.mainTerminalWindow = crashWindow;
+                    crashWindow->moveToFront = true;
+                }
             }
-
+            // it crashes between 4 and 5, probably while trying to allocate memory since it used all the memory
+            //GlobalRenderer->Println("BRUH 5", Colors.yellow);
+            
+            if (crashWindow != NULL)
             {
+                //GlobalRenderer->Println("BRUH 5.1", Colors.yellow);
+                //GlobalRenderer->Print("Win x: {}", to_string(crashWindow->size.width), Colors.yellow);
+                //GlobalRenderer->Println(", y: {}", to_string(crashWindow->size.height), Colors.yellow);
                 crashWindow->renderer->Clear(Colors.black);
+                //GlobalRenderer->Println("BRUH 5.2", Colors.yellow);
                 crashWindow->renderer->Println("------------------------------------------------", Colors.bred);
                 crashWindow->renderer->Println("A (probably) non-fatal Kernel Panic has occured!", Colors.bred);
                 crashWindow->renderer->Println("------------------------------------------------", Colors.bred);
                 crashWindow->renderer->Println();
+                //GlobalRenderer->Println("BRUH 5.3", Colors.yellow);
                 crashWindow->renderer->Println("Panic Message:", Colors.yellow);
                 crashWindow->renderer->Println(panicMessage, var, Colors.bred);
                 crashWindow->renderer->Println();
+                //GlobalRenderer->Println("BRUH 5.4", Colors.yellow);
                 PrintMStackTrace(MStackData::stackArr, MStackData::stackPointer, crashWindow->renderer, Colors.yellow);
+                //GlobalRenderer->Println("BRUH 5.5", Colors.yellow);
             }
-
+            //GlobalRenderer->Println("BRUH 6", Colors.yellow);
 
             osData.tempCrash = false;    
         }
+        //GlobalRenderer->Println("<BRUH END>", Colors.yellow);
     }
     else
     {
@@ -126,8 +159,10 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         {
             GlobalRenderer->Println("(BTW the rendering of the debug terminal is causing issues so no debug terminal)");
             GlobalRenderer->Println();
-        }
 
+            //while(true);
+        }
+        
         PrintMStackTrace(MStackData::stackArr, MStackData::stackPointer);
         GlobalRenderer->Println();
         GlobalRenderer->Println();
@@ -136,8 +171,8 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         if (lock)
             while(true);
     }
-
-    RemoveFromStack();
+    
+    RemoveFromStack(); 
 } 
 
 void Panic(const char* panicMessage, const char* var)
