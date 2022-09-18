@@ -3,7 +3,7 @@ an OS written in C++ and a bit of C.
 The base was made following [Ponchos OS Dev Youtube Playlist](https://www.youtube.com/playlist?list=PLxN4E629pPnJxCQCLy7E0SQY_zuumOVyZ)
 
 
-MaslOS is love, MaslOS is life.
+MaslOS is 1000% the best os ever!11!1
 
 
 
@@ -91,7 +91,7 @@ Go into the MaslOS Folder and run the `RUN.sh` file
 ![The Desktop with some windows open](/images/desktop.PNG "The Desktop with some windows open")
 ![The Desktop](/images/desktop%20background.PNG "The Desktop")
 ![Playing around with the Terminals](/images/terminal%20test%201.PNG "Playing around with the Terminals")
-![A lot of windows](/images/yay.PNG "A lot of windows")
+![A lot of windows](/images/yes.PNG "A lot of windows")
 ![The Panic screen](/images/filesystem%20test.PNG "A short test showing the filesystem working")
 ![The Panic screen](/images/crash%20window.PNG "The Crash window")
 ![The Panic screen](/images/new%20kernel%20panic.PNG "The new Panic screen")
