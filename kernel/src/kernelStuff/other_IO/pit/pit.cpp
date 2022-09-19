@@ -12,7 +12,7 @@ namespace PIT
     void InitPIT()
     {
         TicksSinceBoot = 0;
-        SetDivisor(65535);
+        SetDivisor(500 /*65535*/);
         freq = GetFrequency();
     }
 
@@ -27,7 +27,7 @@ namespace PIT
         io_wait();
         outb(0x40, (uint8_t)((divisor & 0xff00) >> 8));
         io_wait();
-        freq = (double)GetFrequency();
+        freq = GetFrequency();
     }
 
     void Sleep(uint64_t milliseconds)
@@ -66,6 +66,11 @@ namespace PIT
     uint64_t TimeSinceBootMS()
     {
         return (TicksSinceBoot*1000)/freq;
+    }
+
+    uint64_t TimeSinceBootMicroS()
+    {
+        return (TicksSinceBoot*1000000)/freq;
     }
 
 }

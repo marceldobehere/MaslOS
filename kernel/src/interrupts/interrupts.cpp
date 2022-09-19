@@ -62,6 +62,20 @@ __attribute__((interrupt)) void PITInt_handler(interrupt_frame* frame)
     RemoveFromStack();
 }
 
+void TestSetSpeakerPosition(bool in)
+{
+    uint8_t t = inb(0x61);
+    //io_wait();
+
+    if (in)
+        t |= 3;
+    else
+        t &= 0xFC;
+    
+    outb(0x61, t);
+    //io_wait();
+}
+
 
 void RemapPIC() 
 {

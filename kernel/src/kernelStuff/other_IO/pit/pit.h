@@ -15,6 +15,7 @@ namespace PIT
     void SetDivisor(uint16_t divisor);
     double TimeSinceBootS();
     uint64_t TimeSinceBootMS();
+    uint64_t TimeSinceBootMicroS();
     uint64_t GetFrequency();
     void SetFrequency(uint64_t frequency);
     void Tick();

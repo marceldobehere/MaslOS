@@ -1,8 +1,10 @@
 #include "task.h"
+#include "../memory/heap.h"
 #include "sleep/taskSleep.h"
 #include "enterHandler/taskEnterHandler.h"
 #include "closeWindow/taskWindowClose.h"
-#include "../memory/heap.h"
+#include "playBeep/playBeep.h"
+
 
 
 bool Task::GetDone()
@@ -42,6 +44,13 @@ void DoTask(Task* task)
             sleep->Do();
             break;
         }
+        case TaskType::BEEP:
+        {
+            //GlobalRenderer->Println("SLEEP TASK!");
+            TaskPlayBeep* beep = (TaskPlayBeep*)task;
+            beep->Do();
+            break;
+        }
         case TaskType::HANDLEENTER:
         {
             //GlobalRenderer->Println("ENTER TASK!");
@@ -72,6 +81,13 @@ void FreeTask(Task* task)
             TaskSleep* sleep = (TaskSleep*)task;
             sleep->Free();
             free((void*)sleep);
+            break;
+        }
+        case TaskType::BEEP:
+        {
+            TaskPlayBeep* beep = (TaskPlayBeep*)task;
+            beep->Free();
+            free((void*)beep);
             break;
         }
         case TaskType::HANDLEENTER:
