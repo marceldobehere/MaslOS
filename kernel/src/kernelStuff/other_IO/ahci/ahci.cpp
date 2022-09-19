@@ -4,6 +4,8 @@
 #include "../../../memory/heap.h"
 #include "../../memory/memory.h"
 #include "../../Disk_Stuff/Disk_Interfaces/sata/sataDiskInterface.h"
+#include "../../Disk_Stuff/Partition_Interfaces/generic/genericPartitionInterface.h"
+#include "../../Disk_Stuff/Partition_Interfaces/mraps/mrapsPartitionInterface.h"
 
 namespace AHCI 
 {
@@ -340,7 +342,25 @@ namespace AHCI
 
             port->Configure();
 
-            osData.diskInterfaces.add(new DiskInterface::SataDiskInterface(port));
+            DiskInterface::SataDiskInterface* testDiskInterface = new DiskInterface::SataDiskInterface(port);
+            {
+                PartitionInterface::PartitionInterfaceType diskPartType = PartitionInterface ::GetPartitionInterfaceTypeFromDisk(testDiskInterface);
+                if (diskPartType == PartitionInterface::PartitionInterfaceType::mraps)
+                {
+                    osData.debugTerminalWindow->Log("* - Partition Type: \"MRAPS\"",  Colors.orange);
+                    PartitionInterface::MRAPSPartitionInterface* diskPart = new PartitionInterface::MRAPSPartitionInterface(testDiskInterface);
+                }
+                else if (true)
+                {
+                    osData.debugTerminalWindow->Log("* - Partition Type: undefined",  Colors.orange);
+                }
+
+                if (testDiskInterface->partitionInterface != NULL)
+                    ((PartitionInterface::GenericPartitionInterface*)testDiskInterface->partitionInterface)->LoadPartitionTable();
+            }
+            
+            osData.diskInterfaces.add(testDiskInterface);
+
 
             // if (i == 1)
             // {

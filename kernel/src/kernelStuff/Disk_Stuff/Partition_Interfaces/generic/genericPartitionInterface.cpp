@@ -1,8 +1,34 @@
 #include "genericPartitionInterface.h"
 #include "../mraps/mrapsPartitionInterface.h"
+#include "../../../../memory/heap.h"
+#include "../../../../cmdParsing/cstrTools.h"
 
 namespace PartitionInterface
 {
+
+    PartitionInterfaceType GetPartitionInterfaceTypeFromDisk(DiskInterface::GenericDiskInterface* diskInterface)
+    {
+        if (diskInterface == NULL)
+            return PartitionInterfaceType::none;
+        
+        // check for MRAPS
+        {
+            char* t = (char*)malloc(9);
+            t[8] = '\0';
+            bool res = diskInterface->ReadBytes(82, 8, t);
+            if (res)
+                res = StrEquals(t, "MRAPS01"); // v01 is the only currently supported version
+            free(t);
+            if (res)
+                return PartitionInterfaceType::mraps;
+        }
+
+
+
+        // none found (could also be generic i guess idk)
+        return PartitionInterfaceType::none;
+    }
+
     GenericPartitionInterface::GenericPartitionInterface()
     {
 

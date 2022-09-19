@@ -8,6 +8,8 @@
 namespace PartitionInterface
 {    
 
+    PartitionInterfaceType GetPartitionInterfaceTypeFromDisk(DiskInterface::GenericDiskInterface* diskInterface);
+
     class GenericPartitionInterface
     {
     public:
