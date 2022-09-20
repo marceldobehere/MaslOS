@@ -10,6 +10,7 @@
 #include "../OSDATA/osdata.h"
 #include "../kernelStuff/other_IO/pit/pit.h"
 #include "../tasks/sleep/taskSleep.h"
+#include "../tasks/playBeep/playBeep.h"
 #include "../kernelStuff/Disk_Stuff/Disk_Interfaces/ram/ramDiskInterface.h"
 #include "../kernelStuff/Disk_Stuff/Disk_Interfaces/file/fileDiskInterface.h"
 #include "../kernelStuff/Disk_Stuff/Partition_Interfaces/mraps/mrapsPartitionInterface.h"
@@ -213,7 +214,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                         {
                             TerminalInstance* terminal = (TerminalInstance*)window->instance;
 
-                            terminal->tasks.add(NewSleepTask(time / 1000.0));
+                            terminal->tasks.add(NewSleepTask(time));
                         }
                     }
 
@@ -285,6 +286,26 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         return;
     }
 
+    if (StrEquals(data->data[0], "beep"))
+    {
+        int onDur = to_int(data->data[1]);
+        int offDur = to_int(data->data[2]);
+        int totDur = to_int(data->data[3]);
+        
+        if (data->len == 4)
+        {
+            int size = to_int(data->data[3]);
+            terminal->tasks.add(NewBeepTask(onDur, offDur, totDur));
+            window->renderer->Println("Playing beep...");
+
+            free(data);
+            RemoveFromStack();
+            return;
+        }
+        else
+            LogInvalidArgumentCount(3, data->len-1, window);
+    }
+    
     if (StrEquals(data->data[0], "disk"))
     {
         // if (data->len == 3)

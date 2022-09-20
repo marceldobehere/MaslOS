@@ -6,6 +6,7 @@ enum TaskType
     SLEEP,
     HANDLEENTER,
     CLOSEWINDOW,
+    BEEP,
 };
 
 

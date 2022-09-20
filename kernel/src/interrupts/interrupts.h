@@ -26,3 +26,4 @@ __attribute__((interrupt)) void PITInt_handler(interrupt_frame* frame);
 void RemapPIC();
 void PIC_EndMaster();
 void PIC_EndSlave();
+void TestSetSpeakerPosition(bool in);

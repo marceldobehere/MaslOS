@@ -428,6 +428,9 @@ namespace PartitionInterface
         //osData.mainTerminalWindow->Log("Last Buffer    Address: 0x{}", ConvertHexToString((uint64_t)tempBuffer), Colors.bgreen);
         //osData.mainTerminalWindow->Log("Disk Interface Address: 0x{}", ConvertHexToString((uint64_t)diskInterface), Colors.bgreen);
 
+        if (!diskInterface->WriteBytes(82, 8, (void*)"MRAPS01"))
+            return CommandResult.ERROR_WRITE_FAILED;
+
         if (!diskInterface->Write(1, 19, buffer))
             return CommandResult.ERROR_WRITE_FAILED;
 
