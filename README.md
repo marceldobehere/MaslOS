@@ -49,6 +49,10 @@ MaslOS is 1000% the best os ever!11!1
     - Emergency Kernel Panic
   - Crash command
   - KernelFiles
+  - Auto Disk Stuff Detection
+  + - Auto Disk Detection
+    - Auto Partition Detection
+    - Auto Filesystem Detection
 
 
 ## How to run (Linux)
