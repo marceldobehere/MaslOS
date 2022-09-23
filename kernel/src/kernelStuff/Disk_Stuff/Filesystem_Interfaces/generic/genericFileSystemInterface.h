@@ -7,6 +7,8 @@
 
 namespace FilesystemInterface
 {
+    FilesystemInterfaceType GetFilesystemInterfaceTypeFromPartition(PartitionInterface::GenericPartitionInterface* partitionInterface, int index);
+
     class GenericFilesystemInterface
     {
     private:

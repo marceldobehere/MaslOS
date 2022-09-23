@@ -6,6 +6,8 @@
 #include "../../Disk_Stuff/Disk_Interfaces/sata/sataDiskInterface.h"
 #include "../../Disk_Stuff/Partition_Interfaces/generic/genericPartitionInterface.h"
 #include "../../Disk_Stuff/Partition_Interfaces/mraps/mrapsPartitionInterface.h"
+#include "../../Disk_Stuff/Filesystem_Interfaces/generic/genericFileSystemInterface.h"
+#include "../../Disk_Stuff/Filesystem_Interfaces/mrafs/mrafsFileSystemInterface.h"
 
 namespace AHCI 
 {
@@ -354,13 +356,41 @@ namespace AHCI
                 {
                     osData.debugTerminalWindow->Log("* - Partition Type: undefined",  Colors.orange);
                 }
-
-                if (testDiskInterface->partitionInterface != NULL)
-                    ((PartitionInterface::GenericPartitionInterface*)testDiskInterface->partitionInterface)->LoadPartitionTable();
             }
-            
             osData.diskInterfaces.add(testDiskInterface);
 
+            {
+                if (testDiskInterface->partitionInterface != NULL)
+                {
+                    PartitionInterface::GenericPartitionInterface* tDiskInterface = ((PartitionInterface::GenericPartitionInterface*)testDiskInterface->partitionInterface);
+                    tDiskInterface->LoadPartitionTable();
+                    
+                    int pLen = tDiskInterface->partitionList.getCount();
+                    //osData.debugTerminalWindow->Log("<bruh {}>", to_string(pLen),  Colors.orange);
+                    for (int i = 0; i < pLen; i++)
+                    {
+                        PartitionInterface::PartitionInfo* p = tDiskInterface->partitionList[i];
+                        if (p->type != PartitionInterface::PartitionType::Normal)
+                            continue;
+                        FilesystemInterface::FilesystemInterfaceType fsType = FilesystemInterface::GetFilesystemInterfaceTypeFromPartition(tDiskInterface, i);
+                        if (fsType == FilesystemInterface::FilesystemInterfaceType::Mrafs)
+                        {
+                            osData.debugTerminalWindow->Log("  * - Filesystem Type: \"MRAFS\"",  Colors.orange);
+                            FilesystemInterface::GenericFilesystemInterface* fsInterface = new FilesystemInterface::MrafsFilesystemInterface(tDiskInterface, p);
+                        }
+                        else if (true)
+                        {
+                            osData.debugTerminalWindow->Log("  * - Filesystem Type: undefined",  Colors.orange);
+                        }
+
+                        if (p->fsInterface != NULL)
+                            ((FilesystemInterface::GenericFilesystemInterface*)p->fsInterface)->LoadFSTable();
+                    }
+
+
+                }
+
+            }
 
             // if (i == 1)
             // {

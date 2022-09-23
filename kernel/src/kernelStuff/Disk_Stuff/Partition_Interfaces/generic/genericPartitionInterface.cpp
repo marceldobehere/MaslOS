@@ -13,9 +13,9 @@ namespace PartitionInterface
         
         // check for MRAPS
         {
-            char* t = (char*)malloc(9);
-            t[8] = '\0';
-            bool res = diskInterface->ReadBytes(82, 8, t);
+            char* t = (char*)malloc(8);
+            t[7] = '\0';
+            bool res = diskInterface->ReadBytes(82, 7, t);
             if (res)
                 res = StrEquals(t, "MRAPS01"); // v01 is the only currently supported version
             free(t);

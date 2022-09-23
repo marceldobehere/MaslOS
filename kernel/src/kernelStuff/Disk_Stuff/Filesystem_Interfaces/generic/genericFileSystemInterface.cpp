@@ -1,8 +1,39 @@
 #include "genericFileSystemInterface.h"
 #include "../mrafs/mrafsFileSystemInterface.h"
+#include "../../../../memory/heap.h"
+#include "../../../../cmdParsing/cstrTools.h"
+#include "../../../../OSDATA/osdata.h"
 
 namespace FilesystemInterface
 {
+    FilesystemInterfaceType GetFilesystemInterfaceTypeFromPartition(PartitionInterface::GenericPartitionInterface* partitionInterface, int index)
+    {
+        //osData.debugTerminalWindow->Log("<BRUH 1>");
+        if (partitionInterface == NULL)
+            return FilesystemInterfaceType::None;
+        //osData.debugTerminalWindow->Log("<BRUH 2>");
+        if (index < 0 || index >= partitionInterface->partitionList.getCount())
+            return FilesystemInterfaceType::None;
+        //osData.debugTerminalWindow->Log("<BRUH 3>");
+        // check for MRAFS  
+        {
+            PartitionInterface::PartitionInfo* part = partitionInterface->partitionList[index];
+            
+            
+
+            char* t = (char*)malloc(8);
+            t[7] = '\0';
+            bool res = partitionInterface->diskInterface->ReadBytes(part->locationInBytes, 7, t); //partitionInterface. ->ReadPartition(, 0, 7, t);
+            if (res)
+                res = StrEquals(t, "MRAFS01"); // v01 is the only currently supported version
+            free(t);
+            if (res)
+                return FilesystemInterfaceType::Mrafs;
+        }
+
+        return FilesystemInterfaceType::None;
+    }
+
     GenericFilesystemInterface::GenericFilesystemInterface()
     {
         this->InterfaceType = FilesystemInterfaceType::Generic;

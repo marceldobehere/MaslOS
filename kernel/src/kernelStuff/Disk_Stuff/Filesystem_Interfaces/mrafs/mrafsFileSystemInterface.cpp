@@ -1224,12 +1224,12 @@ namespace FilesystemInterface
         if (partitionInfo->owner != partitionInterface)
             return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
 
-
-        uint64_t totalSize = 0;
+        // "MRAFS01"
+        uint64_t totalSize;
         uint32_t fsPartCount = fsPartitionList.getCount();
         uint32_t fsFileCount = fsFileList.getCount();
         uint32_t fsFolderCount = fsFolderList.getCount();
-        totalSize = sizeof(totalSize) + sizeof(fsPartCount) + sizeof(fsFileCount) + sizeof(fsFolderCount);
+        totalSize = 7+sizeof(totalSize) + sizeof(fsPartCount) + sizeof(fsFileCount) + sizeof(fsFolderCount);
 
         for (uint32_t i = 0; i < fsPartCount; i++)
         {
@@ -1274,6 +1274,13 @@ namespace FilesystemInterface
 
         {
             uint8_t* tBuffer = buffer;
+
+            const char* fsSignature = "MRAFS01";
+            for (int i = 0; i < 7; i++)
+            {
+                *tBuffer = fsSignature[i];
+                tBuffer++;
+            }
 
             *((uint64_t*)tBuffer) = totalSize;
             tBuffer += 8;
@@ -1377,14 +1384,15 @@ namespace FilesystemInterface
         uint64_t addrOffset = 0;
 
         {
-            uint8_t* buffer = (uint8_t*)malloc(20, "mini alloc for reading fs data");
-            const char* res = partitionInterface->ReadPartition(partitionInfo, 0, 20, buffer);
+            uint8_t* buffer = (uint8_t*)malloc(27, "mini alloc for reading fs data");
+            const char* res = partitionInterface->ReadPartition(partitionInfo, 0, 27, buffer);
             if (res != FSCommandResult.SUCCESS)
             {
                 free(buffer);
                 return res;
             }
             uint8_t* tBuffer = buffer;
+            tBuffer += 7; // Skip Signature
 
             totalSize = *((uint64_t*)tBuffer);
             tBuffer += 8;

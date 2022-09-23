@@ -306,7 +306,7 @@ void BasicRenderer::ClearDotted(uint32_t col)
 void BasicRenderer::Cls()
 {
     BasicRenderer::Clear(0);
-    BasicRenderer::Println("Masl OS v0.23", Colors.green);
+    BasicRenderer::Println("Masl OS v0.32", Colors.green);
     BasicRenderer::Println("-------------", Colors.green);
     BasicRenderer::Println();
 }
