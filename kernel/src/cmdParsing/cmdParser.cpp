@@ -1449,6 +1449,25 @@ void GetCmd(const char* name, OSUser* user, Window* window)
     {
         window->renderer->Println("Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
     }
+    else if (StrEquals(name, "drives"))
+    {
+        window->renderer->Println("Avaiable Drives:", Colors.bgreen);
+        for (int i = 0; i < osData.diskInterfaces.getCount(); i++)
+        {
+            DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[i];
+            if (diskInterface->partitionInterface == NULL)
+                continue;
+            PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
+            for (int i2 = 0; i2 < partInterface->partitionList.getCount(); i2++)
+            {
+                PartitionInterface::PartitionInfo* partInfo = partInterface->partitionList[i2];
+                if (!partInfo->hidden && partInfo->type == PartitionInterface::PartitionType::Normal)
+                {
+                    window->renderer->Println(" - Drive: \"{}\"", partInfo->driveName, Colors.bgreen);
+                }
+            }
+        }
+    }
     else if (StrEquals(name, "free pages"))
     {
         window->renderer->Println("Free Page Count: {} pages.", to_string(GlobalAllocator->GetFreePageCount()), Colors.bgreen);
