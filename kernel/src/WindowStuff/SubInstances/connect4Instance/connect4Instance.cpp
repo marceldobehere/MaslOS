@@ -15,7 +15,7 @@ Connect4Instance::Connect4Instance(Window* window)
 void Connect4Instance::Init()
 {
     currentMode = CurrentMode::NONE;
-    bgCol = 0xFF000033;
+    bgCol = 0xFF000022;
     window->renderer->Clear(bgCol);
     window->renderer->putStr("CONNECT FOUR", (window->size.width-(12*8))/2, 30);
     window->renderer->putStr("________________", (window->size.width-(16*8))/2, 36);
@@ -79,7 +79,7 @@ void Connect4Instance::HandleInput()
     {
         if (StrEquals(userInput, " "))
         {
-            currentMode = CurrentMode::PLAYER_1_ENTER;    
+            currentMode = CurrentMode::PLAYER_1_ENTER;
             RedrawBoard();
         }
     }
@@ -90,9 +90,9 @@ void Connect4Instance::HandleInput()
         if (col != -1)
             if (DropPiece(col, 1))
             {
-
-                RedrawBoard();  
+                
                 currentMode = CurrentMode::PLAYER_2_ENTER;
+                RedrawBoard();  
             }
         
     }
@@ -103,9 +103,8 @@ void Connect4Instance::HandleInput()
         if (col != -1)
             if (DropPiece(col, 2))
             {
-
-                RedrawBoard();  
                 currentMode = CurrentMode::PLAYER_1_ENTER;
+                RedrawBoard();  
             }
     }
 
@@ -116,9 +115,12 @@ void Connect4Instance::RedrawBoard()
 {
     window->renderer->Clear(bgCol);
     window->renderer->CursorPosition = {0,0};
+    window->renderer->color = Colors.white;
     window->renderer->Println("Board:");
 
     DrawBoard();
+
+    window->renderer->color = Colors.yellow;
 
     if (currentMode == CurrentMode::PLAYER_1_ENTER || currentMode == CurrentMode::PLAYER_2_ENTER)
     {
@@ -126,6 +128,7 @@ void Connect4Instance::RedrawBoard()
             window->renderer->Println("Enter Column, Player 1.");
         else// if (currentMode == CurrentMode::PLAYER_2_ENTER)
             window->renderer->Println("Enter Column, Player 2.");
+        window->renderer->color = Colors.white;
         window->renderer->Print("> ");
     }
     else
@@ -134,14 +137,21 @@ void Connect4Instance::RedrawBoard()
         {
             if (winState == 0 || winState == 3)
             {
+                window->renderer->color = Colors.gray;
                 window->renderer->Println("It's a draw.");
             }
             else
             {
                 if (currentMode == CurrentMode::PLAYER_1_ENTER)
+                {
+                    window->renderer->color = playerCols[1];
                     window->renderer->Println("Player 1 won!");
+                }
                 else// if (currentMode == CurrentMode::PLAYER_2_ENTER)
+                {
+                    window->renderer->color = playerCols[2];
                     window->renderer->Println("Player 2 won!");
+                }
             }
         }
     }
@@ -169,9 +179,15 @@ void Connect4Instance::DrawBoard()
             uint8_t thing = board[x + y * sizeX];
             
             if (thing >= 0 && thing < 3)
+            {
+                window->renderer->color = playerCols[thing];
                 window->renderer->Print(playerChars[thing]);
+            }
             else
+            {
+                window->renderer->color = Colors.yellow;
                 window->renderer->Print("?");
+            }
 
             window->renderer->Print(" ");
         }    
@@ -179,6 +195,7 @@ void Connect4Instance::DrawBoard()
     }
     window->renderer->CursorPosition.y += 16;
     window->renderer->CursorPosition.x = 0;
+    window->renderer->color = Colors.white;
 }
 
 void Connect4Instance::SetBoard(uint8_t x, uint8_t y, uint8_t val)

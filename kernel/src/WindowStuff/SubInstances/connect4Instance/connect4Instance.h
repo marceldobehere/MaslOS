@@ -31,6 +31,7 @@ public:
         bool DropPiece(uint8_t col, uint8_t piece);
         uint8_t GetBoard(uint8_t x, uint8_t y);
         char playerChars[3] = {'_', 'X', 'O'};
+        uint32_t playerCols[3] = {Colors.gray, Colors.bred, Colors.bgreen};
 
 
     public:
