@@ -8,6 +8,7 @@
 #include "../OSDATA/userdata.h"
 #include "../OSDATA/osdata.h"
 #include "../tasks/enterHandler/taskEnterHandler.h"
+#include "../WindowStuff/SubInstances/connect4Instance/connect4Instance.h"
 
 
 bool lshift = false;
@@ -199,6 +200,14 @@ void HandleKeyboard(uint8_t scancode)
                 instance->tasks.add(NewEnterTask(instance));
             }
         }
+        else if (activeWindow->instance->instanceType == InstanceType::Connect4)
+        {
+            Connect4Instance* instance = (Connect4Instance*)activeWindow->instance;
+            if (instance->currentMode == Connect4Instance::CurrentMode::PLAYER_1_ENTER || instance->currentMode == Connect4Instance::CurrentMode::PLAYER_2_ENTER)
+            {
+                instance->HandleInput();
+            }
+        }
     }
     else if (scancode == Backspace)
     {
@@ -213,6 +222,17 @@ void HandleKeyboard(uint8_t scancode)
                     activeWindow->renderer->CursorPosition.x -= 8; 
                 if (activeWindow->allowKeyboardDrawing)
                     activeWindow->renderer->delChar(activeWindow->renderer->CursorPosition.x, activeWindow->renderer->CursorPosition.y);
+            }
+        }
+        else if (activeWindow->instance->instanceType == InstanceType::Connect4)
+        {
+            Connect4Instance* instance = (Connect4Instance*)activeWindow->instance;
+            if (instance->inputLen > 0 &&  (instance->currentMode == Connect4Instance::CurrentMode::PLAYER_1_ENTER || instance->currentMode == Connect4Instance::CurrentMode::PLAYER_2_ENTER))
+            {
+                instance->inputLen--;
+                instance->userInput[instance->inputLen] = 0;
+                activeWindow->renderer->CursorPosition.x -= 8; 
+                activeWindow->renderer->delChar(activeWindow->renderer->CursorPosition.x, activeWindow->renderer->CursorPosition.y, instance->bgCol);
             }
         }
     } 
@@ -275,6 +295,32 @@ void HandleKeyboard(uint8_t scancode)
                 {
                     instance->terminalInput[instance->userlen] = ascii;
                     instance->userlen++;
+                }
+            }
+            else if (activeWindow->instance->instanceType == InstanceType::Connect4)
+            {
+                Connect4Instance* instance = (Connect4Instance*)activeWindow->instance;
+
+                if (instance->currentMode != Connect4Instance::CurrentMode::NONE && instance->currentMode != Connect4Instance::CurrentMode::WAIT)
+                {
+                    if (instance->currentMode == Connect4Instance::CurrentMode::PLAYER_1_ENTER || 
+                        instance->currentMode == Connect4Instance::CurrentMode::PLAYER_2_ENTER)
+                        activeWindow->renderer->Print(ascii);
+
+                    if (instance->currentMode == Connect4Instance::CurrentMode::START)
+                    {
+                        if (ascii == ' ')
+                        {
+                            instance->userInput[instance->inputLen] = ascii;
+                            instance->inputLen++;
+                            instance->HandleInput();
+                        }
+                    }
+                    else if (instance->inputLen < 4)
+                    {
+                        instance->userInput[instance->inputLen] = ascii;
+                        instance->inputLen++;
+                    }   
                 }
             }
         }

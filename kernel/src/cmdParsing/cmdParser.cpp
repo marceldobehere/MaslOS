@@ -15,6 +15,7 @@
 #include "../kernelStuff/Disk_Stuff/Disk_Interfaces/file/fileDiskInterface.h"
 #include "../kernelStuff/Disk_Stuff/Partition_Interfaces/mraps/mrapsPartitionInterface.h"
 #include "../kernelStuff/Disk_Stuff/Filesystem_Interfaces/mrafs/mrafsFileSystemInterface.h"
+#include "../WindowStuff/SubInstances/connect4Instance/connect4Instance.h"
 
 void LogError(const char* msg, Window* window)
 {
@@ -113,6 +114,35 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     {
         window->renderer->Println("Exiting...");
         osData.exit = true;
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(input, "connect 4") || StrEquals(input, "connect four"))
+    {
+        {
+            Window* oldActive = activeWindow;
+            Window* con4Window = (Window*)malloc(sizeof(Window), "Connect 4 Window");
+            Connect4Instance* connect4 = (Connect4Instance*)malloc(sizeof(Connect4Instance), "Connect 4 Instance");
+            *connect4 = Connect4Instance(con4Window);
+            *(con4Window) = Window((DefaultInstance*)connect4, Size(300, 400), Position(10, 40), "Connect 4", true, true, true);
+            osData.windows.add(con4Window);
+            
+            connect4->Init();
+            
+            
+            activeWindow = con4Window;          
+            con4Window->moveToFront = true;
+            osData.mainTerminalWindow = con4Window;
+
+            if (oldActive != NULL)
+            {
+                osData.windowPointerThing->UpdateWindowBorder(oldActive);
+            }
+
+            RemoveFromStack();
+            return;
+        }
         RemoveFromStack();
         return;
     }

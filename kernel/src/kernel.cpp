@@ -107,18 +107,18 @@ extern "C" void _start(BootInfo* bootInfo)
     }
 
 
-    {
-        Window* window = (Window*)malloc(sizeof(Window), "Window");
-        TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance), "Terminal Instance");
-        *terminal = TerminalInstance(&guestUser, window);
-        *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(700, 60), "Testing Window", true, true, true);
-        osData.windows.add(window);
+    // {
+    //     Window* window = (Window*)malloc(sizeof(Window), "Window");
+    //     TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance), "Terminal Instance");
+    //     *terminal = TerminalInstance(&guestUser, window);
+    //     *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(700, 60), "Testing Window", true, true, true);
+    //     osData.windows.add(window);
             
-        window->renderer->Cls();  
-        window->renderer->DrawImage(bootInfo->testImage, 150, 0, 2, 2);
-        //osData.windows[1]->renderer->Println("Hello, world!");
-        KeyboardPrintStart(window);
-    }
+    //     window->renderer->Cls();  
+    //     window->renderer->DrawImage(bootInfo->testImage, 150, 0, 2, 2);
+    //     //osData.windows[1]->renderer->Println("Hello, world!");
+    //     KeyboardPrintStart(window);
+    // }
  
     NewTerminalInstance* newTerminaltest;
     {
