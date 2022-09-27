@@ -203,7 +203,8 @@ void HandleKeyboard(uint8_t scancode)
         else if (activeWindow->instance->instanceType == InstanceType::Connect4)
         {
             Connect4Instance* instance = (Connect4Instance*)activeWindow->instance;
-            if (instance->currentMode == Connect4Instance::CurrentMode::PLAYER_1_ENTER || instance->currentMode == Connect4Instance::CurrentMode::PLAYER_2_ENTER)
+            if (instance->currentMode == Connect4Instance::CurrentMode::PLAYER_1_ENTER || instance->currentMode == Connect4Instance::CurrentMode::PLAYER_2_ENTER
+                || instance->currentMode == Connect4Instance::CurrentMode::END || instance->currentMode == Connect4Instance::CurrentMode::START)
             {
                 instance->HandleInput();
             }
@@ -305,18 +306,10 @@ void HandleKeyboard(uint8_t scancode)
                 {
                     if (instance->currentMode == Connect4Instance::CurrentMode::PLAYER_1_ENTER || 
                         instance->currentMode == Connect4Instance::CurrentMode::PLAYER_2_ENTER)
-                        activeWindow->renderer->Print(ascii);
+                        if (instance->inputLen < 4)
+                            activeWindow->renderer->Print(ascii);
 
-                    if (instance->currentMode == Connect4Instance::CurrentMode::START)
-                    {
-                        if (ascii == ' ')
-                        {
-                            instance->userInput[instance->inputLen] = ascii;
-                            instance->inputLen++;
-                            instance->HandleInput();
-                        }
-                    }
-                    else if (instance->inputLen < 4)
+                    if (instance->inputLen < 4)
                     {
                         instance->userInput[instance->inputLen] = ascii;
                         instance->inputLen++;

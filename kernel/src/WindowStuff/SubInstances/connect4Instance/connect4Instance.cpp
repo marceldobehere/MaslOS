@@ -16,11 +16,12 @@ void Connect4Instance::Init()
 {
     currentMode = CurrentMode::NONE;
     bgCol = 0xFF000022;
+    window->renderer->color = Colors.white;
     window->renderer->Clear(bgCol);
     window->renderer->putStr("CONNECT FOUR", (window->size.width-(12*8))/2, 30);
     window->renderer->putStr("________________", (window->size.width-(16*8))/2, 36);
     
-    window->renderer->putStr("PRESS SPACE TO START", (window->size.width-(20*8))/2, 80);
+    window->renderer->putStr("PRESS ENTER TO START", (window->size.width-(20*8))/2, 80);
 
     sizeX = 7;
     sizeY = 6;
@@ -77,11 +78,8 @@ void Connect4Instance::HandleInput()
 
     if (mode == CurrentMode::START)
     {
-        if (StrEquals(userInput, " "))
-        {
-            currentMode = CurrentMode::PLAYER_1_ENTER;
-            RedrawBoard();
-        }
+        currentMode = CurrentMode::PLAYER_1_ENTER;
+        RedrawBoard();
     }
     else if (mode == CurrentMode::PLAYER_1_ENTER)
     {
@@ -105,6 +103,13 @@ void Connect4Instance::HandleInput()
                 currentMode = CurrentMode::PLAYER_1_ENTER;
                 RedrawBoard();  
             }
+    }
+    else if (mode == CurrentMode::END)
+    {
+        free(board);
+        board = 0;
+        Init();
+        return;
     }
 
     CheckWin();
@@ -157,6 +162,9 @@ void Connect4Instance::RedrawBoard()
                     window->renderer->Println("Player 2 won!");
                 }
             }
+
+            window->renderer->color = Colors.white;
+            window->renderer->Println("Press Enter to restart.");
         }
     }
 
@@ -173,7 +181,7 @@ void Connect4Instance::ClearBoard()
 void Connect4Instance::DrawBoard()
 {
     window->renderer->CursorPosition.y = 16*2;
-    int startX = 8;
+    int startX = (window->size.width - (sizeX * 16)) / 2;
 
     for (int y = 0; y < sizeY; y++)
     {
