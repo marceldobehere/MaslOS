@@ -90,7 +90,6 @@ void Connect4Instance::HandleInput()
         if (col != -1)
             if (DropPiece(col, 1))
             {
-                
                 currentMode = CurrentMode::PLAYER_2_ENTER;
                 RedrawBoard();  
             }
@@ -108,6 +107,11 @@ void Connect4Instance::HandleInput()
             }
     }
 
+    CheckWin();
+    if (winState != 0)
+    {
+        RedrawBoard();
+    }
     ClearInput();
 }
 
@@ -142,7 +146,7 @@ void Connect4Instance::RedrawBoard()
             }
             else
             {
-                if (currentMode == CurrentMode::PLAYER_1_ENTER)
+                if (winState == 1)
                 {
                     window->renderer->color = playerCols[1];
                     window->renderer->Println("Player 1 won!");
@@ -216,5 +220,58 @@ uint8_t Connect4Instance::GetBoard(uint8_t x, uint8_t y)
         return 0;
     
     return board[x + y * sizeX];
+}
+
+void Connect4Instance::CheckWin()
+{
+    for (int i = 1; i < 3 && winState == 0; i++)
+        CheckWin(i);
+
+    if (winState != 0)
+        return;
+
+    for (int i = 0; i < sizeX; i++)
+        if (board[i] == 0)
+            return;
+    
+    winState = 3;
+    currentMode = CurrentMode::END;
+}
+
+void Connect4Instance::CheckWin(uint8_t piece)
+{
+    // Vertical
+    for (int mainX = 0; mainX < sizeX; mainX++)
+        for (int mainY = 0; mainY < sizeY - 3; mainY++)
+            if (CheckSubWin(mainX, mainY, piece, 0, 1, 4))
+                return;
+
+    // Horizonatl
+    for (int mainX = 0; mainX < sizeX - 3; mainX++)
+        for (int mainY = 0; mainY < sizeY; mainY++)
+            if (CheckSubWin(mainX, mainY, piece, 1, 0, 4))
+                return;
+
+    // Diag 1
+    for (int mainX = 0; mainX < sizeX - 3; mainX++)
+        for (int mainY = 0; mainY < sizeY - 3; mainY++)
+            if (CheckSubWin(mainX, mainY, piece, 1, 1, 4))
+                return;
+
+    // Diag 2
+    for (int mainX = 0; mainX < sizeX - 3; mainX++)
+        for (int mainY = 0; mainY < sizeY - 3; mainY++)
+            if (CheckSubWin(((sizeX - 1) - mainX), mainY, piece, -1, 1, 4))
+                return;
+}
+
+bool Connect4Instance::CheckSubWin(int x, int y, uint8_t piece, int xd, int yd, int count)
+{
+    for (int i = 0; i < count; i++)
+        if (GetBoard(x + i*xd, y + i*yd) != piece)
+            return false;
+    winState = piece;
+    currentMode = CurrentMode::END;
+    return true;
 }
 

@@ -32,6 +32,9 @@ public:
         uint8_t GetBoard(uint8_t x, uint8_t y);
         char playerChars[3] = {'_', 'X', 'O'};
         uint32_t playerCols[3] = {Colors.gray, Colors.bred, Colors.bgreen};
+        void CheckWin();
+        void CheckWin(uint8_t piece);
+        bool CheckSubWin(int x, int y, uint8_t piece, int xd, int yd, int count);
 
 
     public:
