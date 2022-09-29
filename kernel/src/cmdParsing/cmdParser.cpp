@@ -16,6 +16,7 @@
 #include "../kernelStuff/Disk_Stuff/Partition_Interfaces/mraps/mrapsPartitionInterface.h"
 #include "../kernelStuff/Disk_Stuff/Filesystem_Interfaces/mrafs/mrafsFileSystemInterface.h"
 #include "../WindowStuff/SubInstances/connect4Instance/connect4Instance.h"
+#include "../tasks/bfTask/bfTask.h"
 
 void LogError(const char* msg, Window* window)
 {
@@ -219,6 +220,18 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     {
         if (data->len == 2)
             window->renderer->Println(data->data[1]);
+        else
+            LogInvalidArgumentCount(1, data->len-1, window);
+        
+        free(data);
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(data->data[0], "bf"))
+    {
+        if (data->len == 2)
+            terminal->tasks.add(NewBFTask(data->data[1], window));
         else
             LogInvalidArgumentCount(1, data->len-1, window);
         

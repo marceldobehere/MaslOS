@@ -8,6 +8,7 @@ TerminalInstance::TerminalInstance(OSUser* user, Window* window)
     mode = commandMode::none;
     instanceType = InstanceType::Terminal;
     userlen = 0;
+    takeInput = false;
     for (int i = 0; i < 256; i++)
     {
         terminalInput[i] = 0;

@@ -282,7 +282,7 @@ void HandleKeyboard(uint8_t scancode)
             {
                 TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
 
-                if (activeWindow->allowKeyboardDrawing && !instance->GetBusy())
+                if ((activeWindow->allowKeyboardDrawing && !instance->GetBusy()))
                 {
                     if (instance->mode == commandMode::none)
                         activeWindow->renderer->Print(ascii);
@@ -292,7 +292,7 @@ void HandleKeyboard(uint8_t scancode)
                         activeWindow->renderer->Print("*");
                 }
 
-                if (instance->userlen < 255 && !instance->GetBusy())
+                if ((instance->userlen < 255 && !instance->GetBusy()) || instance->takeInput)
                 {
                     instance->terminalInput[instance->userlen] = ascii;
                     instance->userlen++;

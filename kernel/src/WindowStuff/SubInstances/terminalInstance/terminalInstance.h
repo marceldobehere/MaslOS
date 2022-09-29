@@ -27,6 +27,7 @@ class TerminalInstance : public DefaultInstance
     char lastTerminalInput[256];
     char terminalInput[256];
     bool GetBusy();
+    bool takeInput;
     uint64_t userlen;
     TerminalInstance(OSUser* user, Window* window);
     void HandleEnter();
