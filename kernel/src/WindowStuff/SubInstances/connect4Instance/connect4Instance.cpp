@@ -25,7 +25,7 @@ void Connect4Instance::Init()
 
     sizeX = 7;
     sizeY = 6;
-    board = (uint8_t*)malloc(sizeX * sizeY);
+    board = (uint8_t*)malloc(sizeX * sizeY, "2D Board go brrt");
     winState = 0;
 
     ClearInput();
@@ -118,6 +118,11 @@ void Connect4Instance::HandleInput()
         RedrawBoard();
     }
     ClearInput();
+}
+
+void Connect4Instance::Free()
+{
+    free(board);
 }
 
 void Connect4Instance::RedrawBoard()

@@ -7,6 +7,7 @@ enum TaskType
     HANDLEENTER,
     CLOSEWINDOW,
     BEEP,
+    BF,
 };
 
 

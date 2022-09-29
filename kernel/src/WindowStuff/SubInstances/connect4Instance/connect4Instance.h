@@ -51,5 +51,6 @@ public:
     void ClearBoard();
     void DrawBoard();
     void RedrawBoard();
+    void Free();
 
 };

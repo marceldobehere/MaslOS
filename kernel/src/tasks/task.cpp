@@ -3,6 +3,7 @@
 #include "sleep/taskSleep.h"
 #include "enterHandler/taskEnterHandler.h"
 #include "closeWindow/taskWindowClose.h"
+#include "bfTask/bfTask.h"
 #include "playBeep/playBeep.h"
 
 
@@ -64,6 +65,12 @@ void DoTask(Task* task)
             close->Do();
             break;
         }
+        case TaskType::BF:
+        {
+            TaskBF* bf = (TaskBF*)task;
+            bf->Do();
+            break;
+        }
     }
 }
 
@@ -102,6 +109,13 @@ void FreeTask(Task* task)
             TaskWindowClose* close = (TaskWindowClose*)task;
             close->Free();
             free((void*)close);
+            break;
+        }
+        case TaskType::BF:
+        {
+            TaskBF* bf = (TaskBF*)task;
+            bf->Free();
+            free((void*)bf);
             break;
         }
     }  
