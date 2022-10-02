@@ -18,6 +18,7 @@ MaslOS is 1000% the best os ever!11!1
 * Apps
   - Terminal
   - (Experimental) Text Display Window
+  - Connect Four Game
 * Audio
   - (In planning) Audio Device Driver of some sorts
 * Keyboard
@@ -47,7 +48,8 @@ MaslOS is 1000% the best os ever!11!1
   + Crash handling
     - Crash Window showing non fatal kernel panic / crash
     - Emergency Kernel Panic
-  - Crash command
+  - Crash Command
+  - BF Interpreter
   - KernelFiles
   - Auto Disk Stuff Detection
   + - Auto Disk Detection
