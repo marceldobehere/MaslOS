@@ -103,6 +103,6 @@ Go into the MaslOS Folder and run the `RUN.sh` file
 ![The Crash Window](/images/crash%20window.PNG "The Crash window")
 ![The Panic screen](/images/new%20kernel%20panic.PNG "The new Panic screen")
 
-![Importing Windows Files](/images/importing text%20file.PNG "Importing Windows Files")
+![Importing Windows Files](/images/importing%20text%20file.PNG "Importing Windows Files")
 ![Importing C# Project](/images/importing%20cs%20file.png "Importing C# Project")
 [More Images](/images)
