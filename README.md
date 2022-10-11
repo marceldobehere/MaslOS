@@ -55,6 +55,7 @@ MaslOS is 1000% the best os ever!11!1
   + - Auto Disk Detection
     - Auto Partition Detection
     - Auto Filesystem Detection
+  + [MRAPS/MRAFS To/From Windows FS Converter Tool](https://github.com/marceldobehere/Masl-Disk-File-Converter)
 
 
 ## How to run (Linux)
