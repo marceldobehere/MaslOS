@@ -99,7 +99,10 @@ Go into the MaslOS Folder and run the `RUN.sh` file
 ![The Desktop](/images/desktop%20background.PNG "The Desktop")
 ![Playing around with the Terminals](/images/terminal%20test%201.PNG "Playing around with the Terminals")
 ![A lot of windows](/images/yes.PNG "A lot of windows")
-![The Panic screen](/images/filesystem%20test.PNG "A short test showing the filesystem working")
-![The Panic screen](/images/crash%20window.PNG "The Crash window")
+![FS Test](/images/filesystem%20test.PNG "A short test showing the filesystem working")
+![The Crash Window](/images/crash%20window.PNG "The Crash window")
 ![The Panic screen](/images/new%20kernel%20panic.PNG "The new Panic screen")
+
+![Importing Windows Files](/images/importing text%20file.PNG "Importing Windows Files")
+![Importing C# Project](/images/importing%20cs%20file.png "Importing C# Project")
 [More Images](/images)
