@@ -57,3 +57,5 @@ struct dispVar
         type = varType::_charPointer;
     }
 };
+
+const char* PrintArg(dispVar var);

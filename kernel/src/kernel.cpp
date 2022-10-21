@@ -99,6 +99,9 @@ extern "C" void _start(BootInfo* bootInfo)
         mainWindow = (Window*)malloc(sizeof(Window), "Main window");
         TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance), "Terminal Instance for main window");
         *terminal = TerminalInstance(&adminUser, mainWindow);
+        // NewTerminalInstance* terminal = (NewTerminalInstance*)malloc(sizeof(NewTerminalInstance), "New Terminal Instance for main window");
+        // *terminal = NewTerminalInstance(&adminUser, mainWindow);
+
         *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(5, 30), "Main Window", true, true, true);
         osData.windows.add(mainWindow);
 
@@ -124,7 +127,7 @@ extern "C" void _start(BootInfo* bootInfo)
     {
         Window* window = (Window*)malloc(sizeof(Window), "Window");
         NewTerminalInstance* terminal = (NewTerminalInstance*)malloc(sizeof(NewTerminalInstance), "Terminal Instance");
-        *terminal = NewTerminalInstance(&guestUser, window);
+        *terminal = NewTerminalInstance(window);
         *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(500, 60), "Testing new Terminal", true, true, true);
         osData.windows.add(window);
             
@@ -151,8 +154,8 @@ extern "C" void _start(BootInfo* bootInfo)
     debugTerminalWindow->Log("<STAT>");
     debugTerminalWindow->Log("<STAT>");
 
-    activeWindow->renderer->Cls();
-    KeyboardPrintStart(mainWindow);
+    ((TerminalInstance*)mainWindow->instance)->Cls();
+    ((TerminalInstance*)mainWindow->instance)->KeyboardPrintStart();
     //mainWindow->Render();
 
     
@@ -165,6 +168,9 @@ extern "C" void _start(BootInfo* bootInfo)
     uint64_t oldTime = PIT::TimeSinceBootMS();
     //double fps = 1;
     uint64_t fps = 1;
+
+    uint64_t frameSum = 0;
+
     while(!osData.exit)
     {
         AddToStack();
@@ -195,9 +201,41 @@ extern "C" void _start(BootInfo* bootInfo)
 
         AddToStack();
         {
+            frameSum++;
+            if (frameSum == 10)
+                newTerminaltest->WriteText("This is a test (2)!");
+            if (frameSum == 300)
+                newTerminaltest->WriteText("This is a test (3)!");
+            
+            if (frameSum > 1000 && frameSum < 1500 && frameSum % 4 == 0)
+                newTerminaltest->scrollX += 1;
+            if (frameSum == 1500)
+                newTerminaltest->WriteText("This is a test (4)!");
+
+            if (frameSum > 2000 && frameSum < 3000 && frameSum % 4 == 0)
+                newTerminaltest->scrollX -= 1;
+            if (frameSum == 3000)
+                newTerminaltest->WriteText("This is a test (5)!");
+
+            if (frameSum > 3500 && frameSum < 4000 && frameSum % 4 == 0)
+                newTerminaltest->scrollY -= 1;
+            if (frameSum == 4000)
+                newTerminaltest->WriteText("This is a test (6)!");
+
+            if (frameSum > 4500 && frameSum < 5400 && frameSum % 4 == 0)
+                newTerminaltest->scrollY += 1;
+            if (frameSum == 5400)
+                newTerminaltest->WriteText("This is a test (7)!");
+
+            if (frameSum > 6000 && frameSum < 6500 && frameSum % 4 == 0)
+                newTerminaltest->scrollY -= 1;
+            if (frameSum == 6500)
+                newTerminaltest->WriteText("This is a test (8)!");
+
+
             // newTerminaltest->scrollX = 60 - ((tFrame % 300) * 2);
             // newTerminaltest->scrollY = 50 - ((tFrame/3 % 250) * 1);
-            // newTerminaltest->Render();
+            newTerminaltest->Render();
         }
         RemoveFromStack();
 
@@ -332,6 +370,17 @@ extern "C" void _start(BootInfo* bootInfo)
                     }
                 }
             }
+            if (window->instance != 0)
+                if (window->instance->instanceType == InstanceType::Terminal)
+                {
+                    TerminalInstance* termInst1 = (TerminalInstance*)window->instance;
+                    if (termInst1->newTermInstance != 0)
+                    {
+                        NewTerminalInstance* termInst2 = (NewTerminalInstance*)termInst1->newTermInstance;
+                        termInst2->Render();
+                    }
+                }
+            
         }
         RemoveFromStack();
 

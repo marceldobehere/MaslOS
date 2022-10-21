@@ -20,6 +20,7 @@ class TerminalInstance : public DefaultInstance
     private:
         Window* window;
         bool printUser;
+        
 
     public:
     List<Task*> tasks = List<Task*>(4);
@@ -30,9 +31,12 @@ class TerminalInstance : public DefaultInstance
     bool takeInput;
     uint64_t userlen;
     TerminalInstance(OSUser* user, Window* window);
+    void KeyboardPrintStart();
     void HandleEnter();
     void PrintUserIfNeeded();
     void Free();
+    void Cls();
     commandMode mode;
+    void* newTermInstance;
 
 };

@@ -10,8 +10,8 @@ void HandleEnter();
 
 void InitKeyboard();
 
-void KeyboardPrintStart(Window* window);
+//void KeyboardPrintStart(Window* window);
 
-void PrintUser(Window* window, OSUser* user);
+//void PrintUser(Window* window, OSUser* user);
 
 void HandleKeyboard(uint8_t scancode);

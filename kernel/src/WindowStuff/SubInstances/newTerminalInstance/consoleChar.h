@@ -19,4 +19,11 @@ struct ConsoleChar
                 this->fg == other.fg   &&
                 this->bg == other.bg;
     }
+
+    bool operator!=(const ConsoleChar & other)
+    {
+        return  this->chr != other.chr ||
+                this->fg != other.fg   ||
+                this->bg != other.bg;
+    }
 };

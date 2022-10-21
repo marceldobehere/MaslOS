@@ -64,48 +64,48 @@ void InitKeyboard()
 
 }
 
-void KeyboardPrintStart(Window* window)
-{
-    AddToStack();
-    if (window == NULL)
-    {
-        RemoveFromStack();
-        return;
-    }
+// void KeyboardPrintStart(Window* window)
+// {
+//     AddToStack();
+//     if (window == NULL)
+//     {
+//         RemoveFromStack();
+//         return;
+//     }
 
-    if (!window->allowKeyboardDrawing)
-    {
-        RemoveFromStack();
-        return;
-    }
+//     if (!window->allowKeyboardDrawing)
+//     {
+//         RemoveFromStack();
+//         return;
+//     }
 
-    if (window->instance->instanceType == InstanceType::Terminal)
-    {
-        window->renderer->CursorPosition.y += 16;
-        TerminalInstance* instance = (TerminalInstance*)window->instance;
-        PrintUser(window, instance->currentUser);
-    }
-    RemoveFromStack();
-}
+//     if (window->instance->instanceType == InstanceType::Terminal)
+//     {
+//         window->renderer->CursorPosition.y += 16;
+//         TerminalInstance* instance = (TerminalInstance*)window->instance;
+//         PrintUser(window, instance->currentUser);
+//     }
+//     RemoveFromStack();
+// }
 
-void PrintUser(Window* window, OSUser* user)
-{
-    AddToStack();
-    if (window == NULL)
-    {
-        RemoveFromStack();
-        return;
-    }
-    if (user== NULL)
-    {
-        RemoveFromStack();
-        return;
-    }
+// void PrintUser(Window* window, OSUser* user)
+// {
+//     AddToStack();
+//     if (window == NULL)
+//     {
+//         RemoveFromStack();
+//         return;
+//     }
+//     if (user== NULL)
+//     {
+//         RemoveFromStack();
+//         return;
+//     }
 
-    window->renderer->Print(user->userName, user->colData.userColor);
-    window->renderer->Print("> ");
-    RemoveFromStack();
-}
+//     window->renderer->Print(user->userName, user->colData.userColor);
+//     window->renderer->Print("> ");
+//     RemoveFromStack();
+// }
 
 void HandleKeyboard(uint8_t scancode)
 {
@@ -155,8 +155,9 @@ void HandleKeyboard(uint8_t scancode)
             *terminal = TerminalInstance(&guestUser, mainWindow);
             *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(10, 40), "Terminal Window", true, true, true);
             osData.windows.add(mainWindow);
-            mainWindow->renderer->Cls();
-            KeyboardPrintStart(mainWindow);
+            ((TerminalInstance*)mainWindow->instance)->Cls();
+            //KeyboardPrintStart(mainWindow);
+            ((TerminalInstance*)mainWindow->instance)->KeyboardPrintStart();
 
             activeWindow = mainWindow;          
             mainWindow->moveToFront = true;
@@ -196,7 +197,7 @@ void HandleKeyboard(uint8_t scancode)
             if (!instance->GetBusy())
             {
                 if (activeWindow->allowKeyboardDrawing)
-                    activeWindow->renderer->Println();
+                    ((NewTerminalInstance*)instance->newTermInstance)->Println();
                 instance->tasks.add(NewEnterTask(instance));
             }
         }
@@ -222,7 +223,7 @@ void HandleKeyboard(uint8_t scancode)
                 if (activeWindow->allowKeyboardDrawing)
                     activeWindow->renderer->CursorPosition.x -= 8; 
                 if (activeWindow->allowKeyboardDrawing)
-                    activeWindow->renderer->delChar(activeWindow->renderer->CursorPosition.x, activeWindow->renderer->CursorPosition.y);
+                    ((NewTerminalInstance*)instance->newTermInstance)->DeleteLastCharInLine();//activeWindow->renderer->delChar(activeWindow->renderer->CursorPosition.x, activeWindow->renderer->CursorPosition.y);
             }
         }
         else if (activeWindow->instance->instanceType == InstanceType::Connect4)
@@ -285,11 +286,11 @@ void HandleKeyboard(uint8_t scancode)
                 if ((activeWindow->allowKeyboardDrawing && !instance->GetBusy()))
                 {
                     if (instance->mode == commandMode::none)
-                        activeWindow->renderer->Print(ascii);
+                        ((NewTerminalInstance*)instance->newTermInstance)->Print(ascii);
                     else if (instance->mode == commandMode::enterText)
-                        activeWindow->renderer->Print(ascii);
+                        ((NewTerminalInstance*)instance->newTermInstance)->Print(ascii);
                     else if (instance->mode == commandMode::enterPassword)
-                        activeWindow->renderer->Print("*");
+                        ((NewTerminalInstance*)instance->newTermInstance)->Print("*");
                 }
 
                 if ((instance->userlen < 255 && !instance->GetBusy()) || instance->takeInput)

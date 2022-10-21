@@ -14,6 +14,7 @@ void BasicRenderer::putChar(char chr, int64_t xoff, int64_t yoff, uint32_t fg, u
     uint32_t tcol = color;
     bool toverwrite = overwrite;
     color = fg;
+    overwrite = false;
     putChar(chr, xoff, yoff);
     overwrite = toverwrite;
     color = tcol;
@@ -306,8 +307,8 @@ void BasicRenderer::ClearDotted(uint32_t col)
 void BasicRenderer::Cls()
 {
     BasicRenderer::Clear(0);
-    BasicRenderer::Println("Masl OS v0.32", Colors.green);
-    BasicRenderer::Println("-------------", Colors.green);
+    BasicRenderer::Println("(OLD) Masl OS v0.35", Colors.green);
+    BasicRenderer::Println("-------------------", Colors.green);
     BasicRenderer::Println();
 }
 
@@ -342,24 +343,7 @@ void BasicRenderer::Print(const char *chrs, dispVar vars[], uint32_t col)
 }
  
 
-void BasicRenderer::PrintArg(dispVar var)
-{
-    const char* toPrint = "<IDK>";
-    if (var.type == varType::_bool)
-        toPrint = to_string(var._bool);
-    else if (var.type == varType::_int)
-        toPrint = to_string(var._int);
-    else if (var.type == varType::_int64)
-        toPrint = to_string(var._int64);
-    else if (var.type == varType::_uint64)
-        toPrint = to_string(var._uint64);
-    else if (var.type == varType::_double)
-        toPrint = to_string(var._double);
-    else if (var.type == varType::_charPointer)
-        toPrint = var._charPointer;
 
-    Print(toPrint);
-}
 
 
 void BasicRenderer::Print(const char* chrs, dispVar vars[])
@@ -399,7 +383,7 @@ void BasicRenderer::Print(const char* chrs, dispVar vars[])
                 free(sub);
                 //GlobalRenderer->Print("[{}]", to_string(indx), Colors.yellow);
                 
-                PrintArg(vars[indx]);
+                printStr(PrintArg(vars[indx]), NULL, false);
                 index++;
             }
             index--;

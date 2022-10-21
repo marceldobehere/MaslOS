@@ -160,6 +160,11 @@ void Panic(const char* panicMessage, const char* var, bool lock)
             GlobalRenderer->Println("(BTW the rendering of the debug terminal is causing issues so no debug terminal)");
             GlobalRenderer->Println();
 
+        PrintMStackTrace(MStackData::stackArr, MStackData::stackPointer);
+        GlobalRenderer->Println();
+        GlobalRenderer->Println();
+        PrintRegisterDump(GlobalRenderer);
+
             while(true);
         }
         

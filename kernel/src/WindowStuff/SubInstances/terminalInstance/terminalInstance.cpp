@@ -1,5 +1,6 @@
 #include "terminalInstance.h"
 #include "../../../OSDATA/MStack/MStackM.h"
+#include "../newTerminalInstance/newTerminalInstance.h"
 
 TerminalInstance::TerminalInstance(OSUser* user, Window* window)
 {
@@ -15,6 +16,8 @@ TerminalInstance::TerminalInstance(OSUser* user, Window* window)
         lastTerminalInput[i] = 0;
     }
     printUser = false;
+    newTermInstance = malloc(sizeof(NewTerminalInstance));
+    *((NewTerminalInstance*)newTermInstance) = NewTerminalInstance(window);
 }
 
 bool TerminalInstance::GetBusy()
@@ -53,6 +56,59 @@ void TerminalInstance::HandleEnter()
     RemoveFromStack();
 }
 
+void PrintUser(NewTerminalInstance* newTermInstance, OSUser* user)
+{
+    AddToStack();
+    if (newTermInstance == NULL)
+    {
+        RemoveFromStack();
+        return;
+    }
+    if (user== NULL)
+    {
+        RemoveFromStack();
+        return;
+    }
+
+    newTermInstance->Print(user->userName, user->colData.userColor);
+    newTermInstance->Print("> ");
+    RemoveFromStack();
+}
+
+void TerminalInstance::KeyboardPrintStart()
+{
+    AddToStack();
+    if (window == NULL)
+    {
+        RemoveFromStack();
+        return;
+    }
+
+    if (!window->allowKeyboardDrawing)
+    {
+        RemoveFromStack();
+        return;
+    }
+
+    if (window->instance->instanceType == InstanceType::Terminal)
+    {
+        ((NewTerminalInstance*)newTermInstance)->Println();
+        TerminalInstance* instance = (TerminalInstance*)window->instance;
+        PrintUser(((NewTerminalInstance*)newTermInstance), instance->currentUser);
+    }
+    RemoveFromStack();
+}
+
+void TerminalInstance::Cls()
+{
+    NewTerminalInstance* tempInst = (NewTerminalInstance*)newTermInstance;
+    tempInst->Clear();
+    tempInst->Println("Masl OS v0.36", Colors.green);
+    tempInst->Println("-------------", Colors.green);
+    tempInst->Println();
+    tempInst->Render();
+}
+
 void TerminalInstance::PrintUserIfNeeded()
 {
     AddToStack();
@@ -65,8 +121,8 @@ void TerminalInstance::PrintUserIfNeeded()
     {
         if (window->allowKeyboardDrawing)
         {
-            window->renderer->Println();
-            PrintUser(window, currentUser);
+            ((NewTerminalInstance*)newTermInstance)->Println();
+            PrintUser((NewTerminalInstance*)newTermInstance, currentUser);
             ClearInput(this);
         }
     }
