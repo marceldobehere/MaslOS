@@ -81,36 +81,47 @@ void RemapPIC()
 {
     AddToStack();
     uint8_t a1, a2;
+    
     a1 = inb(PIC1_DATA);
     io_wait();
     a2 = inb(PIC2_DATA);
     io_wait();
 
+    AddToStack();
     outb(PIC1_COMMAND, ICW1_INIT | ICW1_ICW4);
     io_wait();
     outb(PIC2_COMMAND, ICW1_INIT | ICW1_ICW4);
     io_wait();
 
+    AddToStack();
     outb(PIC1_DATA, 0x20);
     io_wait();
     outb(PIC2_DATA, 0x28);
     io_wait();
 
+    AddToStack();
     outb(PIC1_DATA, 4);
     io_wait();
     outb(PIC2_DATA, 2);
     io_wait();
 
+    AddToStack();
     outb(PIC1_DATA, ICW4_8086);
     io_wait();
     outb(PIC2_DATA, ICW4_8086);
     io_wait();
 
+    AddToStack();
     outb(PIC1_DATA, 0xa1);
     io_wait();
     outb(PIC2_DATA, 0xa2);
     io_wait();
 
+    RemoveFromStack();
+    RemoveFromStack();
+    RemoveFromStack();
+    RemoveFromStack();
+    RemoveFromStack();
     RemoveFromStack();
 }
 

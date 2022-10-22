@@ -1664,7 +1664,43 @@ void GetCmd(const char* name, OSUser* user, Window* window)
     }
     else if (StrEquals(name, "stack trace"))
     {
-        PrintMStackTrace(MStackData::stackArr, MStackData::stackPointer, window->renderer, user->colData.defaultTextColor);
+
+        //PrintMStackTrace(MStackData::stackArr, MStackData::stackPointer, window->renderer, user->colData.defaultTextColor);
+        int64_t size  = MStackData::stackPointer;
+        MStack* stack = MStackData::stackArr;
+        uint32_t col = Colors.yellow;
+
+        #if RECORD_STACK_TRACE  
+        int count = 0;
+        for (int i = 0; i < size; i++)
+        {
+            int index = (size - i) - 1;
+            if (stack[index].line != -1)
+                count++;
+        }
+        Println(window, "STACK TRACE: ({} Elements)\n", to_string(count), col);
+        if (size > 50)
+            size = 50;
+        for (int i = 0; i < size; i++)
+        {
+            int index = (size - i) - 1;
+            if (stack[index].line != -1)
+            {
+                Println(window, "> At \"{}\"", stack[index].name, col);
+                Println(window, "  > in file \"{}\"", stack[index].filename, col);
+                Println(window, "  > At line: {} ", to_string(stack[index].line), col);
+                Println(window);
+            }
+        }
+        Println(window);
+
+        #else
+
+            Println(window, "M-Stack traces are disabled!");
+            Println(window);
+
+        #endif
+
     }
     else if (StrEquals(name, "TSB S"))
     {

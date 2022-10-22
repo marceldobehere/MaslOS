@@ -107,47 +107,75 @@ void InitKeyboard()
 //     RemoveFromStack();
 // }
 
+int scrollSpeed = 8;
+
 void HandleKeyboard(uint8_t scancode)
 {
     AddToStack();
     if (scancode == ARR_LEFT)
     {  
-        int64_t count = Taskbar::taskWindowList->getCount();
-        int64_t index = Taskbar::taskWindowList->getIndexOf(activeWindow);
-        index = (index + count - 1) % count;
-        activeWindow = Taskbar::taskWindowList->elementAt(index);
-        activeWindow->moveToFront = true;
+        if (lshift)
+        {
+            if (activeWindow != NULL)
+                if (activeWindow->instance != NULL)
+                    if (activeWindow->instance->instanceType == InstanceType::Terminal)
+                        if (((TerminalInstance*)activeWindow->instance)->newTermInstance != NULL)
+                            ((NewTerminalInstance*)((TerminalInstance*)activeWindow->instance)->newTermInstance)->scrollX -= scrollSpeed;
+        }
+        else
+        {
+            int64_t count = Taskbar::taskWindowList->getCount();
+            int64_t index = Taskbar::taskWindowList->getIndexOf(activeWindow);
+            index = (index + count - 1) % count;
+            activeWindow = Taskbar::taskWindowList->elementAt(index);
+            activeWindow->moveToFront = true;
+        }
     }
     else if (scancode == ARR_RIGHT)
     {
-        int64_t count = Taskbar::taskWindowList->getCount();
-        int64_t index = Taskbar::taskWindowList->getIndexOf(activeWindow);
-        index = (index + count + 1) % count;
-        activeWindow = Taskbar::taskWindowList->elementAt(index);
-        activeWindow->moveToFront = true;
+        if (lshift)
+        {
+            if (activeWindow != NULL)
+                if (activeWindow->instance != NULL)
+                    if (activeWindow->instance->instanceType == InstanceType::Terminal)
+                        if (((TerminalInstance*)activeWindow->instance)->newTermInstance != NULL)
+                            ((NewTerminalInstance*)((TerminalInstance*)activeWindow->instance)->newTermInstance)->scrollX += scrollSpeed;
+        }
+        else
+        {
+            int64_t count = Taskbar::taskWindowList->getCount();
+            int64_t index = Taskbar::taskWindowList->getIndexOf(activeWindow);
+            index = (index + count + 1) % count;
+            activeWindow = Taskbar::taskWindowList->elementAt(index);
+            activeWindow->moveToFront = true;
+        }
     }
     else if (scancode == ARR_UP)
     {  
-        // int64_t index = osData.windows.getIndexOf(activeWindow);
-        // if (index == -1)
-        // {
-        //     RemoveFromStack();
-        //     return;
-        // }
-        // osData.windows[index]->newSize.width += 10;
+        if (lshift)
+        {
+            if (activeWindow != NULL)
+                if (activeWindow->instance != NULL)
+                    if (activeWindow->instance->instanceType == InstanceType::Terminal)
+                        if (((TerminalInstance*)activeWindow->instance)->newTermInstance != NULL)
+                            ((NewTerminalInstance*)((TerminalInstance*)activeWindow->instance)->newTermInstance)->scrollY -= 2*scrollSpeed;
+        }
+        else
+        {
+            
+        }
     }
     else if (scancode == ARR_DOWN)
     {
-
-        // int64_t index = osData.windows.getIndexOf(activeWindow);
-        // if (index == -1)
-        // {
-        //     RemoveFromStack();
-        //     return;
-        // }
-        // if (osData.windows[index]->newSize.width >= 10)
-        //     osData.windows[index]->newSize.width -= 10;
-
+        if (lshift)
+        {
+            if (activeWindow != NULL)
+                if (activeWindow->instance != NULL)
+                    if (activeWindow->instance->instanceType == InstanceType::Terminal)
+                        if (((TerminalInstance*)activeWindow->instance)->newTermInstance != NULL)
+                            ((NewTerminalInstance*)((TerminalInstance*)activeWindow->instance)->newTermInstance)->scrollY += 2*scrollSpeed;
+        }
+        else
         {
             Window* oldActive = activeWindow;
             Window* mainWindow = (Window*)malloc(sizeof(Window), "Main Window");

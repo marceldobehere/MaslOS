@@ -19,7 +19,7 @@ List<ConsoleChar>* NewTerminalInstance::AddNewLine()
 {
     AddToStack();
     List<ConsoleChar>* list = (List<ConsoleChar>*)malloc(sizeof(List<ConsoleChar>), "New List of console chars");
-    *list = List<ConsoleChar>(1);
+    *list = List<ConsoleChar>(2);
     textData.add(list);
     RemoveFromStack();
     return list;
@@ -33,6 +33,12 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var)
 void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var, bool allowEscape)
 {   
     AddToStack();
+
+    
+    //for (int x = 0; x < 5; x++)
+    //    GlobalRenderer->ClearDotted(Colors.bblue);
+
+    allowEscape = false;
     int len = StrLen(chrs);
     
     List<ConsoleChar>* currList = textData.elementAt(textData.getCount() - 1);
@@ -42,8 +48,12 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
 
     for (int index = 0; index < len; index++)
     {
+        //GlobalRenderer->Println("AAAAA");
         if (chrs[index] == '\n')
+        {
             currList = AddNewLine();
+            currList = textData.elementAt(textData.getCount() - 1);
+        }
         else if (chrs[index] == '\r')
             ;// Maybe implement moving char
         else if (chrs[index] == '{' && allowEscape && var != NULL)
@@ -51,6 +61,7 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
             if (chrs[index + 1] == '}')
             {
                 WriteStringIntoList(var, NULL, false);
+                currList = textData.elementAt(textData.getCount() - 1);
                 index++;
             }
         }
@@ -109,6 +120,9 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
         //currList->add(ConsoleChar(str[i], fg, bg));
     }
     
+    //for (int x = 0; x < 5; x++)
+    //    GlobalRenderer->ClearDotted(Colors.bgreen);
+
     RemoveFromStack();
 }
 
@@ -319,10 +333,12 @@ void NewTerminalInstance::RenderCharChanges()
 void NewTerminalInstance::Render()
 {
     AddToStack();
+    // RemoveFromStack();
+    // return;
     if (scrollX == oldScrollX && scrollY == oldScrollY && oldHeight == window->size.height && oldWidth == window->size.width)
     {
         //osData.drawBackground = !osData.drawBackground;
-        RenderCharChanges();
+        //RenderCharChanges();
     }
     else
     {

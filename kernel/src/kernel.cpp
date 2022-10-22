@@ -370,11 +370,11 @@ extern "C" void _start(BootInfo* bootInfo)
                     }
                 }
             }
-            if (window->instance != 0)
+            if (window->instance != NULL)
                 if (window->instance->instanceType == InstanceType::Terminal)
                 {
                     TerminalInstance* termInst1 = (TerminalInstance*)window->instance;
-                    if (termInst1->newTermInstance != 0)
+                    if (termInst1->newTermInstance != NULL)
                     {
                         NewTerminalInstance* termInst2 = (NewTerminalInstance*)termInst1->newTermInstance;
                         termInst2->Render();

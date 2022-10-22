@@ -218,6 +218,8 @@ template <typename T>bool List<T>::operator==(List<T> other)
 template <typename T> Array<T>::Array(uint64_t size)
 {
     AddToStack();
+    if (size < 2)
+        size = 2;
     this->size = size;
     arr = (T*)malloc(size * sizeof(T), "Array Constructor");
     freed = false;
@@ -237,7 +239,7 @@ template <typename T> void Array<T>::reInit(uint64_t size)
 template <typename T> T& Array<T>::operator[](uint64_t index)
 {
     AddToStack();
-    if (index >= this->size)
+    if (index >= this->size || freed)
         Panic("Accessing Array out of bounds!");
 
     T& t = arr[index];
