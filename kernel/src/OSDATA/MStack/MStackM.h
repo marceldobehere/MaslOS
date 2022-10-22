@@ -31,7 +31,7 @@ inline void AddToTheMStack(MStack thing)
         MStackData::stackPointer++;
     }
     else
-        Panic("Stack overflow");
+        Panic("Stack overflow", true);
 }
 
 inline void RemoveTheLastElementFromTheMStack()
@@ -41,7 +41,7 @@ inline void RemoveTheLastElementFromTheMStack()
     else
     {
         MStackData::stackPointer = 900;
-        Panic("Stack underflow");
+        Panic("Stack underflow", true);
     }
 }
 

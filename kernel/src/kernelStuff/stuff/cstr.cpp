@@ -22,6 +22,7 @@ const char* to_string(uint64_t value)
     uint8_t remainder = value % 10;
     intTo_stringOutput[size - index] = remainder + '0';
     intTo_stringOutput[size + 1] = 0;
+    intTo_stringOutput[size + 2] = 0;
     return intTo_stringOutput;
 }
 
@@ -56,6 +57,7 @@ const char* to_string(int64_t value)
     uint8_t remainder = value % 10;
     intTo_stringOutput[size - index] = remainder + '0';
     intTo_stringOutput[size + 1] = 0;
+    intTo_stringOutput[size + 2] = 0;
 
 
     return intTo_stringOutput;
@@ -66,6 +68,12 @@ const char* to_string(int value)
     return to_string((int64_t) value);
 }
 
+const char* to_string(char value)
+{
+    intTo_stringOutput[0] = value;
+    intTo_stringOutput[1] = 0;
+    return intTo_stringOutput;
+}
 
 char doubleTo_stringOutput[128];
 const char* to_string(double value, uint8_t places)

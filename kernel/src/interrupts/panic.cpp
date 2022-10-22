@@ -58,7 +58,8 @@ int kernelPanicCount = 0;
 
 void Panic(const char* panicMessage, const char* var, bool lock)
 {
-    AddToStack();
+    if (!lock)
+        AddToStack();
     //GlobalRenderer->CursorPosition.x = 0;
     //GlobalRenderer->CursorPosition.y = 0;
     // oh god please no test podcast
@@ -77,7 +78,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
     // ok so it crashes
     // just get a good cmd working with good fs stuff and a programming lang
 
-    if (osData.maxNonFatalCrashCount-- > 0)
+    if (osData.maxNonFatalCrashCount-- > 0 && !lock)
     {
         //GlobalRenderer->Println("BRUH 1", Colors.yellow);
         if (osData.tempCrash)
@@ -180,7 +181,8 @@ void Panic(const char* panicMessage, const char* var, bool lock)
             while(true);
     }
     
-    RemoveFromStack(); 
+    if (!lock)
+        RemoveFromStack(); 
 } 
 
 void Panic(const char* panicMessage, const char* var)

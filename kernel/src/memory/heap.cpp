@@ -173,28 +173,65 @@ void* malloc(size_t size)
     return malloc(size, "<NO TEXT GIVEN>");
 }
 
+uint64_t mCount = 0;
+
 void* malloc(size_t size, const char* text)
 {
-    AddToStack();
+    mCount++;
+
+GlobalRenderer->CursorPosition = {400, 160};
+GlobalRenderer->Print("HALLO: ", Colors.red); 
+
+    //AddToStack();
     
+
+
+    if (size == 0)
+        size = 0x10;
+
     if (size % 0x10 > 0)
     {
         size -= (size % 0x10);
         size += 0x10;
     }
 
-    if (size == 0)
-        size = 0x10;
+GlobalRenderer->CursorPosition = {300, 20};
+for (int i = 0; i < 20; i++)
+    GlobalRenderer->delChar(GlobalRenderer->CursorPosition.x + i * 8, GlobalRenderer->CursorPosition.y, Colors.black);
+GlobalRenderer->Print("SIZE: {}", to_string(size), Colors.bgreen); 
+GlobalRenderer->CursorPosition = {300, 0};
+for (int i = 0; i < 40; i++)
+    GlobalRenderer->delChar(GlobalRenderer->CursorPosition.x + i * 8, GlobalRenderer->CursorPosition.y, Colors.black);
+GlobalRenderer->Print("MALLOC COUNT: {}", to_string(mCount), Colors.bgreen); 
+GlobalRenderer->CursorPosition = {460, 0};
+for (int i = 0; i < 30; i++)
+    GlobalRenderer->delChar(GlobalRenderer->CursorPosition.x + i * 8, GlobalRenderer->CursorPosition.y, Colors.black);
+GlobalRenderer->Print("FREE RAM: {}", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen); 
+GlobalRenderer->CursorPosition = {800, 0};
+for (int i = 0; i < 30; i++)
+    GlobalRenderer->delChar(GlobalRenderer->CursorPosition.x + i * 8, GlobalRenderer->CursorPosition.y, Colors.black);
+GlobalRenderer->Print("STACK COUNT: {}", to_string(MStackData::stackPointer), Colors.bgreen); 
 
     HeapSegHdr* current = (HeapSegHdr*) heapStart;
     while(true)
     {
+
+        if ((uint64_t)current < 10000)
+            Panic("CURRENT IS NULL BRO", true);
+
+GlobalRenderer->CursorPosition = {400, 160};
+GlobalRenderer->Print("HALLO: ", Colors.silver); 
+
         if (current->magicNum != HeapMagicNum)
         {
-            Panic("Trying to access invalid HeapSegment Header!");
-            RemoveFromStack();
+            Panic("Trying to access invalid HeapSegment Header!", true);
+            //RemoveFromStack();
             return NULL;
         }
+
+GlobalRenderer->CursorPosition = {400, 160};
+GlobalRenderer->Print("HALLO: ", Colors.orange); 
+
         if (current->free)
         {
             if (current->length > size)
@@ -212,7 +249,11 @@ void* malloc(size_t size, const char* text)
                 current->activeMemFlagVal = activeMemFlagVal;
                 mallocCount++;
                 usedHeapCount++;
-                RemoveFromStack();
+                //RemoveFromStack();
+
+GlobalRenderer->CursorPosition = {400, 160};
+GlobalRenderer->Print("HALLO: ", Colors.bblue); 
+
                 return (void*)((uint64_t)current + sizeof(HeapSegHdr));
             }
             if (current->length == size)
@@ -222,27 +263,49 @@ void* malloc(size_t size, const char* text)
                 current->activeMemFlagVal = activeMemFlagVal;
                 mallocCount++;
                 usedHeapCount++;
-                RemoveFromStack();
+                //RemoveFromStack();
+
+GlobalRenderer->CursorPosition = {400, 160};
+GlobalRenderer->Print("HALLO: ", Colors.bgreen); 
+
                 return (void*)((uint64_t)current + sizeof(HeapSegHdr));
             }
         }
+
+GlobalRenderer->CursorPosition = {400, 160};
+GlobalRenderer->Print("HALLO: ", Colors.brown); 
+
         if (current->next == NULL)
             break;
         current = current->next;
     }
     //GlobalRenderer->Println("Requesting more RAM.");
 
+GlobalRenderer->CursorPosition = {400, 160};
+GlobalRenderer->Print("HALLO: ", Colors.cyan); 
+
     if (ExpandHeap(size))
     {
         void* res = malloc(size, text);
         //mallocCount++;
-        RemoveFromStack();
+        //RemoveFromStack();
+
+GlobalRenderer->CursorPosition = {400, 160};
+GlobalRenderer->Print("HALLO: ", Colors.yellow); 
+
         return res;
     }
+
     // GlobalRenderer->ClearDotted(Colors.green);
     // while (true);
 
-    RemoveFromStack();
+GlobalRenderer->CursorPosition = {400, 160};
+GlobalRenderer->Print("HALLO: ", Colors.bgreen); 
+
+
+    Panic("MALLOC FAILED!!!");
+
+    //RemoveFromStack();
     return NULL;
 }
 
@@ -317,48 +380,84 @@ bool ExpandHeap(size_t length)
 
     size_t pageCount = length / 0x1000;
     HeapSegHdr* newSegment = (HeapSegHdr*) heapEnd;
+    void* tHeapEnd = heapEnd;
 
     //GlobalRenderer->Println("Page Count  {}", to_string(pageCount), Colors.white);
     //GlobalRenderer->Println("free RAM 1: {}", to_string(GlobalAllocator->GetFreeRAM()), Colors.white);
 
+
+
     for (size_t i = 0; i < pageCount; i++)
     {
-        if (i == 1)
-        {
-            newSegment->free = true;
-            newSegment->last = lastHdr;
-            lastHdr->next = newSegment;
-            lastHdr = newSegment;
-            newSegment->magicNum = HeapMagicNum;
-            
-            newSegment->next = NULL;
-            newSegment->text = "<FREE>";
-            newSegment->length = 0x1000 - sizeof(HeapSegHdr);
-            heapCount++;
-            //newSegment->CombineBackward(); 
-            //GlobalRenderer->Println("ADD MEM", Colors.yellow);
-        }
-        if (i >= 1)
-        {
-            uint64_t tempI = i * 0x1000;
-            newSegment->length = tempI - sizeof(HeapSegHdr);
-        }
-
         void* tempAddr = GlobalAllocator->RequestPage();
-        if (((uint64_t)tempAddr) == 0)
-        {
-            //GlobalRenderer->Println("<HEAP START>", Colors.yellow);
-            // we gotta add the stuff that we requested but didnt add because it return NULL here
-            
-            // GlobalRenderer->ClearDotted(Colors.bblue);
-            // while(true);
-            RemoveFromStack();
-            //GlobalRenderer->Println("<HEAP END>", Colors.yellow);
-            return false;
-        }
-        GlobalPageTableManager.MapMemory(heapEnd, tempAddr);
-        heapEnd = (void*)((size_t)heapEnd + 0x1000);
+        if (tempAddr == NULL)
+            Panic("NO MORE RAM!!!!!!!", true);
+        
+        GlobalPageTableManager.MapMemory(tHeapEnd, tempAddr);
+        tHeapEnd = (void*)((size_t)tHeapEnd + 0x1000);
     }
+
+
+
+    newSegment->free = true;
+    newSegment->last = lastHdr;
+    lastHdr->next = newSegment;
+    lastHdr = newSegment;
+    newSegment->magicNum = HeapMagicNum;
+    
+    newSegment->next = NULL;
+    newSegment->text = "<FREE>";
+    newSegment->length = (pageCount * 0x1000) - sizeof(HeapSegHdr);
+    heapCount++;
+    
+    heapEnd = tHeapEnd;
+
+
+
+
+
+
+
+    // for (size_t i = 0; i < pageCount; i++)
+    // {
+    //     if (i == 1)
+    //     {
+    //         newSegment->free = true;
+    //         newSegment->last = lastHdr;
+    //         lastHdr->next = newSegment;
+    //         lastHdr = newSegment;
+    //         newSegment->magicNum = HeapMagicNum;
+            
+    //         newSegment->next = NULL;
+    //         newSegment->text = "<FREE>";
+    //         newSegment->length = 0x1000 - sizeof(HeapSegHdr);
+    //         heapCount++;
+    //         //newSegment->CombineBackward(); 
+    //         //GlobalRenderer->Println("ADD MEM", Colors.yellow);
+    //     }
+    //     if (i > 0)
+    //     {
+    //         uint64_t tempI = (i+1) * 0x1000;
+    //         newSegment->length = tempI - sizeof(HeapSegHdr);
+    //     }
+
+    //     void* tempAddr = GlobalAllocator->RequestPage();
+    //     if (tempAddr == NULL)
+    //     {
+    //         //GlobalRenderer->Println("<HEAP START>", Colors.yellow);
+    //         // we gotta add the stuff that we requested but didnt add because it return NULL here
+            
+    //         // GlobalRenderer->ClearDotted(Colors.bblue);
+    //         // while(true);
+    //         Panic("NO MORE RAM!!!!!!!", true);
+
+    //         RemoveFromStack();
+    //         //GlobalRenderer->Println("<HEAP END>", Colors.yellow);
+    //         return false;
+    //     }
+    //     GlobalPageTableManager.MapMemory(heapEnd, tempAddr);
+    //     heapEnd = (void*)((size_t)heapEnd + 0x1000);
+    // }
 
     //GlobalRenderer->Println("free RAM 2: {}", to_string(GlobalAllocator->GetFreeRAM()), Colors.white);
     
@@ -367,6 +466,9 @@ bool ExpandHeap(size_t length)
     // lastHdr->next = newSegment;
     // lastHdr = newSegment;
     // newSegment->magicNum = HeapMagicNum;
+
+    if (newSegment == NULL)
+        Panic("NEW SEGMENT IS NULL!");
 
     // newSegment->next = NULL;
     // newSegment->text = "<FREE>";

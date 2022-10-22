@@ -14,6 +14,8 @@ const char* to_string(double value);
 
 const char* to_string(bool value);
 
+const char* to_string(char value);
+
 int64_t to_int(const char* string);
 
 unsigned int ConvertStringToHex(const char* data);

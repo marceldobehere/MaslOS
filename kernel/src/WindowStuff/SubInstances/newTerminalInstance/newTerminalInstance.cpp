@@ -38,22 +38,63 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
         GlobalRenderer->Print("HALLO", Colors.yellow);
     }
 
+
+
     //return;
     AddToStack();
-    
+
+    if ((uint64_t)chrs < 100)
+        Panic("STR IS NULL");
+
     //for (int x = 0; x < 5; x++)
     //    GlobalRenderer->ClearDotted(Colors.bblue);
+
+    {
+        GlobalRenderer->CursorPosition = {50, 10};
+        GlobalRenderer->Print("HALLO", Colors.orange);
+    }
 
     //allowEscape = false;
     int len = StrLen(chrs);
     
+    if (var != NULL)
+        var = StrCopy(var);
+
+
     List<ConsoleChar>* currList = textData.elementAt(textData.getCount() - 1);
+    if (currList == 0)
+        Panic("LAST LIST IS NULL");
+
+    {
+        GlobalRenderer->CursorPosition = {50, 10};
+        GlobalRenderer->Print("HALLO", Colors.bgray);
+    }
 
     uint32_t fg = foregroundColor;
     uint32_t bg = backgroundColor;
 
     for (int index = 0; index < len; index++)
     {
+        {
+            GlobalRenderer->CursorPosition = {50, 10};
+            for (int i = 0; i < 40; i++)
+                    GlobalRenderer->delChar(GlobalRenderer->CursorPosition.x + i * 8, GlobalRenderer->CursorPosition.y, Colors.black);
+            GlobalRenderer->Print("HALLO: ", to_string(chrs[index]), Colors.bgreen);  
+            GlobalRenderer->delChar(GlobalRenderer->CursorPosition.x, GlobalRenderer->CursorPosition.y);
+            if (chrs[index] == '\n')
+                GlobalRenderer->Print("?", Colors.bgreen);  
+            else
+                GlobalRenderer->Print("{}, ", to_string(chrs[index]), Colors.bgreen);  
+            
+            GlobalRenderer->Print("I {}", to_string(index), Colors.bgreen);
+            GlobalRenderer->Print("/{}, ", to_string(len), Colors.bgreen);
+            GlobalRenderer->Print("C {}", to_string(currList->getCount()), Colors.bgreen);
+            GlobalRenderer->Print("/{}", to_string(currList->getCapacity()), Colors.bgreen);
+        }
+
+        if (currList == NULL)
+            Panic("LAST LIST IS NULL 2", true);
+
         //GlobalRenderer->Println("AAAAA");
         if (chrs[index] == '\n')
         {
@@ -128,14 +169,16 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
     
     {
         GlobalRenderer->CursorPosition = {50, 10};
-        GlobalRenderer->Print("HALLO", Colors.purple);
+        GlobalRenderer->Print("HALLO", Colors.brown);
     }
 
     //for (int x = 0; x < 5; x++)
     //    GlobalRenderer->ClearDotted(Colors.bgreen);
-
+    if (var != NULL)
+        free((void*)var);
     RemoveFromStack();
 }
+
 
 void NewTerminalInstance::WriteVarStringIntoList(const char* chrs, dispVar vars[])
 {
@@ -145,17 +188,20 @@ void NewTerminalInstance::WriteVarStringIntoList(const char* chrs, dispVar vars[
         GlobalRenderer->Print("HALLO", Colors.bgreen);
     }
 
+
+
     //return;
     AddToStack();
     int len = StrLen(chrs);
-    
+
     List<ConsoleChar>* currList = textData.elementAt(textData.getCount() - 1);
+
 
     uint32_t fg = foregroundColor;
     uint32_t bg = backgroundColor;
 
     for (int index = 0; index < len; index++)
-    {
+    {   
         if (chrs[index] == '\n')
             currList = AddNewLine();
         else if (chrs[index] == '\r')
@@ -232,7 +278,9 @@ void NewTerminalInstance::WriteVarStringIntoList(const char* chrs, dispVar vars[
                 currList->add(ConsoleChar(chrs[index], fg, bg));
         }
         else
+        {
             currList->add(ConsoleChar(chrs[index], fg, bg));
+        }
         
         //currList->add(ConsoleChar(str[i], fg, bg));
     }

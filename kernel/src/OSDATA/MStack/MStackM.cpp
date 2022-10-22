@@ -12,19 +12,40 @@ void PrintMStackTrace(MStack stack[], int64_t size, BasicRenderer* renderer, uin
             count++;
     }
     renderer->Println("STACK TRACE: ({} Elements)\n", to_string(count), col);
-    if (size > 50)
-        size = 50;
-    for (int i = 0; i < size; i++)
+    if (size != 1000)
     {
-        int index = (size - i) - 1;
-        if (stack[index].line != -1)
+        if (size > 50)
+            size = 50;
+        for (int i = 0; i < size; i++)
         {
-            renderer->Println("> At \"{}\"", stack[index].name, col);
-            renderer->Print("  > in file \"{}\" ", stack[index].filename, col);
-            renderer->Print("at line \"{}\"", to_string(stack[index].line), col);
-            //renderer->Println("  > in file \"{}\"", stack[index].filename, col);
-            //renderer->Println("  > At line: {}", to_string(stack[index].line), col);
-            renderer->Println();
+            int index = (size - i) - 1;
+            if (stack[index].line != -1)
+            {
+                renderer->Println("> At \"{}\"", stack[index].name, col);
+                renderer->Print("  > in file \"{}\" ", stack[index].filename, col);
+                renderer->Print("at line \"{}\"", to_string(stack[index].line), col);
+                //renderer->Println("  > in file \"{}\"", stack[index].filename, col);
+                //renderer->Println("  > At line: {}", to_string(stack[index].line), col);
+                renderer->Println();
+            }
+        }
+    }
+    else
+    {
+        if (size > 50)
+            size = 50;
+        for (int i = 0; i < size; i++)
+        {
+            int index = i;
+            if (stack[index].line != -1)
+            {
+                renderer->Println("> At \"{}\"", stack[index].name, col);
+                renderer->Print("  > in file \"{}\" ", stack[index].filename, col);
+                renderer->Print("at line \"{}\"", to_string(stack[index].line), col);
+                //renderer->Println("  > in file \"{}\"", stack[index].filename, col);
+                //renderer->Println("  > At line: {}", to_string(stack[index].line), col);
+                renderer->Println();
+            }
         }
     }
     renderer->Println();
