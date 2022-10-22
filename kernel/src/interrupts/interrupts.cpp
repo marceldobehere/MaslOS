@@ -29,6 +29,13 @@ __attribute__((interrupt)) void GPFault_handler(interrupt_frame* frame)
     //Panic("General Protection Fault Detected! {}", to_string(*((uint64_t*)frame)), true);
     RemoveFromStack();
 }
+
+__attribute__((interrupt)) void GenFault_handler(interrupt_frame* frame)
+{
+    AddToStack();
+    Panic("General Fault Detected!");
+    RemoveFromStack();
+}
  
 __attribute__((interrupt)) void KeyboardInt_handler(interrupt_frame* frame)
 { 

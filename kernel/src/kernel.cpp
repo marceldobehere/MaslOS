@@ -98,12 +98,13 @@ extern "C" void _start(BootInfo* bootInfo)
     {
         mainWindow = (Window*)malloc(sizeof(Window), "Main window");
         TerminalInstance* terminal = (TerminalInstance*)malloc(sizeof(TerminalInstance), "Terminal Instance for main window");
-        *terminal = TerminalInstance(&adminUser, mainWindow);
+        *terminal = TerminalInstance(&adminUser);
         // NewTerminalInstance* terminal = (NewTerminalInstance*)malloc(sizeof(NewTerminalInstance), "New Terminal Instance for main window");
         // *terminal = NewTerminalInstance(&adminUser, mainWindow);
 
         *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(5, 30), "Main Window", true, true, true);
         osData.windows.add(mainWindow);
+        terminal->SetWindow(mainWindow);
 
         activeWindow = mainWindow;
         osData.mainTerminalWindow = mainWindow;
@@ -127,9 +128,10 @@ extern "C" void _start(BootInfo* bootInfo)
     {
         Window* window = (Window*)malloc(sizeof(Window), "Window");
         NewTerminalInstance* terminal = (NewTerminalInstance*)malloc(sizeof(NewTerminalInstance), "Terminal Instance");
-        *terminal = NewTerminalInstance(window);
+        *terminal = NewTerminalInstance();
         *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(500, 60), "Testing new Terminal", true, true, true);
         osData.windows.add(window);
+        ((NewTerminalInstance*)terminal)->SetWindow(window);
             
         newTerminaltest = terminal;
         terminal->Clear();
@@ -200,6 +202,7 @@ extern "C" void _start(BootInfo* bootInfo)
         ProcessMousePackets();
 
         AddToStack();
+        if (true)// (false)
         {
             frameSum++;
             if (frameSum == 10)

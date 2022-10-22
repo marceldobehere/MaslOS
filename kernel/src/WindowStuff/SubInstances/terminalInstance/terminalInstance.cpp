@@ -2,10 +2,10 @@
 #include "../../../OSDATA/MStack/MStackM.h"
 #include "../newTerminalInstance/newTerminalInstance.h"
 
-TerminalInstance::TerminalInstance(OSUser* user, Window* window)
+TerminalInstance::TerminalInstance(OSUser* user)
 {
     this->currentUser = user;
-    this->window = window;
+    //this->window = window;
     mode = commandMode::none;
     instanceType = InstanceType::Terminal;
     userlen = 0;
@@ -17,7 +17,12 @@ TerminalInstance::TerminalInstance(OSUser* user, Window* window)
     }
     printUser = false;
     newTermInstance = malloc(sizeof(NewTerminalInstance));
-    *((NewTerminalInstance*)newTermInstance) = NewTerminalInstance(window);
+    *((NewTerminalInstance*)newTermInstance) = NewTerminalInstance();
+}
+void TerminalInstance::SetWindow(Window* window)
+{
+    this->window = window;
+    ((NewTerminalInstance*)newTermInstance)->SetWindow(window);
 }
 
 bool TerminalInstance::GetBusy()

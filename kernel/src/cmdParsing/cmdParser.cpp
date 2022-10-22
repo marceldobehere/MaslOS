@@ -1747,36 +1747,69 @@ void GetCmd(const char* name, OSUser* user, Window* window)
     else if (StrEquals(name, "heap stats detail"))
     {
         Println(window, "Heap Statistics (Detailed):", Colors.yellow);
+        GlobalRenderer->Clear(Colors.dgray);
+        GlobalRenderer->Println("Heap Statistics (Detailed):", Colors.yellow);
+        
         {
-            uint64_t totalSegCount = 0, freeSegCount = 0, usedSegCount = 0, totalSegSpace = 0, freeSegSpace = 0, usedSegSpace = 0; 
-            for (HeapSegHdr* current = (HeapSegHdr*) heapStart; current != NULL; current = current->next)
-            {
-                dispVar vars[] = {dispVar(totalSegCount), dispVar(current->length), dispVar(current->text), dispVar(current->activeMemFlagVal)};
-                uint32_t col = Colors.gray;
-                if (current->free)
-                {
-                    freeSegCount += 1;
-                    freeSegSpace += current->length;
-                    if (current->activeMemFlagVal == activeMemFlagVal && activeMemFlagVal != 0)
-                        col = Colors.bgreen;
-                    else
-                        col = Colors.green;
-                }
-                else
-                {
-                    usedSegCount += 1;
-                    usedSegSpace += current->length;
-                    if (current->activeMemFlagVal == activeMemFlagVal && activeMemFlagVal != 0)
-                        col = Colors.yellow;
-                    else
-                        col = Colors.bred;
-                }
-                
-                Println(window, "> Heap# {0} - Size: {1} Bytes, Title: \"{2}\", AMFV: {3}", vars, col);
+            uint64_t totCount = 0;
+            for (HeapSegHdr* current = (HeapSegHdr*) heapStart; current->next != NULL; current = current->next)
+                totCount++;
 
-                totalSegCount += 1;
-                totalSegSpace += current->length;
+
+            uint64_t totalSegCount = 0, freeSegCount = 0, usedSegCount = 0, totalSegSpace = 0, freeSegSpace = 0, usedSegSpace = 0; 
+            //for (HeapSegHdr* current = (HeapSegHdr*) heapStart; current->next != NULL; current = current->next)
+            
+
+            {
+                HeapSegHdr* current = (HeapSegHdr*) heapStart;
+                for (uint64_t tempCount = 0; tempCount < totCount && current != NULL; tempCount++)
+                {
+                    dispVar vars[] = {dispVar(totalSegCount), dispVar(current->length), dispVar(current->text), dispVar(current->activeMemFlagVal), dispVar((uint64_t)current), dispVar((uint64_t)current->next)};
+                    uint32_t col = Colors.gray;
+                    if (current->free)
+                    {
+                        freeSegCount += 1;
+                        freeSegSpace += current->length;
+                        if (current->activeMemFlagVal == activeMemFlagVal && activeMemFlagVal != 0)
+                            col = Colors.bgreen;
+                        else
+                            col = Colors.green;
+                    }
+                    else
+                    {
+                        usedSegCount += 1;
+                        usedSegSpace += current->length;
+                        if (current->activeMemFlagVal == activeMemFlagVal && activeMemFlagVal != 0)
+                            col = Colors.yellow;
+                        else
+                            col = Colors.bred;
+                    }
+                    
+                    GlobalRenderer->Println("> Heap# {0} - Size: {1} Bytes, Title: \"{2}\", AMFV: {3}, ADDR: {4}, NEXT: {5}", vars, col);
+                    Println(window, "> Heap# {0} - Size: {1} Bytes, Title: \"{2}\", AMFV: {3}", vars, col);
+                    GlobalRenderer->Print("<T>");
+                    GlobalRenderer->Println(" Heap# {0} - Size: {1} Bytes, Title: \"{2}\", AMFV: {3}, ADDR: {4}, NEXT: {5}", vars, col);
+
+                    if(GlobalRenderer->CursorPosition.y > 600)
+                    {
+                        PIT::Sleep(2000);
+                        GlobalRenderer->Clear(Colors.dgray);
+                    }
+
+                    totalSegCount += 1;
+                    totalSegSpace += current->length;
+                    current = current->next;
+                }
             }
+
+            {
+                PIT::Sleep(2000);
+                GlobalRenderer->Clear(Colors.dblue);
+                GlobalRenderer->Println("Done printing Heap Stats!", Colors.bgray);
+                PIT::Sleep(2000);
+                GlobalRenderer->Clear(Colors.dgray);
+            }
+
             Println(window);
             Println(window, "-----------------------------------");
             Println(window);

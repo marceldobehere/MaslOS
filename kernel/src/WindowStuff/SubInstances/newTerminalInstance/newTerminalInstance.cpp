@@ -32,13 +32,19 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var)
 
 void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var, bool allowEscape)
 {   
-    AddToStack();
 
+    {
+        GlobalRenderer->CursorPosition = {50, 10};
+        GlobalRenderer->Print("HALLO", Colors.yellow);
+    }
+
+    //return;
+    AddToStack();
     
     //for (int x = 0; x < 5; x++)
     //    GlobalRenderer->ClearDotted(Colors.bblue);
 
-    allowEscape = false;
+    //allowEscape = false;
     int len = StrLen(chrs);
     
     List<ConsoleChar>* currList = textData.elementAt(textData.getCount() - 1);
@@ -120,6 +126,11 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
         //currList->add(ConsoleChar(str[i], fg, bg));
     }
     
+    {
+        GlobalRenderer->CursorPosition = {50, 10};
+        GlobalRenderer->Print("HALLO", Colors.purple);
+    }
+
     //for (int x = 0; x < 5; x++)
     //    GlobalRenderer->ClearDotted(Colors.bgreen);
 
@@ -128,6 +139,12 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
 
 void NewTerminalInstance::WriteVarStringIntoList(const char* chrs, dispVar vars[])
 {
+
+    {
+        GlobalRenderer->CursorPosition = {50, 10};
+        GlobalRenderer->Print("HALLO", Colors.bgreen);
+    }
+
     //return;
     AddToStack();
     int len = StrLen(chrs);
@@ -246,26 +263,53 @@ void ReInitCharArrWithSize(ConsoleChar** charArr, int sizeX, int sizeY)
 }
 
 
-NewTerminalInstance::NewTerminalInstance(/*OSUser* user, */Window* window)
+NewTerminalInstance::NewTerminalInstance()
 {
     AddToStack();
     textData = List<List<ConsoleChar>*>(4);
-    AddNewLine();
     instanceType = InstanceType::NewTerminal;
     //this->currentUser = user;
-    this->window = window;
+    this->window = NULL;
     backgroundColor = Colors.black;
     foregroundColor = Colors.white;
     scrollX = 0;
     scrollY = 0;
     oldScrollX = 0;
     oldScrollY = 0;
-    oldWidth = window->size.width;
-    oldHeight = window->size.height;
+
+    oldWidth = 80;
+    oldHeight = 160;
     //tempPixels = (ConsoleChar*)malloc(((window->size.width/8)*(window->size.height/16) * sizeof(ConsoleChar)));
-    ReInitCharArrWithSize(&tempPixels, (window->size.width/8), (window->size.height/16));
-    ReInitCharArrWithSize(&tempPixels2, (window->size.width/8), (window->size.height/16));
+    ReInitCharArrWithSize(&tempPixels, (oldWidth/8), (oldHeight/16));
+    ReInitCharArrWithSize(&tempPixels2, (oldWidth/8), (oldHeight/16));
+
+    AddNewLine();
     RemoveFromStack();
+}
+void NewTerminalInstance::SetWindow(Window* window)
+{
+    this->window = window;
+    if (window != NULL)
+    {
+        oldWidth = window->size.width;
+        oldHeight = window->size.height;
+        //tempPixels = (ConsoleChar*)malloc(((window->size.width/8)*(window->size.height/16) * sizeof(ConsoleChar)));
+        free(tempPixels);
+        free(tempPixels2);
+        ReInitCharArrWithSize(&tempPixels, (oldWidth/8), (oldHeight/16));
+        ReInitCharArrWithSize(&tempPixels2, (oldWidth/8), (oldHeight/16));
+    }
+    else
+    {
+        oldWidth = 80;
+        oldHeight = 160;
+        //tempPixels = (ConsoleChar*)malloc(((window->size.width/8)*(window->size.height/16) * sizeof(ConsoleChar)));
+        free(tempPixels);
+        free(tempPixels2);
+        ReInitCharArrWithSize(&tempPixels, (oldWidth/8), (oldHeight/16));
+        ReInitCharArrWithSize(&tempPixels2, (oldWidth/8), (oldHeight/16));
+    }
+    Clear();
 }
     
 void NewTerminalInstance::WriteText(const char* text)
@@ -335,9 +379,18 @@ void NewTerminalInstance::RenderCharChanges()
 
 void NewTerminalInstance::Render()
 {
+
+    {
+        GlobalRenderer->CursorPosition = {50, 10};
+        GlobalRenderer->Print("HALLO", Colors.bblue);
+    }
+
+    //return;
     AddToStack();
-    // RemoveFromStack();
-    // return;
+    if (window == NULL)
+        Panic("Trying to Render with window being NULL!");
+
+
     if (scrollX == oldScrollX && scrollY == oldScrollY && oldHeight == window->size.height && oldWidth == window->size.width)
     {
         //osData.drawBackground = !osData.drawBackground;
@@ -361,7 +414,7 @@ void NewTerminalInstance::Render()
         ClearCharArr(tempPixels, (window->size.width/8), (window->size.height/16));
         if (textData.getCount() == 0)
         {
-            window->BlitBackbuffer();
+            //window->BlitBackbuffer();
             RemoveFromStack(); 
             return;
         }
@@ -410,13 +463,17 @@ void NewTerminalInstance::Render()
 
 void NewTerminalInstance::Clear()
 {
+    if (window == NULL)
+        Panic("Trying to clear window which is NULL!");
     AddToStack();
     window->brenderer->Clear(backgroundColor);
     window->renderer->Clear(backgroundColor);
+    ClearCharArr(tempPixels,  (oldWidth / 8), (oldHeight / 16));
+    ClearCharArr(tempPixels2, (oldWidth / 8), (oldHeight / 16));
     ClearListList(&textData);
     AddNewLine();
     Render();
-    window->BlitBackbuffer();
+    //window->BlitBackbuffer();
     RemoveFromStack();
 }
 

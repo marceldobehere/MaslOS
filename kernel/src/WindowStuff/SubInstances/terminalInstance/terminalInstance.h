@@ -30,12 +30,13 @@ class TerminalInstance : public DefaultInstance
     bool GetBusy();
     bool takeInput;
     uint64_t userlen;
-    TerminalInstance(OSUser* user, Window* window);
+    TerminalInstance(OSUser* user);
     void KeyboardPrintStart();
     void HandleEnter();
     void PrintUserIfNeeded();
     void Free();
     void Cls();
+    void SetWindow(Window* window);
     commandMode mode;
     void* newTermInstance;
 

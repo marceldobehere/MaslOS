@@ -20,8 +20,10 @@ void PrintMStackTrace(MStack stack[], int64_t size, BasicRenderer* renderer, uin
         if (stack[index].line != -1)
         {
             renderer->Println("> At \"{}\"", stack[index].name, col);
-            renderer->Println("  > in file \"{}\"", stack[index].filename, col);
-            renderer->Println("  > At line: {}", to_string(stack[index].line), col);
+            renderer->Print("  > in file \"{}\" ", stack[index].filename, col);
+            renderer->Print("at line \"{}\"", to_string(stack[index].line), col);
+            //renderer->Println("  > in file \"{}\"", stack[index].filename, col);
+            //renderer->Println("  > At line: {}", to_string(stack[index].line), col);
             renderer->Println();
         }
     }

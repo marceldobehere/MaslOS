@@ -42,11 +42,13 @@ template <typename T> void List<T>::free()
 template <typename T>void List<T>::expandArr()
 {
     AddToStack();
-    cap *= 2;
-    Array<T> newArr = Array<T>(cap);
+    Array<T> newArr = Array<T>(count);
     arr.copy(newArr);
-    arr.free();
-    arr = newArr;
+
+    cap *= 2;
+    arr.reInit(cap);
+    newArr.copy(arr);
+    newArr.free();
     RemoveFromStack();
 }
 
@@ -76,14 +78,12 @@ template <typename T> uint64_t List<T>::getCapacity()
 template <typename T> int64_t List<T>::getIndexOf(T item)
 {
     AddToStack();
-    #if true
     for (uint64_t index = 0; index < count; index++)
         if (arr[index] == item)
         {
             RemoveFromStack();
             return index;
         }
-    #endif
     RemoveFromStack();
     return -1;
 }
@@ -91,7 +91,7 @@ template <typename T> int64_t List<T>::getIndexOf(T item)
 template <typename T> void List<T>::add(T item)
 {
     AddToStack();
-    if (count + 1 > cap)
+    if (count >= cap)
         expandArr();
     
     arr[count] = item;
@@ -266,7 +266,7 @@ template <typename T> Array<T> Array<T>::clone()
     Array<T> newArr = Array<T>(size);
 
     for (uint64_t i = 0; i < size; i++)
-        newArr[i] = arr[i];
+        newArr.arr[i] = arr[i];
 
     RemoveFromStack();
     return newArr;
@@ -277,7 +277,7 @@ template <typename T> void Array<T>::copy(Array<T> target)
 {
     AddToStack();
     for (uint64_t i = 0; i < size; i++)
-        target[i] = arr[i];
+        target.arr[i] = arr[i];
     RemoveFromStack();
 }
 

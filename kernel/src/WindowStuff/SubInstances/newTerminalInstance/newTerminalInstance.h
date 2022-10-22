@@ -27,13 +27,14 @@ class NewTerminalInstance : public DefaultInstance
     ConsoleChar* tempPixels;
     ConsoleChar* tempPixels2;
     
-    NewTerminalInstance(/*OSUser* user, */Window* window);
+    NewTerminalInstance();
     
     void WriteText(const char* text);
     void Render();
     void RenderCharChanges();
     void Clear();
     void Free();
+    void SetWindow(Window* window);
 
     void Println();
     void Print(const char* msg);
