@@ -1688,7 +1688,7 @@ void GetCmd(const char* name, OSUser* user, Window* window)
             {
                 Println(window, "> At \"{}\"", stack[index].name, col);
                 Println(window, "  > in file \"{}\"", stack[index].filename, col);
-                Println(window, "  > At line: {} ", to_string(stack[index].line), col);
+                Println(window, "  > At line: {}", to_string(stack[index].line), col);
                 Println(window);
             }
         }

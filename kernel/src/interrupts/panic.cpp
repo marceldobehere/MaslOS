@@ -54,6 +54,7 @@ void PrintRegisterDump(BasicRenderer* renderer)
     renderer->Println();
 }
 
+int kernelPanicCount = 0;
 
 void Panic(const char* panicMessage, const char* var, bool lock)
 {
@@ -139,11 +140,13 @@ void Panic(const char* panicMessage, const char* var, bool lock)
     }
     else
     {
+        kernelPanicCount++;
         GlobalRenderer->ClearDotted(Colors.red);
         GlobalRenderer->Println();
         GlobalRenderer->Println();
         GlobalRenderer->Println("KERNEL PANIC AAAAAAAAAAAAAAAAAAAAAAAAAAA", Colors.white);
-        GlobalRenderer->Println();
+        for (int i = 0; i < kernelPanicCount; i++)
+            GlobalRenderer->Println();
         GlobalRenderer->Println(panicMessage, var, Colors.white);
         GlobalRenderer->Println();
 

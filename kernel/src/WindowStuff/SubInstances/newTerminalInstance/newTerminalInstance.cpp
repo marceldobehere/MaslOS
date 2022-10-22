@@ -128,6 +128,7 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
 
 void NewTerminalInstance::WriteVarStringIntoList(const char* chrs, dispVar vars[])
 {
+    //return;
     AddToStack();
     int len = StrLen(chrs);
     
@@ -259,7 +260,7 @@ NewTerminalInstance::NewTerminalInstance(/*OSUser* user, */Window* window)
     scrollY = 0;
     oldScrollX = 0;
     oldScrollY = 0;
-    oldWidth = window->size.width + 1;
+    oldWidth = window->size.width;
     oldHeight = window->size.height;
     //tempPixels = (ConsoleChar*)malloc(((window->size.width/8)*(window->size.height/16) * sizeof(ConsoleChar)));
     ReInitCharArrWithSize(&tempPixels, (window->size.width/8), (window->size.height/16));
@@ -309,7 +310,9 @@ void NewTerminalInstance::RenderCharChanges()
             for (int dx = sDx; dx <= maxX; dx++)
             {
                 ConsoleChar chr = tList->elementAt(dx);
-                tempPixels2[(dx - dx1) + ((dy - dy1) * (oldWidth / 8))] = chr;
+                if (((dx - dx1) + ((dy - dy1) * (oldWidth / 8)) < 0) || ((dx - dx1) + ((dy - dy1) * (oldWidth / 8)) > (oldWidth / 8)*(oldHeight / 16)))
+                        Panic("OUT OF BOUNDS OMGGGGGGGGGGGGGGGGGGG!");
+                tempPixels2[(dx - dx1) + ((dy - dy1) * (sizeX))] = chr;
             }
         }
         RemoveFromStack(); 
@@ -338,7 +341,7 @@ void NewTerminalInstance::Render()
     if (scrollX == oldScrollX && scrollY == oldScrollY && oldHeight == window->size.height && oldWidth == window->size.width)
     {
         //osData.drawBackground = !osData.drawBackground;
-        //RenderCharChanges();
+        RenderCharChanges();
     }
     else
     {
@@ -389,6 +392,8 @@ void NewTerminalInstance::Render()
                     ConsoleChar chr = tList->elementAt(dx);
                     window->renderer->putChar(chr.chr, dx*8-fx1, dy*16-fy1, chr.fg, chr.bg);
 
+                    if (((dx - dx1) + ((dy - dy1) * (oldWidth / 8)) < 0) || ((dx - dx1) + ((dy - dy1) * (oldWidth / 8)) > (oldWidth / 8)*(oldHeight / 16)))
+                        Panic("OUT OF BOUNDS OMGGGGGGGGGGGGGGGGGGG!");
                     tempPixels[(dx - dx1) + ((dy - dy1) * (oldWidth / 8))] = chr;
                 }
             }

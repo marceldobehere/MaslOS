@@ -209,19 +209,13 @@ template <typename T>bool List<T>::operator==(List<T> other)
 
 
 
-
-
-
-
-
-
 template <typename T> Array<T>::Array(uint64_t size)
 {
     AddToStack();
     if (size < 2)
         size = 2;
     this->size = size;
-    arr = (T*)malloc(size * sizeof(T), "Array Constructor");
+    arr = (T*)_malloc(size * sizeof(T), "Array Constructor");
     freed = false;
     RemoveFromStack();
 }
@@ -229,9 +223,11 @@ template <typename T> Array<T>::Array(uint64_t size)
 template <typename T> void Array<T>::reInit(uint64_t size)
 {
     AddToStack();
+    if (size < 2)
+        size = 2;
     this->size = size;
     free();
-    arr = (T*)malloc(size * sizeof(T), "Array re-init");
+    arr = (T*)_malloc(size * sizeof(T), "Array re-init");
     freed = false;
     RemoveFromStack();
 }
