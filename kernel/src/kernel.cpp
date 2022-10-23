@@ -148,13 +148,8 @@ extern "C" void _start(BootInfo* bootInfo)
 
     debugTerminalWindow->Log("Kernel Initialised Successfully!");
 
-    debugTerminalWindow->Log("<STAT>");
-    debugTerminalWindow->Log("<STAT>");
-    debugTerminalWindow->Log("<STAT>");
-    debugTerminalWindow->Log("<STAT>");
-    debugTerminalWindow->Log("<STAT>");
-    debugTerminalWindow->Log("<STAT>");
-    debugTerminalWindow->Log("<STAT>");
+    for (int i = 0; i < 8; i++)
+        debugTerminalWindow->Log("<STAT>");
 
     ((TerminalInstance*)mainWindow->instance)->Cls();
     ((TerminalInstance*)mainWindow->instance)->KeyboardPrintStart();
@@ -373,7 +368,7 @@ extern "C" void _start(BootInfo* bootInfo)
                     }
                 }
             }
-            if (window->instance != NULL)
+            if (window->instance != NULL && frame % 4 == 0)
                 if (window->instance->instanceType == InstanceType::Terminal)
                 {
                     TerminalInstance* termInst1 = (TerminalInstance*)window->instance;

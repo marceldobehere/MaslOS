@@ -178,11 +178,7 @@ uint64_t mCount = 0;
 void* malloc(size_t size, const char* text)
 {
     mCount++;
-
-GlobalRenderer->CursorPosition = {400, 160};
-GlobalRenderer->Print("HALLO: ", Colors.red); 
-
-    //AddToStack();
+    AddToStack();
     
 
 
@@ -194,43 +190,19 @@ GlobalRenderer->Print("HALLO: ", Colors.red);
         size -= (size % 0x10);
         size += 0x10;
     }
-
-GlobalRenderer->CursorPosition = {300, 20};
-for (int i = 0; i < 20; i++)
-    GlobalRenderer->delChar(GlobalRenderer->CursorPosition.x + i * 8, GlobalRenderer->CursorPosition.y, Colors.black);
-GlobalRenderer->Print("SIZE: {}", to_string(size), Colors.bgreen); 
-GlobalRenderer->CursorPosition = {300, 0};
-for (int i = 0; i < 40; i++)
-    GlobalRenderer->delChar(GlobalRenderer->CursorPosition.x + i * 8, GlobalRenderer->CursorPosition.y, Colors.black);
-GlobalRenderer->Print("MALLOC COUNT: {}", to_string(mCount), Colors.bgreen); 
-GlobalRenderer->CursorPosition = {460, 0};
-for (int i = 0; i < 30; i++)
-    GlobalRenderer->delChar(GlobalRenderer->CursorPosition.x + i * 8, GlobalRenderer->CursorPosition.y, Colors.black);
-GlobalRenderer->Print("FREE RAM: {}", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen); 
-GlobalRenderer->CursorPosition = {800, 0};
-for (int i = 0; i < 30; i++)
-    GlobalRenderer->delChar(GlobalRenderer->CursorPosition.x + i * 8, GlobalRenderer->CursorPosition.y, Colors.black);
-GlobalRenderer->Print("STACK COUNT: {}", to_string(MStackData::stackPointer), Colors.bgreen); 
-
     HeapSegHdr* current = (HeapSegHdr*) heapStart;
     while(true)
     {
 
         if ((uint64_t)current < 10000)
-            Panic("CURRENT IS NULL BRO", true);
-
-GlobalRenderer->CursorPosition = {400, 160};
-GlobalRenderer->Print("HALLO: ", Colors.silver); 
+            Panic("CURRENT IS NULL BRO", true); 
 
         if (current->magicNum != HeapMagicNum)
         {
             Panic("Trying to access invalid HeapSegment Header!", true);
-            //RemoveFromStack();
+            RemoveFromStack();
             return NULL;
         }
-
-GlobalRenderer->CursorPosition = {400, 160};
-GlobalRenderer->Print("HALLO: ", Colors.orange); 
 
         if (current->free)
         {
@@ -249,11 +221,7 @@ GlobalRenderer->Print("HALLO: ", Colors.orange);
                 current->activeMemFlagVal = activeMemFlagVal;
                 mallocCount++;
                 usedHeapCount++;
-                //RemoveFromStack();
-
-GlobalRenderer->CursorPosition = {400, 160};
-GlobalRenderer->Print("HALLO: ", Colors.bblue); 
-
+                RemoveFromStack();
                 return (void*)((uint64_t)current + sizeof(HeapSegHdr));
             }
             if (current->length == size)
@@ -263,17 +231,10 @@ GlobalRenderer->Print("HALLO: ", Colors.bblue);
                 current->activeMemFlagVal = activeMemFlagVal;
                 mallocCount++;
                 usedHeapCount++;
-                //RemoveFromStack();
-
-GlobalRenderer->CursorPosition = {400, 160};
-GlobalRenderer->Print("HALLO: ", Colors.bgreen); 
-
+                RemoveFromStack();
                 return (void*)((uint64_t)current + sizeof(HeapSegHdr));
             }
         }
-
-GlobalRenderer->CursorPosition = {400, 160};
-GlobalRenderer->Print("HALLO: ", Colors.brown); 
 
         if (current->next == NULL)
             break;
@@ -281,17 +242,11 @@ GlobalRenderer->Print("HALLO: ", Colors.brown);
     }
     //GlobalRenderer->Println("Requesting more RAM.");
 
-GlobalRenderer->CursorPosition = {400, 160};
-GlobalRenderer->Print("HALLO: ", Colors.cyan); 
-
     if (ExpandHeap(size))
     {
         void* res = malloc(size, text);
         //mallocCount++;
-        //RemoveFromStack();
-
-GlobalRenderer->CursorPosition = {400, 160};
-GlobalRenderer->Print("HALLO: ", Colors.yellow); 
+        RemoveFromStack();
 
         return res;
     }
@@ -299,13 +254,10 @@ GlobalRenderer->Print("HALLO: ", Colors.yellow);
     // GlobalRenderer->ClearDotted(Colors.green);
     // while (true);
 
-GlobalRenderer->CursorPosition = {400, 160};
-GlobalRenderer->Print("HALLO: ", Colors.bgreen); 
 
+    Panic("MALLOC FAILED!!!", true);
 
-    Panic("MALLOC FAILED!!!");
-
-    //RemoveFromStack();
+    RemoveFromStack();
     return NULL;
 }
 

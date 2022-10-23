@@ -33,6 +33,12 @@ bool TerminalInstance::GetBusy()
 void TerminalInstance::Free()
 {
     tasks.free();
+    if (newTermInstance != NULL)
+    {
+        ((NewTerminalInstance*)newTermInstance)->Free();
+        free(newTermInstance);
+        newTermInstance = NULL;
+    }    
 }
 
 void TerminalInstance::HandleEnter()

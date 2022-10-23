@@ -1747,8 +1747,8 @@ void GetCmd(const char* name, OSUser* user, Window* window)
     else if (StrEquals(name, "heap stats detail"))
     {
         Println(window, "Heap Statistics (Detailed):", Colors.yellow);
-        GlobalRenderer->Clear(Colors.dgray);
-        GlobalRenderer->Println("Heap Statistics (Detailed):", Colors.yellow);
+        // GlobalRenderer->Clear(Colors.dgray);
+        // GlobalRenderer->Println("Heap Statistics (Detailed):", Colors.yellow);
         
         {
             uint64_t totCount = 0;
@@ -1785,16 +1785,16 @@ void GetCmd(const char* name, OSUser* user, Window* window)
                             col = Colors.bred;
                     }
                     
-                    GlobalRenderer->Println("> Heap# {0} - Size: {1} Bytes, Title: \"{2}\", AMFV: {3}, ADDR: {4}, NEXT: {5}", vars, col);
+                    //GlobalRenderer->Println("> Heap# {0} - Size: {1} Bytes, Title: \"{2}\", AMFV: {3}, ADDR: {4}, NEXT: {5}", vars, col);
                     Println(window, "> Heap# {0} - Size: {1} Bytes, Title: \"{2}\", AMFV: {3}", vars, col);
-                    GlobalRenderer->Print("<T>");
-                    GlobalRenderer->Println(" Heap# {0} - Size: {1} Bytes, Title: \"{2}\", AMFV: {3}, ADDR: {4}, NEXT: {5}", vars, col);
+                    //GlobalRenderer->Print("<T>");
+                    //GlobalRenderer->Println(" Heap# {0} - Size: {1} Bytes, Title: \"{2}\", AMFV: {3}, ADDR: {4}, NEXT: {5}", vars, col);
 
-                    if(GlobalRenderer->CursorPosition.y > 600)
-                    {
-                        PIT::Sleep(2000);
-                        GlobalRenderer->Clear(Colors.dgray);
-                    }
+                    // if(GlobalRenderer->CursorPosition.y > 600)
+                    // {
+                    //     PIT::Sleep(2000);
+                    //     GlobalRenderer->Clear(Colors.dgray);
+                    // }
 
                     totalSegCount += 1;
                     totalSegSpace += current->length;
@@ -1802,13 +1802,13 @@ void GetCmd(const char* name, OSUser* user, Window* window)
                 }
             }
 
-            {
-                PIT::Sleep(2000);
-                GlobalRenderer->Clear(Colors.dblue);
-                GlobalRenderer->Println("Done printing Heap Stats!", Colors.bgray);
-                PIT::Sleep(2000);
-                GlobalRenderer->Clear(Colors.dgray);
-            }
+            // {
+            //     PIT::Sleep(2000);
+            //     GlobalRenderer->Clear(Colors.dblue);
+            //     GlobalRenderer->Println("Done printing Heap Stats!", Colors.bgray);
+            //     PIT::Sleep(2000);
+            //     GlobalRenderer->Clear(Colors.dgray);
+            // }
 
             Println(window);
             Println(window, "-----------------------------------");

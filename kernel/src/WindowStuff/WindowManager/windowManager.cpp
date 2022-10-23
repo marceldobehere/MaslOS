@@ -807,7 +807,7 @@ if (window != NULL)
 
         //osData.debugTerminalWindow->Log("             : ################", Colors.black);
         osData.debugTerminalWindow->renderer->CursorPosition.x = 0;
-        osData.debugTerminalWindow->renderer->CursorPosition.y -= 112;
+        osData.debugTerminalWindow->renderer->CursorPosition.y -= 128;
 
         osData.debugTerminalWindow->renderer->Clear(
             osData.debugTerminalWindow->renderer->CursorPosition.x,
@@ -865,6 +865,14 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
         osData.debugTerminalWindow->Log("Free Count: {}", to_string(freeCount), Colors.yellow);
+
+        osData.debugTerminalWindow->renderer->Clear(
+            osData.debugTerminalWindow->renderer->CursorPosition.x,
+            osData.debugTerminalWindow->renderer->CursorPosition.y,
+            osData.debugTerminalWindow->renderer->CursorPosition.x + 240,
+            osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
+            Colors.black);
+        osData.debugTerminalWindow->Log("Stack Trace Count: {}", to_string(MStackData::stackPointer+1), Colors.yellow);
 
      
         if(++testCounterX >= testInterlace)

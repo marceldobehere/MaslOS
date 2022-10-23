@@ -41,33 +41,16 @@ template <typename T> void List<T>::free()
 
 template <typename T>void List<T>::expandArr()
 {
-    GlobalRenderer->CursorPosition = {400, 64};
-    GlobalRenderer->Print("HALLO: ", Colors.red);  
     AddToStack();
     Array<T> newArr = Array<T>(arr.getSize());
     arr.copy(newArr);
-    GlobalRenderer->CursorPosition = {400, 64};
-    GlobalRenderer->Print("HALLO: ", Colors.orange); 
-
-    AddToStack();
+    
     cap *= 2;
     arr.reInit(cap);
-    RemoveFromStack();
-
-    GlobalRenderer->CursorPosition = {400, 64};
-    GlobalRenderer->Print("HALLO: ", Colors.bgray); 
-
-    AddToStack();
-    newArr.copy(arr);
-    RemoveFromStack();
     
-    AddToStack();
+    newArr.copy(arr);
     newArr.free();
     RemoveFromStack();
-
-    RemoveFromStack();
-    GlobalRenderer->CursorPosition = {400, 64};
-    GlobalRenderer->Print("HALLO: ", Colors.bgreen); 
 }
 
 template <typename T> List<T> List<T>::clone()
@@ -108,22 +91,13 @@ template <typename T> int64_t List<T>::getIndexOf(T item)
 
 template <typename T> void List<T>::add(T item)
 {
-    GlobalRenderer->CursorPosition = {400, 32};
-    GlobalRenderer->Print("HALLO: ", Colors.red);  
-
     AddToStack();
     if (count >= cap)
         expandArr();
-    
-    GlobalRenderer->CursorPosition = {400, 32};
-    GlobalRenderer->Print("HALLO: ", Colors.brown);  
 
     arr[count] = item;
     count++;
     RemoveFromStack();
-
-    GlobalRenderer->CursorPosition = {400, 32};
-    GlobalRenderer->Print("HALLO: ", Colors.bgreen);  
 }
 
 template <typename T> void List<T>::insertAt(T item, uint64_t index)
@@ -254,28 +228,12 @@ template <typename T> void Array<T>::reInit(uint64_t size)
         size = 2;
     this->size = size;
 
-    GlobalRenderer->CursorPosition = {400, 128};
-    GlobalRenderer->Print("HALLO: ", Colors.orange); 
-    
-    AddToStack();
+
     free();
-    RemoveFromStack();
-
-    GlobalRenderer->CursorPosition = {400, 128};
-    GlobalRenderer->Print("HALLO: ", Colors.blue); 
-
-    AddToStack();
     arr = (T*)_malloc(size * sizeof(T), "Array re-init");
-    RemoveFromStack();
-
-    GlobalRenderer->CursorPosition = {400, 128};
-    GlobalRenderer->Print("HALLO: ", Colors.white); 
 
     freed = false;
     RemoveFromStack();
-
-    GlobalRenderer->CursorPosition = {400, 128};
-    GlobalRenderer->Print("HALLO: ", Colors.bgreen); 
 }
 
 template <typename T> T& Array<T>::operator[](uint64_t index)

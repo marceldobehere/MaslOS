@@ -192,7 +192,7 @@ void Panic(const char* panicMessage, const char* var)
 
 void Panic(const char* panicMessage)
 {
-    Panic(panicMessage, NULL, true);
+    Panic(panicMessage, NULL, false);
 }
 
 void Panic(const char* panicMessage, bool lock)
