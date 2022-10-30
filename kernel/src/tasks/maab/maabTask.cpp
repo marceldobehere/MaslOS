@@ -12,7 +12,8 @@ TaskMAAB::TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInst
 	this->window = window;
 	dTerm = term;
 	newTerm = (NewTerminalInstance*)(term->newTermInstance);
-
+    programEnded = false;
+    done = false;
 
 	//this->code = (uint8_t*)malloc(codeLen);
 	//for (int i = 0; i < codeLen; i++)
@@ -27,16 +28,16 @@ TaskMAAB::TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInst
 
 
 
-	newTerm->Println("Data:");
+	//newTerm->Println("Data:");
 	for (int i = 0; i < codeLen; i++)
 	{
 		mem[i] = code[i];
-		newTerm->Print("{} ", to_string(mem[i]), defCol);
+		//newTerm->Print("{} ", to_string(mem[i]), defCol);
 	}
 	newTerm->Println();
 
 	waitInput = false;
-	done = false;
+	programEnded = false;
 	type = TaskType::MAAB;
 
 
@@ -48,7 +49,7 @@ TaskMAAB::TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInst
 	((TerminalInstance*)window->instance)->userlen = 0;
 	((TerminalInstance*)window->instance)->takeInput = false;
 	waitInput = false;
-	newTerm->Println("<TASK STARTED!>");
+	//newTerm->Println("<TASK STARTED!>");
 	defCol = Colors.white;
 
 	subDeepness = 0;
@@ -63,7 +64,7 @@ void TaskMAAB::Do()
 
 	if (instrPointer >= memLen)
 	{
-		done = true;
+		programEnded = true;
 		errCode = 1;
 		errMsg = "INSTRUCTION POINTER OUT OF BOUNDS!";
 	}
@@ -72,8 +73,31 @@ void TaskMAAB::Do()
 	{
 		if (waitInput)
 			return;
-		if (errCode != 0)
-			return;
+        if (done)
+            return;
+        if (programEnded)
+        {
+            newTerm->Println();
+            newTerm->Println();
+            if (errCode == 0)
+            {
+                newTerm->Println("Program exited with no errors!");
+            }
+            else
+            {
+                newTerm->Println("Program exited with error code: {} !", to_string(errCode));
+                newTerm->Println("Error Message:");
+                newTerm->Println(errMsg);
+            }
+
+            done = true;
+            return;
+        }
+        if (errCode != 0)
+        {
+            programEnded = true;
+            return;
+        }
 
 		uint8_t instr = mem[instrPointer];
 
@@ -83,7 +107,7 @@ void TaskMAAB::Do()
 		}
 		else if (instr == 1) //exit
 		{
-			done = true;
+			programEnded = true;
 			errCode = 0;
 			return;
 		}
@@ -91,7 +115,7 @@ void TaskMAAB::Do()
 		{
 			if (instrPointer + 20 >= memLen)
 			{
-				done = true;
+				programEnded = true;
 				errCode = 1;
 				errMsg = "INSTRUCTION OUT OF BOUNDS!";
 				return;
@@ -101,7 +125,7 @@ void TaskMAAB::Do()
 
 			if (copyAddr + copySize >= memLen)
 			{
-				done = true;
+				programEnded = true;
 				errCode = 1;
 				errMsg = "ADDR OUT OF BOUNDS!";
 				return;
@@ -132,7 +156,7 @@ void TaskMAAB::Do()
 		{
 			if (instrPointer + 17 >= memLen)
 			{
-				done = true;
+				programEnded = true;
 				errCode = 1;
 				errMsg = "INSTRUCTION OUT OF BOUNDS!";
 				return;
@@ -143,7 +167,7 @@ void TaskMAAB::Do()
 
 			if (copyAddr1 + copySize >= memLen || copyAddr2 + copySize >= memLen)
 			{
-				done = true;
+				programEnded = true;
 				errCode = 1;
 				errMsg = "ADDR OUT OF BOUNDS!";
 				return;
@@ -160,7 +184,7 @@ void TaskMAAB::Do()
 		{
 			if (instrPointer + 30 >= memLen)
 			{
-				done = true;
+				programEnded = true;
 				errCode = 1;
 				errMsg = "INSTRUCTION OUT OF BOUNDS!";
 				return;
@@ -181,7 +205,7 @@ void TaskMAAB::Do()
 		{
 			if (instrPointer + 30 >= memLen)
 			{
-				done = true;
+				programEnded = true;
 				errCode = 1;
 				errMsg = "INSTRUCTION OUT OF BOUNDS!";
 				return;
@@ -202,7 +226,7 @@ void TaskMAAB::Do()
 		{
 			if (instrPointer + 30 >= memLen)
 			{
-				done = true;
+				programEnded = true;
 				errCode = 1;
 				errMsg = "INSTRUCTION OUT OF BOUNDS!";
 				return;
@@ -246,7 +270,7 @@ void TaskMAAB::Do()
 		{
 			if (instrPointer + 8 >= memLen)
 			{
-				done = true;
+				programEnded = true;
 				errCode = 1;
 				errMsg = "INSTRUCTION OUT OF BOUNDS!";
 				return;
@@ -259,7 +283,7 @@ void TaskMAAB::Do()
 		{
 			if (instrPointer + 9 >= memLen)
 			{
-				done = true;
+				programEnded = true;
 				errCode = 1;
 				errMsg = "INSTRUCTION OUT OF BOUNDS!";
 				return;
@@ -277,7 +301,7 @@ void TaskMAAB::Do()
 		{
 			if (instrPointer + 8 >= memLen)
 			{
-				done = true;
+				programEnded = true;
 				errCode = 1;
 				errMsg = "INSTRUCTION OUT OF BOUNDS!";
 				return;
@@ -286,7 +310,7 @@ void TaskMAAB::Do()
 
 			if (subDeepness > maxSubDeepness)
 			{
-				done = true;
+				programEnded = true;
 				errCode = 1;
 				errMsg = "SUBROUTINE STACK OVERFLOW!";
 				return;
@@ -299,7 +323,7 @@ void TaskMAAB::Do()
 		{
 			if (subDeepness < 1)
 			{
-				done = true;
+				programEnded = true;
 				errCode = 1;
 				errMsg = "SUBROUTINE STACK UNDERFLOW!";
 				return;
@@ -310,7 +334,7 @@ void TaskMAAB::Do()
 		{
 			if (instrPointer + 9 >= memLen)
 			{
-				done = true;
+				programEnded = true;
 				errCode = 1;
 				errMsg = "INSTRUCTION OUT OF BOUNDS!";
 				return;
@@ -320,7 +344,7 @@ void TaskMAAB::Do()
 
 			if (subDeepness > maxSubDeepness)
 			{
-				done = true;
+				programEnded = true;
 				errCode = 1;
 				errMsg = "SUBROUTINE STACK OVERFLOW!";
 				return;
@@ -335,7 +359,7 @@ void TaskMAAB::Do()
 		{
 			if (instrPointer + 2 >= memLen)
 			{
-				done = true;
+				programEnded = true;
 				errCode = 1;
 				errMsg = "INSTRUCTION OUT OF BOUNDS!";
 				return;
@@ -374,7 +398,7 @@ void TaskMAAB::Do()
 
 				else
 				{
-					done = true;
+					programEnded = true;
 					errCode = 1;
 					errMsg = "CONSOLE SYSCALL IS NOT SUPPORTED";
 					return;
@@ -383,7 +407,7 @@ void TaskMAAB::Do()
 
 			else
 			{
-				done = true;
+				programEnded = true;
 				errCode = 1;
 				errMsg = "SYSCALL IS NOT SUPPORTED";
 				return;
@@ -421,7 +445,7 @@ void TaskMAAB::PrintVal(DatatypeNumber numType, uint64_t numAddr)
 
 	if (numAddr + datatypeSizes[(uint8_t)numType] >= memLen)
 	{
-		done = true;
+		programEnded = true;
 		errCode = 1;
 		errMsg = "ADDR OUT OF BOUNDS!";
 		return;
@@ -491,7 +515,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 	if (addrFrom + datatypeSizes[(uint8_t)typeFrom] >= memLen ||
 		addrTo + datatypeSizes[(uint8_t)typeTo] >= memLen)
 	{
-		done = true;
+		programEnded = true;
 		errCode = 1;
 		errMsg = "ADDR OUT OF BOUNDS!";
 		return;
@@ -529,7 +553,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN DATATYPE TO INT!";
 			return;
@@ -568,7 +592,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN DATATYPE TO INT!";
 			return;
@@ -607,7 +631,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN DATATYPE TO INT!";
 			return;
@@ -646,7 +670,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN DATATYPE TO INT!";
 			return;
@@ -685,7 +709,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN DATATYPE TO INT!";
 			return;
@@ -724,7 +748,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN DATATYPE TO INT!";
 			return;
@@ -763,7 +787,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN DATATYPE TO INT!";
 			return;
@@ -802,7 +826,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN DATATYPE TO INT!";
 			return;
@@ -841,7 +865,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN DATATYPE TO INT!";
 			return;
@@ -880,7 +904,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN DATATYPE TO INT!";
 			return;
@@ -890,7 +914,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 
 	else
 	{
-		done = true;
+		programEnded = true;
 		errCode = 1;
 		errMsg = "UNKNOWN DATATYPE!";
 		return;
@@ -909,7 +933,7 @@ void TaskMAAB::Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint
 		addr1 + datatypeSizes[(uint8_t)typeNum] >= memLen ||
 		addrRes + datatypeSizes[(uint8_t)typeNum] >= memLen)
 	{
-		done = true;
+		programEnded = true;
 		errCode = 1;
 		errMsg = "ADDR OUT OF BOUNDS!";
 		return;
@@ -981,7 +1005,7 @@ void TaskMAAB::Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN OPERATION!";
 			return;
@@ -1031,7 +1055,7 @@ void TaskMAAB::Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN OPERATION!";
 			return;
@@ -1082,7 +1106,7 @@ void TaskMAAB::Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN OPERATION!";
 			return;
@@ -1132,7 +1156,7 @@ void TaskMAAB::Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN OPERATION!";
 			return;
@@ -1183,7 +1207,7 @@ void TaskMAAB::Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN OPERATION!";
 			return;
@@ -1233,7 +1257,7 @@ void TaskMAAB::Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN OPERATION!";
 			return;
@@ -1275,7 +1299,7 @@ void TaskMAAB::Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN OPERATION!";
 			return;
@@ -1316,7 +1340,7 @@ void TaskMAAB::Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN OPERATION!";
 			return;
@@ -1369,7 +1393,7 @@ void TaskMAAB::Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN OPERATION!";
 			return;
@@ -1398,7 +1422,7 @@ void TaskMAAB::Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint
 
 		else
 		{
-			done = true;
+			programEnded = true;
 			errCode = 1;
 			errMsg = "UNKNOWN OPERATION!";
 			return;
@@ -1408,7 +1432,7 @@ void TaskMAAB::Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint
 
 	else
 	{
-		done = true;
+		programEnded = true;
 		errCode = 1;
 		errMsg = "UNKNOWN DATATYPE!";
 		return;
@@ -1426,4 +1450,13 @@ void TaskMAAB::Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint
 void TaskMAAB::Free()
 {
 	free((void*)mem);
+}
+
+
+TaskMAAB* NewMAABTask(uint32_t codeLen, uint8_t* code, Window* window, TerminalInstance* newTerm)
+{
+    //TaskMAAB* maab = (TaskMAAB*)malloc(sizeof(TaskMAAB));
+    //*maab = TaskMAAB(codeLen, code, window, newTerm);
+    TaskMAAB* maab = new TaskMAAB(codeLen, code, window, newTerm);
+    return maab;
 }

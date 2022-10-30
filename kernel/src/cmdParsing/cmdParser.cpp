@@ -17,6 +17,8 @@
 #include "../kernelStuff/Disk_Stuff/Filesystem_Interfaces/mrafs/mrafsFileSystemInterface.h"
 #include "../WindowStuff/SubInstances/connect4Instance/connect4Instance.h"
 #include "../tasks/bfTask/bfTask.h"
+#include "../fsStuff/fsStuff.h"
+#include "../tasks/maab/maabTask.h"
 
 void Println(Window* window)
 {
@@ -425,6 +427,72 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     {
         if (data->len == 2)
             GetCmd(data->data[1], *user, window);
+        else
+            LogInvalidArgumentCount(1, data->len-1, window);
+        
+        free(data);
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(data->data[0], "maab"))
+    {
+        if (data->len == 2)
+        {
+            //Println(window, "Reading File \"{}\"...", data->data[1], Colors.yellow);
+
+            // {
+            //     char* t = FS_STUFF::GetDriveNameFromFullPath(data->data[1]);
+            //     if (t != NULL)
+            //     {
+            //         Println(window, "Drive: \"{}\"", t, Colors.yellow);
+            //         free((void*)t);
+            //     }
+            // }
+
+            // {
+            //     char* t = FS_STUFF::GetFilePathFromFullPath(data->data[1]);
+            //     if (t != NULL)
+            //     {
+            //         Println(window, "Path: \"{}\"", t, Colors.yellow);
+            //         free((void*)t);
+            //     }
+            // }
+
+            FilesystemInterface::GenericFilesystemInterface* fsInterface = FS_STUFF::GetFsInterfaceFromFullPath(data->data[1]);
+            if (fsInterface != NULL)
+            {
+                char* relPath = FS_STUFF::GetFilePathFromFullPath(data->data[1]);
+                if (relPath != NULL)
+                {
+                    if (fsInterface->FileExists(relPath))
+                    {
+                        uint8_t* buf = NULL;
+                        fsInterface->ReadFile(relPath, (void**)(&buf));
+                        if (buf != NULL)
+                        {   
+                            //Println(window, "> File exists!");
+                            int fSize = fsInterface->GetFileInfo(relPath)->sizeInBytes;
+
+                            terminal->tasks.add(NewMAABTask(fSize, buf, window, terminal));
+
+                            free((void*)buf);
+                        }
+                        else
+                            LogError("Reading File failed!", window);
+                    }
+                    else
+                        LogError("File does not exist!", window);
+
+                    free(relPath);
+                }
+                else
+                    LogError("Path is invalid!", window);
+            }
+            else
+                LogError("Path is invalid!", window);
+
+        }
         else
             LogInvalidArgumentCount(1, data->len-1, window);
         
