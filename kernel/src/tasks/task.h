@@ -8,6 +8,7 @@ enum TaskType
     CLOSEWINDOW,
     BEEP,
     BF,
+    MAAB
 };
 
 

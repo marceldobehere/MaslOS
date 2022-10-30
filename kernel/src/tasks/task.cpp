@@ -5,6 +5,7 @@
 #include "closeWindow/taskWindowClose.h"
 #include "bfTask/bfTask.h"
 #include "playBeep/playBeep.h"
+#include "maab/maabTask.h"
 
 
 
@@ -71,6 +72,12 @@ void DoTask(Task* task)
             bf->Do();
             break;
         }
+        case TaskType::MAAB:
+        {
+            TaskMAAB* maab = (TaskMAAB*)task;
+            maab->Do();
+            break;
+        }
     }
 }
 
@@ -116,6 +123,13 @@ void FreeTask(Task* task)
             TaskBF* bf = (TaskBF*)task;
             bf->Free();
             free((void*)bf);
+            break;
+        }
+        case TaskType::MAAB:
+        {
+            TaskMAAB* maab = (TaskMAAB*)task;
+            maab->Free();
+            free((void*)maab);
             break;
         }
     }  
