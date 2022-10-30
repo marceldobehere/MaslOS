@@ -49,6 +49,7 @@ MaslOS is 1000% the best os ever!11!1
     - Emergency Kernel Panic
   - Crash Command
   - BF Interpreter
+  - [MAAB Interpreter](https://github.com/marceldobehere/MAAL-Marcels-Amazing-Assembly-Language)
   - KernelFiles
   - Auto Disk Stuff Detection
   + - Auto Disk Detection
