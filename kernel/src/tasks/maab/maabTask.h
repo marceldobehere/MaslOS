@@ -15,7 +15,7 @@ private:
     Window* window;
     NewTerminalInstance* newTerm;
     TerminalInstance* dTerm;
-    int cyclesPerCall = 100;
+    int cyclesPerCall = 1000;
 
     uint64_t instrPointer = 0;
     uint32_t defCol = Colors.white;
