@@ -12,8 +12,8 @@ TaskMAAB::TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInst
 	this->window = window;
 	dTerm = term;
 	newTerm = (NewTerminalInstance*)(term->newTermInstance);
-    programEnded = false;
-    done = false;
+	programEnded = false;
+	done = false;
 
 	//this->code = (uint8_t*)malloc(codeLen);
 	//for (int i = 0; i < codeLen; i++)
@@ -26,15 +26,22 @@ TaskMAAB::TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInst
 	for (int i = 0; i < memLen; i++)
 		mem[i] = 0;
 
-
-
 	//newTerm->Println("Data:");
 	for (int i = 0; i < codeLen; i++)
 	{
 		mem[i] = code[i];
 		//newTerm->Print("{} ", to_string(mem[i]), defCol);
 	}
-	newTerm->Println();
+	//newTerm->Println();
+
+	//newTerm->Println("MEM 1: {}", to_string((uint64_t)mem), defCol);
+
+	memHandler = (MAAB_MEM::MbMemHandler*)malloc(sizeof(MAAB_MEM::MbMemHandler));
+	*memHandler = MAAB_MEM::MbMemHandler((void*)((uint64_t)mem + codeLen), memLen - codeLen, codeLen);
+
+	//newTerm->Println("MEM 2: {}", to_string((uint64_t)memHandler->buffer), defCol);
+
+
 
 	waitInput = false;
 	programEnded = false;
@@ -73,31 +80,31 @@ void TaskMAAB::Do()
 	{
 		if (waitInput)
 			return;
-        if (done)
-            return;
-        if (programEnded)
-        {
-            newTerm->Println();
-            newTerm->Println();
-            if (errCode == 0)
-            {
-                newTerm->Println("Program exited with no errors!");
-            }
-            else
-            {
-                newTerm->Println("Program exited with error code: {} !", to_string(errCode));
-                newTerm->Println("Error Message:");
-                newTerm->Println(errMsg);
-            }
+		if (done)
+			return;
+		if (programEnded)
+		{
+			newTerm->Println();
+			newTerm->Println();
+			if (errCode == 0)
+			{
+				newTerm->Println("Program exited with no errors!");
+			}
+			else
+			{
+				newTerm->Println("Program exited with error code: {} !", to_string(errCode));
+				newTerm->Println("Error Message:");
+				newTerm->Println(errMsg);
+			}
 
-            done = true;
-            return;
-        }
-        if (errCode != 0)
-        {
-            programEnded = true;
-            return;
-        }
+			done = true;
+			return;
+		}
+		if (errCode != 0)
+		{
+			programEnded = true;
+			return;
+		}
 
 		uint8_t instr = mem[instrPointer];
 
@@ -371,7 +378,7 @@ void TaskMAAB::Do()
 			{
 				if (syscall2 == 1)
 				{
-					uint8_t byteToPrint = *((uint64_t*)((uint64_t)mem + instrPointer + 3));
+					uint8_t byteToPrint = *((uint8_t*)((uint64_t)mem + instrPointer + 3));
 					newTerm->Print((char)byteToPrint);
 					instrPointer += 3 + 1;
 				}
@@ -404,6 +411,69 @@ void TaskMAAB::Do()
 					return;
 				}
 			}
+			else if (syscall1 == 2)
+			{
+				if (syscall2 == 1)
+				{
+					uint32_t mSize = *((uint32_t*)((uint64_t)mem + instrPointer + 3));
+					uint64_t mAddr = *((uint64_t*)((uint64_t)mem + instrPointer + 7));
+
+					if (mAddr + 8 >= memLen)
+					{
+						programEnded = true;
+						errCode = 1;
+						errMsg = "ADDRESS OUT OF BOUNDS!";
+						return;
+					}
+					
+					//newTerm->Println("\n<MALLOC GO BRRT>");
+
+					void* mRes = memHandler->MallocMem(mSize);
+					
+					if (mRes == NULL)
+					{
+						programEnded = true;
+						errCode = 2;
+						errMsg = "MALLOC FAILED!";
+						return;
+					}
+
+					*((uint64_t*)(mem + mAddr)) = (uint64_t)mRes;
+
+
+					instrPointer += 3 + 12;
+				}
+				else if (syscall2 == 2)
+				{
+					uint64_t fAddr = *((uint64_t*)((uint64_t)mem + instrPointer + 3));
+
+					//newTerm->Println("\n<FREE GO BRRT>");
+
+					bool fRes = memHandler->FreeMem((void*)fAddr);
+
+					if (!fRes)
+					{
+						programEnded = true;
+						errCode = 2;
+						errMsg = "FREE FAILED!";
+						return;
+					}
+
+					instrPointer += 3 + 8;
+				}
+
+
+
+				else
+				{
+					programEnded = true;
+					errCode = 1;
+					errMsg = "MEMORY SYSCALL IS NOT SUPPORTED";
+					return;
+				}
+			}
+
+
 
 			else
 			{
@@ -493,7 +563,7 @@ void TaskMAAB::ShowBytes(uint8_t amount, uint64_t addr)
 {
 	newTerm->Print("<");
 	for (int i = 0; i < amount; i++)
-		newTerm->Print("{} ", to_string(*((uint8_t*)((uint64_t)mem+addr + i))));
+		newTerm->Print("{} ", to_string(*((uint8_t*)((uint64_t)mem + addr + i))));
 	newTerm->Print(">");
 }
 
@@ -524,7 +594,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 #pragma region INT
 	if (typeFrom == DatatypeNumber::INT)
 	{
-		int32_t from = *((int32_t*)((uint64_t)mem+addrFrom));
+		int32_t from = *((int32_t*)((uint64_t)mem + addrFrom));
 
 		if (typeTo == DatatypeNumber::INT)
 			*((int32_t*)((uint64_t)mem + addrTo)) = from;
@@ -563,7 +633,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 #pragma region UINT
 	else if (typeFrom == DatatypeNumber::UINT)
 	{
-		uint32_t from = *((uint32_t*)((uint64_t)mem+addrFrom));
+		uint32_t from = *((uint32_t*)((uint64_t)mem + addrFrom));
 
 		if (typeTo == DatatypeNumber::INT)
 			*((int32_t*)((uint64_t)mem + addrTo)) = (int32_t)from;
@@ -602,7 +672,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 #pragma region SHORT
 	else if (typeFrom == DatatypeNumber::SHORT)
 	{
-		int16_t from = *((int16_t*)((uint64_t)mem+addrFrom));
+		int16_t from = *((int16_t*)((uint64_t)mem + addrFrom));
 
 		if (typeTo == DatatypeNumber::INT)
 			*((int32_t*)((uint64_t)mem + addrTo)) = (int32_t)from;
@@ -641,7 +711,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 #pragma region USHORT
 	else if (typeFrom == DatatypeNumber::USHORT)
 	{
-		uint16_t from = *((uint16_t*)((uint64_t)mem+addrFrom));
+		uint16_t from = *((uint16_t*)((uint64_t)mem + addrFrom));
 
 		if (typeTo == DatatypeNumber::INT)
 			*((int32_t*)((uint64_t)mem + addrTo)) = (int32_t)from;
@@ -680,7 +750,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 #pragma region LONG
 	else if (typeFrom == DatatypeNumber::LONG)
 	{
-		int64_t from = *((int64_t*)((uint64_t)mem+addrFrom));
+		int64_t from = *((int64_t*)((uint64_t)mem + addrFrom));
 
 		if (typeTo == DatatypeNumber::INT)
 			*((int32_t*)((uint64_t)mem + addrTo)) = (int32_t)from;
@@ -719,7 +789,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 #pragma region ULONG
 	else if (typeFrom == DatatypeNumber::ULONG)
 	{
-		uint64_t from = *((uint64_t*)((uint64_t)mem+addrFrom));
+		uint64_t from = *((uint64_t*)((uint64_t)mem + addrFrom));
 
 		if (typeTo == DatatypeNumber::INT)
 			*((int32_t*)((uint64_t)mem + addrTo)) = (int32_t)from;
@@ -836,7 +906,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 #pragma region CHAR
 	else if (typeFrom == DatatypeNumber::CHAR)
 	{
-		char from = *((char*)((uint64_t)mem+addrFrom));
+		char from = *((char*)((uint64_t)mem + addrFrom));
 
 		if (typeTo == DatatypeNumber::INT)
 			*((int32_t*)((uint64_t)mem + addrTo)) = (int32_t)from;
@@ -875,7 +945,7 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 #pragma region BOOL
 	else if (typeFrom == DatatypeNumber::BOOL)
 	{
-		bool from = *((bool*)((uint64_t)mem+addrFrom));
+		bool from = *((bool*)((uint64_t)mem + addrFrom));
 
 		if (typeTo == DatatypeNumber::INT)
 			*((int32_t*)((uint64_t)mem + addrTo)) = (int32_t)from;
@@ -925,7 +995,6 @@ void TaskMAAB::Cast(DatatypeNumber typeFrom, uint64_t addrFrom, DatatypeNumber t
 	//ShowBytes(datatypeSizes[(uint8_t)typeTo], addrTo);
 	//newTerm->Println();
 }
-
 
 void TaskMAAB::Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint64_t addr2, uint64_t addrRes)
 {
@@ -1450,13 +1519,14 @@ void TaskMAAB::Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint
 void TaskMAAB::Free()
 {
 	free((void*)mem);
+	free((void*)memHandler);
 }
 
 
 TaskMAAB* NewMAABTask(uint32_t codeLen, uint8_t* code, Window* window, TerminalInstance* newTerm)
 {
-    //TaskMAAB* maab = (TaskMAAB*)malloc(sizeof(TaskMAAB));
-    //*maab = TaskMAAB(codeLen, code, window, newTerm);
-    TaskMAAB* maab = new TaskMAAB(codeLen, code, window, newTerm);
-    return maab;
+	//TaskMAAB* maab = (TaskMAAB*)malloc(sizeof(TaskMAAB));
+	//*maab = TaskMAAB(codeLen, code, window, newTerm);
+	TaskMAAB* maab = new TaskMAAB(codeLen, code, window, newTerm);
+	return maab;
 }

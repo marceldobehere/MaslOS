@@ -4,12 +4,16 @@
 #include "../../WindowStuff/SubInstances/terminalInstance/terminalInstance.h"
 #include "../../WindowStuff/SubInstances/newTerminalInstance/newTerminalInstance.h"
 #include <stdint.h>
+#include "maabMem/maabMemHandler.h"
 
 class TaskMAAB : public Task
 {
 private:
     uint8_t* mem;
     uint64_t memLen;
+
+    MAAB_MEM::MbMemHandler* memHandler;
+
 
     bool waitInput;
     Window* window;
@@ -39,8 +43,8 @@ private:
         DOUBLE = 9
     };
 
-    const uint8_t datatypeSizes[10] = 
-    {4,4, 2,2, 8,8, 1,1, 4,8};
+    const uint8_t datatypeSizes[10] =
+    { 4,4, 2,2, 8,8, 1,1, 4,8 };
 
     enum OpNumber : uint8_t
     {
@@ -85,3 +89,4 @@ public:
 };
 
 TaskMAAB* NewMAABTask(uint32_t codeLen, uint8_t* code, Window* window, TerminalInstance* newTerm);
+
