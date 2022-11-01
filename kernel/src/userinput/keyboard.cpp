@@ -9,6 +9,7 @@
 #include "../OSDATA/osdata.h"
 #include "../tasks/enterHandler/taskEnterHandler.h"
 #include "../WindowStuff/SubInstances/connect4Instance/connect4Instance.h"
+#include "../tasks/maab/maabTask.h"
 
 
 bool lshift = false;
@@ -32,80 +33,12 @@ void ClearInput(TerminalInstance* instance)
 void HandleEnter()
 {
     Panic("Old Function used!");
-    // AddToStack();
-    // if (activeWindow->instance->instanceType == InstanceType::Terminal)
-    // {
-    //     TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
-    //     if (instance->userlen > 0)
-    //     {
-    //         if (instance->userlen > 255)
-    //             instance->userlen = 255;
-                
-    //         instance->terminalInput[instance->userlen] = 0;
-    //         ParseCommand(instance->terminalInput, instance->lastTerminalInput, &instance->currentUser, activeWindow);
-    //         //GlobalRenderer->Print("> ");
-    //         //GlobalRenderer->Println(userData);
-    //     }
-    //     if (activeWindow != NULL)
-    //     {
-    //         if (activeWindow->allowKeyboardDrawing)
-    //         {
-    //             activeWindow->renderer->Println();
-    //             PrintUser(activeWindow, instance->currentUser);
-    //             ClearInput(instance);
-    //         }
-    //     }
-    // }
-    // RemoveFromStack();
 }
 
 void InitKeyboard()
 {
 
 }
-
-// void KeyboardPrintStart(Window* window)
-// {
-//     AddToStack();
-//     if (window == NULL)
-//     {
-//         RemoveFromStack();
-//         return;
-//     }
-
-//     if (!window->allowKeyboardDrawing)
-//     {
-//         RemoveFromStack();
-//         return;
-//     }
-
-//     if (window->instance->instanceType == InstanceType::Terminal)
-//     {
-//         window->renderer->CursorPosition.y += 16;
-//         TerminalInstance* instance = (TerminalInstance*)window->instance;
-//         PrintUser(window, instance->currentUser);
-//     }
-//     RemoveFromStack();
-// }
-
-// void PrintUser(Window* window, OSUser* user)
-// {
-//     AddToStack();
-//     if (window == NULL)
-//     {
-//         RemoveFromStack();
-//         return;
-//     }
-//     if (user== NULL)
-//     {
-//         RemoveFromStack();
-//         return;
-//     }
-
-//     window->renderer->Print(user->userName, user->colData.userColor);
-//     window->renderer->Print("> ");
-//     RemoveFromStack();
-// }
 
 int scrollSpeed = 8;
 
@@ -223,11 +156,28 @@ void HandleKeyboard(uint8_t scancode)
         if (activeWindow->instance->instanceType == InstanceType::Terminal)
         {
             TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
-            if (!instance->GetBusy())
+            TaskMAAB* maab = NULL;
+            for (int i = 0; i < instance->tasks.getCount(); i++)
             {
-                if (activeWindow->allowKeyboardDrawing)
-                    ((NewTerminalInstance*)instance->newTermInstance)->Println();
-                instance->tasks.add(NewEnterTask(instance));
+                if (instance->tasks[i]->GetType() == TaskType::MAAB)
+                {
+                    maab = (TaskMAAB*)instance->tasks[i];
+                    break;
+                }
+            }
+
+            if (maab == NULL)
+            {
+                if (!instance->GetBusy())
+                {
+                    if (activeWindow->allowKeyboardDrawing)
+                        ((NewTerminalInstance*)instance->newTermInstance)->Println();
+                    instance->tasks.add(NewEnterTask(instance));
+                }
+            }
+            else
+            {
+                maab->gotInput = true;
             }
         }
         else if (activeWindow->instance->instanceType == InstanceType::Connect4)
@@ -245,14 +195,36 @@ void HandleKeyboard(uint8_t scancode)
         if (activeWindow->instance->instanceType == InstanceType::Terminal)
         {
             TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
-            if (instance->userlen > 0 && !instance->GetBusy())
+
+            TaskMAAB* maab = NULL;
+            for (int i = 0; i < instance->tasks.getCount(); i++)
             {
-                instance->userlen--;
-                instance->terminalInput[instance->userlen] = 0;
-                if (activeWindow->allowKeyboardDrawing)
-                    activeWindow->renderer->CursorPosition.x -= 8; 
-                if (activeWindow->allowKeyboardDrawing)
-                    ((NewTerminalInstance*)instance->newTermInstance)->DeleteLastCharInLine();//activeWindow->renderer->delChar(activeWindow->renderer->CursorPosition.x, activeWindow->renderer->CursorPosition.y);
+                if (instance->tasks[i]->GetType() == TaskType::MAAB)
+                {
+                    maab = (TaskMAAB*)instance->tasks[i];
+                    break;
+                }
+            }
+
+            if (maab == NULL)
+            {
+                if (instance->userlen > 0 && !instance->GetBusy())
+                {
+                    instance->userlen--;
+                    instance->terminalInput[instance->userlen] = 0;
+                    if (activeWindow->allowKeyboardDrawing)
+                        activeWindow->renderer->CursorPosition.x -= 8; 
+                    if (activeWindow->allowKeyboardDrawing)
+                        ((NewTerminalInstance*)instance->newTermInstance)->DeleteLastCharInLine();//activeWindow->renderer->delChar(activeWindow->renderer->CursorPosition.x, activeWindow->renderer->CursorPosition.y);
+                }
+            }
+            else
+            {
+                if (maab->memUserInputLen > 0)
+                {
+                    maab->memUserInput[--maab->memUserInputLen] = 0;
+                    ((NewTerminalInstance*)instance->newTermInstance)->DeleteLastCharInLine();
+                }
             }
         }
         else if (activeWindow->instance->instanceType == InstanceType::Connect4)
@@ -312,20 +284,56 @@ void HandleKeyboard(uint8_t scancode)
             {
                 TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
 
-                if ((activeWindow->allowKeyboardDrawing && !instance->GetBusy()))
+                //NewTerminalInstance* inst = NULL;
+                TaskMAAB* maab = NULL;
+                for (int i = 0; i < instance->tasks.getCount(); i++)
                 {
-                    if (instance->mode == commandMode::none)
-                        ((NewTerminalInstance*)instance->newTermInstance)->Print(ascii);
-                    else if (instance->mode == commandMode::enterText)
-                        ((NewTerminalInstance*)instance->newTermInstance)->Print(ascii);
-                    else if (instance->mode == commandMode::enterPassword)
-                        ((NewTerminalInstance*)instance->newTermInstance)->Print("*");
+                    if (instance->tasks[i]->GetType() == TaskType::MAAB)
+                    {
+                        maab = (TaskMAAB*)instance->tasks[i];
+                        break;
+                    }
                 }
-
-                if ((instance->userlen < 255 && !instance->GetBusy()) || instance->takeInput)
+                if (maab == NULL)
                 {
-                    instance->terminalInput[instance->userlen] = ascii;
-                    instance->userlen++;
+                    if ((activeWindow->allowKeyboardDrawing && !instance->GetBusy()))
+                    {
+                        if (instance->mode == commandMode::none)
+                            ((NewTerminalInstance*)instance->newTermInstance)->Print(ascii);
+                        else if (instance->mode == commandMode::enterText)
+                            ((NewTerminalInstance*)instance->newTermInstance)->Print(ascii);
+                        else if (instance->mode == commandMode::enterPassword)
+                            ((NewTerminalInstance*)instance->newTermInstance)->Print("*");
+                    }
+
+                    if ((instance->userlen < 255 && !instance->GetBusy()) || instance->takeInput)
+                    {
+                        instance->terminalInput[instance->userlen] = ascii;
+                        instance->userlen++;
+                    }
+                }
+                else
+                {
+                    if (maab->waitInput && !maab->gotInput)
+                    {
+                        if (ascii == '\n' || maab->memUserInputLen >= 490)
+                        {
+                            maab->gotInput = true;
+                        }
+                        else if (ascii == '\b')
+                        {
+                            if (maab->memUserInputLen > 0)
+                            {
+                                maab->memUserInput[--maab->memUserInputLen] = 0;
+                                ((NewTerminalInstance*)instance->newTermInstance)->DeleteLastCharInLine();
+                            }
+                        }
+                        else
+                        {
+                            maab->memUserInput[maab->memUserInputLen++] = ascii;
+                            ((NewTerminalInstance*)instance->newTermInstance)->Print(ascii);
+                        }
+                    }
                 }
             }
             else if (activeWindow->instance->instanceType == InstanceType::Connect4)

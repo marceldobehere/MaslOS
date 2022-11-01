@@ -14,8 +14,10 @@ private:
 
     MAAB_MEM::MbMemHandler* memHandler;
 
+    uint64_t writeInputInto;
 
-    bool waitInput;
+
+
     Window* window;
     NewTerminalInstance* newTerm;
     TerminalInstance* dTerm;
@@ -81,6 +83,10 @@ public:
 
     const char* errMsg = "<NO ERRORS>";
     int errCode = 0;
+    bool waitInput;
+    bool gotInput;
+    char memUserInput[500];
+    uint64_t memUserInputLen = 0;
 
     TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInstance* newTerm);
     void Do();
@@ -89,4 +95,5 @@ public:
 };
 
 TaskMAAB* NewMAABTask(uint32_t codeLen, uint8_t* code, Window* window, TerminalInstance* newTerm);
+
 

@@ -7,6 +7,8 @@
 //#include "terminalInstance.h"
 #include "../../kernelStuff/stuff/cstr.h"
 
+
+
 TaskMAAB::TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInstance* term)
 {
 	this->window = window;
@@ -42,8 +44,14 @@ TaskMAAB::TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInst
 	//newTerm->Println("MEM 2: {}", to_string((uint64_t)memHandler->buffer), defCol);
 
 
+	memUserInputLen = 0;
+	for (int i = 0; i < 500; i++)
+		memUserInput[i] = (char)0;
+
+
 
 	waitInput = false;
+	gotInput = false;
 	programEnded = false;
 	type = TaskType::MAAB;
 
@@ -56,6 +64,7 @@ TaskMAAB::TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInst
 	((TerminalInstance*)window->instance)->userlen = 0;
 	((TerminalInstance*)window->instance)->takeInput = false;
 	waitInput = false;
+	writeInputInto = (uint64_t)0;
 	//newTerm->Println("<TASK STARTED!>");
 	defCol = Colors.white;
 
@@ -67,13 +76,38 @@ TaskMAAB::TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInst
 void TaskMAAB::Do()
 {
 	if (waitInput)
-		return;
+	{
+		if (!gotInput)
+			return;
+		waitInput = false;
+		gotInput = false;
+
+		void* toWrite = memHandler->MallocMem(memUserInputLen + 1);
+		if (toWrite == NULL)
+		{
+			programEnded = true;
+			errCode = 2;
+			errMsg = "MALLOC FOR USER INPUT FAILED!";
+			return;
+		}
+
+		for (int i = 0; i < memUserInputLen; i++)
+			*((char*)((uint64_t)mem + (uint64_t)toWrite + i)) = memUserInput[i];
+		*((char*)((uint64_t)mem + (uint64_t)toWrite + memUserInputLen)) = 0;
+
+		*((uint64_t*)((uint64_t)mem + writeInputInto)) = (uint64_t)toWrite;
+
+		memUserInputLen = 0;
+		for (int i = 0; i < 500; i++)
+			memUserInput[i] = (char)0;
+	}
 
 	if (instrPointer >= memLen)
 	{
 		programEnded = true;
 		errCode = 1;
 		errMsg = "INSTRUCTION POINTER OUT OF BOUNDS!";
+		return;
 	}
 
 	for (int sI = 0; sI < cyclesPerCall; sI++)
@@ -401,6 +435,28 @@ void TaskMAAB::Do()
 						newTerm->Print((char)mem[printAddr + i]);
 					}
 					instrPointer += 3 + 8;
+				}
+				else if (syscall2 == 4)
+				{
+					uint64_t rAddr = *((uint64_t*)((uint64_t)mem + instrPointer + 3));
+
+					//newTerm->Println("\n<FREE GO BRRT>");
+
+					//bool fRes = memHandler->FreeMem((void*)fAddr);
+
+					if (rAddr + 8 >= memLen)
+					{
+						programEnded = true;
+						errCode = 1;
+						errMsg = "ADDRESS OUT OF BOUNDS!";
+						return;
+					}
+
+					instrPointer += 3 + 8;
+					gotInput = false;
+					waitInput = true;
+					writeInputInto = rAddr;
+					break;
 				}
 
 				else
@@ -1478,7 +1534,7 @@ void TaskMAAB::Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint
 		if (opNum != OpNumber::BOOL_NOT)
 			b = *((bool*)addr2);
 
-		else if (opNum == OpNumber::EQUALS)
+		if (opNum == OpNumber::EQUALS)
 			*((bool*)addrRes) = a == b;
 		else if (opNum == OpNumber::NOT_EQUALS)
 			*((bool*)addrRes) = a != b;
