@@ -244,17 +244,17 @@ void NewTerminalInstance::WriteVarStringIntoList(const char* chrs, dispVar vars[
 
 
 
-void ClearCharArr(ConsoleChar* charArr, int sizeX, int sizeY)
+void ClearCharArr(ConsoleChar* charArr, int sizeX, int sizeY, uint32_t fg, uint32_t bg)
 {
-    ConsoleChar tempChar = ConsoleChar(' ', Colors.white, Colors.black);
+    ConsoleChar tempChar = ConsoleChar(' ', fg, bg);
     for (int i = 0; i < sizeX * sizeY; i++)
         charArr[i] = tempChar;
 }
 
-void ReInitCharArrWithSize(ConsoleChar** charArr, int sizeX, int sizeY)
+void ReInitCharArrWithSize(ConsoleChar** charArr, int sizeX, int sizeY, uint32_t fg, uint32_t bg)
 {
     *charArr = (ConsoleChar*)malloc((sizeX * sizeY * sizeof(ConsoleChar)));
-    ClearCharArr(*charArr, sizeX, sizeY);
+    ClearCharArr(*charArr, sizeX, sizeY, fg, bg);
 }
 
 
@@ -275,8 +275,8 @@ NewTerminalInstance::NewTerminalInstance()
     oldWidth = 80;
     oldHeight = 160;
     //tempPixels = (ConsoleChar*)malloc(((window->size.width/8)*(window->size.height/16) * sizeof(ConsoleChar)));
-    ReInitCharArrWithSize(&tempPixels, (oldWidth/8), (oldHeight/16));
-    ReInitCharArrWithSize(&tempPixels2, (oldWidth/8), (oldHeight/16));
+    ReInitCharArrWithSize(&tempPixels, (oldWidth/8), (oldHeight/16), foregroundColor, backgroundColor);
+    ReInitCharArrWithSize(&tempPixels2, (oldWidth/8), (oldHeight/16), foregroundColor, backgroundColor);
 
     AddNewLine();
     RemoveFromStack();
@@ -291,8 +291,8 @@ void NewTerminalInstance::SetWindow(Window* window)
         //tempPixels = (ConsoleChar*)malloc(((window->size.width/8)*(window->size.height/16) * sizeof(ConsoleChar)));
         free(tempPixels);
         free(tempPixels2);
-        ReInitCharArrWithSize(&tempPixels, (oldWidth/8), (oldHeight/16));
-        ReInitCharArrWithSize(&tempPixels2, (oldWidth/8), (oldHeight/16));
+        ReInitCharArrWithSize(&tempPixels, (oldWidth/8), (oldHeight/16), foregroundColor, backgroundColor);
+        ReInitCharArrWithSize(&tempPixels2, (oldWidth/8), (oldHeight/16), foregroundColor, backgroundColor);
     }
     else
     {
@@ -301,8 +301,8 @@ void NewTerminalInstance::SetWindow(Window* window)
         //tempPixels = (ConsoleChar*)malloc(((window->size.width/8)*(window->size.height/16) * sizeof(ConsoleChar)));
         free(tempPixels);
         free(tempPixels2);
-        ReInitCharArrWithSize(&tempPixels, (oldWidth/8), (oldHeight/16));
-        ReInitCharArrWithSize(&tempPixels2, (oldWidth/8), (oldHeight/16));
+        ReInitCharArrWithSize(&tempPixels, (oldWidth/8), (oldHeight/16), foregroundColor, backgroundColor);
+        ReInitCharArrWithSize(&tempPixels2, (oldWidth/8), (oldHeight/16), foregroundColor, backgroundColor);
     }
     Clear();
 }
@@ -323,7 +323,7 @@ void NewTerminalInstance::RenderCharChanges()
     AddToStack();
     int sizeX = oldWidth / 8;
     int sizeY = oldHeight / 16;
-    ClearCharArr(tempPixels2, sizeX, sizeY);
+    ClearCharArr(tempPixels2, sizeX, sizeY, foregroundColor, backgroundColor);
 
     {
         AddToStack();
@@ -349,9 +349,12 @@ void NewTerminalInstance::RenderCharChanges()
             for (int dx = sDx; dx <= maxX; dx++)
             {
                 ConsoleChar chr = tList->elementAt(dx);
-                if (((dx - dx1) + ((dy - dy1) * (oldWidth / 8)) < 0) || ((dx - dx1) + ((dy - dy1) * (oldWidth / 8)) > (oldWidth / 8)*(oldHeight / 16)))
-                        Panic("OUT OF BOUNDS OMGGGGGGGGGGGGGGGGGGG!");
+                // if (((dx - dx1) + ((dy - dy1) * (oldWidth / 8)) < 0) || ((dx - dx1) + ((dy - dy1) * (oldWidth / 8)) > (oldWidth / 8)*(oldHeight / 16)))
+                //         Panic("OUT OF BOUNDS OMGGGGGGGGGGGGGGGGGGG!");
+
+
                 tempPixels2[(dx - dx1) + ((dy - dy1) * (sizeX))] = chr;
+
             }
         }
         RemoveFromStack(); 
@@ -368,6 +371,23 @@ void NewTerminalInstance::RenderCharChanges()
                 tempPixels[x + (y * sizeX)] = chr;
                 window->renderer->putChar(chr.chr, x*8 - (scrollX % 8), y*16 - (scrollY % 16), chr.fg, chr.bg);
             }
+
+
+
+
+    // for (int y = 0; y < sizeY; y++)
+    //     for (int x = 0; x < sizeX; x++)
+    //         if (tempPixels[x + (y * sizeX)] != tempPixels2[x + (y * sizeX)])
+    //         {
+    //             ConsoleChar chr = tempPixels[x + (y * sizeX)];
+    //             // if (chr.chr == ' ')
+    //             //    chr.chr = '?';
+    //             // chr.fg = Colors.yellow;
+    //             tempPixels2[x + (y * sizeX)] = chr;
+    //             window->renderer->putChar(chr.chr, x*8 - (scrollX % 8), y*16 - (scrollY % 16), chr.fg, chr.bg);
+    //         }
+
+
     //window->BlitBackbuffer();
     RemoveFromStack();
 }
@@ -393,13 +413,13 @@ void NewTerminalInstance::Render()
             oldWidth = window->size.width;
             oldHeight = window->size.height;
             free(tempPixels);
-            ReInitCharArrWithSize(&tempPixels, (window->size.width/8), (window->size.height/16));
+            ReInitCharArrWithSize(&tempPixels, (window->size.width/8), (window->size.height/16), foregroundColor, backgroundColor);
             free(tempPixels2);
-            ReInitCharArrWithSize(&tempPixels2, (window->size.width/8), (window->size.height/16));
+            ReInitCharArrWithSize(&tempPixels2, (window->size.width/8), (window->size.height/16), foregroundColor, backgroundColor);
         }
 
         window->renderer->Clear(backgroundColor);
-        ClearCharArr(tempPixels, (window->size.width/8), (window->size.height/16));
+        ClearCharArr(tempPixels, (window->size.width/8), (window->size.height/16), foregroundColor, backgroundColor);
         if (textData.getCount() == 0)
         {
             //window->BlitBackbuffer();
@@ -456,8 +476,8 @@ void NewTerminalInstance::Clear()
     AddToStack();
     window->brenderer->Clear(backgroundColor);
     window->renderer->Clear(backgroundColor);
-    ClearCharArr(tempPixels,  (oldWidth / 8), (oldHeight / 16));
-    ClearCharArr(tempPixels2, (oldWidth / 8), (oldHeight / 16));
+    ClearCharArr(tempPixels,  (oldWidth / 8), (oldHeight / 16), foregroundColor, backgroundColor);
+    ClearCharArr(tempPixels2, (oldWidth / 8), (oldHeight / 16), foregroundColor, backgroundColor);
     ClearListList(&textData);
     AddNewLine();
     Render();

@@ -717,7 +717,7 @@ void ProcessMousePacket(MousePacket packet)
         {
             if (clicks[i])
             {   
-                if (time >= clickTimes[i] + 100)
+                if (time >= clickTimes[i] + 50)
                     tHolds[i] = true;  
             }
             else

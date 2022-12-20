@@ -1536,7 +1536,30 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
     {
         ParsedColData data = ParseColor(val);
         if (data.parseSuccess)
-            window->renderer->color = data.col;
+        {
+            ((NewTerminalInstance*)(((TerminalInstance*)window->instance)->newTermInstance))->foregroundColor = data.col;
+            ((NewTerminalInstance*)(((TerminalInstance*)window->instance)->newTermInstance))->backgroundColor = Colors.black;
+        }
+        else
+            LogError("Color \"{}\" could not be Parsed!", val, window);
+    }
+    else if (StrEquals(name, "default color fg"))
+    {
+        ParsedColData data = ParseColor(val);
+        if (data.parseSuccess)
+        {
+            ((NewTerminalInstance*)(((TerminalInstance*)window->instance)->newTermInstance))->foregroundColor = data.col;
+        }
+        else
+            LogError("Color \"{}\" could not be Parsed!", val, window);
+    }
+    else if (StrEquals(name, "default color bg"))
+    {
+        ParsedColData data = ParseColor(val);
+        if (data.parseSuccess)
+        {
+            ((NewTerminalInstance*)(((TerminalInstance*)window->instance)->newTermInstance))->backgroundColor = data.col;
+        }
         else
             LogError("Color \"{}\" could not be Parsed!", val, window);
     }
@@ -1905,7 +1928,7 @@ ParsedColData ParseColor(const char* col)
     AddToStack();
     ParsedColData data = ParsedColData();
     data.parseSuccess = false;
-    data.col = 0;
+    data.col = Colors.white;
 
     //Println("Col: \"{}\" (", col, Colors.orange);
     //Print(col[0]);
@@ -1917,6 +1940,7 @@ ParsedColData ParseColor(const char* col)
         //Println("Col: \"{}\"", subStr, Colors.cyan);
         data.col = ConvertStringToHex(subStr);
         data.parseSuccess = true;
+        free((void*)subStr);
         RemoveFromStack();
         return data;
     }

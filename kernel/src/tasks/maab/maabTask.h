@@ -17,7 +17,6 @@ private:
     uint64_t writeInputInto;
 
 
-
     Window* window;
     NewTerminalInstance* newTerm;
     TerminalInstance* dTerm;
@@ -91,9 +90,8 @@ public:
     TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInstance* newTerm);
     void Do();
     void Free();
+    void PrintMem();
 
 };
 
 TaskMAAB* NewMAABTask(uint32_t codeLen, uint8_t* code, Window* window, TerminalInstance* newTerm);
-
-

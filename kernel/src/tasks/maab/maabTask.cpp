@@ -8,7 +8,6 @@
 #include "../../kernelStuff/stuff/cstr.h"
 
 
-
 TaskMAAB::TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInstance* term)
 {
 	this->window = window;
@@ -72,6 +71,15 @@ TaskMAAB::TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInst
 	for (int i = 0; i < maxSubDeepness; i++)
 		subLastPos[i] = 0;
 }
+
+void TaskMAAB::PrintMem()
+{
+	newTerm->Println("Data:");
+	for (int i = 0; i < 500; i++)
+			newTerm->Print("{} ", to_string(mem[i]), defCol);
+	newTerm->Println();
+}
+
 
 void TaskMAAB::Do()
 {
@@ -457,6 +465,29 @@ void TaskMAAB::Do()
 					waitInput = true;
 					writeInputInto = rAddr;
 					break;
+				}
+				else if (syscall2 == 5)
+				{
+					uint32_t col = *((uint32_t*)((uint64_t)mem + instrPointer + 3));
+					//newTerm->Println("<PRINTING STR AT {}>", to_string(printAddr), defCol);
+
+					newTerm->foregroundColor = col;
+
+					instrPointer += 3 + 4;
+				}
+				else if (syscall2 == 6)
+				{
+					uint32_t col = *((uint32_t*)((uint64_t)mem + instrPointer + 3));
+					//newTerm->Println("<PRINTING STR AT {}>", to_string(printAddr), defCol);
+
+					newTerm->backgroundColor = col;
+
+					instrPointer += 3 + 4;
+				}
+				else if (syscall2 == 7)
+				{
+					newTerm->Clear();
+					instrPointer += 3 + 0;
 				}
 
 				else
@@ -1451,17 +1482,17 @@ void TaskMAAB::Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint
 				*((double*)addrRes) = a / b;
 		}
 		else if (opNum == OpNumber::EQUALS)
-			*((double*)addrRes) = a == b;
+			*((bool*)addrRes) = a == b;
 		else if (opNum == OpNumber::NOT_EQUALS)
-			*((double*)addrRes) = a != b;
+			*((bool*)addrRes) = a != b;
 		else if (opNum == OpNumber::GREATER)
-			*((double*)addrRes) = a > b;
+			*((bool*)addrRes) = a > b;
 		else if (opNum == OpNumber::GREATER_EQUALS)
-			*((double*)addrRes) = a >= b;
+			*((bool*)addrRes) = a >= b;
 		else if (opNum == OpNumber::LESS)
-			*((double*)addrRes) = a < b;
+			*((bool*)addrRes) = a < b;
 		else if (opNum == OpNumber::LESS_EQUAL)
-			*((double*)addrRes) = a <= b;
+			*((bool*)addrRes) = a <= b;
 
 		else
 		{
