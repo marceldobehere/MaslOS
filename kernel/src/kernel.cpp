@@ -124,22 +124,22 @@ extern "C" void _start(BootInfo* bootInfo)
     //     KeyboardPrintStart(window);
     // }
  
-    NewTerminalInstance* newTerminaltest;
-    {
-        Window* window = (Window*)malloc(sizeof(Window), "Window");
-        NewTerminalInstance* terminal = (NewTerminalInstance*)malloc(sizeof(NewTerminalInstance), "Terminal Instance");
-        *terminal = NewTerminalInstance();
-        *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(500, 60), "Testing new Terminal", true, true, true);
-        osData.windows.add(window);
-        ((NewTerminalInstance*)terminal)->SetWindow(window);
+    // NewTerminalInstance* newTerminaltest;
+    // {
+    //     Window* window = (Window*)malloc(sizeof(Window), "Window");
+    //     NewTerminalInstance* terminal = (NewTerminalInstance*)malloc(sizeof(NewTerminalInstance), "Terminal Instance");
+    //     *terminal = NewTerminalInstance();
+    //     *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(500, 60), "Testing new Terminal", true, true, true);
+    //     osData.windows.add(window);
+    //     ((NewTerminalInstance*)terminal)->SetWindow(window);
             
-        newTerminaltest = terminal;
-        terminal->Clear();
-        terminal->WriteText("This \\B1100FFis a \\FFF00FFtest!");
-        terminal->WriteText("Oh ma go\nsh");
-        //osData.windows[1]->renderer->Println("Hello, world!");
-        //KeyboardPrintStart(window);
-    }
+    //     newTerminaltest = terminal;
+    //     terminal->Clear();
+    //     terminal->WriteText("This \\B1100FFis a \\FFF00FFtest!");
+    //     terminal->WriteText("Oh ma go\nsh");
+    //     //osData.windows[1]->renderer->Println("Hello, world!");
+    //     //KeyboardPrintStart(window);
+    // }
     
 
     
@@ -196,46 +196,46 @@ extern "C" void _start(BootInfo* bootInfo)
 
         ProcessMousePackets();
 
-        AddToStack();
-        if (true)// (false)
-        {
-            frameSum++;
-            if (frameSum == 10)
-                newTerminaltest->WriteText("This is a test (2)!");
-            if (frameSum == 300)
-                newTerminaltest->WriteText("This is a test (3)!");
+        // AddToStack();
+        // if (true)// (false)
+        // {
+        //     frameSum++;
+        //     if (frameSum == 10)
+        //         newTerminaltest->WriteText("This is a test (2)!");
+        //     if (frameSum == 300)
+        //         newTerminaltest->WriteText("This is a test (3)!");
             
-            if (frameSum > 1000 && frameSum < 1500 && frameSum % 4 == 0)
-                newTerminaltest->scrollX += 1;
-            if (frameSum == 1500)
-                newTerminaltest->WriteText("This is a test (4)!");
+        //     if (frameSum > 1000 && frameSum < 1500 && frameSum % 4 == 0)
+        //         newTerminaltest->scrollX += 1;
+        //     if (frameSum == 1500)
+        //         newTerminaltest->WriteText("This is a test (4)!");
 
-            if (frameSum > 2000 && frameSum < 3000 && frameSum % 4 == 0)
-                newTerminaltest->scrollX -= 1;
-            if (frameSum == 3000)
-                newTerminaltest->WriteText("This is a test (5)!");
+        //     if (frameSum > 2000 && frameSum < 3000 && frameSum % 4 == 0)
+        //         newTerminaltest->scrollX -= 1;
+        //     if (frameSum == 3000)
+        //         newTerminaltest->WriteText("This is a test (5)!");
 
-            if (frameSum > 3500 && frameSum < 4000 && frameSum % 4 == 0)
-                newTerminaltest->scrollY -= 1;
-            if (frameSum == 4000)
-                newTerminaltest->WriteText("This is a test (6)!");
+        //     if (frameSum > 3500 && frameSum < 4000 && frameSum % 4 == 0)
+        //         newTerminaltest->scrollY -= 1;
+        //     if (frameSum == 4000)
+        //         newTerminaltest->WriteText("This is a test (6)!");
 
-            if (frameSum > 4500 && frameSum < 5400 && frameSum % 4 == 0)
-                newTerminaltest->scrollY += 1;
-            if (frameSum == 5400)
-                newTerminaltest->WriteText("This is a test (7)!");
+        //     if (frameSum > 4500 && frameSum < 5400 && frameSum % 4 == 0)
+        //         newTerminaltest->scrollY += 1;
+        //     if (frameSum == 5400)
+        //         newTerminaltest->WriteText("This is a test (7)!");
 
-            if (frameSum > 6000 && frameSum < 6500 && frameSum % 4 == 0)
-                newTerminaltest->scrollY -= 1;
-            if (frameSum == 6500)
-                newTerminaltest->WriteText("This is a test (8)!");
+        //     if (frameSum > 6000 && frameSum < 6500 && frameSum % 4 == 0)
+        //         newTerminaltest->scrollY -= 1;
+        //     if (frameSum == 6500)
+        //         newTerminaltest->WriteText("This is a test (8)!");
 
 
-            // newTerminaltest->scrollX = 60 - ((tFrame % 300) * 2);
-            // newTerminaltest->scrollY = 50 - ((tFrame/3 % 250) * 1);
-            newTerminaltest->Render();
-        }
-        RemoveFromStack();
+        //     // newTerminaltest->scrollX = 60 - ((tFrame % 300) * 2);
+        //     // newTerminaltest->scrollY = 50 - ((tFrame/3 % 250) * 1);
+        //     newTerminaltest->Render();
+        // }
+        // RemoveFromStack();
 
         if (bgm != osData.drawBackground)
         {
@@ -267,8 +267,10 @@ extern "C" void _start(BootInfo* bootInfo)
                     osData.windows.removeAt(index);
                     osData.windows.add(activeWindow);
                     
-                    osData.windowPointerThing->RenderWindow(activeWindow);
                     osData.windowPointerThing->UpdateWindowBorder(oldActive);
+
+                    osData.windowPointerThing->RenderWindow(activeWindow);
+                    osData.windowPointerThing->UpdateWindowBorder(activeWindow);
                 }
             }
         }
@@ -368,14 +370,14 @@ extern "C" void _start(BootInfo* bootInfo)
                     }
                 }
             }
-            if (window->instance != NULL && frame % 4 == 0)
+            if (window->instance != NULL && (activeWindow == window || frame % 15 == 0))
                 if (window->instance->instanceType == InstanceType::Terminal)
                 {
                     TerminalInstance* termInst1 = (TerminalInstance*)window->instance;
                     if (termInst1->newTermInstance != NULL)
                     {
                         NewTerminalInstance* termInst2 = (NewTerminalInstance*)termInst1->newTermInstance;
-                        termInst2->Render();
+                        termInst2->DoRender();
                     }
                 }
             

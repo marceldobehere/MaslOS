@@ -907,6 +907,23 @@ if (window != NULL)
                                                      x2,   y1-1);
         osData.windowPointerThing->UpdatePointerRect(x1-1, y2, 
                                                      x2,   y2);
+
+        osData.windowPointerThing->UpdatePointerRect(x1,   y1-22, 
+                                                    x2,   y1-1);
+
+
+
+        // osData.windowPointerThing->UpdatePointerRect(x1-1, y1-22, 
+        //                                              x1-1, y2);
+        // osData.windowPointerThing->UpdatePointerRect(x2,   y1-22, 
+        //                                              x2,   y2);
+
+        // osData.windowPointerThing->UpdatePointerRect(x1-1, y1-22, 
+        //                                              x2,   y1-22);
+        // osData.windowPointerThing->UpdatePointerRect(x1-1, y1-1, 
+        //                                              x2,   y1-1);
+        // osData.windowPointerThing->UpdatePointerRect(x1-1, y2, 
+        //                                              x2,   y2);
     }
 }
 
