@@ -22,8 +22,8 @@ class Task
         TaskType type;
 
     public:
-        uint32_t tempTime;
-        uint32_t cpuUsagePercent;
+        int32_t tempTime = 0;
+        int32_t actTime = 0;
         bool GetDone();
         TaskType GetType();
         Task();

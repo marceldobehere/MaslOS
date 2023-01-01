@@ -13,6 +13,7 @@ struct OSStats
     int32_t windowUpdateTime = 2;
     int32_t totalRenderTime = 2;
     int32_t totalWindowUpdateTime = 2;
+    int32_t totalIdleTime = 1;
 };
 
 

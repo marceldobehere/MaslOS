@@ -183,12 +183,25 @@ extern "C" void _start(BootInfo* bootInfo)
 
     uint64_t frameSum = 0;
 
+    osData.wantedFps = 120;
+    uint32_t TwantedFps = 1000;
+    uint64_t timeForFps = 1000;
+
+
     while(!osData.exit)
     {
         AddToStack();
         freeCount = 0;
         mallocCount = 0;
         osStats.frameStartTime = PIT::TimeSinceBootMicroS();
+
+
+        if (TwantedFps != osData.wantedFps)
+        {
+            TwantedFps = osData.wantedFps;
+            timeForFps = 1000000 / osData.wantedFps;
+        }
+
 
 
         if (++tFrame >= 1000)
@@ -410,67 +423,6 @@ extern "C" void _start(BootInfo* bootInfo)
 
 
 
-
-        AddToStack();
-        //double endTime = PIT::TimeSinceBoot + 0.02;
-        {
-            uint64_t tS = PIT::TimeSinceBootMicroS();
-            for (int ax = 0; ax < 10; ax++)
-            {
-                //GlobalRenderer->Print("A");
-                for (int i = 0; i < osData.windows.getCount(); i++)
-                {     
-                    //GlobalRenderer->Print("B");
-                    
-                    Window* window = osData.windows[i];
-                    if (window->instance == NULL)
-                        continue;
-                    if (window->instance->instanceType != InstanceType::Terminal)
-                        continue;
-
-                    TerminalInstance* terminal = (TerminalInstance*)window->instance;
-
-                    if (terminal->tasks.getCount() != 0)
-                    {
-                        Task* task = terminal->tasks[0];
-                        DoTask(task);
-                        if (task->GetDone())
-                        {
-                            terminal->tasks.removeFirst();
-                            FreeTask(task);
-                            //GlobalRenderer->Println("TASK DONE");
-                            terminal->PrintUserIfNeeded();
-                        }
-                        else
-                        {
-                            //GlobalRenderer->Println("TASK NOT DONE");
-                        }
-                    }
-                }
-                //PIT::Sleep(10);
-                //asm("hlt");
-            }
-            osStats.totalTaskTime = PIT::TimeSinceBootMicroS() - tS;
-        }
-        
-
-        {
-            uint64_t tS = PIT::TimeSinceBootMicroS();
-            while(osData.osTasks.getCount() > 0)
-            {
-                Task* task = osData.osTasks[0];
-                DoTask(task);
-                if (task->GetDone())
-                {
-                    osData.osTasks.removeFirst();
-                    FreeTask(task);
-                }
-            }
-            osStats.totalOsTaskTime = PIT::TimeSinceBootMicroS() - tS;
-        }
-        RemoveFromStack();
-
-
         {
             uint64_t tS = PIT::TimeSinceBootMicroS();
             AddToStack();
@@ -485,8 +437,138 @@ extern "C" void _start(BootInfo* bootInfo)
         }
 
 
+
+        {
+            AddToStack();
+            uint64_t totTaskTemp = 0;
+            uint64_t totOsTaskTemp = 0;
+
+            uint64_t tS1 = PIT::TimeSinceBootMicroS();
+            uint64_t tempVal = osStats.frameStartTime + timeForFps;
+
+
+            {
+                for (int i = 0; i < osData.windows.getCount(); i++)
+                {     
+                    Window* window = osData.windows[i];
+                    if (window->instance == NULL)
+                        continue;
+                    if (window->instance->instanceType != InstanceType::Terminal)
+                        continue;
+
+                    TerminalInstance* terminal = (TerminalInstance*)window->instance;
+
+                    if (terminal->tasks.getCount() != 0)
+                    {
+                        Task* task = terminal->tasks[0];
+                        task->tempTime = 0;
+                    }
+                }
+            }
+
+
+            while (PIT::TimeSinceBootMicroS() < tempVal)
+            {
+                //double endTime = PIT::TimeSinceBoot + 0.02;
+                {
+                    uint64_t tS = PIT::TimeSinceBootMicroS();
+                    //for (int ax = 0; ax < 10; ax++)
+                    {
+                        //GlobalRenderer->Print("A");
+                        for (int i = 0; i < osData.windows.getCount(); i++)
+                        {     
+                            //GlobalRenderer->Print("B");
+                            
+                            Window* window = osData.windows[i];
+                            if (window->instance == NULL)
+                                continue;
+                            if (window->instance->instanceType != InstanceType::Terminal)
+                                continue;
+
+                            TerminalInstance* terminal = (TerminalInstance*)window->instance;
+
+                            if (terminal->tasks.getCount() != 0)
+                            {
+                                uint64_t tS2 = PIT::TimeSinceBootMicroS();
+                                Task* task = terminal->tasks[0];
+                                DoTask(task);
+                                task->tempTime += PIT::TimeSinceBootMicroS() - tS2;
+                                if (task->GetDone())
+                                {
+                                    terminal->tasks.removeFirst();
+                                    FreeTask(task);
+                                    //GlobalRenderer->Println("TASK DONE");
+                                    terminal->PrintUserIfNeeded();
+                                }
+                                else
+                                {
+                                    
+                                    //GlobalRenderer->Println("TASK NOT DONE");
+                                }
+                            }
+                        }
+                        //PIT::Sleep(10);
+                        //asm("hlt");
+                    }
+                    totTaskTemp += PIT::TimeSinceBootMicroS() - tS;
+                }
+                
+
+                {
+                    uint64_t tS = PIT::TimeSinceBootMicroS();
+                    if (osData.osTasks.getCount() > 0)
+                    {
+                        uint64_t tS2 = PIT::TimeSinceBootMicroS();
+                        Task* task = osData.osTasks[0];
+                        DoTask(task);
+                        task->tempTime += PIT::TimeSinceBootMicroS() - tS2;
+                        if (task->GetDone())
+                        {
+                            osData.osTasks.removeFirst();
+                            FreeTask(task);
+                        }
+                    }
+                    totOsTaskTemp += PIT::TimeSinceBootMicroS() - tS;
+                }
+            }
+
+            {
+                for (int i = 0; i < osData.windows.getCount(); i++)
+                {     
+                    Window* window = osData.windows[i];
+                    if (window->instance == NULL)
+                        continue;
+                    if (window->instance->instanceType != InstanceType::Terminal)
+                        continue;
+
+                    TerminalInstance* terminal = (TerminalInstance*)window->instance;
+
+                    if (terminal->tasks.getCount() != 0)
+                    {
+                        Task* task = terminal->tasks[0];
+                        task->actTime = task->tempTime;
+                    }
+                }
+            }
+
+            osStats.totalIdleTime = PIT::TimeSinceBootMicroS() - tS1;
+            osStats.totalTaskTime = totTaskTemp;
+            osStats.totalOsTaskTime = totOsTaskTemp;
+            RemoveFromStack();
+        }
+
+
+
+
         //GlobalRenderer->Print("C");
         //asm("hlt");
+        // {
+        //     uint64_t tS = PIT::TimeSinceBootMicroS();
+        //     uint64_t tempVal = osStats.frameStartTime + timeForFps;
+        //     while (PIT::TimeSinceBootMicroS() < tempVal)
+        //         asm("hlt");
+        //     osStats.totalIdleTime = PIT::TimeSinceBootMicroS() - tS;
+        // }
 
         osStats.frameEndTime = PIT::TimeSinceBootMicroS();
         osStats.totalFrameTime = osStats.frameEndTime - osStats.frameStartTime;

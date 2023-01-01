@@ -1571,6 +1571,17 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
         else
             LogError("Color \"{}\" could not be Parsed!", val, window);
     }
+    else if (StrEquals(name, "fps"))
+    {
+        int fpsVal = to_int(val);
+        if (fpsVal > 0 && fpsVal < 100000)
+        {
+            osData.wantedFps = fpsVal;
+            Println(window, "FPS set to {}.", val);
+        }
+        else
+            LogError("Wanted FPS of {} is out of range!", val, window);
+    }
     else if (StrEquals(name, "username"))
     {
         (*user)->userName = StrCopy(val);

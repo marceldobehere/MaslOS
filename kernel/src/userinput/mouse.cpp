@@ -589,7 +589,7 @@ void HandleHold(bool L, bool R, bool M)
 
 void ProcessMousePackets()
 {
-    ProcessMousePackets(15);
+    ProcessMousePackets(20);
 }
 
 void ProcessMousePackets(int limit)

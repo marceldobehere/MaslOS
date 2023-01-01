@@ -11,6 +11,7 @@ class TaskTaskManager : public Task
         int callCount = 0;
         int totalCount = 0;
         const char* oldTitle;
+        uint64_t nextTime = 0;
 
     public:
         bool exit = false;
