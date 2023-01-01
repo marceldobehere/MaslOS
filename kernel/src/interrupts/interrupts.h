@@ -1,5 +1,5 @@
 #pragma once
-
+#include "stdint.h"
 //#include "../userinput/mouse.h"
 
 #define  PIC1_COMMAND 0x20
@@ -23,8 +23,12 @@ __attribute__((interrupt)) void KeyboardInt_handler(interrupt_frame* frame);
 __attribute__((interrupt)) void MouseInt_handler(interrupt_frame* frame);
 __attribute__((interrupt)) void PITInt_handler(interrupt_frame* frame);
 __attribute__((interrupt)) void GenFault_handler(interrupt_frame* frame);
+__attribute__((interrupt)) void GenFloatFault_handler(interrupt_frame* frame);
+__attribute__((interrupt)) void GenMathFault_handler(interrupt_frame* frame);
+__attribute__((interrupt)) void Debug_handler(interrupt_frame* frame);
+__attribute__((interrupt)) void Breakpoint_handler(interrupt_frame* frame);
  
-void RemapPIC();
+void RemapPIC(uint8_t _a1, uint8_t _a2);
 void PIC_EndMaster();
 void PIC_EndSlave();
 void TestSetSpeakerPosition(bool in);

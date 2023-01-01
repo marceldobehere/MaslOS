@@ -68,6 +68,11 @@ const char* to_string(int value)
     return to_string((int64_t) value);
 }
 
+const char* to_string(uint32_t value)
+{
+    return to_string((int64_t) value);
+}
+
 const char* to_string(char value)
 {
     intTo_stringOutput[0] = value;

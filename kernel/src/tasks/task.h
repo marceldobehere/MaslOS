@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 enum TaskType
 {
@@ -21,6 +22,8 @@ class Task
         TaskType type;
 
     public:
+        uint32_t tempTime;
+        uint32_t cpuUsagePercent;
         bool GetDone();
         TaskType GetType();
         Task();

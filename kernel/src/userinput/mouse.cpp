@@ -322,7 +322,8 @@ uint8_t MouseRead()
     return inb(0x60);
 }
 
-int mouseCycleSkip = 2;
+int mouseCycleSkip = 0;
+uint8_t MouseCycle = 0;
 
 MPoint diff = MPoint();
 bool startDrag = false;
@@ -333,10 +334,15 @@ void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName)
     mouseZIP = _mouseZIP;
     oldMouseImageName = "";
     currentMouseImageName = _mouseName;
-    mouseCycleSkip = 2;
+    
     for (int i = 0; i < 4; i++)
         dragArr[i] = false;
+
+    mouseCycleSkip = 0;
+    MouseCycle = 0;
+
     outb(0x64, 0xA8);
+    io_wait();
     Mousewait();
 
     mousePackets = List<MousePacket>(4);
@@ -372,13 +378,15 @@ void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName)
 
     MouseWrite(0xF6);
     MouseRead();
+    Mousewait();
 
 
     MouseWrite(0xF4);
     MouseRead();
+    Mousewait();
 }
 
-uint8_t MouseCycle = 0;
+
 uint8_t mousePacketArr[4];
 
 

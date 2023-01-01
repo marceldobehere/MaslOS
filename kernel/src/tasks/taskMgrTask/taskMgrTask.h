@@ -7,7 +7,7 @@ class TaskTaskManager : public Task
 {
     private:    
         Window* window;
-        int callsPerFrame = 50;
+        int callsPerFrame = 200;
         int callCount = 0;
         int totalCount = 0;
         const char* oldTitle;

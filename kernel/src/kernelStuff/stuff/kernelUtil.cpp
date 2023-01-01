@@ -101,10 +101,13 @@ void PrepareInterrupts()
     SetIDTGate((void*)MouseInt_handler, 0x2C, IDT_TA_InterruptGate, 0x08);
     SetIDTGate((void*)PITInt_handler, 0x20, IDT_TA_InterruptGate, 0x08);
     
-    SetIDTGate((void*)GenFault_handler, 0x0, IDT_TA_InterruptGate, 0x08); // Divide by 0
-    SetIDTGate((void*)GenFault_handler, 0x1, IDT_TA_InterruptGate, 0x08); // Debug
+    SetIDTGate((void*)GenMathFault_handler, 0x0, IDT_TA_InterruptGate, 0x08); // Divide by 0
+    SetIDTGate((void*)Debug_handler, 0x1, IDT_TA_InterruptGate, 0x08); // Debug
+    SetIDTGate((void*)Breakpoint_handler, 0x3, IDT_TA_InterruptGate, 0x08); // Breakpoint
+    SetIDTGate((void*)GenFloatFault_handler, 0x10, IDT_TA_InterruptGate, 0x08); // x87 Float error
+    SetIDTGate((void*)GenFloatFault_handler, 0x13, IDT_TA_InterruptGate, 0x08); // SIMD Float error
+
     SetIDTGate((void*)GenFault_handler, 0x2, IDT_TA_InterruptGate, 0x08); // Non Maskable interrupt
-    SetIDTGate((void*)GenFault_handler, 0x3, IDT_TA_InterruptGate, 0x08); // Breakpoint
     SetIDTGate((void*)GenFault_handler, 0x4, IDT_TA_InterruptGate, 0x08); // Overflow
     SetIDTGate((void*)GenFault_handler, 0x5, IDT_TA_InterruptGate, 0x08); // Bound Range Exceeded
     SetIDTGate((void*)GenFault_handler, 0x6, IDT_TA_InterruptGate, 0x08); // Invalid OPCODE
@@ -112,19 +115,26 @@ void PrepareInterrupts()
     SetIDTGate((void*)GenFault_handler, 0xA, IDT_TA_InterruptGate, 0x08); // Invalid TSS
     SetIDTGate((void*)GenFault_handler, 0xB, IDT_TA_InterruptGate, 0x08); // Segment not present
     SetIDTGate((void*)GenFault_handler, 0xC, IDT_TA_InterruptGate, 0x08); // Stack segment fault
-    SetIDTGate((void*)GenFault_handler, 0x10, IDT_TA_InterruptGate, 0x08); // x87 Float error
     SetIDTGate((void*)GenFault_handler, 0x11, IDT_TA_InterruptGate, 0x08); //  Alligment check
     SetIDTGate((void*)GenFault_handler, 0x12, IDT_TA_InterruptGate, 0x08); // machine check
-    SetIDTGate((void*)GenFault_handler, 0x13, IDT_TA_InterruptGate, 0x08); // SIMD Float error
     SetIDTGate((void*)GenFault_handler, 0x14, IDT_TA_InterruptGate, 0x08); // Virtualization Exception
     SetIDTGate((void*)GenFault_handler, 0x15, IDT_TA_InterruptGate, 0x08); // Control Protection Exception
     SetIDTGate((void*)GenFault_handler, 0x1C, IDT_TA_InterruptGate, 0x08); // Hypervisor Inhection Exception
     SetIDTGate((void*)GenFault_handler, 0xD, IDT_TA_InterruptGate, 0x08); // VMM Communication Exception
 
 
-    asm("lidt %0" : : "m" (idtr));
+    __asm__ volatile ("lidt %0" : : "m" (idtr));
+    __asm__ volatile ("sti");
+    
 
-    RemapPIC();
+
+    AddToStack();
+    RemapPIC(
+        0b11111000, 
+        0b11101111
+    );
+    RemoveFromStack();
+    
 }
 
 void PrepareWindowsTemp(Framebuffer* img)
@@ -208,7 +218,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     PIT::InitPIT();
 
-    PrepareInterrupts();
+
 
     InitPS2Mouse(bootInfo->mouseZIP, "default.mbif");
     //mouseImage = kernelFiles::ConvertFileToImage(kernelFiles::ZIP::GetFileFromFileName(bootInfo->mouseZIP, "default.mbif"));
@@ -247,10 +257,8 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     PrepareACPI(bootInfo);
 
-    outb(PIC1_DATA, 0b11111000);
-    outb(PIC2_DATA, 0b11101111);
 
-    asm ("sti");
+    PrepareInterrupts();
 
     RemoveFromStack();
     return kernelInfo;

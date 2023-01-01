@@ -85,6 +85,8 @@ class Window
     uint32_t defaultTitleColor;
     uint32_t selectedTitleColor;
     uint32_t defaultTitleBackgroundColor;
+    // uint32_t tempTime;
+    // uint32_t cpuUsagePercent;
     bool showTitleBar, showBorder, moveable, hidden;
     bool oldHidden;
     

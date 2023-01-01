@@ -36,6 +36,34 @@ __attribute__((interrupt)) void GenFault_handler(interrupt_frame* frame)
     Panic("General Fault Detected!");
     RemoveFromStack();
 }
+
+__attribute__((interrupt)) void GenFloatFault_handler(interrupt_frame* frame)
+{
+    AddToStack();
+    Panic("General Float Fault Detected!");
+    RemoveFromStack();
+}
+
+__attribute__((interrupt)) void GenMathFault_handler(interrupt_frame* frame)
+{
+    AddToStack();
+    Panic("General Math Fault Detected!");
+    RemoveFromStack();
+}
+
+__attribute__((interrupt)) void Debug_handler(interrupt_frame* frame)
+{
+    AddToStack();
+    Panic("Debug thing Detected!");
+    RemoveFromStack();
+}
+
+__attribute__((interrupt)) void Breakpoint_handler(interrupt_frame* frame)
+{
+    AddToStack();
+    Panic("Breakpoint Detected!", true);
+    RemoveFromStack();
+}
  
 __attribute__((interrupt)) void KeyboardInt_handler(interrupt_frame* frame)
 { 
@@ -84,51 +112,60 @@ void TestSetSpeakerPosition(bool in)
 }
 
 
-void RemapPIC() 
+void RemapPIC(uint8_t _a1, uint8_t _a2) 
 {
     AddToStack();
-    uint8_t a1, a2;
+    // uint8_t a1, a2;
     
-    a1 = inb(PIC1_DATA);
-    io_wait();
-    a2 = inb(PIC2_DATA);
-    io_wait();
+    // a1 = inb(PIC1_DATA);
+    // //io_wait();
+    // a2 = inb(PIC2_DATA);
+    // //io_wait();
 
     AddToStack();
     outb(PIC1_COMMAND, ICW1_INIT | ICW1_ICW4);
     io_wait();
     outb(PIC2_COMMAND, ICW1_INIT | ICW1_ICW4);
     io_wait();
+    RemoveFromStack();
 
     AddToStack();
     outb(PIC1_DATA, 0x20);
     io_wait();
     outb(PIC2_DATA, 0x28);
     io_wait();
+    RemoveFromStack();
 
     AddToStack();
     outb(PIC1_DATA, 4);
     io_wait();
     outb(PIC2_DATA, 2);
     io_wait();
+    RemoveFromStack();
 
     AddToStack();
     outb(PIC1_DATA, ICW4_8086);
     io_wait();
     outb(PIC2_DATA, ICW4_8086);
     io_wait();
+    RemoveFromStack();
 
-    AddToStack();
-    outb(PIC1_DATA, 0xa1);
+    // AddToStack();
+    // outb(PIC1_DATA, 0xa1);
+    // io_wait();
+    // outb(PIC2_DATA, 0xa2);
+    // io_wait();
+    // RemoveFromStack();
+    
+    // restore masks
+    // outb(PIC1_DATA, a1);
+    // outb(PIC2_DATA, a2);  
     io_wait();
-    outb(PIC2_DATA, 0xa2);
+    outb(PIC1_DATA, _a1);
+    io_wait();
+    outb(PIC2_DATA, _a2);  
     io_wait();
 
-    RemoveFromStack();
-    RemoveFromStack();
-    RemoveFromStack();
-    RemoveFromStack();
-    RemoveFromStack();
     RemoveFromStack();
 }
 

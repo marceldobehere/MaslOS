@@ -4,6 +4,7 @@
 #include "../../interrupts/interrupts.h"
 #include "../../cmdParsing/cstrTools.h"
 #include "../../OSDATA/MStack/MStackM.h"
+#include "../../OSDATA/osStats.h"
 
 
 TaskTaskManager::TaskTaskManager(Window* window)
@@ -89,6 +90,7 @@ void TaskTaskManager::Do()
             window->renderer->Println("\"{}\"", TaskTypeToString(terminal->tasks.elementAt(i2)->GetType()));
         }
     }
+    window->renderer->Println();
     window->renderer->Println("------------------");
     window->renderer->Println("OS TASKS:");
     for (int i2 = 0; i2 < osData.osTasks.getCount(); i2++)
@@ -97,6 +99,29 @@ void TaskTaskManager::Do()
         window->renderer->Println("\"{}\"", TaskTypeToString(osData.osTasks.elementAt(i2)->GetType()));
     }
     window->renderer->Println();
+    window->renderer->Println("------------------");
+    window->renderer->Println("Time Stats: (in microseconds)");
+
+    if (osStats.totalFrameTime != 0)
+    {
+        window->renderer->Print(" - Total Frame Time:         {}", to_string(osStats.totalFrameTime));
+        window->renderer->Println("  ({} %)", to_string((100* osStats.totalFrameTime)/osStats.totalFrameTime));
+
+        window->renderer->Print(" - Total Render Time:        {}", to_string(osStats.totalRenderTime));
+        window->renderer->Println("  ({} %)", to_string((100* osStats.totalRenderTime)/osStats.totalFrameTime));
+
+        window->renderer->Print(" - Total Window Update Time: {}", to_string(osStats.totalWindowUpdateTime));
+        window->renderer->Println("  ({} %)", to_string((100* osStats.totalWindowUpdateTime)/osStats.totalFrameTime));
+
+        window->renderer->Print(" - Total Task Time:          {}", to_string(osStats.totalTaskTime));
+        window->renderer->Println("  ({} %)", to_string((100* osStats.totalTaskTime)/osStats.totalFrameTime));
+
+        window->renderer->Print(" - Total OS Task Time:       {}", to_string(osStats.totalOsTaskTime));
+        window->renderer->Println("  ({} %)", to_string((100* osStats.totalOsTaskTime)/osStats.totalFrameTime));
+    }
+
+    window->renderer->Println();
+    window->renderer->Println("------------------");
 
 
     RemoveFromStack();
