@@ -393,6 +393,8 @@ extern "C" void _start(BootInfo* bootInfo)
         osData.windowPointerThing->UpdatePointerRect(mPos.x - 32, mPos.y - 32, mPos.x + 32, mPos.y + 32);
         RemoveFromStack();
 
+
+
         AddToStack();
         //double endTime = PIT::TimeSinceBoot + 0.02;
         for (int ax = 0; ax < 10; ax++)

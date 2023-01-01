@@ -16,6 +16,7 @@
 #include "../kernelStuff/Disk_Stuff/Partition_Interfaces/mraps/mrapsPartitionInterface.h"
 #include "../kernelStuff/Disk_Stuff/Filesystem_Interfaces/mrafs/mrafsFileSystemInterface.h"
 #include "../WindowStuff/SubInstances/connect4Instance/connect4Instance.h"
+#include "../tasks/taskMgrTask/taskMgrTask.h"
 #include "../tasks/bfTask/bfTask.h"
 #include "../fsStuff/fsStuff.h"
 #include "../tasks/maab/maabTask.h"
@@ -279,6 +280,13 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             RemoveFromStack();
             return;
         }
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(input, "taskmgr") || StrEquals(input, "task manager"))
+    {
+        terminal->tasks.add(NewTaskManagerTask(window));
         RemoveFromStack();
         return;
     }

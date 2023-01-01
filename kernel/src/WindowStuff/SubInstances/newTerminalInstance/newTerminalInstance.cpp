@@ -398,10 +398,17 @@ void NewTerminalInstance::Render()
     RenderCalled = true;
 }
 
+void NewTerminalInstance::Reload()
+{
+    oldScrollX = scrollX + 1;
+    Render();
+}
+
 void NewTerminalInstance::DoRender()
 {
-    if (!RenderCalled)
-        return;
+    if (scrollX == oldScrollX && scrollY == oldScrollY && oldHeight == window->size.height && oldWidth == window->size.width)
+        if (!RenderCalled)
+            return;
     RenderCalled = false;
 
     AddToStack();

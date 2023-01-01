@@ -8,10 +8,11 @@ enum TaskType
     CLOSEWINDOW,
     BEEP,
     BF,
-    MAAB
+    MAAB,
+    TASK_MGR
 };
 
-
+const char* TaskTypeToString(TaskType type);
 
 class Task
 {
