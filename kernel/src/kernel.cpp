@@ -43,11 +43,25 @@ extern "C" void _start(BootInfo* bootInfo)
     GlobalRenderer->DrawImage(bootInfo->bootImage, 0, 0, 1, 1);
     osData.booting = true;
 
+    if (PIT::TimeSinceBootMS() != 0)
     {
         uint64_t endTime = PIT::TimeSinceBootMS() + 1000;
         while (PIT::TimeSinceBootMS() < endTime && osData.booting)
             asm("hlt");
         osData.booting = false;
+    }
+    else
+    {
+        GlobalRenderer->CursorPosition.x = 0;
+        GlobalRenderer->CursorPosition.y = 0;
+        
+        GlobalRenderer->color = Colors.bred;
+        GlobalRenderer->Println("ERROR: Interrupts are not working properly!");
+        GlobalRenderer->color = Colors.yellow;
+        GlobalRenderer->Println("Please reboot the system.");
+
+        while (true)
+            asm("hlt");
     }
     
     GlobalRenderer->Clear(Colors.black);
