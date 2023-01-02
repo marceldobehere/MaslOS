@@ -1,5 +1,7 @@
 #include "kernelStuff/stuff/kernelUtil.h"
 #include "OSDATA/osStats.h"
+#include "WindowStuff/SubInstances/guiInstance/guiInstance.h"
+#include "WindowStuff/SubInstances/guiInstance/guiStuff/components/rectangle/rectangleComponent.h"
 
 
 /*
@@ -13,7 +15,7 @@ if (osData.enableStackTrace)
 extern "C" void _start(BootInfo* bootInfo)
 {  
     osData.booting = false;
-    osData.maxNonFatalCrashCount = 3;
+    osData.maxNonFatalCrashCount = 5;
     MStackData::stackPointer = 0;
     for (int i = 0; i < 1000; i++)
         MStackData::stackArr[i] = MStack();
@@ -155,6 +157,87 @@ extern "C" void _start(BootInfo* bootInfo)
     //     //osData.windows[1]->renderer->Println("Hello, world!");
     //     //KeyboardPrintStart(window);
     // }
+
+    AddToStack();
+    GuiInstance* testGui;
+    GuiComponentStuff::RectangleComponent* testRect;
+    {
+        Window* window = (Window*)malloc(sizeof(Window), "GUI Window");
+        GuiInstance* gui = (GuiInstance*)malloc(sizeof(GuiInstance), "GUI Instance");
+        *gui = GuiInstance(window);
+        *(window) = Window((DefaultInstance*)gui, Size(400, 360), Position(500, 60), "Testing GUI Window", true, true, true);
+        osData.windows.add(window);
+        
+        gui->Init();
+
+        testGui = gui;
+        // gui->Clear();
+        // gui->WriteText("This \\B1100FFis a \\FFF00FFtest!");
+        // gui->WriteText("Oh ma go\nsh");
+        //osData.windows[1]->renderer->Println("Hello, world!");
+        //KeyboardPrintStart(window);
+
+        {
+            GuiComponentStuff::ComponentSize s = GuiComponentStuff::ComponentSize(60, 20);
+            s.IsXFixed = false;
+            s.ScaledX = 0.5;
+            testRect = new GuiComponentStuff::RectangleComponent(Colors.purple, s, testGui->screen);
+            testRect->position = GuiComponentStuff::Position(100, 20);
+        }
+
+
+        {
+            GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                Colors.dgray, GuiComponentStuff::ComponentSize(180, 180), testGui->screen);
+            t->position = GuiComponentStuff::Position(0, 40);
+            testGui->screen->children->add(t);
+        }
+
+        {
+            GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                Colors.white, GuiComponentStuff::ComponentSize(20, 20), testGui->screen);
+            t->position = GuiComponentStuff::Position(40, 80);
+            testGui->screen->children->add(t);
+        }
+
+        {
+            GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                Colors.white, GuiComponentStuff::ComponentSize(20, 20), testGui->screen);
+            t->position = GuiComponentStuff::Position(120, 80);
+            testGui->screen->children->add(t);
+        }
+
+        {
+            GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                Colors.orange, GuiComponentStuff::ComponentSize(20, 20), testGui->screen);
+            t->position = GuiComponentStuff::Position(80, 120);
+            testGui->screen->children->add(t);
+        }
+
+        {
+            GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                Colors.bred, GuiComponentStuff::ComponentSize(20, 20), testGui->screen);
+            t->position = GuiComponentStuff::Position(20, 140);
+            testGui->screen->children->add(t);
+        }
+
+        {
+            GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                Colors.bred, GuiComponentStuff::ComponentSize(20, 20), testGui->screen);
+            t->position = GuiComponentStuff::Position(140, 140);
+            testGui->screen->children->add(t);
+        }
+
+        {
+            GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                Colors.bred, GuiComponentStuff::ComponentSize(100, 20), testGui->screen);
+            t->position = GuiComponentStuff::Position(40, 160);
+            testGui->screen->children->add(t);
+        }
+
+        testGui->screen->children->add(testRect);
+    }
+    RemoveFromStack();
     
 
     
@@ -222,6 +305,11 @@ extern "C" void _start(BootInfo* bootInfo)
             frame = 0;
         }
         RemoveFromStack();
+
+        testRect->position.x = frame * 5;
+        testRect->position.y = frame * 3;
+        
+
 
         ProcessMousePackets();
 
@@ -404,7 +492,8 @@ extern "C" void _start(BootInfo* bootInfo)
                         }
                     }
                 }
-                if (window->instance != NULL && (activeWindow == window || frame % 15 == 0))
+                if (window->instance != NULL && (activeWindow == window || frame % 10 == (i%8)))
+                {
                     if (window->instance->instanceType == InstanceType::Terminal)
                     {
                         TerminalInstance* termInst1 = (TerminalInstance*)window->instance;
@@ -413,7 +502,13 @@ extern "C" void _start(BootInfo* bootInfo)
                             NewTerminalInstance* termInst2 = (NewTerminalInstance*)termInst1->newTermInstance;
                             termInst2->DoRender();
                         }
-                    }
+                    }   
+                    else if (window->instance->instanceType == InstanceType::GUI)
+                    {
+                        GuiInstance* guiInst = (GuiInstance*)window->instance;
+                        guiInst->Render();
+                    }   
+                }
                 
             }
 
@@ -466,9 +561,10 @@ extern "C" void _start(BootInfo* bootInfo)
                 }
             }
 
-
-            while (PIT::TimeSinceBootMicroS() < tempVal)
+            bool startThing = true;
+            while (PIT::TimeSinceBootMicroS() < tempVal || startThing)
             {
+                startThing = false;
                 //double endTime = PIT::TimeSinceBoot + 0.02;
                 {
                     uint64_t tS = PIT::TimeSinceBootMicroS();

@@ -675,7 +675,7 @@ if (window != NULL)
         //    RenderWindow(osData.windows[i]);
     } 
 
-    uint8_t testInterlace = 4;
+    uint8_t testInterlace = 2;
     uint8_t testCounterX = 0;
     uint8_t testCounterY = 0;
 
