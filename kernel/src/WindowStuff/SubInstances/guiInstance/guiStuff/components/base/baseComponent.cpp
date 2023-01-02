@@ -18,6 +18,9 @@ namespace GuiComponentStuff
 
     void BaseComponent::Render(Field field)
     {
+        if (hidden)
+            return;
+
         if (componentType == RECT)
             ((RectangleComponent*)this)->Render(field);
         if (componentType == SCREEN)

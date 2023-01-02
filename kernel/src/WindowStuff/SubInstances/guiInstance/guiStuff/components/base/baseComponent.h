@@ -26,6 +26,7 @@ namespace GuiComponentStuff
         const char* ID;
         ComponentType componentType;
         ComponentRenderer* renderer;
+        bool hidden = false;
 
 
 
