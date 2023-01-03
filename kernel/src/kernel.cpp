@@ -2,6 +2,7 @@
 #include "OSDATA/osStats.h"
 #include "WindowStuff/SubInstances/guiInstance/guiInstance.h"
 #include "WindowStuff/SubInstances/guiInstance/guiStuff/components/rectangle/rectangleComponent.h"
+#include "WindowStuff/SubInstances/guiInstance/guiStuff/components/box/boxComponent.h"
 
 
 /*
@@ -187,52 +188,59 @@ extern "C" void _start(BootInfo* bootInfo)
 
 
         {
-            GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
-                Colors.dgray, GuiComponentStuff::ComponentSize(180, 180), testGui->screen);
-            t->position = GuiComponentStuff::Position(0, 40);
-            testGui->screen->children->add(t);
-        }
+            GuiComponentStuff::BoxComponent* box = new GuiComponentStuff::BoxComponent(
+                testGui->screen, GuiComponentStuff::ComponentSize(200, 200)
+            );
+            testGui->screen->children->add(box);
 
-        {
-            GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
-                Colors.white, GuiComponentStuff::ComponentSize(20, 20), testGui->screen);
-            t->position = GuiComponentStuff::Position(40, 80);
-            testGui->screen->children->add(t);
-        }
+            {
+                GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                    Colors.dgray, GuiComponentStuff::ComponentSize(180, 180), box);
+                t->position = GuiComponentStuff::Position(0, 40);
+                box->children->add(t);
+            }
 
-        {
-            GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
-                Colors.white, GuiComponentStuff::ComponentSize(20, 20), testGui->screen);
-            t->position = GuiComponentStuff::Position(120, 80);
-            testGui->screen->children->add(t);
-        }
+            {
+                GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                    Colors.white, GuiComponentStuff::ComponentSize(20, 20), box);
+                t->position = GuiComponentStuff::Position(40, 80);
+                box->children->add(t);
+            }
 
-        {
-            GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
-                Colors.orange, GuiComponentStuff::ComponentSize(20, 20), testGui->screen);
-            t->position = GuiComponentStuff::Position(80, 120);
-            testGui->screen->children->add(t);
-        }
+            {
+                GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                    Colors.white, GuiComponentStuff::ComponentSize(20, 20), box);
+                t->position = GuiComponentStuff::Position(120, 80);
+                box->children->add(t);
+            }
 
-        {
-            GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
-                Colors.bred, GuiComponentStuff::ComponentSize(20, 20), testGui->screen);
-            t->position = GuiComponentStuff::Position(20, 140);
-            testGui->screen->children->add(t);
-        }
+            {
+                GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                    Colors.orange, GuiComponentStuff::ComponentSize(20, 20), box);
+                t->position = GuiComponentStuff::Position(80, 120);
+                box->children->add(t);
+            }
 
-        {
-            GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
-                Colors.bred, GuiComponentStuff::ComponentSize(20, 20), testGui->screen);
-            t->position = GuiComponentStuff::Position(140, 140);
-            testGui->screen->children->add(t);
-        }
+            {
+                GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                    Colors.bred, GuiComponentStuff::ComponentSize(20, 20), box);
+                t->position = GuiComponentStuff::Position(20, 140);
+                box->children->add(t);
+            }
 
-        {
-            GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
-                Colors.bred, GuiComponentStuff::ComponentSize(100, 20), testGui->screen);
-            t->position = GuiComponentStuff::Position(40, 160);
-            testGui->screen->children->add(t);
+            {
+                GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                    Colors.bred, GuiComponentStuff::ComponentSize(20, 20), box);
+                t->position = GuiComponentStuff::Position(140, 140);
+                box->children->add(t);
+            }
+
+            {
+                GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                    Colors.bred, GuiComponentStuff::ComponentSize(100, 20), box);
+                t->position = GuiComponentStuff::Position(40, 160);
+                box->children->add(t);
+            }
         }
 
         testGui->screen->children->add(testRect);

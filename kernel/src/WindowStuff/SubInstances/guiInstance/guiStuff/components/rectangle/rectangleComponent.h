@@ -14,6 +14,6 @@ namespace GuiComponentStuff
         void MouseClicked(Position mousePos);
         void Render(Field field);
         void Destroy(bool destroyChildren);
-        ComponentSize GetActualComponentSize();
+        ComponentSize GetActualComponentSize(BaseComponent* caller);
     };
 }

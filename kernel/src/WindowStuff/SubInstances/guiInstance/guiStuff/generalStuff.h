@@ -8,6 +8,7 @@ namespace GuiComponentStuff
         int FixedX, FixedY;
         bool IsXFixed, IsYFixed; // basically is the size in pixel or in percent
         double ScaledX, ScaledY;
+        bool undefined;
 
         ComponentSize(int x, int y) // pixels
         {
@@ -15,6 +16,7 @@ namespace GuiComponentStuff
             IsXFixed = true;
             FixedY = y;
             IsYFixed = true;
+            undefined = false;
         }
 
         ComponentSize(double x, double y) // percent like 0.9 for 90%
@@ -23,14 +25,37 @@ namespace GuiComponentStuff
             IsXFixed = false;
             ScaledY = y;
             IsYFixed = false;
+            undefined = false;
         }
 
-        ComponentSize()
+        ComponentSize(bool any)
         {
-            FixedX = 0;
-            IsXFixed = true;
-            FixedY = 0;
-            IsYFixed = true;
+            if (any)
+            {
+                FixedX = 0;
+                IsXFixed = false;
+                FixedY = 0;
+                IsYFixed = false;
+                undefined = true;
+            }
+            else
+            {
+                FixedX = 0;
+                IsXFixed = true;
+                FixedY = 0;
+                IsYFixed = true;
+                undefined = false;
+            }
+        }
+        
+        bool operator!=(ComponentSize other)
+        {
+            return
+                FixedX != other.FixedX ||
+                FixedY != other.FixedY ||
+                IsXFixed != other.IsXFixed ||
+                IsYFixed != other.IsYFixed ||
+                undefined != other.undefined;
         }
     };
 
@@ -52,6 +77,12 @@ namespace GuiComponentStuff
         Position operator-(Position other)
         {
             return Position(this->x - other.x, this->y - other.y);
+        }
+
+        bool operator!=(Position other)
+        {
+            return x != other.x ||
+                    y != other.y;
         }
     };
 

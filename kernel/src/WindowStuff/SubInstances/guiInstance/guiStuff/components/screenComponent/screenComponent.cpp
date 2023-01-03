@@ -6,12 +6,12 @@ namespace GuiComponentStuff
     ScreenComponent::ScreenComponent(Window* window)
     {
         this->window = window;
-        wantedSize = ComponentSize((int)window->framebuffer->Width, (int)window->framebuffer->Height);
-        actualSize = wantedSize;
+        size = ComponentSize((int)window->framebuffer->Width, (int)window->framebuffer->Height);
+        oldSize = size;
         componentType = SCREEN;
         parent = NULL;
         children = new List<BaseComponent*>(5);
-        renderer = new ComponentRenderer(actualSize);
+        renderer = new ComponentRenderer(size);
         renderer->bgCol = Colors.bgray;
         renderer->Fill(Colors.bgray);
     }
@@ -20,11 +20,11 @@ namespace GuiComponentStuff
     {
         ComponentSize tSize = ComponentSize((int)window->framebuffer->Width, (int)window->framebuffer->Height);
 
-        if (tSize.FixedX != actualSize.FixedX || tSize.FixedY != actualSize.FixedY)
+        if (oldSize != tSize)
         {
             renderer->Resize(tSize);
-            actualSize = tSize;
-            wantedSize = tSize;
+            size = tSize;
+            oldSize = tSize;
         }
 
         {
@@ -40,9 +40,9 @@ namespace GuiComponentStuff
         }
     }
 
-    ComponentSize ScreenComponent::GetActualComponentSize()
+    ComponentSize ScreenComponent::GetActualComponentSize(BaseComponent* caller)
     {
-        return actualSize;
+        return size;
     }
 
     void ScreenComponent::MouseClicked(Position mousePos)

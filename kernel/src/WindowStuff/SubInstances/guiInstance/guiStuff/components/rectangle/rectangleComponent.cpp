@@ -6,13 +6,15 @@ namespace GuiComponentStuff
     RectangleComponent::RectangleComponent(uint32_t fillColor, ComponentSize size, BaseComponent* parent)
     {
         this->fillColor = fillColor;
-        wantedSize = size;
+        this->size = size;
         componentType = RECT;
         this->parent = parent;
-        actualSize = GetActualComponentSize();
-        renderer = new ComponentRenderer(actualSize);
+        ComponentSize temp = GetActualComponentSize(this);
+        renderer = new ComponentRenderer(temp);
         renderer->bgCol = fillColor;
         renderer->Fill(fillColor);
+        oldPosition = position;
+        oldSize = temp;
     }
 
     void RectangleComponent::MouseClicked(Position mousePos)
@@ -22,12 +24,12 @@ namespace GuiComponentStuff
 
     void RectangleComponent::Render(Field field)
     {
-        ComponentSize temp = GetActualComponentSize();
-        if (actualSize.FixedX != temp.FixedX || actualSize.FixedY != temp.FixedY)
+        ComponentSize temp = GetActualComponentSize(this);
+        if (oldSize != temp)
         {
             renderer->Resize(temp);
             renderer->Fill(fillColor);
-            actualSize = temp;
+            oldSize = temp;
         }
 
         renderer->Render(position, field, parent->renderer->componentFrameBuffer);
@@ -38,22 +40,21 @@ namespace GuiComponentStuff
         renderer->Free();
     }
 
-    ComponentSize RectangleComponent::GetActualComponentSize()
+    ComponentSize RectangleComponent::GetActualComponentSize(BaseComponent* caller)
     {
-        if (wantedSize.IsXFixed && wantedSize.IsYFixed)
-            return ComponentSize(wantedSize);
+        if (size.IsXFixed && size.IsYFixed)
+            return size;
 
         ComponentSize temp = ComponentSize(0, 0);
-        if (wantedSize.IsXFixed)
-            temp.FixedX = wantedSize.FixedX;
+        if (size.IsXFixed)
+            temp.FixedX = size.FixedX;
         else
-            temp.FixedX = wantedSize.ScaledX * parent->GetActualComponentSize().FixedX;
+            temp.FixedX = size.ScaledX * parent->GetActualComponentSize(this).FixedX;
 
-        if (wantedSize.IsYFixed)
-            temp.FixedY = wantedSize.FixedY;
+        if (size.IsYFixed)
+            temp.FixedY = size.FixedY;
          else
-            temp.FixedY = wantedSize.ScaledY * parent->GetActualComponentSize().FixedY;
-
+            temp.FixedY = size.ScaledY * parent->GetActualComponentSize(this).FixedY;
 
         return temp;
     }
