@@ -9,7 +9,7 @@ namespace GuiComponentStuff
         this->size = size;
         componentType = RECT;
         this->parent = parent;
-        ComponentSize temp = GetActualComponentSize(this);
+        ComponentSize temp = GetActualComponentSize();
         renderer = new ComponentRenderer(temp);
         renderer->bgCol = fillColor;
         renderer->Fill(fillColor);
@@ -24,7 +24,7 @@ namespace GuiComponentStuff
 
     void RectangleComponent::Render(Field field)
     {
-        ComponentSize temp = GetActualComponentSize(this);
+        ComponentSize temp = GetActualComponentSize();
         if (oldSize != temp)
         {
             renderer->Resize(temp);
@@ -40,7 +40,7 @@ namespace GuiComponentStuff
         renderer->Free();
     }
 
-    ComponentSize RectangleComponent::GetActualComponentSize(BaseComponent* caller)
+    ComponentSize RectangleComponent::GetActualComponentSize()
     {
         if (size.IsXFixed && size.IsYFixed)
             return size;
@@ -49,12 +49,12 @@ namespace GuiComponentStuff
         if (size.IsXFixed)
             temp.FixedX = size.FixedX;
         else
-            temp.FixedX = size.ScaledX * parent->GetActualComponentSize(this).FixedX;
+            temp.FixedX = size.ScaledX * parent->GetActualComponentSize().FixedX;
 
         if (size.IsYFixed)
             temp.FixedY = size.FixedY;
          else
-            temp.FixedY = size.ScaledY * parent->GetActualComponentSize(this).FixedY;
+            temp.FixedY = size.ScaledY * parent->GetActualComponentSize().FixedY;
 
         return temp;
     }

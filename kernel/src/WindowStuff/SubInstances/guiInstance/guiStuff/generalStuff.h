@@ -8,7 +8,7 @@ namespace GuiComponentStuff
         int FixedX, FixedY;
         bool IsXFixed, IsYFixed; // basically is the size in pixel or in percent
         double ScaledX, ScaledY;
-        bool undefined;
+        //bool undefined;
 
         ComponentSize(int x, int y) // pixels
         {
@@ -16,7 +16,7 @@ namespace GuiComponentStuff
             IsXFixed = true;
             FixedY = y;
             IsYFixed = true;
-            undefined = false;
+            //undefined = false;
         }
 
         ComponentSize(double x, double y) // percent like 0.9 for 90%
@@ -25,27 +25,35 @@ namespace GuiComponentStuff
             IsXFixed = false;
             ScaledY = y;
             IsYFixed = false;
-            undefined = false;
+            //undefined = false;
         }
 
-        ComponentSize(bool any)
+        // ComponentSize(bool any)
+        // {
+        //     if (any)
+        //     {
+        //         FixedX = 0;
+        //         IsXFixed = false;
+        //         FixedY = 0;
+        //         IsYFixed = false;
+        //         undefined = true;
+        //     }
+        //     else
+        //     {
+        //         FixedX = 0;
+        //         IsXFixed = true;
+        //         FixedY = 0;
+        //         IsYFixed = true;
+        //         undefined = false;
+        //     }
+        // }
+
+        ComponentSize()
         {
-            if (any)
-            {
-                FixedX = 0;
-                IsXFixed = false;
-                FixedY = 0;
-                IsYFixed = false;
-                undefined = true;
-            }
-            else
-            {
-                FixedX = 0;
-                IsXFixed = true;
-                FixedY = 0;
-                IsYFixed = true;
-                undefined = false;
-            }
+            FixedX = 0;
+            IsXFixed = true;
+            FixedY = 0;
+            IsYFixed = true;
         }
         
         bool operator!=(ComponentSize other)
@@ -54,8 +62,7 @@ namespace GuiComponentStuff
                 FixedX != other.FixedX ||
                 FixedY != other.FixedY ||
                 IsXFixed != other.IsXFixed ||
-                IsYFixed != other.IsYFixed ||
-                undefined != other.undefined;
+                IsYFixed != other.IsYFixed;
         }
     };
 

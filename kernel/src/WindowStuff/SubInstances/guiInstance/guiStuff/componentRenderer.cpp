@@ -22,6 +22,7 @@ namespace GuiComponentStuff
     {
         componentFrameBuffer = new ComponentFramebuffer(size.FixedX, size.FixedY);
         Fill(0);
+        font = GlobalRenderer->psf1_font;
     }
 
     void ComponentRenderer::Resize(ComponentSize size)
@@ -78,7 +79,11 @@ namespace GuiComponentStuff
         AddToStack();
         for (int y = y1; y <= y2; y++)
             for (int x = x1; x <= x2; x++)
-                pxlsTo[(x + componentPosition.x) + (y + componentPosition.y) * w2] = pxls[x + y * w];
+            {
+                uint32_t col = pxls[x + y * w];
+                if (col >> 24 != 0)
+                    pxlsTo[(x + componentPosition.x) + (y + componentPosition.y) * w2] = col;
+            }
         RemoveFromStack();
     }
 
@@ -106,5 +111,58 @@ namespace GuiComponentStuff
     void ComponentRenderer::Free()
     {
         componentFrameBuffer->Free();
+    }
+
+    Position ComponentRenderer::PrintString(char chr, Position pos, uint32_t fgCol, uint32_t bgCol, bool transparent)
+    {
+        if (chr != '\n')
+        {
+            uint32_t* pixPtr = (unsigned int *)componentFrameBuffer->pixels;
+            char *fontPtr = ((char *)font->glyphBuffer) + (chr * font->psf1_Header->charsize);
+
+            int eY = min(pos.y + 16, componentFrameBuffer->Height);
+            int eX = min(pos.x + 8, componentFrameBuffer->Width);
+            
+            int pps = componentFrameBuffer->Width;
+
+            for (int64_t y = max(pos.y, 0); y < eY; y++)
+            {
+                for (int64_t x = max(pos.x, 0); x < eX; x++)
+                {
+                    if ((*fontPtr & (0b10000000 >> (x - pos.x))) > 0)
+                        *(unsigned int *)(pixPtr + x + (y * pps)) = fgCol;
+                }
+                fontPtr++;
+            }
+        }
+        
+        if (chr == '\n' || pos.x + 8 >= componentFrameBuffer->Width)
+        {
+            pos.x = 0;
+            pos.y += 16;
+        }
+        else
+        {   
+            pos.x += 8;
+        }
+        return pos;
+    }
+
+    Position ComponentRenderer::PrintString(const char *chrs, Position pos, uint32_t fgCol, uint32_t bgCol, bool transparent)
+    {
+        for (int i = 0; chrs[i] != 0; i++)
+            pos = PrintString(chrs[i], pos, fgCol, bgCol, transparent);
+
+        return pos;
+    }
+
+    Position ComponentRenderer::PrintString(const char *chrs, Position pos, uint32_t fgCol)
+    {
+        return PrintString(chrs, pos, fgCol, Colors.black, false);
+    }
+
+    Position ComponentRenderer::PrintString(char chr, Position pos, uint32_t fgCol)
+    {
+        return PrintString(chr, pos, fgCol, Colors.black, false);
     }
 }

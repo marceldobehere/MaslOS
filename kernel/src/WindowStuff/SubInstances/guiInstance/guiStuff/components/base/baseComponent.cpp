@@ -3,6 +3,7 @@
 #include "../rectangle/rectangleComponent.h"
 #include "../screenComponent/screenComponent.h"
 #include "../box/boxComponent.h"
+#include "../text/textComponent.h"
 
 namespace GuiComponentStuff
 {
@@ -28,6 +29,8 @@ namespace GuiComponentStuff
             ((ScreenComponent*)this)->Render(field);
         if (componentType == BOX)
             ((BoxComponent*)this)->Render(field);
+        if (componentType == TEXT)
+            ((TextComponent*)this)->Render(field);
     }
 
     void BaseComponent::MouseClicked(Position mousePos)
@@ -38,6 +41,8 @@ namespace GuiComponentStuff
             ((ScreenComponent*)this)->MouseClicked(mousePos);
         if (componentType == BOX)
             ((BoxComponent*)this)->MouseClicked(mousePos);
+        if (componentType == TEXT)
+            ((TextComponent*)this)->MouseClicked(mousePos);
     }
 
     void BaseComponent::Destroy(bool destroyChildren)
@@ -48,16 +53,20 @@ namespace GuiComponentStuff
             ((ScreenComponent*)this)->Destroy(destroyChildren);
         if (componentType == BOX)
             ((BoxComponent*)this)->Destroy(destroyChildren);
+        if (componentType == TEXT)
+            ((TextComponent*)this)->Destroy(destroyChildren);
     }
 
-    ComponentSize BaseComponent::GetActualComponentSize(BaseComponent* caller)
+    ComponentSize BaseComponent::GetActualComponentSize()
     {
         if (componentType == RECT)
-            return ((RectangleComponent*)this)->GetActualComponentSize(caller);
+            return ((RectangleComponent*)this)->GetActualComponentSize();
         if (componentType == SCREEN)
-            return ((ScreenComponent*)this)->GetActualComponentSize(caller);
+            return ((ScreenComponent*)this)->GetActualComponentSize();
         if (componentType == BOX)
-            return ((BoxComponent*)this)->GetActualComponentSize(caller);
+            return ((BoxComponent*)this)->GetActualComponentSize();
+        if (componentType == TEXT)
+            return ((TextComponent*)this)->GetActualComponentSize();
 
         return ComponentSize(0, 0);
     }

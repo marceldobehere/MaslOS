@@ -94,6 +94,7 @@ void PrepareInterrupts()
     idtr.Limit = 0x0FFF;
     idtr.Offset = (uint64_t)GlobalAllocator->RequestPage();
 
+
     SetIDTGate((void*)PageFault_handler, 0xE, IDT_TA_InterruptGate, 0x08);
     SetIDTGate((void*)DoubleFault_handler, 0x8, IDT_TA_InterruptGate, 0x08);
     SetIDTGate((void*)GPFault_handler, 0xD, IDT_TA_InterruptGate, 0x08);
@@ -124,15 +125,17 @@ void PrepareInterrupts()
 
 
     __asm__ volatile ("lidt %0" : : "m" (idtr));
-    __asm__ volatile ("sti");
     
-
+    
+    //asm ("int $0x1");
 
     AddToStack();
     RemapPIC(
         0b11111000, 
         0b11101111
     );
+
+    __asm__ volatile ("sti");
     RemoveFromStack();
     
 }
@@ -216,6 +219,9 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     PrepareWindowsTemp(bgImg);
 
+
+    
+
     PIT::InitPIT();
 
 
@@ -224,6 +230,8 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     //mouseImage = kernelFiles::ConvertFileToImage(kernelFiles::ZIP::GetFileFromFileName(bootInfo->mouseZIP, "default.mbif"));
 
     InitKeyboard();
+
+    PrepareInterrupts();
 
     initUsers();
 
@@ -258,7 +266,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     PrepareACPI(bootInfo);
 
 
-    PrepareInterrupts();
+    
 
     RemoveFromStack();
     return kernelInfo;

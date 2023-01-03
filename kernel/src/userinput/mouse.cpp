@@ -292,7 +292,7 @@ void DrawMousePointer2(PointerFramebuffer* framebuffer, MPoint mousePos)
 
 void Mousewait()
 {
-    uint64_t timeout = 100000;
+    uint64_t timeout = 1000000;
     while (timeout--)
         if ((inb(0x64) & 0b10) == 0)
             return;
@@ -301,7 +301,7 @@ void Mousewait()
 
 void MousewaitInput()
 {
-    uint64_t timeout = 100000;
+    uint64_t timeout = 1000000;
     while (timeout--)
         if (inb(0x64) & 0b1)
             return;
@@ -342,7 +342,6 @@ void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName)
     MouseCycle = 0;
 
     outb(0x64, 0xA8);
-    io_wait();
     Mousewait();
 
     mousePackets = List<MousePacket>(4);
@@ -378,12 +377,12 @@ void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName)
 
     MouseWrite(0xF6);
     MouseRead();
-    Mousewait();
+    //Mousewait();
 
 
     MouseWrite(0xF4);
     MouseRead();
-    Mousewait();
+    //Mousewait();
 }
 
 

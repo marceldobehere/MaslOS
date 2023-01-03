@@ -12,6 +12,7 @@ class TaskTaskManager : public Task
         int totalCount = 0;
         const char* oldTitle;
         uint64_t nextTime = 0;
+        kernelFiles::ImageFile* oldIcon;
 
     public:
         bool exit = false;

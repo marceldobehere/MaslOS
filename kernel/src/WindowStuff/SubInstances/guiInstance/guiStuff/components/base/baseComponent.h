@@ -10,7 +10,8 @@ namespace GuiComponentStuff
         NONE,
         SCREEN,
         RECT,
-        BOX
+        BOX,
+        TEXT
     };
 
 
@@ -20,9 +21,9 @@ namespace GuiComponentStuff
         BaseComponent* parent;
 
         public:
-        ComponentSize size = ComponentSize(true);
+        ComponentSize size = ComponentSize();
         Position position;
-        ComponentSize oldSize = ComponentSize(true);
+        ComponentSize oldSize = ComponentSize();
         Position oldPosition;
         const char* ID;
         ComponentType componentType;
@@ -36,7 +37,7 @@ namespace GuiComponentStuff
 
         BaseComponent(BaseComponent* parent);
         BaseComponent();
-        ComponentSize GetActualComponentSize(BaseComponent* caller);
+        ComponentSize GetActualComponentSize();
 
         void MouseClicked(Position mousePos);
 

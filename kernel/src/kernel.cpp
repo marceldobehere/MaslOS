@@ -3,6 +3,7 @@
 #include "WindowStuff/SubInstances/guiInstance/guiInstance.h"
 #include "WindowStuff/SubInstances/guiInstance/guiStuff/components/rectangle/rectangleComponent.h"
 #include "WindowStuff/SubInstances/guiInstance/guiStuff/components/box/boxComponent.h"
+#include "WindowStuff/SubInstances/guiInstance/guiStuff/components/text/textComponent.h"
 
 
 /*
@@ -161,6 +162,7 @@ extern "C" void _start(BootInfo* bootInfo)
 
     AddToStack();
     GuiInstance* testGui;
+    GuiComponentStuff::BoxComponent* box;
     GuiComponentStuff::RectangleComponent* testRect;
     {
         Window* window = (Window*)malloc(sizeof(Window), "GUI Window");
@@ -188,10 +190,11 @@ extern "C" void _start(BootInfo* bootInfo)
 
 
         {
-            GuiComponentStuff::BoxComponent* box = new GuiComponentStuff::BoxComponent(
-                testGui->screen, GuiComponentStuff::ComponentSize(200, 200)
+            box = new GuiComponentStuff::BoxComponent(
+                testGui->screen, GuiComponentStuff::ComponentSize(240, 240), Colors.tblack
             );
             testGui->screen->children->add(box);
+            box->position = GuiComponentStuff::Position(20, 30);
 
             {
                 GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
@@ -241,6 +244,13 @@ extern "C" void _start(BootInfo* bootInfo)
                 t->position = GuiComponentStuff::Position(40, 160);
                 box->children->add(t);
             }
+        }
+
+
+        {
+            GuiComponentStuff::TextComponent* txt = new GuiComponentStuff::TextComponent(testGui->screen, Colors.black, Colors.white, "Hello!\nThis is an amazing test.", 
+            GuiComponentStuff::Position(200, 90));
+            testGui->screen->children->add(txt);
         }
 
         testGui->screen->children->add(testRect);
@@ -315,7 +325,9 @@ extern "C" void _start(BootInfo* bootInfo)
         RemoveFromStack();
 
         testRect->position.x = frame * 5;
-        testRect->position.y = frame * 3;
+        //testRect->position.y = frame * 3;
+
+        box->position.x = frame * 6;
         
 
 

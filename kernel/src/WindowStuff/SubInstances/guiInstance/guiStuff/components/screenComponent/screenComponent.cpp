@@ -40,7 +40,7 @@ namespace GuiComponentStuff
         }
     }
 
-    ComponentSize ScreenComponent::GetActualComponentSize(BaseComponent* caller)
+    ComponentSize ScreenComponent::GetActualComponentSize()
     {
         return size;
     }

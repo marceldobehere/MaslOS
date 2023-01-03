@@ -22,6 +22,8 @@ TaskTaskManager::TaskTaskManager(Window* window)
 
     ((TerminalInstance*)window->instance)->userlen = 0;
     ((TerminalInstance*)window->instance)->takeInput = false;
+    oldIcon = window->icon;
+    window->icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.TASK_MANAGER];
 }
 
 void TaskTaskManager::Do()
@@ -31,6 +33,7 @@ void TaskTaskManager::Do()
     {
         window->title = oldTitle;
         done = true;
+        window->icon = oldIcon;
         window->renderer->Clear(Colors.black);
         osData.windowPointerThing->UpdateWindowBorder(window);
         ((NewTerminalInstance*)(((TerminalInstance*)window->instance)->newTermInstance))->Reload();

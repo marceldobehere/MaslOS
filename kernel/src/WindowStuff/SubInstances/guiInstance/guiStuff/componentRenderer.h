@@ -1,5 +1,6 @@
 #pragma once
 #include "generalStuff.h"
+#include "../../../../Rendering/S-Font.h"
 
 namespace GuiComponentStuff
 {
@@ -18,6 +19,7 @@ namespace GuiComponentStuff
         public:
         ComponentFramebuffer* componentFrameBuffer;
         uint32_t bgCol = 0;
+        PSF1_FONT* font;
 
 
         ComponentRenderer(ComponentSize size);
@@ -25,6 +27,11 @@ namespace GuiComponentStuff
         void Render(Position componentPosition, Field field, ComponentFramebuffer* to);
         void Fill(uint32_t col);
         void Fill(uint32_t col, Field field);
+
+        Position PrintString(char chr, Position pos, uint32_t fgCol, uint32_t bgCol, bool transparent);
+        Position PrintString(const char *chrs, Position pos, uint32_t fgCol, uint32_t bgCol, bool transparent);
+        Position PrintString(char chr, Position pos, uint32_t fgCol);
+        Position PrintString(const char *chrs, Position pos, uint32_t fgCol);
 
         void Free();
         

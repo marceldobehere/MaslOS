@@ -11,11 +11,11 @@ namespace GuiComponentStuff
         uint32_t backgroundColor = 0;
         List<BaseComponent*>* children;
 
-        BoxComponent(BaseComponent* parent);
-        BoxComponent(BaseComponent* parent, ComponentSize size);
+        //BoxComponent(BaseComponent* parent);
+        BoxComponent(BaseComponent* parent, ComponentSize size, uint32_t bgCol);
         void MouseClicked(Position mousePos);
         void Render(Field field);
         void Destroy(bool destroyChildren);
-        ComponentSize GetActualComponentSize(BaseComponent* caller);
+        ComponentSize GetActualComponentSize();
     };
 }
