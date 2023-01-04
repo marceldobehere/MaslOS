@@ -79,7 +79,7 @@ void PrepareMemory(BootInfo* bootInfo)
     kernelInfo.pageTableManager = &GlobalPageTableManager;
 }
 
-uint8_t testIdtrArr[0x1000];
+uint8_t testIdtrArr[0x4000];
 IDTR idtr;
 
 void SetIDTGate(void* handler, uint8_t entryOffset, uint8_t type_attr, uint8_t selector)
@@ -93,6 +93,10 @@ void SetIDTGate(void* handler, uint8_t entryOffset, uint8_t type_attr, uint8_t s
 void PrepareInterrupts()
 {  
     idtr.Limit = 0x0FFF;
+
+    for (int i = 0; i < 0x4000; i++)
+        testIdtrArr[i] = 0;
+
     idtr.Offset = (uint64_t)testIdtrArr;//(uint64_t)GlobalAllocator->RequestPage();
 
 
