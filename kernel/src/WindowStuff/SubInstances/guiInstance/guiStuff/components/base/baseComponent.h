@@ -11,7 +11,8 @@ namespace GuiComponentStuff
         SCREEN,
         RECT,
         BOX,
-        TEXT
+        TEXT,
+        BUTTON
     };
 
 
@@ -38,6 +39,8 @@ namespace GuiComponentStuff
         BaseComponent(BaseComponent* parent);
         BaseComponent();
         ComponentSize GetActualComponentSize();
+        Position GetAbsoluteComponentPosition();
+        void* GetWindow();
 
         void MouseClicked(Position mousePos);
 

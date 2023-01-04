@@ -106,6 +106,8 @@ class Window
     void Log(const char* message, uint32_t col);
     void Log(const char* message, const char* var, uint32_t col);
 
+    Position GetMousePosRelativeToWindow();
+
     WindowActionEnum GetCurrentAction();
 };
 

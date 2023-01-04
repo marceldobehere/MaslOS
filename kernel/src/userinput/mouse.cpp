@@ -19,6 +19,7 @@
 #define MouseRight  1 
 #define MouseMiddle 2
 
+bool MouseClickState[3] = {false, false, false};
 
 kernelFiles::ZIPFile* mouseZIP;
 kernelFiles::ImageFile* currentMouseImage;
@@ -500,6 +501,12 @@ void HandleClick(bool L, bool R, bool M)
                 diff.x = MousePosition.x;
                 diff.y = MousePosition.y;
                 window->moveToFront = true;
+
+
+                if (!activeDragOn && MousePosition.y > window->position.y + 20)
+                {
+                    dragWindow = NULL;
+                }
                 //osData.windowPointerThing->UpdateWindowBorder(osData.windows[osData.windows.getCount() - 1]);
             }
             else
@@ -707,6 +714,9 @@ void ProcessMousePacket(MousePacket packet)
     // }
 
     bool cClicks[3] = {leftButton, rightButton, middleButton};
+    MouseClickState[0] = leftButton;
+    MouseClickState[1] = rightButton;
+    MouseClickState[2] = middleButton;
 
     bool tClicks[3] = {false, false, false};
     bool tHolds[3] = {false, false, false};
@@ -735,6 +745,7 @@ void ProcessMousePacket(MousePacket packet)
             }
         }
     }
+
 
 
     if(tClicks[0] || tClicks[1] || tClicks[2])

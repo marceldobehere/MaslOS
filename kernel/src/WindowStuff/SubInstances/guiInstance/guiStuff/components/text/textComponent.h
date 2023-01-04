@@ -13,6 +13,8 @@ namespace GuiComponentStuff
         public:
         uint32_t bgColor;
         uint32_t fgColor;
+        uint32_t bgColorOld;
+        uint32_t fgColorOld;
         const char* text;
         const char* oldText;
 

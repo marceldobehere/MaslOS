@@ -24,6 +24,8 @@ namespace GuiComponentStuff
         oldPosition = position;
         oldSize = temp;
         renderer->PrintString(text, Position(0, 0), fgColor);
+        bgColorOld = bgColor;
+        fgColorOld = fgColor;
     }
 
     void TextComponent::MouseClicked(Position mousePos)
@@ -44,12 +46,15 @@ namespace GuiComponentStuff
     {
         ComponentSize temp = GetActualComponentSize();
         bool newText = TextUpdate();
-        if (oldSize != temp || newText)
+        if (oldSize != temp || newText ||
+            fgColor != fgColorOld || bgColor != bgColorOld)
         {
             renderer->Resize(temp);
             renderer->Fill(bgColor);
             oldSize = temp;
             renderer->PrintString(text, Position(0, 0), fgColor);
+            fgColorOld = fgColor;
+            bgColorOld = bgColor;
         }
 
 

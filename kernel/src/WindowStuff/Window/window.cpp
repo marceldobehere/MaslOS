@@ -80,6 +80,10 @@ Window::Window(DefaultInstance* instance, Size size, Position position, const ch
     RemoveFromStack();
 }
 
+Position Window::GetMousePosRelativeToWindow()
+{
+    return Position(MousePosition.x - position.x, MousePosition.y - position.y);
+}
 
 WindowActionEnum Window::GetCurrentAction()
 {

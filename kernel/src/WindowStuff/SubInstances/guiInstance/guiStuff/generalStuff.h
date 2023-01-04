@@ -86,6 +86,11 @@ namespace GuiComponentStuff
             return Position(this->x - other.x, this->y - other.y);
         }
 
+        Position operator+(Position other)
+        {
+            return Position(this->x + other.x, this->y + other.y);
+        }
+
         bool operator!=(Position other)
         {
             return x != other.x ||

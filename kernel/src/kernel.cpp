@@ -4,7 +4,7 @@
 #include "WindowStuff/SubInstances/guiInstance/guiStuff/components/rectangle/rectangleComponent.h"
 #include "WindowStuff/SubInstances/guiInstance/guiStuff/components/box/boxComponent.h"
 #include "WindowStuff/SubInstances/guiInstance/guiStuff/components/text/textComponent.h"
-
+#include "WindowStuff/SubInstances/guiInstance/guiStuff/components/button/buttonComponent.h"
 
 /*
 if (osData.enableStackTrace)
@@ -251,6 +251,17 @@ extern "C" void _start(BootInfo* bootInfo)
             GuiComponentStuff::TextComponent* txt = new GuiComponentStuff::TextComponent(testGui->screen, Colors.black, Colors.white, "Hello!\nThis is an amazing test.", 
             GuiComponentStuff::Position(200, 90));
             testGui->screen->children->add(txt);
+        }
+
+        {
+            GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("CLICK", 
+            Colors.black, Colors.dgray, Colors.gray, 
+            Colors.bgreen, Colors.yellow, Colors.bred, 
+            GuiComponentStuff::ComponentSize(100, 20),
+            GuiComponentStuff::Position(210, 160), testGui->screen
+            );
+            
+            testGui->screen->children->add(btn);
         }
 
         testGui->screen->children->add(testRect);

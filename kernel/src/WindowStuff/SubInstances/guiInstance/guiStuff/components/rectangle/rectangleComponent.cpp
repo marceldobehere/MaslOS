@@ -15,6 +15,7 @@ namespace GuiComponentStuff
         renderer->Fill(fillColor);
         oldPosition = position;
         oldSize = temp;
+        oldFillColor = fillColor;
     }
 
     void RectangleComponent::MouseClicked(Position mousePos)
@@ -30,6 +31,11 @@ namespace GuiComponentStuff
             renderer->Resize(temp);
             renderer->Fill(fillColor);
             oldSize = temp;
+        }
+        if (oldFillColor != fillColor)
+        {
+            renderer->Fill(fillColor);
+            oldFillColor = fillColor;
         }
 
         renderer->Render(position, field, parent->renderer->componentFrameBuffer);

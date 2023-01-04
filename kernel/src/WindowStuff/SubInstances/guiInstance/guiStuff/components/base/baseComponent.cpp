@@ -4,6 +4,7 @@
 #include "../screenComponent/screenComponent.h"
 #include "../box/boxComponent.h"
 #include "../text/textComponent.h"
+#include "../button/buttonComponent.h"
 
 namespace GuiComponentStuff
 {
@@ -31,6 +32,8 @@ namespace GuiComponentStuff
             ((BoxComponent*)this)->Render(field);
         if (componentType == TEXT)
             ((TextComponent*)this)->Render(field);
+        if (componentType == BUTTON)
+            ((ButtonComponent*)this)->Render(field);
     }
 
     void BaseComponent::MouseClicked(Position mousePos)
@@ -43,6 +46,8 @@ namespace GuiComponentStuff
             ((BoxComponent*)this)->MouseClicked(mousePos);
         if (componentType == TEXT)
             ((TextComponent*)this)->MouseClicked(mousePos);
+        if (componentType == BUTTON)
+            ((ButtonComponent*)this)->MouseClicked(mousePos);
     }
 
     void BaseComponent::Destroy(bool destroyChildren)
@@ -55,6 +60,8 @@ namespace GuiComponentStuff
             ((BoxComponent*)this)->Destroy(destroyChildren);
         if (componentType == TEXT)
             ((TextComponent*)this)->Destroy(destroyChildren);
+        if (componentType == BUTTON)
+            ((ButtonComponent*)this)->Destroy(destroyChildren);
     }
 
     ComponentSize BaseComponent::GetActualComponentSize()
@@ -67,9 +74,28 @@ namespace GuiComponentStuff
             return ((BoxComponent*)this)->GetActualComponentSize();
         if (componentType == TEXT)
             return ((TextComponent*)this)->GetActualComponentSize();
+        if (componentType == BUTTON)
+            return ((ButtonComponent*)this)->GetActualComponentSize();
 
         return ComponentSize(0, 0);
     }
 
+    Position BaseComponent::GetAbsoluteComponentPosition()
+    {
+        if (componentType == ComponentType::SCREEN || parent == NULL)
+            return this->position;
+        else
+            return this->position + parent->GetAbsoluteComponentPosition();
+    }
+
+    void* BaseComponent::GetWindow()
+    {
+        if (componentType == ComponentType::SCREEN)
+            return (void*)((ScreenComponent*)this)->window;
+        else if (parent == NULL)
+            return NULL;
+        else
+            return parent->GetWindow();
+    }
 
 }

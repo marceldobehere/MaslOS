@@ -8,9 +8,10 @@ namespace GuiComponentStuff
     class ScreenComponent : public BaseComponent
     {
         private:
-        Window* window;
+        
 
         public:
+        Window* window;
         List<BaseComponent*>* children;
         uint32_t backgroundColor = 0;
 
