@@ -52,7 +52,16 @@ namespace GuiComponentStuff
 
     void BaseComponent::KeyHit(KeyHitEventInfo info)
     {
-
+        if (componentType == RECT)
+            ((RectangleComponent*)this)->KeyHit(info);
+        if (componentType == SCREEN)
+            ((ScreenComponent*)this)->KeyHit(info);
+        if (componentType == BOX)
+            ((BoxComponent*)this)->KeyHit(info);
+        if (componentType == TEXT)
+            ((TextComponent*)this)->KeyHit(info);
+        if (componentType == BUTTON)
+            ((ButtonComponent*)this)->KeyHit(info);
     }
 
     void BaseComponent::Destroy(bool destroyChildren)
@@ -101,6 +110,16 @@ namespace GuiComponentStuff
             return NULL;
         else
             return parent->GetWindow();
+    }
+
+    bool BaseComponent::IsVisible()
+    {
+        if (componentType == ComponentType::SCREEN)
+            return !hidden;
+        else if (parent == NULL)
+            return false;
+        else
+            return !hidden && parent->IsVisible();
     }
 
     void* BaseComponent::GetScreen()

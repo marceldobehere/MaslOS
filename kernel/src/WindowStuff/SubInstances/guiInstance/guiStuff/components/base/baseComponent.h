@@ -42,6 +42,7 @@ namespace GuiComponentStuff
         Position GetAbsoluteComponentPosition();
         void* GetWindow();
         void* GetScreen();
+        bool IsVisible();
 
         void MouseClicked(MouseClickEventInfo info);
         void KeyHit(KeyHitEventInfo info);

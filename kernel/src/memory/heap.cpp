@@ -430,3 +430,43 @@ bool ExpandHeap(size_t length)
     RemoveFromStack();
     return true;
 }
+
+bool tryFree(void* address)
+{
+    AddToStack();
+    HeapSegHdr* segment = ((HeapSegHdr*)address) - 1;
+
+    if (segment->magicNum == HeapMagicNum)
+    {
+        if (!segment->free)
+        {
+            freeCount++;
+            segment->free = true;
+            segment->text = "<FREE>";
+            //GlobalRenderer->Print("A");
+            //GlobalRenderer->Print("<");
+            segment->CombineForward();
+            //GlobalRenderer->Print("-");
+            segment->CombineBackward();
+            //GlobalRenderer->Print(">");
+            usedHeapCount--;
+
+            RemoveFromStack();
+            return true;
+        }
+        else
+        {
+            //Panic("Tried to free already free Segment!");
+            RemoveFromStack();
+            return false;
+        }
+    }
+    else
+    {
+        //Panic("Tried to free invalid Segment!");
+        RemoveFromStack();
+        return false;
+    }
+    RemoveFromStack();
+    return true;
+}

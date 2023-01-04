@@ -19,6 +19,53 @@ void TestClickHandler(GuiComponentStuff::BaseComponent* btn, GuiComponentStuff::
     btn->position.y += 20;
 }
 
+void TestKeyHandler(GuiComponentStuff::BaseComponent* btn, GuiComponentStuff::KeyHitEventInfo info)
+{
+    AddToStack();
+    //btn->position.y -= 20;
+    //return;
+    if (btn->componentType != GuiComponentStuff::ComponentType::BUTTON)
+        return;
+
+    const char** txt = &((GuiComponentStuff::ButtonComponent*)btn)->textComp->text;
+
+    int len = StrLen(*txt);
+    if (info.Scancode == 0x0E)
+    {
+        if (len < 1)
+        {
+            RemoveFromStack();
+            return;
+        }
+        char* bleh = (char*)malloc(len);
+        for (int i = 0; i < len - 1; i++)
+            bleh[i] = (*txt)[i];
+        bleh[len - 1] = 0;
+
+        AddToStack();
+        tryFree((void*)*txt);
+        RemoveFromStack();
+        *txt = bleh; 
+    }
+    else
+    {
+        
+        char* bleh = (char*)malloc(len + 2);
+        for (int i = 0; i < len; i++)
+            bleh[i] = (*txt)[i];
+        bleh[len] = info.Chr;
+        bleh[len + 1] = 0;
+
+        AddToStack();
+        tryFree((void*)*txt);
+        RemoveFromStack();
+        *txt = bleh; 
+    }
+
+
+    RemoveFromStack();
+}
+
 
 extern "C" void _start(BootInfo* bootInfo)
 {  
@@ -267,6 +314,7 @@ extern "C" void _start(BootInfo* bootInfo)
             GuiComponentStuff::Position(210, 160), testGui->screen
             );
             btn->mouseClickedCallBack = TestClickHandler;
+            btn->keyHitCallBack = TestKeyHandler;
             //btn->stickToDefaultColor = true;
             
             testGui->screen->children->add(btn);

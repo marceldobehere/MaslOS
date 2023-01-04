@@ -35,6 +35,7 @@ namespace GuiComponentStuff
         actualButtonStuff->children->add(textComp);
 
         mouseClickedCallBack = NULL;
+        keyHitCallBack = NULL;
     }
 
     void ButtonComponent::MouseClicked(MouseClickEventInfo info)
@@ -45,7 +46,8 @@ namespace GuiComponentStuff
 
     void ButtonComponent::KeyHit(KeyHitEventInfo info)
     {
-
+        if (keyHitCallBack != NULL)
+            keyHitCallBack(this, info);
     }
 
     void ButtonComponent::Render(Field field)

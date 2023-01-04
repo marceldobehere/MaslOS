@@ -1,5 +1,6 @@
 #include "screenComponent.h"
 #include "../../../../../../Rendering/Cols.h"
+#include "../../../../../../OSDATA/MStack/MStackM.h"
 
 namespace GuiComponentStuff
 {
@@ -21,6 +22,7 @@ namespace GuiComponentStuff
 
     void ScreenComponent::Render(Field field)
     {
+        AddToStack();
         tempSelectedComponent = NULL;
         ComponentSize tSize = ComponentSize((int)window->framebuffer->Width, (int)window->framebuffer->Height);
 
@@ -42,6 +44,7 @@ namespace GuiComponentStuff
         {
             children->elementAt(i)->Render(bruh);
         }
+        RemoveFromStack();
     }
 
     ComponentSize ScreenComponent::GetActualComponentSize()
@@ -51,14 +54,20 @@ namespace GuiComponentStuff
 
     void ScreenComponent::MouseClicked(MouseClickEventInfo info)
     {
+        AddToStack();
         selectedComponent = tempSelectedComponent;
         if (selectedComponent != NULL)
             selectedComponent->MouseClicked(info);
+        RemoveFromStack();
     }
 
     void ScreenComponent::KeyHit(KeyHitEventInfo info)
     {
-
+        AddToStack();
+        //selectedComponent = tempSelectedComponent;
+        if (selectedComponent != NULL)
+            selectedComponent->KeyHit(info);
+        RemoveFromStack();
     }
 
     void ScreenComponent::Destroy(bool destroyChildren)
