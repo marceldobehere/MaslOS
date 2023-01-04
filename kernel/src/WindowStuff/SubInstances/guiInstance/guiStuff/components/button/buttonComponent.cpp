@@ -30,6 +30,7 @@ namespace GuiComponentStuff
         actualButtonStuff->children->add(rectComp);
 
         this->textComp = new TextComponent(actualButtonStuff, Colors.tblack, textColDef, text, Position());
+        textComp->center = true;
         actualButtonStuff->children->add(textComp);
     }
 
@@ -46,7 +47,7 @@ namespace GuiComponentStuff
         Position abs = GetAbsoluteComponentPosition();
         ScreenComponent* scr = (ScreenComponent*)GetScreen();
 
-        ComponentSize tSize = textComp->GetActualComponentSize();
+        ComponentSize tSize = GetActualComponentSize();
 
         mouseHover =
         mPos.x >= abs.x &&

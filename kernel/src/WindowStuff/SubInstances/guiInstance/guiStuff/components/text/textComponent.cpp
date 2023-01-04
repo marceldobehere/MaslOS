@@ -23,7 +23,7 @@ namespace GuiComponentStuff
         this->position = position;
         oldPosition = position;
         oldSize = temp;
-        renderer->PrintString(text, Position(0, 0), fgColor);
+        renderer->PrintString(text, Position(0, 0), fgColor, bgColor, false, center);
         bgColorOld = bgColor;
         fgColorOld = fgColor;
     }
@@ -52,7 +52,7 @@ namespace GuiComponentStuff
             renderer->Resize(temp);
             renderer->Fill(bgColor);
             oldSize = temp;
-            renderer->PrintString(text, Position(0, 0), fgColor);
+            renderer->PrintString(text, Position(0, 0), fgColor, bgColor, false, center);
             fgColorOld = fgColor;
             bgColorOld = bgColor;
         }

@@ -148,17 +148,77 @@ namespace GuiComponentStuff
         return pos;
     }
 
-    Position ComponentRenderer::PrintString(const char *chrs, Position pos, uint32_t fgCol, uint32_t bgCol, bool transparent)
+    Position ComponentRenderer::PrintString(const char *chrs, Position pos, uint32_t fgCol, uint32_t bgCol, bool transparent, bool center)
     {
-        for (int i = 0; chrs[i] != 0; i++)
-            pos = PrintString(chrs[i], pos, fgCol, bgCol, transparent);
+        if (!center)
+        {
+            for (int i = 0; chrs[i] != 0; i++)
+                pos = PrintString(chrs[i], pos, fgCol, bgCol, transparent);
+            return pos;
+        }
+
+        int w = componentFrameBuffer->Width;
+
+        char* thing = (char*)((uint64_t)chrs);
+        int count = 0;
+        for (int i = 0; thing[i] != 0; i++)
+        {
+            if (thing[i] == '\n')
+            {
+                thing[i] = 0;
+                count++;
+            }
+        }
+
+        {
+            int tCount = count;
+            int oldI = 0;
+            const char* bleh = chrs;
+            for (int i = 0; tCount >= 0; i++)
+            {
+                if (thing[i] == 0)
+                {
+                    if (tCount < 0)
+                        break;
+                    tCount--;
+                    
+                    int len = StrLen(bleh);
+                    int tW = 8 * len;
+                    
+
+                    int tX = (w - tW) / 2;
+                    pos.x = tX;
+                    PrintString(bleh, pos, fgCol, bgCol, transparent, false);
+                    bleh += len + 1;
+
+                    if (tCount >= 0)
+                        pos.y += 16;
+                }
+
+            }
+            // for (int i = 0; chrs[i] != 0; i++)
+            //     pos = PrintString(chrs[i], pos, fgCol, bgCol, transparent);
+        }
+
+
+        {
+            int tCount = count;
+            for (int i = 0; tCount > 0; i++)
+            {
+                if (thing[i] == 0)
+                {
+                    thing[i] = '\n';
+                    tCount--;
+                }
+            }
+        }
 
         return pos;
     }
 
     Position ComponentRenderer::PrintString(const char *chrs, Position pos, uint32_t fgCol)
     {
-        return PrintString(chrs, pos, fgCol, Colors.black, false);
+        return PrintString(chrs, pos, fgCol, Colors.black, false, false);
     }
 
     Position ComponentRenderer::PrintString(char chr, Position pos, uint32_t fgCol)

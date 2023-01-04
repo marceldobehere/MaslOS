@@ -29,7 +29,7 @@ namespace GuiComponentStuff
         void Fill(uint32_t col, Field field);
 
         Position PrintString(char chr, Position pos, uint32_t fgCol, uint32_t bgCol, bool transparent);
-        Position PrintString(const char *chrs, Position pos, uint32_t fgCol, uint32_t bgCol, bool transparent);
+        Position PrintString(const char *chrs, Position pos, uint32_t fgCol, uint32_t bgCol, bool transparent, bool center);
         Position PrintString(char chr, Position pos, uint32_t fgCol);
         Position PrintString(const char *chrs, Position pos, uint32_t fgCol);
 

@@ -254,10 +254,10 @@ extern "C" void _start(BootInfo* bootInfo)
         }
 
         {
-            GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("CLICK", 
+            GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("CLICK\nME\nPLS", 
             Colors.black, Colors.dgray, Colors.gray, 
             Colors.bgreen, Colors.yellow, Colors.bred, 
-            GuiComponentStuff::ComponentSize(100, 20),
+            GuiComponentStuff::ComponentSize(150, 80),
             GuiComponentStuff::Position(210, 160), testGui->screen
             );
             
