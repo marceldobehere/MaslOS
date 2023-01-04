@@ -37,12 +37,15 @@ namespace GuiComponentStuff
         mouseClickedCallBack = NULL;
     }
 
-
-
-    void ButtonComponent::MouseClicked(Position mousePos)
+    void ButtonComponent::MouseClicked(MouseClickEventInfo info)
     {
         if (mouseClickedCallBack != NULL)
-            mouseClickedCallBack(this);
+            mouseClickedCallBack(this, info);
+    }
+
+    void ButtonComponent::KeyHit(KeyHitEventInfo info)
+    {
+
     }
 
     void ButtonComponent::Render(Field field)
@@ -65,7 +68,7 @@ namespace GuiComponentStuff
         mouseClick = mouseHover && MouseClickState[0];
 
         if (mouseHover)
-            scr->selectedComponent = this;
+            scr->tempSelectedComponent = this;
 
         actualButtonStuff->position = position;
         actualButtonStuff->size = tSize;

@@ -18,7 +18,12 @@ namespace GuiComponentStuff
         oldFillColor = fillColor;
     }
 
-    void RectangleComponent::MouseClicked(Position mousePos)
+    void RectangleComponent::MouseClicked(MouseClickEventInfo info)
+    {
+
+    }
+
+    void RectangleComponent::KeyHit(KeyHitEventInfo info)
     {
 
     }

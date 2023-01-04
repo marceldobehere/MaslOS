@@ -21,7 +21,8 @@ namespace GuiComponentStuff
         bool oldCenter = false;
 
         TextComponent(BaseComponent* parent, uint32_t bgColor, uint32_t fgColor, const char* text, Position position);
-        void MouseClicked(Position mousePos);
+        void MouseClicked(MouseClickEventInfo info);
+        void KeyHit(KeyHitEventInfo info);
         void Render(Field field);
         void Destroy(bool destroyChildren);
         ComponentSize GetActualComponentSize();

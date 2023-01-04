@@ -121,5 +121,31 @@ namespace GuiComponentStuff
     };
 
 
+    struct MouseClickEventInfo
+    {   
+        Position MousePosition;
+        bool LeftClickPressed;
+        bool RightClickPressed;
+        bool MiddleClickPressed;
 
-}
+        MouseClickEventInfo(Position pos, bool left, bool right, bool middle)
+        {
+            MousePosition = pos;
+            LeftClickPressed = left;
+            RightClickPressed = right;
+            MiddleClickPressed = middle;
+        }
+    };
+
+    struct KeyHitEventInfo
+    {
+        uint8_t Scancode;
+        char Chr;
+
+        KeyHitEventInfo(uint8_t scan, char chr)
+        {
+            Scancode = scan;
+            Chr = chr;
+        }
+    };
+}  

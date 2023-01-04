@@ -30,7 +30,12 @@ namespace GuiComponentStuff
         oldCenter = false;
     }
 
-    void TextComponent::MouseClicked(Position mousePos)
+    void TextComponent::MouseClicked(MouseClickEventInfo info)
+    {
+
+    }
+
+    void TextComponent::KeyHit(KeyHitEventInfo info)
     {
 
     }

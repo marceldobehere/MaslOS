@@ -15,3 +15,5 @@ void InitKeyboard();
 //void PrintUser(Window* window, OSUser* user);
 
 void HandleKeyboard(uint8_t scancode);
+
+extern bool KeyboardScancodeState[256];

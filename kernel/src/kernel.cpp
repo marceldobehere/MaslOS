@@ -14,7 +14,7 @@ if (osData.enableStackTrace)
 
 */
 
-void TestClickHandler(GuiComponentStuff::BaseComponent* btn)
+void TestClickHandler(GuiComponentStuff::BaseComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
 {
     btn->position.y += 20;
 }

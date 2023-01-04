@@ -440,13 +440,13 @@ void HandleClick(bool L, bool R, bool M)
 {
     AddToStack();
     //activeWindow->renderer->Println("Click");
-    if (L)
+    if (L || R || M)
     {
         Window* oldActive = activeWindow;
         Window* window = WindowManager::getWindowAtMousePosition();
 
         WindowActionEnum action = WindowActionEnum::_NONE;
-        if (WindowManager::currentActionWindow != NULL)
+        if (L && WindowManager::currentActionWindow != NULL)
         {
             if (WindowManager::currentActionWindow == window)
             {
@@ -487,9 +487,13 @@ void HandleClick(bool L, bool R, bool M)
         else
         {
             
-            Window* oldActive = activeWindow;
-            activeWindow = window;
-            dragWindow = window;
+            oldActive = activeWindow;
+            //if (L)
+            {
+                activeWindow = window;
+                
+                dragWindow = window;
+            }
             startDrag = false;
             if (window != NULL)
             {
@@ -511,10 +515,12 @@ void HandleClick(bool L, bool R, bool M)
                     if (window->instance->instanceType == InstanceType::GUI)
                     {
                         GuiInstance* gui = (GuiInstance*)window->instance;
-                        if (gui->screen != NULL && gui->screen->selectedComponent != NULL)
+                        // if (gui->screen != NULL && gui->screen->selectedComponent != NULL)
+                        if (gui->screen != NULL)
                         {
                             Position p = window->GetMousePosRelativeToWindow();
-                            gui->screen->selectedComponent->MouseClicked(GuiComponentStuff::Position(p.x, p.y));
+                            
+                            gui->screen->MouseClicked(GuiComponentStuff::MouseClickEventInfo(GuiComponentStuff::Position(p.x, p.y), L, R, M));
                         }
                     }
                 }
@@ -526,7 +532,7 @@ void HandleClick(bool L, bool R, bool M)
                 //osData.windowPointerThing->UpdateWindowBorder(osData.windows[osData.windows.getCount() - 1]);
 
 
-                if (Taskbar::activeTabWindow != NULL) // Taskbar Button Clicked
+                if (L && Taskbar::activeTabWindow != NULL) // Taskbar Button Clicked
                 {
                     activeWindow = Taskbar::activeTabWindow;
                     Taskbar::activeTabWindow->moveToFront = true;

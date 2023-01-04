@@ -13,7 +13,8 @@ namespace GuiComponentStuff
 
         //BoxComponent(BaseComponent* parent);
         BoxComponent(BaseComponent* parent, ComponentSize size, uint32_t bgCol);
-        void MouseClicked(Position mousePos);
+        void MouseClicked(MouseClickEventInfo info);
+        void KeyHit(KeyHitEventInfo info);
         void Render(Field field);
         void Destroy(bool destroyChildren);
         ComponentSize GetActualComponentSize();

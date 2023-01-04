@@ -43,7 +43,8 @@ namespace GuiComponentStuff
         void* GetWindow();
         void* GetScreen();
 
-        void MouseClicked(Position mousePos);
+        void MouseClicked(MouseClickEventInfo info);
+        void KeyHit(KeyHitEventInfo info);
 
         void Render(Field field);
         void Destroy(bool destroyChildren);

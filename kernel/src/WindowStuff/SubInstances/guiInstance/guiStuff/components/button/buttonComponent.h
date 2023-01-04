@@ -27,10 +27,11 @@ namespace GuiComponentStuff
         bool mouseHover = false;
         bool mouseClick = false;
 
-        void (*mouseClickedCallBack)(BaseComponent*);
+        void (*mouseClickedCallBack)(BaseComponent*, MouseClickEventInfo);
 
         ButtonComponent(const char* text, uint32_t textColDef, uint32_t textColHover, uint32_t textColClick, uint32_t bgColDef, uint32_t bgColHover, uint32_t bgColClick, ComponentSize size, Position position, BaseComponent* parent);
-        void MouseClicked(Position mousePos);
+        void MouseClicked(MouseClickEventInfo info);
+        void KeyHit(KeyHitEventInfo info);
         void Render(Field field);
         void Destroy(bool destroyChildren);
         ComponentSize GetActualComponentSize();

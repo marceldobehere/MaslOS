@@ -11,6 +11,7 @@
 #include "../tasks/taskMgrTask/taskMgrTask.h"
 #include "../WindowStuff/SubInstances/connect4Instance/connect4Instance.h"
 #include "../tasks/maab/maabTask.h"
+#include "../WindowStuff/SubInstances/guiInstance/guiInstance.h"
 
 
 bool lshift = false;
@@ -43,9 +44,45 @@ void InitKeyboard()
 
 int scrollSpeed = 8;
 
+bool KeyboardScancodeState[256];
+
 void HandleKeyboard(uint8_t scancode)
 {
+    if (scancode == LeftShift)
+        lshift = true; 
+    else if (scancode == LeftShift + 0x80)
+        lshift = false;
+    else if (scancode == RightShift)
+        rshift = true; 
+    else if (scancode == RightShift + 0x80)
+        rshift = false;
+        
+    if (scancode & 0x80)
+    {
+        KeyboardScancodeState[scancode & ~0x80] = false;
+        return;
+    }
+    else
+    {
+        if (KeyboardScancodeState[scancode])
+        {
+            return;
+        }
+        else
+            KeyboardScancodeState[scancode] = true;
+    }
+
+
     AddToStack();
+    if (activeWindow != NULL &&
+        activeWindow->instance != NULL &&
+        activeWindow->instance->instanceType == InstanceType::GUI &&
+        ((GuiInstance*)activeWindow->instance)->screen != NULL)
+    {
+        ((GuiInstance*)activeWindow->instance)->screen->KeyHit(GuiComponentStuff::KeyHitEventInfo(scancode, QWERTYKeyboard::Translate(scancode, lshift || rshift)));
+        return;
+    }
+
     if (scancode == ARR_LEFT)
     {  
         if (lshift)
@@ -144,15 +181,7 @@ void HandleKeyboard(uint8_t scancode)
     }
 
 
-    if (scancode == LeftShift)
-        lshift = true; 
-    else if (scancode == LeftShift + 0x80)
-        lshift = false;
-    else if (scancode == RightShift)
-        rshift = true; 
-    else if (scancode == RightShift + 0x80)
-        rshift = false;
-    else if (scancode == Enter)
+    if (scancode == Enter)
     {
         if (activeWindow->instance->instanceType == InstanceType::Terminal)
         {

@@ -14,11 +14,14 @@ namespace GuiComponentStuff
         renderer = new ComponentRenderer(size);
         renderer->bgCol = Colors.bgray;
         renderer->Fill(Colors.bgray);
+
+        tempSelectedComponent = NULL;
+        selectedComponent = NULL;
     }
 
     void ScreenComponent::Render(Field field)
     {
-        selectedComponent = NULL;
+        tempSelectedComponent = NULL;
         ComponentSize tSize = ComponentSize((int)window->framebuffer->Width, (int)window->framebuffer->Height);
 
         if (oldSize != tSize)
@@ -46,7 +49,14 @@ namespace GuiComponentStuff
         return size;
     }
 
-    void ScreenComponent::MouseClicked(Position mousePos)
+    void ScreenComponent::MouseClicked(MouseClickEventInfo info)
+    {
+        selectedComponent = tempSelectedComponent;
+        if (selectedComponent != NULL)
+            selectedComponent->MouseClicked(info);
+    }
+
+    void ScreenComponent::KeyHit(KeyHitEventInfo info)
     {
 
     }

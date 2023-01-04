@@ -12,7 +12,8 @@ namespace GuiComponentStuff
         uint32_t oldFillColor;
 
         RectangleComponent(uint32_t fillColor, ComponentSize size, BaseComponent* parent);
-        void MouseClicked(Position mousePos);
+        void MouseClicked(MouseClickEventInfo info);
+        void KeyHit(KeyHitEventInfo info);
         void Render(Field field);
         void Destroy(bool destroyChildren);
         ComponentSize GetActualComponentSize();

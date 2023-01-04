@@ -34,7 +34,12 @@ namespace GuiComponentStuff
         renderer->Fill(backgroundColor);
     }
 
-    void BoxComponent::MouseClicked(Position mousePos)
+    void BoxComponent::MouseClicked(MouseClickEventInfo info)
+    {
+
+    }
+
+    void BoxComponent::KeyHit(KeyHitEventInfo info)
     {
 
     }

@@ -36,18 +36,23 @@ namespace GuiComponentStuff
             ((ButtonComponent*)this)->Render(field);
     }
 
-    void BaseComponent::MouseClicked(Position mousePos)
+    void BaseComponent::MouseClicked(MouseClickEventInfo info)
     {
         if (componentType == RECT)
-            ((RectangleComponent*)this)->MouseClicked(mousePos);
+            ((RectangleComponent*)this)->MouseClicked(info);
         if (componentType == SCREEN)
-            ((ScreenComponent*)this)->MouseClicked(mousePos);
+            ((ScreenComponent*)this)->MouseClicked(info);
         if (componentType == BOX)
-            ((BoxComponent*)this)->MouseClicked(mousePos);
+            ((BoxComponent*)this)->MouseClicked(info);
         if (componentType == TEXT)
-            ((TextComponent*)this)->MouseClicked(mousePos);
+            ((TextComponent*)this)->MouseClicked(info);
         if (componentType == BUTTON)
-            ((ButtonComponent*)this)->MouseClicked(mousePos);
+            ((ButtonComponent*)this)->MouseClicked(info);
+    }
+
+    void BaseComponent::KeyHit(KeyHitEventInfo info)
+    {
+
     }
 
     void BaseComponent::Destroy(bool destroyChildren)
