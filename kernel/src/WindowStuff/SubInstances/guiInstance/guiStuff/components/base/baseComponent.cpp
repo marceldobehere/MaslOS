@@ -5,6 +5,7 @@
 #include "../box/boxComponent.h"
 #include "../text/textComponent.h"
 #include "../button/buttonComponent.h"
+#include "../textField/textFieldComponent.h"
 
 namespace GuiComponentStuff
 {
@@ -34,6 +35,8 @@ namespace GuiComponentStuff
             ((TextComponent*)this)->Render(field);
         if (componentType == BUTTON)
             ((ButtonComponent*)this)->Render(field);
+        if (componentType == TEXTFIELD)
+            ((TextFieldComponent*)this)->Render(field);
     }
 
     void BaseComponent::MouseClicked(MouseClickEventInfo info)
@@ -48,6 +51,8 @@ namespace GuiComponentStuff
             ((TextComponent*)this)->MouseClicked(info);
         if (componentType == BUTTON)
             ((ButtonComponent*)this)->MouseClicked(info);
+        if (componentType == TEXTFIELD)
+            ((TextFieldComponent*)this)->MouseClicked(info);
     }
 
     void BaseComponent::KeyHit(KeyHitEventInfo info)
@@ -62,6 +67,8 @@ namespace GuiComponentStuff
             ((TextComponent*)this)->KeyHit(info);
         if (componentType == BUTTON)
             ((ButtonComponent*)this)->KeyHit(info);
+        if (componentType == TEXTFIELD)
+            ((TextFieldComponent*)this)->KeyHit(info);
     }
 
     void BaseComponent::Destroy(bool destroyChildren)
@@ -76,6 +83,8 @@ namespace GuiComponentStuff
             ((TextComponent*)this)->Destroy(destroyChildren);
         if (componentType == BUTTON)
             ((ButtonComponent*)this)->Destroy(destroyChildren);
+        if (componentType == TEXTFIELD)
+            ((TextFieldComponent*)this)->Destroy(destroyChildren);
     }
 
     ComponentSize BaseComponent::GetActualComponentSize()
@@ -90,6 +99,8 @@ namespace GuiComponentStuff
             return ((TextComponent*)this)->GetActualComponentSize();
         if (componentType == BUTTON)
             return ((ButtonComponent*)this)->GetActualComponentSize();
+        if (componentType == TEXTFIELD)
+            return ((TextFieldComponent*)this)->GetActualComponentSize();
 
         return ComponentSize(0, 0);
     }

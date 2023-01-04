@@ -12,7 +12,8 @@ namespace GuiComponentStuff
         RECT,
         BOX,
         TEXT,
-        BUTTON
+        BUTTON,
+        TEXTFIELD
     };
 
 

@@ -51,19 +51,38 @@ namespace GuiComponentStuff
 
     void TextComponent::Render(Field field)
     {
-        ComponentSize temp = GetActualComponentSize();
-        bool newText = TextUpdate();
-        if (oldSize != temp || newText ||
-            fgColor != fgColorOld || bgColor != bgColorOld ||
-            oldCenter != center)
+        if (!useFixedSize)
         {
-            renderer->Resize(temp);
-            renderer->Fill(bgColor);
-            oldSize = temp;
-            renderer->PrintString(text, Position(0, 0), fgColor, bgColor, false, center);
-            fgColorOld = fgColor;
-            bgColorOld = bgColor;
-            oldCenter = center;
+            ComponentSize temp = GetActualComponentSize();
+            bool newText = TextUpdate();
+            if (oldSize != temp || newText ||
+                fgColor != fgColorOld || bgColor != bgColorOld ||
+                oldCenter != center)
+            {
+                renderer->Resize(temp);
+                renderer->Fill(bgColor);
+                oldSize = temp;
+                renderer->PrintString(text, Position(0, 0), fgColor, bgColor, false, center);
+                fgColorOld = fgColor;
+                bgColorOld = bgColor;
+                oldCenter = center;
+            }
+        }
+        else
+        {
+            bool newText = TextUpdate();
+            if (oldSize != size || newText ||
+                fgColor != fgColorOld || bgColor != bgColorOld ||
+                oldCenter != center)
+            {
+                renderer->Resize(size);
+                renderer->Fill(bgColor);
+                oldSize = size;
+                renderer->PrintString(text, Position(0, 0), fgColor, bgColor, false, center);
+                fgColorOld = fgColor;
+                bgColorOld = bgColor;
+                oldCenter = center;
+            }
         }
 
 
@@ -77,6 +96,25 @@ namespace GuiComponentStuff
 
     ComponentSize TextComponent::GetActualComponentSize()
     {
+        if (useFixedSize)
+        {
+             if (size.IsXFixed && size.IsYFixed)
+            return size;
+
+            ComponentSize temp = ComponentSize(0, 0);
+            if (size.IsXFixed)
+                temp.FixedX = size.FixedX;
+            else
+                temp.FixedX = size.ScaledX * parent->GetActualComponentSize().FixedX;
+
+            if (size.IsYFixed)
+                temp.FixedY = size.FixedY;
+            else
+                temp.FixedY = size.ScaledY * parent->GetActualComponentSize().FixedY;
+
+            return temp;
+        }
+
         int sX = 0;
         int sY = 0;
         int maxX = 0;

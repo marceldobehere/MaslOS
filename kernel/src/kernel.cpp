@@ -5,6 +5,7 @@
 #include "WindowStuff/SubInstances/guiInstance/guiStuff/components/box/boxComponent.h"
 #include "WindowStuff/SubInstances/guiInstance/guiStuff/components/text/textComponent.h"
 #include "WindowStuff/SubInstances/guiInstance/guiStuff/components/button/buttonComponent.h"
+#include "WindowStuff/SubInstances/guiInstance/guiStuff/components/textField/textFieldComponent.h"
 
 /*
 if (osData.enableStackTrace)
@@ -21,49 +22,50 @@ void TestClickHandler(GuiComponentStuff::BaseComponent* btn, GuiComponentStuff::
 
 void TestKeyHandler(GuiComponentStuff::BaseComponent* btn, GuiComponentStuff::KeyHitEventInfo info)
 {
-    AddToStack();
-    //btn->position.y -= 20;
-    //return;
-    if (btn->componentType != GuiComponentStuff::ComponentType::BUTTON)
-        return;
+    btn->position.y -= 20;
 
-    const char** txt = &((GuiComponentStuff::ButtonComponent*)btn)->textComp->text;
+    // AddToStack();
+    // //return;
+    // if (btn->componentType != GuiComponentStuff::ComponentType::BUTTON)
+    //     return;
 
-    int len = StrLen(*txt);
-    if (info.Scancode == 0x0E)
-    {
-        if (len < 1)
-        {
-            RemoveFromStack();
-            return;
-        }
-        char* bleh = (char*)malloc(len);
-        for (int i = 0; i < len - 1; i++)
-            bleh[i] = (*txt)[i];
-        bleh[len - 1] = 0;
+    // const char** txt = &((GuiComponentStuff::ButtonComponent*)btn)->textComp->text;
 
-        AddToStack();
-        tryFree((void*)*txt);
-        RemoveFromStack();
-        *txt = bleh; 
-    }
-    else
-    {
+    // int len = StrLen(*txt);
+    // if (info.Scancode == 0x0E)
+    // {
+    //     if (len < 1)
+    //     {
+    //         RemoveFromStack();
+    //         return;
+    //     }
+    //     char* bleh = (char*)malloc(len);
+    //     for (int i = 0; i < len - 1; i++)
+    //         bleh[i] = (*txt)[i];
+    //     bleh[len - 1] = 0;
+
+    //     AddToStack();
+    //     tryFree((void*)*txt);
+    //     RemoveFromStack();
+    //     *txt = bleh; 
+    // }
+    // else
+    // {
         
-        char* bleh = (char*)malloc(len + 2);
-        for (int i = 0; i < len; i++)
-            bleh[i] = (*txt)[i];
-        bleh[len] = info.Chr;
-        bleh[len + 1] = 0;
+    //     char* bleh = (char*)malloc(len + 2);
+    //     for (int i = 0; i < len; i++)
+    //         bleh[i] = (*txt)[i];
+    //     bleh[len] = info.Chr;
+    //     bleh[len + 1] = 0;
 
-        AddToStack();
-        tryFree((void*)*txt);
-        RemoveFromStack();
-        *txt = bleh; 
-    }
+    //     AddToStack();
+    //     tryFree((void*)*txt);
+    //     RemoveFromStack();
+    //     *txt = bleh; 
+    // }
 
 
-    RemoveFromStack();
+    // RemoveFromStack();
 }
 
 
@@ -318,6 +320,20 @@ extern "C" void _start(BootInfo* bootInfo)
             //btn->stickToDefaultColor = true;
             
             testGui->screen->children->add(btn);
+        }
+
+        {
+            GuiComponentStuff::TextFieldComponent* txtField = new GuiComponentStuff::TextFieldComponent(
+            Colors.white,
+            Colors.black,
+            GuiComponentStuff::ComponentSize(150, 80),
+            GuiComponentStuff::Position(160, 260), testGui->screen
+            );
+            //btn->mouseClickedCallBack = TestClickHandler;
+            //btn->keyHitCallBack = TestKeyHandler;
+            //btn->stickToDefaultColor = true;
+            
+            testGui->screen->children->add(txtField);
         }
 
         testGui->screen->children->add(testRect);
