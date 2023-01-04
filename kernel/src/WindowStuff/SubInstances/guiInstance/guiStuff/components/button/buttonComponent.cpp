@@ -10,6 +10,7 @@ namespace GuiComponentStuff
 {
     ButtonComponent::ButtonComponent(const char* text, uint32_t textColDef, uint32_t textColHover, uint32_t textColClick, uint32_t bgColDef, uint32_t bgColHover, uint32_t bgColClick, ComponentSize size, Position position, BaseComponent* parent)
     {
+
         componentType = ComponentType::BUTTON;
 
         this->textColDef = textColDef;
@@ -32,11 +33,16 @@ namespace GuiComponentStuff
         this->textComp = new TextComponent(actualButtonStuff, Colors.tblack, textColDef, text, Position());
         textComp->center = true;
         actualButtonStuff->children->add(textComp);
+
+        callBack = NULL;
     }
+
+
 
     void ButtonComponent::MouseClicked(Position mousePos)
     {
-        position.x += 10;
+        if (callBack != NULL)
+            callBack(this);
     }
 
     void ButtonComponent::Render(Field field)
