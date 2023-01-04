@@ -85,7 +85,7 @@ namespace GuiComponentStuff
 
         
 
-        if (mouseHover)
+        if (mouseHover && !stickToDefaultColor)
         {
             if (mouseClick)
             {

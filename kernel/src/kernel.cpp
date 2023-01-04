@@ -267,6 +267,7 @@ extern "C" void _start(BootInfo* bootInfo)
             GuiComponentStuff::Position(210, 160), testGui->screen
             );
             btn->mouseClickedCallBack = TestClickHandler;
+            //btn->stickToDefaultColor = true;
             
             testGui->screen->children->add(btn);
         }

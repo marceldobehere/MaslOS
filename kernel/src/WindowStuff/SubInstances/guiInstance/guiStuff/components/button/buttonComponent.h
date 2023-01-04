@@ -23,6 +23,7 @@ namespace GuiComponentStuff
         uint32_t bgColHover; 
         uint32_t bgColClick;
 
+        bool stickToDefaultColor = false;
         bool mouseHover = false;
         bool mouseClick = false;
 

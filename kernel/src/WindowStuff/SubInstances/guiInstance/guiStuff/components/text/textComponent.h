@@ -18,6 +18,7 @@ namespace GuiComponentStuff
         const char* text;
         const char* oldText;
         bool center = false;
+        bool oldCenter = false;
 
         TextComponent(BaseComponent* parent, uint32_t bgColor, uint32_t fgColor, const char* text, Position position);
         void MouseClicked(Position mousePos);
