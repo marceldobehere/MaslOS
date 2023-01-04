@@ -14,7 +14,7 @@ if (osData.enableStackTrace)
 
 */
 
-void TestEvent(GuiComponentStuff::BaseComponent* btn)
+void TestClickHandler(GuiComponentStuff::BaseComponent* btn)
 {
     btn->position.y += 20;
 }
@@ -266,7 +266,7 @@ extern "C" void _start(BootInfo* bootInfo)
             GuiComponentStuff::ComponentSize(150, 80),
             GuiComponentStuff::Position(210, 160), testGui->screen
             );
-            btn->callBack = TestEvent;
+            btn->mouseClickedCallBack = TestClickHandler;
             
             testGui->screen->children->add(btn);
         }

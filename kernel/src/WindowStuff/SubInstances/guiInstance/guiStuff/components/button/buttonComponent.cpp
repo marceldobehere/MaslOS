@@ -34,15 +34,15 @@ namespace GuiComponentStuff
         textComp->center = true;
         actualButtonStuff->children->add(textComp);
 
-        callBack = NULL;
+        mouseClickedCallBack = NULL;
     }
 
 
 
     void ButtonComponent::MouseClicked(Position mousePos)
     {
-        if (callBack != NULL)
-            callBack(this);
+        if (mouseClickedCallBack != NULL)
+            mouseClickedCallBack(this);
     }
 
     void ButtonComponent::Render(Field field)
