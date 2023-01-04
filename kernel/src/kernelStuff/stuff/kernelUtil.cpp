@@ -122,11 +122,10 @@ void PrepareInterrupts()
     SetIDTGate((void*)GenFault_handler, 0x15, IDT_TA_InterruptGate, 0x08); // Control Protection Exception
     SetIDTGate((void*)GenFault_handler, 0x1C, IDT_TA_InterruptGate, 0x08); // Hypervisor Inhection Exception
     SetIDTGate((void*)GenFault_handler, 0xD, IDT_TA_InterruptGate, 0x08); // VMM Communication Exception
-
-
+    
+    io_wait();    
     __asm__ volatile ("lidt %0" : : "m" (idtr));
-    
-    
+    io_wait();    
     //asm ("int $0x1");
 
     AddToStack();
@@ -134,7 +133,8 @@ void PrepareInterrupts()
         0b11111000, 
         0b11101111
     );
-
+    
+    io_wait();    
     __asm__ volatile ("sti");
     RemoveFromStack();
     
