@@ -98,4 +98,14 @@ namespace GuiComponentStuff
             return parent->GetWindow();
     }
 
+    void* BaseComponent::GetScreen()
+    {
+        if (componentType == ComponentType::SCREEN)
+            return (void*)this;
+        else if (parent == NULL)
+            return NULL;
+        else
+            return parent->GetScreen();
+    }
+
 }

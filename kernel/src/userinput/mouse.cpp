@@ -5,6 +5,8 @@
 #include "../OSDATA/osdata.h"
 #include "../Rendering/VirtualRenderer.h"
 #include "../tasks/closeWindow/taskWindowClose.h"
+#include "../WindowStuff/SubInstances/guiInstance/guiStuff/components/screenComponent/screenComponent.h"
+#include "../WindowStuff/SubInstances/guiInstance/guiInstance.h"
 
 #define PS2XSign        0b00010000
 #define PS2YSign        0b00100000
@@ -506,6 +508,15 @@ void HandleClick(bool L, bool R, bool M)
                 if (!activeDragOn && MousePosition.y > window->position.y + 20)
                 {
                     dragWindow = NULL;
+                    if (window->instance->instanceType == InstanceType::GUI)
+                    {
+                        GuiInstance* gui = (GuiInstance*)window->instance;
+                        if (gui->screen != NULL && gui->screen->selectedComponent != NULL)
+                        {
+                            Position p = window->GetMousePosRelativeToWindow();
+                            gui->screen->selectedComponent->MouseClicked(GuiComponentStuff::Position(p.x, p.y));
+                        }
+                    }
                 }
                 //osData.windowPointerThing->UpdateWindowBorder(osData.windows[osData.windows.getCount() - 1]);
             }

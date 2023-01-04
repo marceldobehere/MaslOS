@@ -14,6 +14,7 @@ namespace GuiComponentStuff
         Window* window;
         List<BaseComponent*>* children;
         uint32_t backgroundColor = 0;
+        BaseComponent* selectedComponent = NULL;
 
         ScreenComponent(Window* window);
         void MouseClicked(Position mousePos);

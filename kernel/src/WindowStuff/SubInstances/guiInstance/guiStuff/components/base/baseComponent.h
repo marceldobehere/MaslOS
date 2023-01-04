@@ -41,6 +41,7 @@ namespace GuiComponentStuff
         ComponentSize GetActualComponentSize();
         Position GetAbsoluteComponentPosition();
         void* GetWindow();
+        void* GetScreen();
 
         void MouseClicked(Position mousePos);
 

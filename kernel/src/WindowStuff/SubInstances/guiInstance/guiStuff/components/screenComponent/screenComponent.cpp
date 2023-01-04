@@ -18,6 +18,7 @@ namespace GuiComponentStuff
 
     void ScreenComponent::Render(Field field)
     {
+        selectedComponent = NULL;
         ComponentSize tSize = ComponentSize((int)window->framebuffer->Width, (int)window->framebuffer->Height);
 
         if (oldSize != tSize)

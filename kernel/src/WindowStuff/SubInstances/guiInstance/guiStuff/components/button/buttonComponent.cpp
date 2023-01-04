@@ -2,6 +2,7 @@
 #include "../../../../../../Rendering/Cols.h"
 //#include "../../../../../../OSDATA/osdata.h"
 #include "../../../../../../userinput/mouse.h"
+#include "../screenComponent/screenComponent.h"
 
 
 
@@ -34,7 +35,7 @@ namespace GuiComponentStuff
 
     void ButtonComponent::MouseClicked(Position mousePos)
     {
-
+        position.x += 10;
     }
 
     void ButtonComponent::Render(Field field)
@@ -43,6 +44,7 @@ namespace GuiComponentStuff
         ::Position mPos = wind->GetMousePosRelativeToWindow();
         //position = Position(mPos.x, mPos.y);
         Position abs = GetAbsoluteComponentPosition();
+        ScreenComponent* scr = (ScreenComponent*)GetScreen();
 
         ComponentSize tSize = textComp->GetActualComponentSize();
 
@@ -54,6 +56,9 @@ namespace GuiComponentStuff
 
         mouseHover &= !wind->hidden && activeWindow == wind;
         mouseClick = mouseHover && MouseClickState[0];
+
+        if (mouseHover)
+            scr->selectedComponent = this;
 
         actualButtonStuff->position = position;
         actualButtonStuff->size = tSize;
