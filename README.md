@@ -15,6 +15,8 @@ MaslOS is 1000% the best os ever!11!1
   - Taskbar
 * Window Manager
   - Working Window Manager with dynamic windows
+* GUI Framework
+  - Still WIP but it exists!
 * Apps
   - Terminal using a scrollable Text Window
   - Connect Four Game
