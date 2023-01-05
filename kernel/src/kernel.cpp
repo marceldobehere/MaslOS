@@ -305,6 +305,7 @@ extern "C" void _start(BootInfo* bootInfo)
         {
             GuiComponentStuff::TextComponent* txt = new GuiComponentStuff::TextComponent(testGui->screen, Colors.black, Colors.white, "Hello!\nThis is an amazing test.", 
             GuiComponentStuff::Position(200, 90));
+            txt->id = 993344;
             testGui->screen->children->add(txt);
         }
 
@@ -337,6 +338,13 @@ extern "C" void _start(BootInfo* bootInfo)
         }
 
         testGui->screen->children->add(testRect);
+
+
+        {
+            uint64_t bleh = 0;
+            *((int*)&bleh) = 1;
+            testGui->SetBaseComponentAttribute(993344, GuiInstanceBaseAttributeType::POSITION_Y, bleh);
+        }
     }
     RemoveFromStack();
     
