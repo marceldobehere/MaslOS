@@ -375,7 +375,7 @@ extern "C" void _start(BootInfo* bootInfo)
 
     uint64_t frameSum = 0;
 
-    osData.wantedFps = 120;
+    osData.wantedFps = 150;
     uint32_t TwantedFps = 1000;
     uint64_t timeForFps = 1000;
 
