@@ -182,7 +182,7 @@ void PrepareWindows(Framebuffer* img)
         DebugTerminalInstance* dterminal = (DebugTerminalInstance*)malloc(sizeof(DebugTerminalInstance), "Debug Terminal Instance");
         *dterminal = DebugTerminalInstance(debugTerminalWindow);
         
-        *(debugTerminalWindow) = Window(dterminal, Size(500, 800), Position(600, 20), "Debug Terminal", true, true, true);
+        *(debugTerminalWindow) = Window(dterminal, Size(500, GlobalRenderer->framebuffer->Height - 100), Position(600, 20), "Debug Terminal", true, true, true);
         //osData.windows.add(debugTerminalWindow);
 
         osData.debugTerminalWindow = debugTerminalWindow;
