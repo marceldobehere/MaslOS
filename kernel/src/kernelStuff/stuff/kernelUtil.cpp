@@ -17,18 +17,21 @@ void PrepareACPI(BootInfo* bootInfo)
 
     AddToStack();   
     ACPI::SDTHeader* rootThing = NULL;
+    int div = 1;
 
     if (bootInfo->rsdp->firstPart.Revision == 0)
     {
         osData.debugTerminalWindow->Log("ACPI Version: 1");
         rootThing = (ACPI::SDTHeader*)(uint64_t)(bootInfo->rsdp->firstPart.RSDTAddress);
         osData.debugTerminalWindow->Log("RSDT Header Addr: {}", ConvertHexToString((uint64_t)rootThing));
+        div = 4;
     }
     else
     {
         osData.debugTerminalWindow->Log("ACPI Version: 2");
         rootThing = (ACPI::SDTHeader*)(bootInfo->rsdp->XSDTAddress);
         osData.debugTerminalWindow->Log("XSDT Header Addr: {}", ConvertHexToString((uint64_t)rootThing));
+        div = 8;
     }
 
     RemoveFromStack();
@@ -37,7 +40,7 @@ void PrepareACPI(BootInfo* bootInfo)
 
     
     AddToStack();
-    int entries = (rootThing->Length - sizeof(ACPI::SDTHeader)) / 8;
+    int entries = (rootThing->Length - sizeof(ACPI::SDTHeader)) / div;
     osData.debugTerminalWindow->Log("Entry count: {}", to_string(entries));
     RemoveFromStack();
 
@@ -45,7 +48,7 @@ void PrepareACPI(BootInfo* bootInfo)
     osData.debugTerminalWindow->renderer->Print("> ");
     for (int t = 0; t < entries; t++)
     {
-        ACPI::SDTHeader* newSDTHeader = (ACPI::SDTHeader*)*(uint64_t*)((uint64_t)rootThing + sizeof(ACPI::SDTHeader) + (t * 8));
+        ACPI::SDTHeader* newSDTHeader = (ACPI::SDTHeader*)*(uint64_t*)((uint64_t)rootThing + sizeof(ACPI::SDTHeader) + (t * div));
         
         for (int i = 0; i < 4; i++)
             osData.debugTerminalWindow->renderer->Print(newSDTHeader->Signature[i]);
@@ -56,7 +59,7 @@ void PrepareACPI(BootInfo* bootInfo)
     RemoveFromStack();
 
     AddToStack();
-    ACPI::MCFGHeader* mcfg = (ACPI::MCFGHeader*)ACPI::FindTable(rootThing, (char*)"MCFG");
+    ACPI::MCFGHeader* mcfg = (ACPI::MCFGHeader*)ACPI::FindTable(rootThing, (char*)"MCFG", div);
 
     osData.debugTerminalWindow->Log("MCFG Header Addr: {}", ConvertHexToString((uint64_t)mcfg));
     RemoveFromStack();
