@@ -25,6 +25,11 @@ void PrepareACPI(BootInfo* bootInfo)
         rootThing = (ACPI::SDTHeader*)(uint64_t)(bootInfo->rsdp->firstPart.RSDTAddress);
         osData.debugTerminalWindow->Log("RSDT Header Addr: {}", ConvertHexToString((uint64_t)rootThing));
         div = 4;
+
+        if (rootThing == NULL)
+        {
+            Panic("RSDT Header is at NULL!", true);
+        }
     }
     else
     {
