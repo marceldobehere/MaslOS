@@ -126,7 +126,7 @@ void PrepareMemory(BootInfo* bootInfo)
     kernelInfo.pageTableManager = &GlobalPageTableManager;
 }
 
-uint8_t testIdtrArr[0x4000];
+uint8_t testIdtrArr[0x2000];
 IDTR idtr;
 
 void SetIDTGate(void* handler, uint8_t entryOffset, uint8_t type_attr, uint8_t selector)
@@ -139,9 +139,9 @@ void SetIDTGate(void* handler, uint8_t entryOffset, uint8_t type_attr, uint8_t s
 
 void PrepareInterrupts()
 {  
-    idtr.Limit = 0x4000 - 1;
+    idtr.Limit = 0x2000 - 1;
 
-    for (int i = 0; i < 0x4000; i++)
+    for (int i = 0; i < 0x2000; i++)
         testIdtrArr[i] = 0;
 
     idtr.Offset = (uint64_t)testIdtrArr;//(uint64_t)GlobalAllocator->RequestPage();
@@ -160,20 +160,20 @@ void PrepareInterrupts()
     SetIDTGate((void*)GenFloatFault_handler, 0x10, IDT_TA_InterruptGate, 0x08); // x87 Float error
     SetIDTGate((void*)GenFloatFault_handler, 0x13, IDT_TA_InterruptGate, 0x08); // SIMD Float error
 
-    SetIDTGate((void*)GenFault_handler, 0x2, IDT_TA_InterruptGate, 0x08); // Non Maskable interrupt
-    SetIDTGate((void*)GenFault_handler, 0x4, IDT_TA_InterruptGate, 0x08); // Overflow
-    SetIDTGate((void*)GenFault_handler, 0x5, IDT_TA_InterruptGate, 0x08); // Bound Range Exceeded
-    SetIDTGate((void*)GenFault_handler, 0x6, IDT_TA_InterruptGate, 0x08); // Invalid OPCODE
-    SetIDTGate((void*)GenFault_handler, 0x7, IDT_TA_InterruptGate, 0x08); // Device not avaiable
-    SetIDTGate((void*)GenFault_handler, 0xA, IDT_TA_InterruptGate, 0x08); // Invalid TSS
-    SetIDTGate((void*)GenFault_handler, 0xB, IDT_TA_InterruptGate, 0x08); // Segment not present
-    SetIDTGate((void*)GenFault_handler, 0xC, IDT_TA_InterruptGate, 0x08); // Stack segment fault
+    SetIDTGate((void*)WeirdFault_handler, 0x2, IDT_TA_InterruptGate, 0x08); // Non Maskable interrupt
+    SetIDTGate((void*)WeirdFault_handler, 0x4, IDT_TA_InterruptGate, 0x08); // Overflow
+    SetIDTGate((void*)WeirdFault_handler, 0x5, IDT_TA_InterruptGate, 0x08); // Bound Range Exceeded
+    SetIDTGate((void*)WeirdFault_handler, 0x6, IDT_TA_InterruptGate, 0x08); // Invalid OPCODE
+    SetIDTGate((void*)WeirdFault_handler, 0x7, IDT_TA_InterruptGate, 0x08); // Device not avaiable
+    SetIDTGate((void*)WeirdFault_handler, 0xA, IDT_TA_InterruptGate, 0x08); // Invalid TSS
+    SetIDTGate((void*)WeirdFault_handler, 0xB, IDT_TA_InterruptGate, 0x08); // Segment not present
+    SetIDTGate((void*)WeirdFault_handler, 0xC, IDT_TA_InterruptGate, 0x08); // Stack segment fault
     SetIDTGate((void*)GenFault_handler, 0x11, IDT_TA_InterruptGate, 0x08); //  Alligment check
     SetIDTGate((void*)GenFault_handler, 0x12, IDT_TA_InterruptGate, 0x08); // machine check
-    SetIDTGate((void*)GenFault_handler, 0x14, IDT_TA_InterruptGate, 0x08); // Virtualization Exception
-    SetIDTGate((void*)GenFault_handler, 0x15, IDT_TA_InterruptGate, 0x08); // Control Protection Exception
-    SetIDTGate((void*)GenFault_handler, 0x1C, IDT_TA_InterruptGate, 0x08); // Hypervisor Inhection Exception
-    SetIDTGate((void*)GenFault_handler, 0xD, IDT_TA_InterruptGate, 0x08); // VMM Communication Exception
+    SetIDTGate((void*)VirtualFault_handler, 0x14, IDT_TA_InterruptGate, 0x08); // Virtualization Exception
+    SetIDTGate((void*)VirtualFault_handler, 0x15, IDT_TA_InterruptGate, 0x08); // Control Protection Exception
+    SetIDTGate((void*)VirtualFault_handler, 0x1C, IDT_TA_InterruptGate, 0x08); // Hypervisor Inhection Exception
+    SetIDTGate((void*)VirtualFault_handler, 0xD, IDT_TA_InterruptGate, 0x08); // VMM Communication Exception
     
     io_wait();    
     __asm__ volatile ("lidt %0" : : "m" (idtr));
@@ -182,8 +182,8 @@ void PrepareInterrupts()
 
     AddToStack();
     RemapPIC(
-        0b11111000, 
-        0b11101111
+        0b11111000, //0b11111000, 
+        0b11101111 //0b11101111
     );
     
     io_wait();    

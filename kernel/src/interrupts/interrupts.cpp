@@ -37,6 +37,20 @@ __attribute__((interrupt)) void GenFault_handler(interrupt_frame* frame)
     RemoveFromStack();
 }
 
+__attribute__((interrupt)) void WeirdFault_handler(interrupt_frame* frame)
+{
+    AddToStack();
+    Panic("Weird Fault Detected!", true);
+    RemoveFromStack();
+}
+
+__attribute__((interrupt)) void VirtualFault_handler(interrupt_frame* frame)
+{
+    AddToStack();
+    Panic("Virtual Fault Detected!", true);
+    RemoveFromStack();
+}
+
 __attribute__((interrupt)) void GenFloatFault_handler(interrupt_frame* frame)
 {
     AddToStack();
