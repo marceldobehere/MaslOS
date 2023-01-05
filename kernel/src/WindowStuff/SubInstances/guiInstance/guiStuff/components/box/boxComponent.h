@@ -5,6 +5,12 @@
 
 namespace GuiComponentStuff
 {
+
+    enum class GuiInstanceBoxComponentAttributeType : int32_t
+    {
+        BACKGROUND_COLOR = 10
+    };
+
     class BoxComponent : public BaseComponent
     {
         public:

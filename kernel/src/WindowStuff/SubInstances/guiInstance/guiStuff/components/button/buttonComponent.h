@@ -8,6 +8,26 @@
 
 namespace GuiComponentStuff
 {
+    enum class GuiInstanceButtonComponentAttributeType : int32_t
+    {
+        TEXT_COLOR_DEFAULT = 10,
+        TEXT_COLOR_HOVER = 11,
+        TEXT_COLOR_CLICK = 12,
+
+        BG_COLOR_DEFAULT = 20,
+        BG_COLOR_HOVER = 21,
+        BG_COLOR_CLICK = 22,
+
+        STICK_TO_DEFAULT_COLS = 30,
+        MOUSE_HOVER = 31,
+        MOUSE_CLICK = 32,
+
+        BOX_COMPONENT_ID = 40,
+        RECT_COMPONENT_ID = 41,
+        TEXT_COMPONENT_ID = 42,
+
+    };
+
     class ButtonComponent : public BaseComponent
     {
         public:

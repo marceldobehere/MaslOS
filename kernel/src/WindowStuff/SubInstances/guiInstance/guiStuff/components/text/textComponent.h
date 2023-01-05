@@ -5,6 +5,17 @@
 
 namespace GuiComponentStuff
 {
+    enum class GuiInstanceTextComponentAttributeType : int32_t
+    {
+        TEXT_COLOR = 10,
+        BACKGROUND_COLOR = 11,
+
+        TEXT_ADDRESS = 20,
+
+        CENTER_TEXT = 30,
+        USE_FIXED_SIZE = 31,
+    };
+
     class TextComponent : public BaseComponent
     {
         private:

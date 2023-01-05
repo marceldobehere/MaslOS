@@ -6,6 +6,28 @@
 #include "guiStuff/components/screenComponent/screenComponent.h"
 
 
+
+enum class GuiInstanceBaseAttributeType : int32_t
+{   
+    POSITION_X = 10,
+    POSITION_Y = 11,
+
+    SIZE_FIXED_X = 20,
+    SIZE_FIXED_Y = 21,
+    SIZE_SCALED_X = 22,
+    SIZE_SCALED_Y = 23,
+    SIZE_IS_FIXED_X = 24,
+    SIZE_IS_FIXED_Y = 25,
+
+    ACTUAL_SIZE_X = 30,
+    ACTUAL_SIZE_Y = 31,
+
+    ID = 40, 
+    PARENT_ID = 41,
+    IS_HIDDEN = 42,
+
+};
+
 class GuiInstance : public DefaultInstance
 {
     private:
@@ -20,4 +42,18 @@ class GuiInstance : public DefaultInstance
     void Init();
     void Render();
 
+    GuiComponentStuff::BaseComponent* GetComponentFromId(uint64_t id);
+    GuiComponentStuff::BaseComponent* GetChildFromComponentWithId(uint64_t id, int index);
+
+    bool DeleteComponentWithId(int64_t id, bool destroyChildren);
+    bool CreateComponentWithId(int64_t id, GuiComponentStuff::ComponentType type);
+    bool CreateComponentWithIdAndParent(int64_t id, GuiComponentStuff::ComponentType type, int64_t parentId);
+    
+    bool SetBaseComponentAttribute(int64_t id, GuiInstanceBaseAttributeType type, uint64_t val);
+    bool SetSpecificComponentAttribute(int64_t id, int32_t type, uint64_t val);
+
+    uint64_t GetBaseComponentAttribute(int64_t id, GuiInstanceBaseAttributeType type);
+    uint64_t GetSpecificComponentAttribute(int64_t id, int32_t type);
+
+    bool SetActiveScreenFromId(int64_t id);
 };

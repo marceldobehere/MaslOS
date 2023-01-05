@@ -8,6 +8,19 @@
 
 namespace GuiComponentStuff
 {
+    enum class GuiInstanceTextFieldComponentAttributeType : int32_t
+    {
+        TEXT_COLOR = 10,
+        BACKGROUND_COLOR = 11,
+
+        MOUSE_HOVER = 21,
+        MOUSE_CLICK = 22,
+
+        BOX_COMPONENT_ID = 30,
+        RECT_COMPONENT_ID = 31,
+        TEXT_COMPONENT_ID = 32,
+    };
+
     class TextFieldComponent : public BaseComponent
     {
         public:
@@ -17,7 +30,6 @@ namespace GuiComponentStuff
         
         uint32_t textCol;
         uint32_t bgCol;
-
 
         bool mouseHover = false;
         bool mouseClick = false;

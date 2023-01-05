@@ -20,9 +20,10 @@ namespace GuiComponentStuff
     class BaseComponent
     {
         protected:
-        BaseComponent* parent;
+        
 
         public:
+        BaseComponent* parent;
         ComponentSize size = ComponentSize();
         Position position;
         ComponentSize oldSize = ComponentSize();
@@ -31,7 +32,7 @@ namespace GuiComponentStuff
         ComponentType componentType;
         ComponentRenderer* renderer;
         bool hidden = false;
-        bool newLine = false;
+        int64_t id = 0;
 
 
 
@@ -44,12 +45,16 @@ namespace GuiComponentStuff
         void* GetWindow();
         void* GetScreen();
         bool IsVisible();
+        BaseComponent* GetComponentFromId(uint64_t id);
 
         void MouseClicked(MouseClickEventInfo info);
         void KeyHit(KeyHitEventInfo info);
 
         void Render(Field field);
         void Destroy(bool destroyChildren);
+
+        bool SetAttribute(int32_t type, uint64_t val);
+        uint64_t GetAttribute(int32_t type);
 
     };
 

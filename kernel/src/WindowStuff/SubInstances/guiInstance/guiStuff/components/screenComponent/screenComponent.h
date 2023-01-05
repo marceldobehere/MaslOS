@@ -5,6 +5,13 @@
 
 namespace GuiComponentStuff
 {
+    enum class GuiInstanceScreenComponentAttributeType : int32_t
+    {
+        WINDOW_ID = 10,
+        BACKGROUND_COLOR = 11,
+        SELECTED_COMPONENT_ID = 12
+    };
+
     class ScreenComponent : public BaseComponent
     {
         private:

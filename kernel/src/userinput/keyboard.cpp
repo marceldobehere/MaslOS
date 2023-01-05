@@ -56,7 +56,7 @@ void HandleKeyboard(uint8_t scancode)
         rshift = true; 
     else if (scancode == RightShift + 0x80)
         rshift = false;
-        
+
     if (scancode & 0x80)
     {
         KeyboardScancodeState[scancode & ~0x80] = false;
@@ -64,7 +64,7 @@ void HandleKeyboard(uint8_t scancode)
     }
     else
     {
-        if (KeyboardScancodeState[scancode])
+        if (KeyboardScancodeState[scancode] && scancode != Backspace)
         {
             return;
         }

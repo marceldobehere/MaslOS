@@ -5,6 +5,11 @@
 
 namespace GuiComponentStuff
 {
+    enum class GuiInstanceRectComponentAttributeType : int32_t
+    {
+        FILL_COLOR = 10
+    };
+
     class RectangleComponent : public BaseComponent
     {
         public:

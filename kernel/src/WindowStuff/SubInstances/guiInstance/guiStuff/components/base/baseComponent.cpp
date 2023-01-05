@@ -133,6 +133,40 @@ namespace GuiComponentStuff
             return !hidden && parent->IsVisible();
     }
 
+    BaseComponent* BaseComponent::GetComponentFromId(uint64_t id)
+    {
+        if (this->id == id)
+            return this;
+
+        if (componentType == ComponentType::SCREEN)
+        {
+            BaseComponent* found = NULL;
+            ScreenComponent* screen = (ScreenComponent*)this;
+            for (int i = 0; found == NULL && i < screen->children->getCount(); i++)
+                found = screen->children->elementAt(i)->GetComponentFromId(id);
+                
+            return found;
+        }
+
+        if (componentType == ComponentType::BOX)
+        {
+            BaseComponent* found = NULL;
+            BoxComponent* box = (BoxComponent*)this;
+            for (int i = 0; found == NULL && i < box->children->getCount(); i++)
+                found = box->children->elementAt(i)->GetComponentFromId(id);
+                
+            return found;
+        }
+
+        if (componentType == ComponentType::BUTTON)
+            return ((ButtonComponent*)this)->actualButtonStuff->GetComponentFromId(id);
+
+        if (componentType == ComponentType::TEXTFIELD)
+            return ((TextFieldComponent*)this)->actualButtonStuff->GetComponentFromId(id);
+
+        return NULL;
+    }
+
     void* BaseComponent::GetScreen()
     {
         if (componentType == ComponentType::SCREEN)
@@ -141,6 +175,17 @@ namespace GuiComponentStuff
             return NULL;
         else
             return parent->GetScreen();
+    }
+
+
+    bool BaseComponent::SetAttribute(int32_t type, uint64_t val)
+    {
+        return false;
+    }
+
+    uint64_t BaseComponent::GetAttribute(int32_t type)
+    {
+        return 0;
     }
 
 }
