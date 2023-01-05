@@ -9,14 +9,28 @@
 void PrepareACPI(BootInfo* bootInfo)
 {
     AddToStack();
+
+    AddToStack();
     osData.debugTerminalWindow->Log("Preparing ACPI...");
     osData.debugTerminalWindow->Log("RSDP Addr: {}", ConvertHexToString((uint64_t)bootInfo->rsdp));
+    //bootInfo->rsdp->XSDTAddress
     ACPI::SDTHeader* xsdt = (ACPI::SDTHeader*)(bootInfo->rsdp->XSDTAddress);
+
+    if ((uint64_t)xsdt > 0xFFFFFFFF)
+    {
+        xsdt = (ACPI::SDTHeader*)(((uint64_t)xsdt) >> 32);
+    }
+
     osData.debugTerminalWindow->Log("XSDT Header Addr: {}", ConvertHexToString((uint64_t)xsdt));
     //osData.debugTerminalWindow->Log("Length: {}", to_string((uint64_t)xsdt->Length));
+    RemoveFromStack();
+
+    AddToStack();
     int entries = (xsdt->Length - sizeof(ACPI::SDTHeader)) / 8;
     osData.debugTerminalWindow->Log("Entry count: {}", to_string(entries));
+    RemoveFromStack();
 
+    AddToStack();
     osData.debugTerminalWindow->renderer->Print("> ");
     for (int t = 0; t < entries; t++)
     {
@@ -28,16 +42,21 @@ void PrepareACPI(BootInfo* bootInfo)
         osData.debugTerminalWindow->renderer->Print(" ");
     }
     osData.debugTerminalWindow->renderer->Println();
+    RemoveFromStack();
 
-
+    AddToStack();
     ACPI::MCFGHeader* mcfg = (ACPI::MCFGHeader*)ACPI::FindTable(xsdt, (char*)"MCFG");
 
     osData.debugTerminalWindow->Log("MCFG Header Addr: {}", ConvertHexToString((uint64_t)mcfg));
+    RemoveFromStack();
 
+    AddToStack();
     PCI::EnumeratePCI(mcfg);
+    RemoveFromStack();
 
+    AddToStack();
     osData.debugTerminalWindow->Log("Drive Count: {}", to_string(osData.diskInterfaces.getCount()), Colors.yellow);
-    
+    RemoveFromStack();    
 
     RemoveFromStack();
 }
