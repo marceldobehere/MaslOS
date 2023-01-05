@@ -37,6 +37,11 @@ void PrepareACPI(BootInfo* bootInfo)
         rootThing = (ACPI::SDTHeader*)(bootInfo->rsdp->XSDTAddress);
         osData.debugTerminalWindow->Log("XSDT Header Addr: {}", ConvertHexToString((uint64_t)rootThing));
         div = 8;
+
+        if (rootThing == NULL)
+        {
+            Panic("XSDT Header is at NULL!", true);
+        }
     }
 
     RemoveFromStack();
@@ -53,7 +58,10 @@ void PrepareACPI(BootInfo* bootInfo)
     osData.debugTerminalWindow->renderer->Print("> ");
     for (int t = 0; t < entries; t++)
     {
-        ACPI::SDTHeader* newSDTHeader = (ACPI::SDTHeader*)*(uint64_t*)((uint64_t)rootThing + sizeof(ACPI::SDTHeader) + (t * div));
+        uint64_t bleh1 = *(uint64_t*)((uint64_t)rootThing + sizeof(ACPI::SDTHeader) + (t * div));
+        if (div == 4)
+            bleh1 &= 0x00000000FFFFFFFF;
+        ACPI::SDTHeader* newSDTHeader = (ACPI::SDTHeader*)bleh1;
         
         for (int i = 0; i < 4; i++)
             osData.debugTerminalWindow->renderer->Print(newSDTHeader->Signature[i]);
