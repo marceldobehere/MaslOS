@@ -15,47 +15,29 @@ void PrepareACPI(BootInfo* bootInfo)
     osData.debugTerminalWindow->Log("RSDP Addr: {}", ConvertHexToString((uint64_t)bootInfo->rsdp));
     RemoveFromStack();
 
-    AddToStack();
-    osData.debugTerminalWindow->Log("Checking ACPI Version...");
-    bool check = true;
-    // {
-    //     //check = ACPI::CheckSumHeader(bootInfo->rsdp, bootInfo->rsdp->firstPart.Checksum, sizeof(ACPI::RSDP1));
-    //     //check1 = ACPI::CheckSumHeader(bootInfo->rsdp, bootInfo->rsdp->ExtendedChecksum, sizeof(ACPI::RSDP2));
+    AddToStack();   
+    ACPI::SDTHeader* rootThing = NULL;
 
-    // }
-
-    // if (!check)
-    // {
-    //     Panic("RSDP IS INVALID!", true);
-    // }
-    
     if (bootInfo->rsdp->firstPart.Revision == 0)
     {
-        osData.debugTerminalWindow->Log("ACPI Version: 1 (!!!)");
-
-
-
-        Panic("ACPI TOO OLD", true);
-        return;
+        osData.debugTerminalWindow->Log("ACPI Version: 1");
+        rootThing = (ACPI::SDTHeader*)(uint64_t)(bootInfo->rsdp->firstPart.RSDTAddress);
+        osData.debugTerminalWindow->Log("RSDT Header Addr: {}", ConvertHexToString((uint64_t)rootThing));
     }
-    osData.debugTerminalWindow->Log("ACPI Version: 2");
+    else
+    {
+        osData.debugTerminalWindow->Log("ACPI Version: 2");
+        rootThing = (ACPI::SDTHeader*)(bootInfo->rsdp->XSDTAddress);
+        osData.debugTerminalWindow->Log("XSDT Header Addr: {}", ConvertHexToString((uint64_t)rootThing));
+    }
 
     RemoveFromStack();
 
 
 
+    
     AddToStack();
-    //bootInfo->rsdp->XSDTAddress
-    ACPI::SDTHeader* xsdt = (ACPI::SDTHeader*)(bootInfo->rsdp->XSDTAddress);
-
-
-
-    osData.debugTerminalWindow->Log("XSDT Header Addr: {}", ConvertHexToString((uint64_t)xsdt));
-    //osData.debugTerminalWindow->Log("Length: {}", to_string((uint64_t)xsdt->Length));
-    RemoveFromStack();
-
-    AddToStack();
-    int entries = (xsdt->Length - sizeof(ACPI::SDTHeader)) / 8;
+    int entries = (rootThing->Length - sizeof(ACPI::SDTHeader)) / 8;
     osData.debugTerminalWindow->Log("Entry count: {}", to_string(entries));
     RemoveFromStack();
 
@@ -63,7 +45,7 @@ void PrepareACPI(BootInfo* bootInfo)
     osData.debugTerminalWindow->renderer->Print("> ");
     for (int t = 0; t < entries; t++)
     {
-        ACPI::SDTHeader* newSDTHeader = (ACPI::SDTHeader*)*(uint64_t*)((uint64_t)xsdt + sizeof(ACPI::SDTHeader) + (t * 8));
+        ACPI::SDTHeader* newSDTHeader = (ACPI::SDTHeader*)*(uint64_t*)((uint64_t)rootThing + sizeof(ACPI::SDTHeader) + (t * 8));
         
         for (int i = 0; i < 4; i++)
             osData.debugTerminalWindow->renderer->Print(newSDTHeader->Signature[i]);
@@ -74,7 +56,7 @@ void PrepareACPI(BootInfo* bootInfo)
     RemoveFromStack();
 
     AddToStack();
-    ACPI::MCFGHeader* mcfg = (ACPI::MCFGHeader*)ACPI::FindTable(xsdt, (char*)"MCFG");
+    ACPI::MCFGHeader* mcfg = (ACPI::MCFGHeader*)ACPI::FindTable(rootThing, (char*)"MCFG");
 
     osData.debugTerminalWindow->Log("MCFG Header Addr: {}", ConvertHexToString((uint64_t)mcfg));
     RemoveFromStack();
@@ -86,6 +68,7 @@ void PrepareACPI(BootInfo* bootInfo)
     AddToStack();
     osData.debugTerminalWindow->Log("Drive Count: {}", to_string(osData.diskInterfaces.getCount()), Colors.yellow);
     RemoveFromStack();    
+    
 
     RemoveFromStack();
 }
@@ -230,7 +213,7 @@ void PrepareWindows(Framebuffer* img)
         DebugTerminalInstance* dterminal = (DebugTerminalInstance*)malloc(sizeof(DebugTerminalInstance), "Debug Terminal Instance");
         *dterminal = DebugTerminalInstance(debugTerminalWindow);
         
-        *(debugTerminalWindow) = Window(dterminal, Size(500, GlobalRenderer->framebuffer->Height - 100), Position(600, 20), "Debug Terminal", true, true, true);
+        *(debugTerminalWindow) = Window(dterminal, Size(500, GlobalRenderer->framebuffer->Height - 50), Position(600, 20), "Debug Terminal", true, true, true);
         //osData.windows.add(debugTerminalWindow);
 
         osData.debugTerminalWindow = debugTerminalWindow;
