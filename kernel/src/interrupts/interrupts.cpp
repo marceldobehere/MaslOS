@@ -8,21 +8,21 @@
 #include "../kernelStuff/other_IO/pit/pit.h"
 #include "../OSDATA/MStack/MStackM.h"
 
-__attribute__((interrupt)) void PageFault_handler(struct interrupt_frame* frame)
+__attribute__((interrupt)) void PageFault_handler(struct interrupt_frame* frame, uint64_t error)
 {
     AddToStack();
     Panic("Page Fault Detected!");
     RemoveFromStack();
 }
 
-__attribute__((interrupt)) void DoubleFault_handler(interrupt_frame* frame)
+__attribute__((interrupt)) void DoubleFault_handler(interrupt_frame* frame, uint64_t error)
 {
     AddToStack();
     Panic("Double Fault Detected!");
     RemoveFromStack();
 }
 
-__attribute__((interrupt)) void GPFault_handler(interrupt_frame* frame)
+__attribute__((interrupt)) void GPFault_handler(interrupt_frame* frame, uint64_t error)
 {
     AddToStack();
     Panic("General Protection Fault Detected!", true);
@@ -37,10 +37,10 @@ __attribute__((interrupt)) void GenFault_handler(interrupt_frame* frame)
     RemoveFromStack();
 }
 
-__attribute__((interrupt)) void WeirdFault_handler(interrupt_frame* frame)
+__attribute__((interrupt)) void GenFaultWithError_handler(interrupt_frame* frame, uint64_t error)
 {
     AddToStack();
-    Panic("Weird Fault Detected!", true);
+    Panic("General Fault Detected!", true);
     RemoveFromStack();
 }
 
@@ -112,7 +112,7 @@ __attribute__((interrupt)) void VirtualizationFault_handler(interrupt_frame* fra
     RemoveFromStack();
 }
 
-__attribute__((interrupt)) void ControlProtectionFault_handler(interrupt_frame* frame)
+__attribute__((interrupt)) void ControlProtectionFault_handler(interrupt_frame* frame, uint64_t error)
 {
     AddToStack();
     Panic("Control Protection Fault Detected!", true);
@@ -126,10 +126,10 @@ __attribute__((interrupt)) void HypervisorFault_handler(interrupt_frame* frame)
     RemoveFromStack();
 }
 
-__attribute__((interrupt)) void VMMCommunicationFault_handler(interrupt_frame* frame)
+__attribute__((interrupt)) void VMMCommunicationFault_handler(interrupt_frame* frame, uint64_t error)
 {
     AddToStack();
-    Panic("VMM Communication Fault Detected!");
+    Panic("VMM Communication Fault Detected!", true);
     RemoveFromStack();
 }
 

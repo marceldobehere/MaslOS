@@ -16,23 +16,23 @@
 
 
 struct interrupt_frame;
-__attribute__((interrupt)) void PageFault_handler(interrupt_frame* frame);
-__attribute__((interrupt)) void DoubleFault_handler(interrupt_frame* frame);
-__attribute__((interrupt)) void GPFault_handler(interrupt_frame* frame);
+__attribute__((interrupt)) void PageFault_handler(interrupt_frame* frame, uint64_t error);
+__attribute__((interrupt)) void DoubleFault_handler(interrupt_frame* frame, uint64_t error);
+__attribute__((interrupt)) void GPFault_handler(interrupt_frame* frame, uint64_t error);
 __attribute__((interrupt)) void KeyboardInt_handler(interrupt_frame* frame);
 __attribute__((interrupt)) void MouseInt_handler(interrupt_frame* frame);
 __attribute__((interrupt)) void PITInt_handler(interrupt_frame* frame);
 __attribute__((interrupt)) void GenFault_handler(interrupt_frame* frame);
-__attribute__((interrupt)) void WeirdFault_handler(interrupt_frame* frame);
+__attribute__((interrupt)) void GenFaultWithError_handler(interrupt_frame* frame, uint64_t error);
 __attribute__((interrupt)) void GenFloatFault_handler(interrupt_frame* frame);
 __attribute__((interrupt)) void GenMathFault_handler(interrupt_frame* frame);
 __attribute__((interrupt)) void Debug_handler(interrupt_frame* frame);
 __attribute__((interrupt)) void Breakpoint_handler(interrupt_frame* frame);
  
 __attribute__((interrupt)) void VirtualizationFault_handler(interrupt_frame* frame);
-__attribute__((interrupt)) void ControlProtectionFault_handler(interrupt_frame* frame);
+__attribute__((interrupt)) void ControlProtectionFault_handler(interrupt_frame* frame, uint64_t error);
 __attribute__((interrupt)) void HypervisorFault_handler(interrupt_frame* frame);
-__attribute__((interrupt)) void VMMCommunicationFault_handler(interrupt_frame* frame);
+__attribute__((interrupt)) void VMMCommunicationFault_handler(interrupt_frame* frame, uint64_t error);
 
 
 void RemapPIC(uint8_t _a1, uint8_t _a2);
