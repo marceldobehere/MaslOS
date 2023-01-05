@@ -303,15 +303,36 @@ Framebuffer* InitializeGOP()
 	for (UINTN i = 0; i < numModes; i++)
 	{
 		status = uefi_call_wrapper(gop->QueryMode, 4, gop, i, &SizeOfInfo, &info);
-		Print(L"mode %03d width %d height %d format %x %s.\n\r",
-			i,
-			info->HorizontalResolution,
-			info->VerticalResolution,
-			info->PixelFormat,
-			i == nativeMode ? "(current)" : ""			
-		);
-		if (info->HorizontalResolution == 1280 && info->VerticalResolution == 720)
+		if (i == nativeMode)
+		{
+			Print(L"mode %03d width %d height %d format %d (native resolution).\n\r",
+				i,
+				info->HorizontalResolution,
+				info->VerticalResolution,
+				info->PixelsPerScanLine	
+			);
+		}
+		else if ((info->HorizontalResolution == 1280 && info->VerticalResolution == 720))
+		// || (info->HorizontalResolution == 1920 && info->VerticalResolution == 1080))
+		{
 			MODE = i;
+			Print(L"mode %03d width %d height %d format %d (ideal format!).\n\r",
+				i,
+				info->HorizontalResolution,
+				info->VerticalResolution,
+				info->PixelsPerScanLine	
+			);
+		}
+		else
+		{
+			Print(L"mode %03d width %d height %d format %d.\n\r",
+				i,
+				info->HorizontalResolution,
+				info->VerticalResolution,
+				info->PixelsPerScanLine		
+			);
+		}
+		
 	}
 
 
@@ -328,16 +349,23 @@ Framebuffer* InitializeGOP()
 
 
 
-	status = uefi_call_wrapper(gop->SetMode, 2, gop, MODE);
-
-	if (EFI_ERROR(status))
+	if (MODE != nativeMode)
 	{
-		Print(L"Unable to set mode %03d\n\r", 0);
-		return NULL;
+		status = uefi_call_wrapper(gop->SetMode, 2, gop, MODE);
+
+		if (EFI_ERROR(status))
+		{
+			Print(L"Unable to set mode %03d\n\r", 0);
+			return NULL;
+		}
+		else
+		{
+			Print(L"GOP set to correct mode.\n\r");
+		}
 	}
 	else
 	{
-		Print(L"GOP set to correct mode.\n\r");
+		Print(L"GOP still at native mode.\n\r");
 	}
 
 	framebuffer.BaseAddress = (void*)gop->Mode->FrameBufferBase;
