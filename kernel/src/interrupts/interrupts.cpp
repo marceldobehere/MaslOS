@@ -129,7 +129,7 @@ __attribute__((interrupt)) void HypervisorFault_handler(interrupt_frame* frame)
 __attribute__((interrupt)) void VMMCommunicationFault_handler(interrupt_frame* frame)
 {
     AddToStack();
-    Panic("VMM Communication Fault Detected!", true);
+    Panic("VMM Communication Fault Detected!");
     RemoveFromStack();
 }
 
