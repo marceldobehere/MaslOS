@@ -152,7 +152,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         GlobalRenderer->Println();
 
         osData.crashCount++;
-        if (osData.crashCount == 1)
+        if (osData.crashCount <= 2)
         {
             osData.debugTerminalWindow->position.x = GlobalRenderer->framebuffer->Width - (osData.debugTerminalWindow->size.width + 2);
             osData.debugTerminalWindow->position.y = 23;
@@ -169,7 +169,8 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         GlobalRenderer->Println();
         PrintRegisterDump(GlobalRenderer);
 
-            while(true);
+            while(true)
+                asm("hlt");
         }
         
         PrintMStackTrace(MStackData::stackArr, MStackData::stackPointer);
@@ -178,7 +179,8 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         PrintRegisterDump(GlobalRenderer);
         
         if (lock)
-            while(true);
+            while(true)
+                asm("hlt");
     }
     
     if (!lock)
