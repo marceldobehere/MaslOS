@@ -169,8 +169,8 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         GlobalRenderer->Println();
         PrintRegisterDump(GlobalRenderer);
 
-            while(true)
-                asm("hlt");
+            // while(true)
+            //     asm("hlt");
         }
         
         PrintMStackTrace(MStackData::stackArr, MStackData::stackPointer);
@@ -178,9 +178,9 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         GlobalRenderer->Println();
         PrintRegisterDump(GlobalRenderer);
         
-        if (lock)
-            while(true)
-                asm("hlt");
+        //if (lock)
+        while(true)
+            asm("hlt");
     }
     
     if (!lock)
