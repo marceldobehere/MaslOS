@@ -44,12 +44,6 @@ __attribute__((interrupt)) void WeirdFault_handler(interrupt_frame* frame)
     RemoveFromStack();
 }
 
-__attribute__((interrupt)) void VirtualFault_handler(interrupt_frame* frame)
-{
-    AddToStack();
-    Panic("Virtual Fault Detected!", true);
-    RemoveFromStack();
-}
 
 __attribute__((interrupt)) void GenFloatFault_handler(interrupt_frame* frame)
 {
@@ -110,6 +104,48 @@ __attribute__((interrupt)) void PITInt_handler(interrupt_frame* frame)
     PIC_EndMaster();
     RemoveFromStack();
 }
+
+__attribute__((interrupt)) void VirtualizationFault_handler(interrupt_frame* frame)
+{
+    AddToStack();
+    Panic("Virtualization Fault Detected!", true);
+    RemoveFromStack();
+}
+
+__attribute__((interrupt)) void ControlProtectionFault_handler(interrupt_frame* frame)
+{
+    AddToStack();
+    Panic("Control Protection Fault Detected!", true);
+    RemoveFromStack();
+}
+
+__attribute__((interrupt)) void HypervisorFault_handler(interrupt_frame* frame)
+{
+    AddToStack();
+    Panic("Hypervisor Fault Detected!", true);
+    RemoveFromStack();
+}
+
+__attribute__((interrupt)) void VMMCommunicationFault_handler(interrupt_frame* frame)
+{
+    AddToStack();
+    Panic("VMM Communication Fault Detected!", true);
+    RemoveFromStack();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void TestSetSpeakerPosition(bool in)
 {

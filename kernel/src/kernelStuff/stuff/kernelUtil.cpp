@@ -170,10 +170,10 @@ void PrepareInterrupts()
     SetIDTGate((void*)WeirdFault_handler, 0xC, IDT_TA_InterruptGate, 0x08); // Stack segment fault
     SetIDTGate((void*)GenFault_handler, 0x11, IDT_TA_InterruptGate, 0x08); //  Alligment check
     SetIDTGate((void*)GenFault_handler, 0x12, IDT_TA_InterruptGate, 0x08); // machine check
-    SetIDTGate((void*)VirtualFault_handler, 0x14, IDT_TA_InterruptGate, 0x08); // Virtualization Exception
-    SetIDTGate((void*)VirtualFault_handler, 0x15, IDT_TA_InterruptGate, 0x08); // Control Protection Exception
-    SetIDTGate((void*)VirtualFault_handler, 0x1C, IDT_TA_InterruptGate, 0x08); // Hypervisor Inhection Exception
-    SetIDTGate((void*)VirtualFault_handler, 0xD, IDT_TA_InterruptGate, 0x08); // VMM Communication Exception
+    SetIDTGate((void*)VirtualizationFault_handler, 0x14, IDT_TA_InterruptGate, 0x08); // Virtualization Exception
+    SetIDTGate((void*)ControlProtectionFault_handler, 0x15, IDT_TA_InterruptGate, 0x08); // Control Protection Exception
+    SetIDTGate((void*)HypervisorFault_handler, 0x1C, IDT_TA_InterruptGate, 0x08); // Hypervisor Inhection Exception
+    SetIDTGate((void*)VMMCommunicationFault_handler, 0xD, IDT_TA_InterruptGate, 0x08); // VMM Communication Exception
     
     io_wait();    
     __asm__ volatile ("lidt %0" : : "m" (idtr));
