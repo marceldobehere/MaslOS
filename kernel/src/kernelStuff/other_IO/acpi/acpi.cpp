@@ -37,6 +37,13 @@ namespace ACPI
         return NULL;
     }
 
-
+    bool CheckSumHeader(void* start, uint8_t extra, uint32_t len)
+    {
+        uint8_t val = extra;
+        uint8_t* bruh = (uint8_t*)start;
+        for (uint32_t i = 0; i < len; i++)
+            val += bruh[i];
+        return val == 0;
+    }
 
 }

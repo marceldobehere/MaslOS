@@ -13,13 +13,42 @@ void PrepareACPI(BootInfo* bootInfo)
     AddToStack();
     osData.debugTerminalWindow->Log("Preparing ACPI...");
     osData.debugTerminalWindow->Log("RSDP Addr: {}", ConvertHexToString((uint64_t)bootInfo->rsdp));
+    RemoveFromStack();
+
+    AddToStack();
+    osData.debugTerminalWindow->Log("Checking ACPI Version...");
+    bool check = true;
+    // {
+    //     //check = ACPI::CheckSumHeader(bootInfo->rsdp, bootInfo->rsdp->firstPart.Checksum, sizeof(ACPI::RSDP1));
+    //     //check1 = ACPI::CheckSumHeader(bootInfo->rsdp, bootInfo->rsdp->ExtendedChecksum, sizeof(ACPI::RSDP2));
+
+    // }
+
+    // if (!check)
+    // {
+    //     Panic("RSDP IS INVALID!", true);
+    // }
+    
+    if (bootInfo->rsdp->firstPart.Revision == 0)
+    {
+        osData.debugTerminalWindow->Log("ACPI Version: 1 (!!!)");
+
+
+
+        Panic("ACPI TOO OLD", true);
+        return;
+    }
+    osData.debugTerminalWindow->Log("ACPI Version: 2");
+
+    RemoveFromStack();
+
+
+
+    AddToStack();
     //bootInfo->rsdp->XSDTAddress
     ACPI::SDTHeader* xsdt = (ACPI::SDTHeader*)(bootInfo->rsdp->XSDTAddress);
 
-    if ((uint64_t)xsdt > 0xFFFFFFFF)
-    {
-        xsdt = (ACPI::SDTHeader*)(((uint64_t)xsdt) >> 32);
-    }
+
 
     osData.debugTerminalWindow->Log("XSDT Header Addr: {}", ConvertHexToString((uint64_t)xsdt));
     //osData.debugTerminalWindow->Log("Length: {}", to_string((uint64_t)xsdt->Length));

@@ -24,6 +24,7 @@ namespace ACPI
     } __attribute__((packed));
 
 
+
     struct SDTHeader
     {
         unsigned char Signature[4];
@@ -54,5 +55,6 @@ namespace ACPI
 
 
     void* FindTable(SDTHeader* sdtHeader, char* signature);
+    bool CheckSumHeader(void* start, uint8_t extra, uint32_t len);
 
 }  
