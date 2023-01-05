@@ -305,7 +305,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     
     Taskbar::InitTaskbar(bootInfo->MButton, bootInfo->MButtonS);
 
-    bootInfo->rsdp = (ACPI::RSDP2*)((uint64_t)bootInfo->rsdp + 20); //idk why but this is very important unless ya want the whole os to crash on boot
+    //bootInfo->rsdp = (ACPI::RSDP2*)((uint64_t)bootInfo->rsdp + 20); //idk why but this is very important unless ya want the whole os to crash on boot
 
     PrepareACPI(bootInfo);
 
