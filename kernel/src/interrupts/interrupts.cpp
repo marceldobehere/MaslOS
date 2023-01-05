@@ -83,7 +83,7 @@ __attribute__((interrupt)) void KeyboardInt_handler(interrupt_frame* frame)
     else
         HandleKeyboard(scancode);  
     PIC_EndMaster();
-    //RemoveFromStack();
+    RemoveFromStack();
 }
 
 __attribute__((interrupt)) void MouseInt_handler(interrupt_frame* frame)
