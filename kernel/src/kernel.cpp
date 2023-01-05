@@ -357,6 +357,7 @@ extern "C" void _start(BootInfo* bootInfo)
 
     for (int i = 0; i < 8; i++)
         debugTerminalWindow->Log("<STAT>");
+    debugTerminalWindow->renderer->CursorPosition.y = 16 * 16;
 
     ((TerminalInstance*)mainWindow->instance)->Cls();
     ((TerminalInstance*)mainWindow->instance)->KeyboardPrintStart();
