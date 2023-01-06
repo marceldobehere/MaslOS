@@ -300,36 +300,35 @@ Framebuffer* InitializeGOP()
 		numModes = gop->Mode->MaxMode;
 	}
 	UINTN MODE = nativeMode;
-	for (UINTN i = 0; i < numModes; i++)
+	
+	for (UINTN a = 0; a < numModes; a++)
 	{
+		UINTN i = numModes - 1 - a;
 		status = uefi_call_wrapper(gop->QueryMode, 4, gop, i, &SizeOfInfo, &info);
 		if (i == nativeMode)
 		{
-			Print(L"mode %03d width %d height %d format %d (native resolution).\n\r",
+			Print(L"mode %03d width %d height %d (native resolution).\n\r",
 				i,
 				info->HorizontalResolution,
-				info->VerticalResolution,
-				info->PixelsPerScanLine	
+				info->VerticalResolution
 			);
 		}
-		else if ((info->HorizontalResolution == 1280 && info->VerticalResolution == 720))
-		// || (info->HorizontalResolution == 1920 && info->VerticalResolution == 1080))
+		else if ((info->HorizontalResolution == 1280 && info->VerticalResolution == 720)
+		|| (info->HorizontalResolution == 1280 && info->VerticalResolution == 1024))
 		{
 			MODE = i;
-			Print(L"mode %03d width %d height %d format %d (ideal format!).\n\r",
+			Print(L"mode %03d width %d height %d (ideal format!).\n\r",
 				i,
 				info->HorizontalResolution,
-				info->VerticalResolution,
-				info->PixelsPerScanLine	
+				info->VerticalResolution
 			);
 		}
 		else
 		{
-			Print(L"mode %03d width %d height %d format %d.\n\r",
+			Print(L"mode %03d width %d height %d.\n\r",
 				i,
 				info->HorizontalResolution,
-				info->VerticalResolution,
-				info->PixelsPerScanLine		
+				info->VerticalResolution	
 			);
 		}
 		

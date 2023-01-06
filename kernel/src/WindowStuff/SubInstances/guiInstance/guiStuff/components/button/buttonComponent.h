@@ -56,5 +56,8 @@ namespace GuiComponentStuff
         void Render(Field field);
         void Destroy(bool destroyChildren);
         ComponentSize GetActualComponentSize();
+
+        bool SetAttribute(int32_t type, uint64_t val);
+        uint64_t GetAttribute(int32_t type);
     };
 }

@@ -45,5 +45,8 @@ namespace GuiComponentStuff
         ComponentSize GetActualComponentSize();
 
         void KeyHandler(GuiComponentStuff::KeyHitEventInfo info);
+
+        bool SetAttribute(int32_t type, uint64_t val);
+        uint64_t GetAttribute(int32_t type);
     };
 }
