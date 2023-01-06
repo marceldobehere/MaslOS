@@ -90,6 +90,7 @@ __attribute__((interrupt)) void MouseInt_handler(interrupt_frame* frame)
 { 
     AddToStack();
     uint8_t mousedata = inb(0x60);
+    
 
     HandlePS2Mouse(mousedata);
 

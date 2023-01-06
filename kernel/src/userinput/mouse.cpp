@@ -670,31 +670,66 @@ void ProcessMousePacket(MousePacket packet)
 
     if (!xNegative)
     {
-        IMousePosition.x += packet.data[1];
-        if (xOverflow)
-            IMousePosition.x += 255;
+        if (packet.data[1] < 200 || xOverflow)
+        {
+            IMousePosition.x += packet.data[1];
+            if (xOverflow)
+                IMousePosition.x += 255;
+        }
+        else
+        {
+            mouseCycleSkip = 1;
+            return;
+        }
     }
     else
     {
         packet.data[1] = 256 - packet.data[1];
-        IMousePosition.x -= packet.data[1];
-        if (xOverflow)
-            IMousePosition.x -= 255;
+        
+        if (packet.data[1] < 200 || xOverflow)
+        {
+            IMousePosition.x -= packet.data[1];
+            if (xOverflow)
+                IMousePosition.x -= 255;   
+        }
+        else
+        {
+            mouseCycleSkip = 1;
+            return;
+        }
+        
     }
 
     if (yNegative)
     {
         packet.data[2] = 256 - packet.data[2];
-        IMousePosition.y += packet.data[2];
-        if (yOverflow)
-            IMousePosition.y += 255;
+
+        if (packet.data[2] < 200 || yOverflow)
+        {
+            IMousePosition.y += packet.data[2];
+            if (yOverflow)
+                IMousePosition.y += 255;
+        }
+        else
+        {
+            mouseCycleSkip = 1;
+            return;
+        }
     }
     else
     {
         //MousePacket[2] = 256 - MousePacket[2];
-        IMousePosition.y -= packet.data[2];
-        if (yOverflow)
-            IMousePosition.y -= 255;
+        if (packet.data[2] < 200 || yOverflow)
+        {
+            IMousePosition.y -= packet.data[2];
+            if (yOverflow)
+                IMousePosition.y -= 255;
+        }
+        else
+        {
+            mouseCycleSkip = 1;
+            return;
+        }
     }
 
     //GlobalRenderer->overwrite = true;

@@ -68,6 +68,12 @@ void TestKeyHandler(GuiComponentStuff::BaseComponent* btn, GuiComponentStuff::Ke
     // RemoveFromStack();
 }
 
+void IO_CHECK()
+{
+    if (inb(0x64) & 0b1)
+        inb(0x60);
+}
+
 
 extern "C" void _start(BootInfo* bootInfo)
 {  
@@ -777,6 +783,8 @@ extern "C" void _start(BootInfo* bootInfo)
         //         asm("hlt");
         //     osStats.totalIdleTime = PIT::TimeSinceBootMicroS() - tS;
         // }
+
+        IO_CHECK();
 
         osStats.frameEndTime = PIT::TimeSinceBootMicroS();
         osStats.totalFrameTime = osStats.frameEndTime - osStats.frameStartTime;
