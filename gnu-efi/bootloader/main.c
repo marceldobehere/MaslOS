@@ -338,7 +338,7 @@ Framebuffer* InitializeGOP()
 
 	if (EFI_ERROR(status))
 	{
-		Print(L"Unable to locate GOP!!!\n\r");
+		Print(L"Unable to locate GOP!\n\r");
 		return NULL;
 	}
 	else
@@ -350,7 +350,7 @@ Framebuffer* InitializeGOP()
 
 	if (MODE != nativeMode)
 	{
-		status = uefi_call_wrapper(gop->SetMode, 2, gop, MODE);
+		status = uefi_call_wrapper(gop->SetMode, 1, gop, MODE);
 
 		if (EFI_ERROR(status))
 		{
