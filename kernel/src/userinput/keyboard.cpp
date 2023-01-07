@@ -45,6 +45,11 @@ void InitKeyboard()
     // io_wait();
 }
 
+uint8_t TranslateScancode2(uint8_t scan)
+{
+    return QWERTYKeyboard::Scancode2ToScancode1[scan];
+}
+
 int scrollSpeed = 8;
 
 bool KeyboardScancodeState[256];

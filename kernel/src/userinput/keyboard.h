@@ -16,4 +16,6 @@ void InitKeyboard();
 
 void HandleKeyboard(uint8_t scancode);
 
+uint8_t TranslateScancode2(uint8_t scan);
+
 extern bool KeyboardScancodeState[256];
