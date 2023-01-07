@@ -80,7 +80,8 @@ void IO_CHECK()
         return;
     port64Val = t;
 
-    if (port64Val == 0x1D)
+    uint64_t now = PIT::TimeSinceBootMS();
+    if (port64Val == 0x1D && (now - osStats.lastKeyboardCall > 4000))
     {
         port64Val = inb(0x60);
         keyboardWeird = true;
@@ -107,9 +108,10 @@ void IO_CHECK()
         //PIC_EndMaster();
         //PIC_EndSlave();
     }
-    else if ((port64Val & 0b1 == 1))
+    else if ((port64Val & 0b1 == 1) && (now - osStats.lastMouseCall > 2000))
     {
-        inb(0x60);
+        uint8_t b = inb(0x60);
+        //HandlePS2Mouse(b);
     }
 }
 

@@ -7,6 +7,7 @@
 #include "../kernelStuff/IO/IO.h"
 #include "../kernelStuff/other_IO/pit/pit.h"
 #include "../OSDATA/MStack/MStackM.h"
+#include "../OSDATA/osStats.h"
 
 __attribute__((interrupt)) void PageFault_handler(interrupt_frame* frame)//, uint64_t error)
 {
@@ -76,6 +77,7 @@ __attribute__((interrupt)) void Breakpoint_handler(interrupt_frame* frame)
 __attribute__((interrupt)) void KeyboardInt_handler(interrupt_frame* frame)
 { 
     AddToStack();
+    osStats.lastKeyboardCall = PIT::TimeSinceBootMS();
     uint8_t scancode = inb(0x60);
     //GlobalRenderer->Println("Pressed: {}", to_string((uint64_t)scancode));
     if (osData.booting)
@@ -89,6 +91,7 @@ __attribute__((interrupt)) void KeyboardInt_handler(interrupt_frame* frame)
 __attribute__((interrupt)) void MouseInt_handler(interrupt_frame* frame)
 { 
     AddToStack();
+    osStats.lastMouseCall = PIT::TimeSinceBootMS();
     uint8_t mousedata = inb(0x60);
     
 

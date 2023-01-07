@@ -16,6 +16,8 @@ struct OSStats
     int32_t totalIdleTime = 1;
 
     uint8_t testThing = 0;
+    uint64_t lastKeyboardCall = 0;
+    uint64_t lastMouseCall = 0;
 };
 
 

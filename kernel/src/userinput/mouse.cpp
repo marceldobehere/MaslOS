@@ -406,7 +406,10 @@ void HandlePS2Mouse(uint8_t data)
         case 0:
         {
             if (data & 0b00001000 == 0)
+            {
+                mouseCycleSkip = (PIT::TimeSinceBootMS() / 10) % 4;
                 break;
+            }
 
             mousePacketArr[0] = data;
             MouseCycle++;
@@ -670,11 +673,15 @@ void ProcessMousePacket(MousePacket packet)
 
     if (!xNegative)
     {
-        if (packet.data[1] < 200 || xOverflow)
+        if (true)//(packet.data[1] < 200 || xOverflow)
         {
             IMousePosition.x += packet.data[1];
             if (xOverflow)
-                IMousePosition.x += 255;
+            {
+                mouseCycleSkip = (PIT::TicksSinceBoot / 1000) % 4;
+                return;
+            }
+                ;//IMousePosition.x += 255;
         }
         else
         {
@@ -686,11 +693,15 @@ void ProcessMousePacket(MousePacket packet)
     {
         packet.data[1] = 256 - packet.data[1];
         
-        if (packet.data[1] < 200 || xOverflow)
+        if (true)//(packet.data[1] < 200 || xOverflow)
         {
             IMousePosition.x -= packet.data[1];
             if (xOverflow)
-                IMousePosition.x -= 255;   
+            {
+                mouseCycleSkip = (PIT::TicksSinceBoot / 1000) % 4;
+                return;
+            }
+                ;//IMousePosition.x -= 255;   
         }
         else
         {
@@ -704,11 +715,15 @@ void ProcessMousePacket(MousePacket packet)
     {
         packet.data[2] = 256 - packet.data[2];
 
-        if (packet.data[2] < 200 || yOverflow)
+        if (true)//(packet.data[2] < 200 || yOverflow)
         {
             IMousePosition.y += packet.data[2];
             if (yOverflow)
-                IMousePosition.y += 255;
+            {
+                mouseCycleSkip = (PIT::TicksSinceBoot / 1000) % 4;
+                return;
+            }
+                ;//IMousePosition.y += 255;
         }
         else
         {
@@ -719,11 +734,15 @@ void ProcessMousePacket(MousePacket packet)
     else
     {
         //MousePacket[2] = 256 - MousePacket[2];
-        if (packet.data[2] < 200 || yOverflow)
+        if (true)//(packet.data[2] < 200 || yOverflow)
         {
             IMousePosition.y -= packet.data[2];
             if (yOverflow)
-                IMousePosition.y -= 255;
+            {
+                mouseCycleSkip = (PIT::TicksSinceBoot / 1000) % 4;
+                return;
+            }
+                ;//IMousePosition.y -= 255;
         }
         else
         {
