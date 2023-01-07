@@ -68,10 +68,41 @@ void TestKeyHandler(GuiComponentStuff::BaseComponent* btn, GuiComponentStuff::Ke
     // RemoveFromStack();
 }
 
+uint8_t port64Val = 0;
+
 void IO_CHECK()
 {
-    if (inb(0x64) & 0b1)
+    uint8_t t = inb(0x64);
+    if (t == 0x1C)
+        return;
+    port64Val = t;
+
+    if (port64Val == 0x1D)
+    {
+        port64Val = inb(0x60);
+        
+
+        HandleKeyboard(port64Val);
+        //HandleKeyboard(port64Val & (~0b10000000));
+
+        //HandleKeyboard(port64Val | (0b10000000));
+
+        // io_wait();
+        // outb(0x60, 0xF0);
+        // io_wait();
+        // outb(0x60, 0x01);
+        // io_wait();
+        // inb(0x60);
+        // io_wait();
+        //outb(0x60, 0x1C);
+        //io_wait();
+        //PIC_EndMaster();
+        //PIC_EndSlave();
+    }
+    else if ((port64Val & 0b1 == 1))
+    {
         inb(0x60);
+    }
 }
 
 
@@ -804,6 +835,7 @@ extern "C" void _start(BootInfo* bootInfo)
         // }
 
         IO_CHECK();
+        osStats.testThing = port64Val;
 
         osStats.frameEndTime = PIT::TimeSinceBootMicroS();
         osStats.totalFrameTime = osStats.frameEndTime - osStats.frameStartTime;

@@ -1,5 +1,6 @@
 #include "windowManager.h"
 #include "../../OSDATA/osdata.h" 
+#include "../../OSDATA/osStats.h" 
 #include "../../Rendering/VirtualRenderer.h"
 //#include "../../userinput/mouse.h"
 
@@ -807,7 +808,7 @@ if (window != NULL)
 
         //osData.debugTerminalWindow->Log("             : ################", Colors.black);
         osData.debugTerminalWindow->renderer->CursorPosition.x = 0;
-        osData.debugTerminalWindow->renderer->CursorPosition.y -= 128;
+        osData.debugTerminalWindow->renderer->CursorPosition.y -= 128 + 16;
 
         osData.debugTerminalWindow->renderer->Clear(
             osData.debugTerminalWindow->renderer->CursorPosition.x,
@@ -873,6 +874,14 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
         osData.debugTerminalWindow->Log("Stack Trace Count: {}", to_string(MStackData::stackPointer+1), Colors.yellow);
+
+        osData.debugTerminalWindow->renderer->Clear(
+            osData.debugTerminalWindow->renderer->CursorPosition.x,
+            osData.debugTerminalWindow->renderer->CursorPosition.y,
+            osData.debugTerminalWindow->renderer->CursorPosition.x + 240,
+            osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
+            Colors.black);
+        osData.debugTerminalWindow->Log("Test Val: {}", ConvertHexToString(osStats.testThing), Colors.yellow);
 
      
         if(++testCounterX >= testInterlace)

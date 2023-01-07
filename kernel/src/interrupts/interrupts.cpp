@@ -217,6 +217,12 @@ void RemapPIC(uint8_t _a1, uint8_t _a2)
     outb(PIC2_DATA, _a2);  
     io_wait();
 
+    io_wait();
+    outb(PIC1_DATA, _a1);
+    io_wait();
+    outb(PIC2_DATA, _a2);  
+    io_wait();
+
     RemoveFromStack();
 }
 

@@ -39,7 +39,10 @@ void HandleEnter()
 
 void InitKeyboard()
 {
-
+    // outb(0x60, 0xF0);
+    // io_wait();
+    // outb(0x60, 0x01);
+    // io_wait();
 }
 
 int scrollSpeed = 8;
