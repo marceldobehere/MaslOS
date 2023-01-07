@@ -74,7 +74,7 @@ namespace GuiComponentStuff
 
         actualButtonStuff->position = position;
         actualButtonStuff->size = tSize;
-        rectComp->size = size;
+        rectComp->size = tSize;
 
         ComponentSize textSize = textComp->GetActualComponentSize();
 
@@ -134,6 +134,98 @@ namespace GuiComponentStuff
             temp.FixedY = size.ScaledY * parent->GetActualComponentSize().FixedY;
 
         return temp;
+    }
+
+
+    bool ButtonComponent::SetAttribute(int32_t type, uint64_t val)
+    {
+        if (type == 10)
+        {
+            textColDef = *((uint32_t*)&val);
+            return true;
+        }
+        if (type == 11)
+        {
+            textColHover = *((uint32_t*)&val);
+            return true;
+        }
+        if (type == 12)
+        {
+            textColClick = *((uint32_t*)&val);
+            return true;
+        }
+
+        if (type == 20)
+        {
+            bgColDef = *((uint32_t*)&val);
+            return true;
+        }
+        if (type == 21)
+        {
+            bgColHover = *((uint32_t*)&val);
+            return true;
+        }
+        if (type == 22)
+        {
+            bgColClick = *((uint32_t*)&val);
+            return true;
+        }
+
+        if (type == 30)
+        {
+            stickToDefaultColor= *((bool*)&val);
+            return true;
+        }
+        if (type == 31)
+        {
+            mouseHover= *((bool*)&val);
+            return true;
+        }
+        if (type == 32)
+        {
+            mouseClick= *((bool*)&val);
+            return true;
+        }
+
+        return false;
+    }
+
+    uint64_t ButtonComponent::GetAttribute(int32_t type)
+    {
+        uint8_t temp[8];
+        for (int i = 0; i < 8; i++)
+            temp[i] = 0;
+
+        if (type == 10)
+            *((uint32_t*)temp) = textColDef;
+        else if (type == 11)
+            *((uint32_t*)temp) = textColHover;
+        else if (type == 12)
+            *((uint32_t*)temp) = textColClick;
+
+
+        else if (type == 20)
+            *((uint32_t*)temp) = bgColDef;
+        else if (type == 21)
+            *((uint32_t*)temp) = bgColHover;
+        else if (type == 22)
+            *((uint32_t*)temp) = bgColClick;
+
+        else if (type == 30)
+            *((bool*)temp) = stickToDefaultColor;
+        else if (type == 31)
+            *((bool*)temp) = mouseHover;
+        else if (type == 32)
+            *((bool*)temp) = mouseClick;
+
+        else if (type == 40)
+            *((int64_t*)temp) = actualButtonStuff->id;
+        else if (type == 41)
+            *((int64_t*)temp) = rectComp->id;
+        else if (type == 42)
+            *((int64_t*)temp) = textComp->id;
+
+        return *((uint64_t*)temp);
     }
 
 }

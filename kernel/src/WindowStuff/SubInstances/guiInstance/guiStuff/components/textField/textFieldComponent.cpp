@@ -75,7 +75,7 @@ namespace GuiComponentStuff
 
         actualButtonStuff->position = position;
         actualButtonStuff->size = tSize;
-        rectComp->size = size;
+        rectComp->size = tSize;
 
         
             textComp->fgColor = textCol;
@@ -151,5 +151,60 @@ namespace GuiComponentStuff
 
 
         RemoveFromStack();
+    }
+
+
+    bool TextFieldComponent::SetAttribute(int32_t type, uint64_t val)
+    {
+        if (type == 10)
+        {
+            textCol = *((uint32_t*)&val);
+            return true;
+        }
+        if (type == 11)
+        {
+            bgCol = *((uint32_t*)&val);
+            return true;
+        }
+
+        if (type == 21)
+        {
+            mouseHover= *((bool*)&val);
+            return true;
+        }
+        if (type == 22)
+        {
+            mouseClick= *((bool*)&val);
+            return true;
+        }
+
+        return false;
+    }
+
+    uint64_t TextFieldComponent::GetAttribute(int32_t type)
+    {
+        uint8_t temp[8];
+        for (int i = 0; i < 8; i++)
+            temp[i] = 0;
+
+        if (type == 10)
+            *((uint32_t*)temp) = textCol;
+        else if (type == 11)
+            *((uint32_t*)temp) = bgCol;
+
+
+        else if (type == 20)
+            *((bool*)temp) = mouseHover;
+        else if (type == 21)
+            *((bool*)temp) = mouseClick;
+
+        else if (type == 30)
+            *((int64_t*)temp) = actualButtonStuff->id;
+        else if (type == 31)
+            *((int64_t*)temp) = rectComp->id;
+        else if (type == 32)
+            *((int64_t*)temp) = textComp->id;
+
+        return *((uint64_t*)temp);
     }
 }

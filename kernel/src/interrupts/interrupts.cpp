@@ -224,6 +224,7 @@ void PIC_EndMaster()
 {
     AddToStack();
     outb(PIC1_COMMAND, PIC_EOI);
+    io_wait();
     RemoveFromStack();
 }
 
@@ -232,7 +233,9 @@ void PIC_EndSlave()
 {
     AddToStack();
     outb(PIC2_COMMAND, PIC_EOI);
+    io_wait();
     outb(PIC1_COMMAND, PIC_EOI);
+    io_wait();
     RemoveFromStack();
 }
 

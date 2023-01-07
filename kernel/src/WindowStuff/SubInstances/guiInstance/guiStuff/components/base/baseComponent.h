@@ -28,11 +28,11 @@ namespace GuiComponentStuff
         Position position;
         ComponentSize oldSize = ComponentSize();
         Position oldPosition;
-        const char* ID;
+        //const char* ID;
         ComponentType componentType;
         ComponentRenderer* renderer;
         bool hidden = false;
-        int64_t id = 0;
+        int64_t id = 10;
 
 
 

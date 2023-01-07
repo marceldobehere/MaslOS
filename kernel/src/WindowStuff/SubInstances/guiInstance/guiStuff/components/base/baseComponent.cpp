@@ -180,11 +180,37 @@ namespace GuiComponentStuff
 
     bool BaseComponent::SetAttribute(int32_t type, uint64_t val)
     {
+        if (componentType == RECT)
+            return ((RectangleComponent*)this)->SetAttribute(type, val);
+        if (componentType == SCREEN)
+            return ((ScreenComponent*)this)->SetAttribute(type, val);
+        if (componentType == BOX)
+            return ((BoxComponent*)this)->SetAttribute(type, val);
+        if (componentType == TEXT)
+            return ((TextComponent*)this)->SetAttribute(type, val);
+        if (componentType == BUTTON)
+            return ((ButtonComponent*)this)->SetAttribute(type, val);
+        if (componentType == TEXTFIELD)
+            return ((TextFieldComponent*)this)->SetAttribute(type, val);
+
         return false;
     }
 
     uint64_t BaseComponent::GetAttribute(int32_t type)
     {
+        if (componentType == RECT)
+            return ((RectangleComponent*)this)->GetAttribute(type);
+        if (componentType == SCREEN)
+            return ((ScreenComponent*)this)->GetAttribute(type);
+        if (componentType == BOX)
+            return ((BoxComponent*)this)->GetAttribute(type);
+        if (componentType == TEXT)
+            return ((TextComponent*)this)->GetAttribute(type);
+        if (componentType == BUTTON)
+            return ((ButtonComponent*)this)->GetAttribute(type);
+        if (componentType == TEXTFIELD)
+            return ((TextFieldComponent*)this)->GetAttribute(type);
+
         return 0;
     }
 

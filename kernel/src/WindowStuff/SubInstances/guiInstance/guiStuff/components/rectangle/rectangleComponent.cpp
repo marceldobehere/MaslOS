@@ -70,4 +70,27 @@ namespace GuiComponentStuff
         return temp;
     }
 
+    bool RectangleComponent::SetAttribute(int32_t type, uint64_t val)
+    {
+        if (type == 10)
+        {
+            fillColor = *((uint32_t*)&val);
+            return true;
+        }
+
+        return false;
+    }
+
+    uint64_t RectangleComponent::GetAttribute(int32_t type)
+    {
+        uint8_t temp[8];
+        for (int i = 0; i < 8; i++)
+            temp[i] = 0;
+
+        if (type == 10)
+            *((uint32_t*)temp) = fillColor;
+
+        return *((uint64_t*)temp);
+    }
+
 }

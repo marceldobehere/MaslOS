@@ -79,4 +79,38 @@ namespace GuiComponentStuff
         children->free();
     }
     
+
+
+    bool ScreenComponent::SetAttribute(int32_t type, uint64_t val)
+    {
+        if (type == 11)
+        {
+            backgroundColor = *((uint32_t*)&val);
+            return true;
+        }
+
+
+        return false;
+    }
+
+    uint64_t ScreenComponent::GetAttribute(int32_t type)
+    {
+        uint8_t temp[8];
+        for (int i = 0; i < 8; i++)
+            temp[i] = 0;
+
+        if (type == 10)
+            *((int64_t*)temp) = id;
+        else if (type == 11)
+            *((uint32_t*)temp) = backgroundColor;
+        else if (type == 12)
+        {
+            if (selectedComponent != NULL)
+                *((int64_t*)temp) = 0;
+            else
+                *((int64_t*)temp) = selectedComponent->id;
+        }
+
+        return *((uint64_t*)temp);
+    }
 }

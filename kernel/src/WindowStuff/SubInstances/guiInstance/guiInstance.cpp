@@ -24,6 +24,8 @@ void GuiInstance::Init()
 
 void GuiInstance::Render()
 {
+    if (screen == NULL)
+        return;
     //window->renderer->Clear(Colors.orange);
     screen->Render(GuiComponentStuff::Field(GuiComponentStuff::Position(), GuiComponentStuff::Position(window->size.width, window->size.height)));
     long t = window->size.height * (long)window->size.width;

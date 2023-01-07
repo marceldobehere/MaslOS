@@ -137,4 +137,60 @@ namespace GuiComponentStuff
         return ComponentSize(maxX, sY + 16);
     }
 
+
+    bool TextComponent::SetAttribute(int32_t type, uint64_t val)
+    {
+        if (type == 10)
+        {
+            fgColor = *((uint32_t*)&val);
+            return true;
+        }
+        if (type == 11)
+        {
+            bgColor = *((uint32_t*)&val);
+            return true;
+        }
+
+        if (type == 20)
+        {
+            text = (const char*)*((uint64_t*)&val);
+            return true;
+        }
+
+        if (type == 30)
+        {
+            center = *((bool*)&val);
+            return true;
+        }
+        if (type == 31)
+        {
+            useFixedSize = *((bool*)&val);
+            return true;
+        }
+
+        return false;
+    }
+
+    uint64_t TextComponent::GetAttribute(int32_t type)
+    {
+        uint8_t temp[8];
+        for (int i = 0; i < 8; i++)
+            temp[i] = 0;
+
+        if (type == 10)
+            *((uint32_t*)temp) = fgColor;
+        else if (type == 11)
+            *((uint32_t*)temp) = bgColor;
+
+        else if (type == 20)
+            *((uint64_t*)temp) = (uint64_t)text;
+
+        else if (type == 30)
+            *((bool*)temp) = center;
+        else if (type == 31)
+            *((bool*)temp) = useFixedSize;
+
+        return *((uint64_t*)temp);
+    }
+
 }

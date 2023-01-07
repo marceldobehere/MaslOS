@@ -325,6 +325,7 @@ extern "C" void _start(BootInfo* bootInfo)
             btn->mouseClickedCallBack = TestClickHandler;
             btn->keyHitCallBack = TestKeyHandler;
             //btn->stickToDefaultColor = true;
+            btn->id = 995544;
             
             testGui->screen->children->add(btn);
         }
@@ -334,7 +335,7 @@ extern "C" void _start(BootInfo* bootInfo)
             Colors.white,
             Colors.black,
             GuiComponentStuff::ComponentSize(150, 80),
-            GuiComponentStuff::Position(160, 260), testGui->screen
+            GuiComponentStuff::Position(100, 260), testGui->screen
             );
             //btn->mouseClickedCallBack = TestClickHandler;
             //btn->keyHitCallBack = TestKeyHandler;
@@ -350,6 +351,24 @@ extern "C" void _start(BootInfo* bootInfo)
             uint64_t bleh = 0;
             *((int*)&bleh) = 1;
             testGui->SetBaseComponentAttribute(993344, GuiInstanceBaseAttributeType::POSITION_Y, bleh);
+        }
+
+        {
+            uint64_t bleh = 0;
+            *((uint32_t*)&bleh) = Colors.red;
+            testGui->SetSpecificComponentAttribute(995544, 10, bleh);
+        }
+
+        {
+            uint64_t bleh = 0;
+            *((double*)&bleh) = 0.3;
+            testGui->SetBaseComponentAttribute(995544, GuiInstanceBaseAttributeType::SIZE_SCALED_Y, bleh);
+        }
+
+        {
+            uint64_t bleh = 0;
+            *((bool*)&bleh) = false;
+            testGui->SetBaseComponentAttribute(995544, GuiInstanceBaseAttributeType::SIZE_IS_FIXED_Y, bleh);
         }
     }
     RemoveFromStack();
