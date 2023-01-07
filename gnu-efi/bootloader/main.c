@@ -313,8 +313,8 @@ Framebuffer* InitializeGOP()
 				info->VerticalResolution
 			);
 		}
-		else if ((info->HorizontalResolution == 1280 && info->VerticalResolution == 720)
-		|| (info->HorizontalResolution == 1280 && info->VerticalResolution == 1024))
+		else if ((info->HorizontalResolution == 1280 && info->VerticalResolution == 720))
+		//|| (info->HorizontalResolution == 1280 && info->VerticalResolution == 1024))
 		{
 			MODE = i;
 			Print(L"mode %03d width %d height %d (ideal format!).\n\r",
@@ -350,7 +350,7 @@ Framebuffer* InitializeGOP()
 
 	if (MODE != nativeMode)
 	{
-		status = uefi_call_wrapper(gop->SetMode, 1, gop, MODE);
+		status = uefi_call_wrapper(gop->SetMode, 2, gop, MODE);
 
 		if (EFI_ERROR(status))
 		{
