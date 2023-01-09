@@ -30,7 +30,10 @@ class NewTerminalInstance : public DefaultInstance
     NewTerminalInstance();
     
     void WriteText(const char* text);
+    bool RenderCalled;
     void Render();
+    void Reload();
+    void DoRender();
     void RenderCharChanges();
     void Clear();
     void Free();

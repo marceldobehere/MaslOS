@@ -8,8 +8,10 @@
 #include "../OSDATA/userdata.h"
 #include "../OSDATA/osdata.h"
 #include "../tasks/enterHandler/taskEnterHandler.h"
+#include "../tasks/taskMgrTask/taskMgrTask.h"
 #include "../WindowStuff/SubInstances/connect4Instance/connect4Instance.h"
 #include "../tasks/maab/maabTask.h"
+#include "../WindowStuff/SubInstances/guiInstance/guiInstance.h"
 
 
 bool lshift = false;
@@ -37,14 +39,58 @@ void HandleEnter()
 
 void InitKeyboard()
 {
+    // outb(0x60, 0xF0);
+    // io_wait();
+    // outb(0x60, 0x01);
+    // io_wait();
+}
 
+uint8_t TranslateScancode2(uint8_t scan)
+{
+    return QWERTYKeyboard::Scancode2ToScancode1[scan];
 }
 
 int scrollSpeed = 8;
 
+bool KeyboardScancodeState[256];
+
 void HandleKeyboard(uint8_t scancode)
 {
+    if (scancode == LeftShift)
+        lshift = true; 
+    else if (scancode == LeftShift + 0x80)
+        lshift = false;
+    else if (scancode == RightShift)
+        rshift = true; 
+    else if (scancode == RightShift + 0x80)
+        rshift = false;
+
+    if (scancode & 0x80)
+    {
+        KeyboardScancodeState[scancode & ~0x80] = false;
+        return;
+    }
+    else
+    {
+        if (KeyboardScancodeState[scancode] && scancode != Backspace)
+        {
+            return;
+        }
+        else
+            KeyboardScancodeState[scancode] = true;
+    }
+
+
     AddToStack();
+    if (activeWindow != NULL &&
+        activeWindow->instance != NULL &&
+        activeWindow->instance->instanceType == InstanceType::GUI &&
+        ((GuiInstance*)activeWindow->instance)->screen != NULL)
+    {
+        ((GuiInstance*)activeWindow->instance)->screen->KeyHit(GuiComponentStuff::KeyHitEventInfo(scancode, QWERTYKeyboard::Translate(scancode, lshift || rshift)));
+        return;
+    }
+
     if (scancode == ARR_LEFT)
     {  
         if (lshift)
@@ -143,15 +189,7 @@ void HandleKeyboard(uint8_t scancode)
     }
 
 
-    if (scancode == LeftShift)
-        lshift = true; 
-    else if (scancode == LeftShift + 0x80)
-        lshift = false;
-    else if (scancode == RightShift)
-        rshift = true; 
-    else if (scancode == RightShift + 0x80)
-        rshift = false;
-    else if (scancode == Enter)
+    if (scancode == Enter)
     {
         if (activeWindow->instance->instanceType == InstanceType::Terminal)
         {
@@ -286,6 +324,7 @@ void HandleKeyboard(uint8_t scancode)
 
                 //NewTerminalInstance* inst = NULL;
                 TaskMAAB* maab = NULL;
+                TaskTaskManager* taskMgr = NULL;
                 for (int i = 0; i < instance->tasks.getCount(); i++)
                 {
                     if (instance->tasks[i]->GetType() == TaskType::MAAB)
@@ -293,26 +332,13 @@ void HandleKeyboard(uint8_t scancode)
                         maab = (TaskMAAB*)instance->tasks[i];
                         break;
                     }
-                }
-                if (maab == NULL)
-                {
-                    if ((activeWindow->allowKeyboardDrawing && !instance->GetBusy()))
+                    if (instance->tasks[i]->GetType() == TaskType::TASK_MGR)
                     {
-                        if (instance->mode == commandMode::none)
-                            ((NewTerminalInstance*)instance->newTermInstance)->Print(ascii);
-                        else if (instance->mode == commandMode::enterText)
-                            ((NewTerminalInstance*)instance->newTermInstance)->Print(ascii);
-                        else if (instance->mode == commandMode::enterPassword)
-                            ((NewTerminalInstance*)instance->newTermInstance)->Print("*");
-                    }
-
-                    if ((instance->userlen < 255 && !instance->GetBusy()) || instance->takeInput)
-                    {
-                        instance->terminalInput[instance->userlen] = ascii;
-                        instance->userlen++;
+                        taskMgr = (TaskTaskManager*)instance->tasks[i];
+                        break;
                     }
                 }
-                else
+                if (maab != NULL)
                 {
                     if (maab->waitInput && !maab->gotInput)
                     {
@@ -333,6 +359,29 @@ void HandleKeyboard(uint8_t scancode)
                             maab->memUserInput[maab->memUserInputLen++] = ascii;
                             ((NewTerminalInstance*)instance->newTermInstance)->Print(ascii);
                         }
+                    }
+                }
+                else if (taskMgr != NULL)
+                {
+                    if (ascii == 'Q' || ascii == 'q')
+                        taskMgr->exit = true;
+                }
+                else
+                {
+                    if ((activeWindow->allowKeyboardDrawing && !instance->GetBusy()))
+                    {
+                        if (instance->mode == commandMode::none)
+                            ((NewTerminalInstance*)instance->newTermInstance)->Print(ascii);
+                        else if (instance->mode == commandMode::enterText)
+                            ((NewTerminalInstance*)instance->newTermInstance)->Print(ascii);
+                        else if (instance->mode == commandMode::enterPassword)
+                            ((NewTerminalInstance*)instance->newTermInstance)->Print("*");
+                    }
+
+                    if ((instance->userlen < 255 && !instance->GetBusy()) || instance->takeInput)
+                    {
+                        instance->terminalInput[instance->userlen] = ascii;
+                        instance->userlen++;
                     }
                 }
             }

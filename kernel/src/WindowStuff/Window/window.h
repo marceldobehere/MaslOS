@@ -85,6 +85,9 @@ class Window
     uint32_t defaultTitleColor;
     uint32_t selectedTitleColor;
     uint32_t defaultTitleBackgroundColor;
+    int64_t windowId = 1;
+    // uint32_t tempTime;
+    // uint32_t cpuUsagePercent;
     bool showTitleBar, showBorder, moveable, hidden;
     bool oldHidden;
     
@@ -103,6 +106,8 @@ class Window
 
     void Log(const char* message, uint32_t col);
     void Log(const char* message, const char* var, uint32_t col);
+
+    Position GetMousePosRelativeToWindow();
 
     WindowActionEnum GetCurrentAction();
 };

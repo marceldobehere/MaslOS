@@ -1,5 +1,6 @@
 #include "windowManager.h"
 #include "../../OSDATA/osdata.h" 
+#include "../../OSDATA/osStats.h" 
 #include "../../Rendering/VirtualRenderer.h"
 //#include "../../userinput/mouse.h"
 
@@ -675,7 +676,7 @@ if (window != NULL)
         //    RenderWindow(osData.windows[i]);
     } 
 
-    uint8_t testInterlace = 4;
+    uint8_t testInterlace = 2;
     uint8_t testCounterX = 0;
     uint8_t testCounterY = 0;
 
@@ -874,6 +875,7 @@ if (window != NULL)
             Colors.black);
         osData.debugTerminalWindow->Log("Stack Trace Count: {}", to_string(MStackData::stackPointer+1), Colors.yellow);
 
+
      
         if(++testCounterX >= testInterlace)
         {
@@ -907,6 +909,23 @@ if (window != NULL)
                                                      x2,   y1-1);
         osData.windowPointerThing->UpdatePointerRect(x1-1, y2, 
                                                      x2,   y2);
+
+        osData.windowPointerThing->UpdatePointerRect(x1,   y1-22, 
+                                                    x2,   y1-1);
+
+
+
+        // osData.windowPointerThing->UpdatePointerRect(x1-1, y1-22, 
+        //                                              x1-1, y2);
+        // osData.windowPointerThing->UpdatePointerRect(x2,   y1-22, 
+        //                                              x2,   y2);
+
+        // osData.windowPointerThing->UpdatePointerRect(x1-1, y1-22, 
+        //                                              x2,   y1-22);
+        // osData.windowPointerThing->UpdatePointerRect(x1-1, y1-1, 
+        //                                              x2,   y1-1);
+        // osData.windowPointerThing->UpdatePointerRect(x1-1, y2, 
+        //                                              x2,   y2);
     }
 }
 

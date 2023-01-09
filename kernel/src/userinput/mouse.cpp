@@ -5,6 +5,8 @@
 #include "../OSDATA/osdata.h"
 #include "../Rendering/VirtualRenderer.h"
 #include "../tasks/closeWindow/taskWindowClose.h"
+#include "../WindowStuff/SubInstances/guiInstance/guiStuff/components/screenComponent/screenComponent.h"
+#include "../WindowStuff/SubInstances/guiInstance/guiInstance.h"
 
 #define PS2XSign        0b00010000
 #define PS2YSign        0b00100000
@@ -19,6 +21,7 @@
 #define MouseRight  1 
 #define MouseMiddle 2
 
+bool MouseClickState[3] = {false, false, false};
 
 kernelFiles::ZIPFile* mouseZIP;
 kernelFiles::ImageFile* currentMouseImage;
@@ -292,7 +295,7 @@ void DrawMousePointer2(PointerFramebuffer* framebuffer, MPoint mousePos)
 
 void Mousewait()
 {
-    uint64_t timeout = 100000;
+    uint64_t timeout = 1000000;
     while (timeout--)
         if ((inb(0x64) & 0b10) == 0)
             return;
@@ -301,7 +304,7 @@ void Mousewait()
 
 void MousewaitInput()
 {
-    uint64_t timeout = 100000;
+    uint64_t timeout = 1000000;
     while (timeout--)
         if (inb(0x64) & 0b1)
             return;
@@ -322,7 +325,8 @@ uint8_t MouseRead()
     return inb(0x60);
 }
 
-int mouseCycleSkip = 2;
+int mouseCycleSkip = 0;
+uint8_t MouseCycle = 0;
 
 MPoint diff = MPoint();
 bool startDrag = false;
@@ -333,9 +337,13 @@ void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName)
     mouseZIP = _mouseZIP;
     oldMouseImageName = "";
     currentMouseImageName = _mouseName;
-    mouseCycleSkip = 2;
+    
     for (int i = 0; i < 4; i++)
         dragArr[i] = false;
+
+    mouseCycleSkip = 0;
+    MouseCycle = 0;
+
     outb(0x64, 0xA8);
     Mousewait();
 
@@ -372,13 +380,15 @@ void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName)
 
     MouseWrite(0xF6);
     MouseRead();
+    //Mousewait();
 
 
     MouseWrite(0xF4);
     MouseRead();
+    //Mousewait();
 }
 
-uint8_t MouseCycle = 0;
+
 uint8_t mousePacketArr[4];
 
 
@@ -396,7 +406,10 @@ void HandlePS2Mouse(uint8_t data)
         case 0:
         {
             if (data & 0b00001000 == 0)
+            {
+                mouseCycleSkip = (PIT::TimeSinceBootMS() / 10) % 4;
                 break;
+            }
 
             mousePacketArr[0] = data;
             MouseCycle++;
@@ -430,13 +443,13 @@ void HandleClick(bool L, bool R, bool M)
 {
     AddToStack();
     //activeWindow->renderer->Println("Click");
-    if (L)
+    if (L || R || M)
     {
         Window* oldActive = activeWindow;
         Window* window = WindowManager::getWindowAtMousePosition();
 
         WindowActionEnum action = WindowActionEnum::_NONE;
-        if (WindowManager::currentActionWindow != NULL)
+        if (L && WindowManager::currentActionWindow != NULL)
         {
             if (WindowManager::currentActionWindow == window)
             {
@@ -477,9 +490,13 @@ void HandleClick(bool L, bool R, bool M)
         else
         {
             
-            Window* oldActive = activeWindow;
-            activeWindow = window;
-            dragWindow = window;
+            oldActive = activeWindow;
+            //if (L)
+            {
+                activeWindow = window;
+                
+                dragWindow = window;
+            }
             startDrag = false;
             if (window != NULL)
             {
@@ -493,6 +510,23 @@ void HandleClick(bool L, bool R, bool M)
                 diff.x = MousePosition.x;
                 diff.y = MousePosition.y;
                 window->moveToFront = true;
+
+
+                if (!activeDragOn && MousePosition.y > window->position.y + 20)
+                {
+                    dragWindow = NULL;
+                    if (window->instance->instanceType == InstanceType::GUI)
+                    {
+                        GuiInstance* gui = (GuiInstance*)window->instance;
+                        // if (gui->screen != NULL && gui->screen->selectedComponent != NULL)
+                        if (gui->screen != NULL)
+                        {
+                            Position p = window->GetMousePosRelativeToWindow();
+                            
+                            gui->screen->MouseClicked(GuiComponentStuff::MouseClickEventInfo(GuiComponentStuff::Position(p.x, p.y), L, R, M));
+                        }
+                    }
+                }
                 //osData.windowPointerThing->UpdateWindowBorder(osData.windows[osData.windows.getCount() - 1]);
             }
             else
@@ -501,7 +535,7 @@ void HandleClick(bool L, bool R, bool M)
                 //osData.windowPointerThing->UpdateWindowBorder(osData.windows[osData.windows.getCount() - 1]);
 
 
-                if (Taskbar::activeTabWindow != NULL) // Taskbar Button Clicked
+                if (L && Taskbar::activeTabWindow != NULL) // Taskbar Button Clicked
                 {
                     activeWindow = Taskbar::activeTabWindow;
                     Taskbar::activeTabWindow->moveToFront = true;
@@ -581,7 +615,7 @@ void HandleHold(bool L, bool R, bool M)
 
 void ProcessMousePackets()
 {
-    ProcessMousePackets(5);
+    ProcessMousePackets(20);
 }
 
 void ProcessMousePackets(int limit)
@@ -639,31 +673,82 @@ void ProcessMousePacket(MousePacket packet)
 
     if (!xNegative)
     {
-        IMousePosition.x += packet.data[1];
-        if (xOverflow)
-            IMousePosition.x += 255;
+        if (true)//(packet.data[1] < 200 || xOverflow)
+        {
+            IMousePosition.x += packet.data[1];
+            if (xOverflow)
+            {
+                mouseCycleSkip = (PIT::TicksSinceBoot / 1000) % 4;
+                return;
+            }
+                ;//IMousePosition.x += 255;
+        }
+        else
+        {
+            mouseCycleSkip = 1;
+            return;
+        }
     }
     else
     {
         packet.data[1] = 256 - packet.data[1];
-        IMousePosition.x -= packet.data[1];
-        if (xOverflow)
-            IMousePosition.x -= 255;
+        
+        if (true)//(packet.data[1] < 200 || xOverflow)
+        {
+            IMousePosition.x -= packet.data[1];
+            if (xOverflow)
+            {
+                mouseCycleSkip = (PIT::TicksSinceBoot / 1000) % 4;
+                return;
+            }
+                ;//IMousePosition.x -= 255;   
+        }
+        else
+        {
+            mouseCycleSkip = 1;
+            return;
+        }
+        
     }
 
     if (yNegative)
     {
         packet.data[2] = 256 - packet.data[2];
-        IMousePosition.y += packet.data[2];
-        if (yOverflow)
-            IMousePosition.y += 255;
+
+        if (true)//(packet.data[2] < 200 || yOverflow)
+        {
+            IMousePosition.y += packet.data[2];
+            if (yOverflow)
+            {
+                mouseCycleSkip = (PIT::TicksSinceBoot / 1000) % 4;
+                return;
+            }
+                ;//IMousePosition.y += 255;
+        }
+        else
+        {
+            mouseCycleSkip = 1;
+            return;
+        }
     }
     else
     {
         //MousePacket[2] = 256 - MousePacket[2];
-        IMousePosition.y -= packet.data[2];
-        if (yOverflow)
-            IMousePosition.y -= 255;
+        if (true)//(packet.data[2] < 200 || yOverflow)
+        {
+            IMousePosition.y -= packet.data[2];
+            if (yOverflow)
+            {
+                mouseCycleSkip = (PIT::TicksSinceBoot / 1000) % 4;
+                return;
+            }
+                ;//IMousePosition.y -= 255;
+        }
+        else
+        {
+            mouseCycleSkip = 1;
+            return;
+        }
     }
 
     //GlobalRenderer->overwrite = true;
@@ -700,6 +785,9 @@ void ProcessMousePacket(MousePacket packet)
     // }
 
     bool cClicks[3] = {leftButton, rightButton, middleButton};
+    MouseClickState[0] = leftButton;
+    MouseClickState[1] = rightButton;
+    MouseClickState[2] = middleButton;
 
     bool tClicks[3] = {false, false, false};
     bool tHolds[3] = {false, false, false};
@@ -728,6 +816,7 @@ void ProcessMousePacket(MousePacket packet)
             }
         }
     }
+
 
 
     if(tClicks[0] || tClicks[1] || tClicks[2])

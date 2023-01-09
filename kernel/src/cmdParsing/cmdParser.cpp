@@ -16,6 +16,7 @@
 #include "../kernelStuff/Disk_Stuff/Partition_Interfaces/mraps/mrapsPartitionInterface.h"
 #include "../kernelStuff/Disk_Stuff/Filesystem_Interfaces/mrafs/mrafsFileSystemInterface.h"
 #include "../WindowStuff/SubInstances/connect4Instance/connect4Instance.h"
+#include "../tasks/taskMgrTask/taskMgrTask.h"
 #include "../tasks/bfTask/bfTask.h"
 #include "../fsStuff/fsStuff.h"
 #include "../tasks/maab/maabTask.h"
@@ -283,11 +284,18 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         return;
     }
 
+    if (StrEquals(input, "taskmgr") || StrEquals(input, "task manager"))
+    {
+        terminal->tasks.add(NewTaskManagerTask(window));
+        RemoveFromStack();
+        return;
+    }
+
 
     if (StrEquals(input, "crash"))
     {
         Println(window, "Crashing...");
-        asm("int $0x0e");
+        asm("int $0x01");
         RemoveFromStack();
         return;
     }
@@ -1562,6 +1570,17 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
         }
         else
             LogError("Color \"{}\" could not be Parsed!", val, window);
+    }
+    else if (StrEquals(name, "fps"))
+    {
+        int fpsVal = to_int(val);
+        if (fpsVal > 0 && fpsVal < 100000)
+        {
+            osData.wantedFps = fpsVal;
+            Println(window, "FPS set to {}.", val);
+        }
+        else
+            LogError("Wanted FPS of {} is out of range!", val, window);
     }
     else if (StrEquals(name, "username"))
     {

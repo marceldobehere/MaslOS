@@ -45,6 +45,8 @@ struct OSData
 
     List<DiskInterface::GenericDiskInterface*> diskInterfaces;
 
+    uint32_t wantedFps = 60;
+
 };
 
 

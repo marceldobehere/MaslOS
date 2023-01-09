@@ -6,7 +6,8 @@ enum InstanceType
     Terminal,
     DebugTerminal,
     NewTerminal,
-    Connect4
+    Connect4,
+    GUI
 };
 
 class DefaultInstance

@@ -43,6 +43,9 @@ void TaskBF::Do()
         return;
     }
 
+    NewTerminalInstance* newTerm = (NewTerminalInstance*)(((TerminalInstance*)(window->instance))->newTermInstance);
+
+
     if (waitInput)
     {
         // Get Input
@@ -97,9 +100,9 @@ void TaskBF::Do()
         else if (code[pIndex] == '.')
         {
             if (mem[mIndex] == '\n')
-                window->renderer->Println();
+                newTerm->Println();
             else
-                window->renderer->Print((char)mem[mIndex]);
+                newTerm->Print((char)mem[mIndex]);
         }
         else if (code[pIndex] == ',')
         {

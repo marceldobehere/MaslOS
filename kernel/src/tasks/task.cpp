@@ -6,6 +6,7 @@
 #include "bfTask/bfTask.h"
 #include "playBeep/playBeep.h"
 #include "maab/maabTask.h"
+#include "taskMgrTask/taskMgrTask.h"
 
 
 
@@ -25,6 +26,28 @@ Task::Task()
     this->type = TaskType::NONE;
 }
 
+
+const char* TaskTypeToString(TaskType type)
+{
+    if (type == TaskType::NONE)
+        return "NONE";
+    if (type == TaskType::BEEP)
+        return "BEEP HANDLER";
+    if (type == TaskType::BF)
+        return "BF INTERPRETER";
+    if (type == TaskType::CLOSEWINDOW)
+        return "CLOSE WINDOW HANDLER";
+    if (type == TaskType::HANDLEENTER)
+        return "ENTER PRESSED HANDLER";
+    if (type == TaskType::MAAB)
+        return "MAAB INTERPRETER";
+    if (type == TaskType::SLEEP)
+        return "SLEEP / WAIT";
+    if (type == TaskType::TASK_MGR)
+        return "TASK MANAGER";
+
+    return "UNKNOWN!";
+}
 
 
 void DoTask(Task* task)
@@ -78,6 +101,12 @@ void DoTask(Task* task)
             maab->Do();
             break;
         }
+        case TaskType::TASK_MGR:
+        {
+            TaskTaskManager* maab = (TaskTaskManager*)task;
+            maab->Do();
+            break;
+        }
     }
 }
 
@@ -128,6 +157,13 @@ void FreeTask(Task* task)
         case TaskType::MAAB:
         {
             TaskMAAB* maab = (TaskMAAB*)task;
+            maab->Free();
+            free((void*)maab);
+            break;
+        }
+        case TaskType::TASK_MGR:
+        {
+            TaskTaskManager* maab = (TaskTaskManager*)task;
             maab->Free();
             free((void*)maab);
             break;

@@ -1,4 +1,11 @@
 #include "kernelStuff/stuff/kernelUtil.h"
+#include "OSDATA/osStats.h"
+#include "WindowStuff/SubInstances/guiInstance/guiInstance.h"
+#include "WindowStuff/SubInstances/guiInstance/guiStuff/components/rectangle/rectangleComponent.h"
+#include "WindowStuff/SubInstances/guiInstance/guiStuff/components/box/boxComponent.h"
+#include "WindowStuff/SubInstances/guiInstance/guiStuff/components/text/textComponent.h"
+#include "WindowStuff/SubInstances/guiInstance/guiStuff/components/button/buttonComponent.h"
+#include "WindowStuff/SubInstances/guiInstance/guiStuff/components/textField/textFieldComponent.h"
 
 
 /*
@@ -9,10 +16,110 @@ if (osData.enableStackTrace)
 
 */
 
+void TestClickHandler(GuiComponentStuff::BaseComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
+{
+    btn->position.y += 20;
+}
+
+void TestKeyHandler(GuiComponentStuff::BaseComponent* btn, GuiComponentStuff::KeyHitEventInfo info)
+{
+    btn->position.y -= 20;
+
+    // AddToStack();
+    // //return;
+    // if (btn->componentType != GuiComponentStuff::ComponentType::BUTTON)
+    //     return;
+
+    // const char** txt = &((GuiComponentStuff::ButtonComponent*)btn)->textComp->text;
+
+    // int len = StrLen(*txt);
+    // if (info.Scancode == 0x0E)
+    // {
+    //     if (len < 1)
+    //     {
+    //         RemoveFromStack();
+    //         return;
+    //     }
+    //     char* bleh = (char*)malloc(len);
+    //     for (int i = 0; i < len - 1; i++)
+    //         bleh[i] = (*txt)[i];
+    //     bleh[len - 1] = 0;
+
+    //     AddToStack();
+    //     tryFree((void*)*txt);
+    //     RemoveFromStack();
+    //     *txt = bleh; 
+    // }
+    // else
+    // {
+        
+    //     char* bleh = (char*)malloc(len + 2);
+    //     for (int i = 0; i < len; i++)
+    //         bleh[i] = (*txt)[i];
+    //     bleh[len] = info.Chr;
+    //     bleh[len + 1] = 0;
+
+    //     AddToStack();
+    //     tryFree((void*)*txt);
+    //     RemoveFromStack();
+    //     *txt = bleh; 
+    // }
+
+
+    // RemoveFromStack();
+}
+
+uint8_t port64Val = 0;
+bool keyboardWeird = false;
+bool oldKeyboardWeird = false;
+
+void IO_CHECK()
+{
+    uint8_t t = inb(0x64);
+    if (t == 0x1C)
+        return;
+    port64Val = t;
+
+    uint64_t now = PIT::TimeSinceBootMS();
+    if (port64Val == 0x1D && (now - osStats.lastKeyboardCall > 4000))
+    {
+        port64Val = inb(0x60);
+        keyboardWeird = true;
+        
+        uint8_t real = TranslateScancode2(port64Val);
+        //HandleKeyboard(real);
+        
+        if (KeyboardScancodeState[real])
+            HandleKeyboard(real | (0b10000000));
+        else
+            HandleKeyboard(real & (~0b10000000));
+
+        
+
+        // io_wait();
+        // outb(0x60, 0xF0);
+        // io_wait();
+        // outb(0x60, 0x01);
+        // io_wait();
+        // inb(0x60);
+        // io_wait();
+        //outb(0x60, 0x1C);
+        //io_wait();
+        //PIC_EndMaster();
+        //PIC_EndSlave();
+    }
+    else if ((port64Val & 0b1 == 1) && (now - osStats.lastMouseCall > 2000))
+    {
+        uint8_t b = inb(0x60);
+        //HandlePS2Mouse(b);
+    }
+}
+
+
 extern "C" void _start(BootInfo* bootInfo)
 {  
     osData.booting = false;
-    osData.maxNonFatalCrashCount = 3;
+    osData.maxNonFatalCrashCount = 5;
     MStackData::stackPointer = 0;
     for (int i = 0; i < 1000; i++)
         MStackData::stackArr[i] = MStack();
@@ -43,11 +150,25 @@ extern "C" void _start(BootInfo* bootInfo)
     GlobalRenderer->DrawImage(bootInfo->bootImage, 0, 0, 1, 1);
     osData.booting = true;
 
+    if (PIT::TicksSinceBoot != 0)
     {
         uint64_t endTime = PIT::TimeSinceBootMS() + 1000;
         while (PIT::TimeSinceBootMS() < endTime && osData.booting)
             asm("hlt");
         osData.booting = false;
+    }
+    else
+    {
+        GlobalRenderer->CursorPosition.x = 0;
+        GlobalRenderer->CursorPosition.y = 0;
+        
+        GlobalRenderer->color = Colors.bred;
+        GlobalRenderer->Println("ERROR: Interrupts are not working properly!");
+        GlobalRenderer->color = Colors.yellow;
+        GlobalRenderer->Println("Please reboot the system.");
+
+        while (true)
+            asm("hlt");
     }
     
     GlobalRenderer->Clear(Colors.black);
@@ -124,22 +245,174 @@ extern "C" void _start(BootInfo* bootInfo)
     //     KeyboardPrintStart(window);
     // }
  
-    NewTerminalInstance* newTerminaltest;
-    {
-        Window* window = (Window*)malloc(sizeof(Window), "Window");
-        NewTerminalInstance* terminal = (NewTerminalInstance*)malloc(sizeof(NewTerminalInstance), "Terminal Instance");
-        *terminal = NewTerminalInstance();
-        *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(500, 60), "Testing new Terminal", true, true, true);
-        osData.windows.add(window);
-        ((NewTerminalInstance*)terminal)->SetWindow(window);
+    // NewTerminalInstance* newTerminaltest;
+    // {
+    //     Window* window = (Window*)malloc(sizeof(Window), "Window");
+    //     NewTerminalInstance* terminal = (NewTerminalInstance*)malloc(sizeof(NewTerminalInstance), "Terminal Instance");
+    //     *terminal = NewTerminalInstance();
+    //     *(window) = Window((DefaultInstance*)terminal, Size(400, 360), Position(500, 60), "Testing new Terminal", true, true, true);
+    //     osData.windows.add(window);
+    //     ((NewTerminalInstance*)terminal)->SetWindow(window);
             
-        newTerminaltest = terminal;
-        terminal->Clear();
-        terminal->WriteText("This \\B1100FFis a \\FFF00FFtest!");
-        terminal->WriteText("Oh ma go\nsh");
+    //     newTerminaltest = terminal;
+    //     terminal->Clear();
+    //     terminal->WriteText("This \\B1100FFis a \\FFF00FFtest!");
+    //     terminal->WriteText("Oh ma go\nsh");
+    //     //osData.windows[1]->renderer->Println("Hello, world!");
+    //     //KeyboardPrintStart(window);
+    // }
+
+    AddToStack();
+    GuiInstance* testGui;
+    GuiComponentStuff::BoxComponent* box;
+    GuiComponentStuff::RectangleComponent* testRect;
+    {
+        Window* window = (Window*)malloc(sizeof(Window), "GUI Window");
+        GuiInstance* gui = (GuiInstance*)malloc(sizeof(GuiInstance), "GUI Instance");
+        *gui = GuiInstance(window);
+        *(window) = Window((DefaultInstance*)gui, Size(400, 360), Position(500, 60), "Testing GUI Window", true, true, true);
+        osData.windows.add(window);
+        
+        gui->Init();
+
+        testGui = gui;
+        // gui->Clear();
+        // gui->WriteText("This \\B1100FFis a \\FFF00FFtest!");
+        // gui->WriteText("Oh ma go\nsh");
         //osData.windows[1]->renderer->Println("Hello, world!");
         //KeyboardPrintStart(window);
+
+        {
+            GuiComponentStuff::ComponentSize s = GuiComponentStuff::ComponentSize(60, 20);
+            s.IsXFixed = false;
+            s.ScaledX = 0.5;
+            testRect = new GuiComponentStuff::RectangleComponent(Colors.purple, s, testGui->screen);
+            testRect->position = GuiComponentStuff::Position(100, 20);
+        }
+
+
+        {
+            box = new GuiComponentStuff::BoxComponent(
+                testGui->screen, GuiComponentStuff::ComponentSize(240, 240), Colors.tblack
+            );
+            testGui->screen->children->add(box);
+            box->position = GuiComponentStuff::Position(20, 30);
+
+            {
+                GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                    Colors.dgray, GuiComponentStuff::ComponentSize(180, 180), box);
+                t->position = GuiComponentStuff::Position(0, 40);
+                box->children->add(t);
+            }
+
+            {
+                GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                    Colors.white, GuiComponentStuff::ComponentSize(20, 20), box);
+                t->position = GuiComponentStuff::Position(40, 80);
+                box->children->add(t);
+            }
+
+            {
+                GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                    Colors.white, GuiComponentStuff::ComponentSize(20, 20), box);
+                t->position = GuiComponentStuff::Position(120, 80);
+                box->children->add(t);
+            }
+
+            {
+                GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                    Colors.orange, GuiComponentStuff::ComponentSize(20, 20), box);
+                t->position = GuiComponentStuff::Position(80, 120);
+                box->children->add(t);
+            }
+
+            {
+                GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                    Colors.bred, GuiComponentStuff::ComponentSize(20, 20), box);
+                t->position = GuiComponentStuff::Position(20, 140);
+                box->children->add(t);
+            }
+
+            {
+                GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                    Colors.bred, GuiComponentStuff::ComponentSize(20, 20), box);
+                t->position = GuiComponentStuff::Position(140, 140);
+                box->children->add(t);
+            }
+
+            {
+                GuiComponentStuff::RectangleComponent* t = new GuiComponentStuff::RectangleComponent(
+                    Colors.bred, GuiComponentStuff::ComponentSize(100, 20), box);
+                t->position = GuiComponentStuff::Position(40, 160);
+                box->children->add(t);
+            }
+        }
+
+
+        {
+            GuiComponentStuff::TextComponent* txt = new GuiComponentStuff::TextComponent(testGui->screen, Colors.black, Colors.white, "Hello!\nThis is an amazing test.", 
+            GuiComponentStuff::Position(200, 90));
+            txt->id = 993344;
+            testGui->screen->children->add(txt);
+        }
+
+        {
+            GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("CLICK\nME\nPLS", 
+            Colors.black, Colors.dgray, Colors.gray, 
+            Colors.bgreen, Colors.yellow, Colors.bred, 
+            GuiComponentStuff::ComponentSize(150, 80),
+            GuiComponentStuff::Position(210, 160), testGui->screen
+            );
+            btn->mouseClickedCallBack = TestClickHandler;
+            btn->keyHitCallBack = TestKeyHandler;
+            //btn->stickToDefaultColor = true;
+            btn->id = 995544;
+            
+            testGui->screen->children->add(btn);
+        }
+
+        {
+            GuiComponentStuff::TextFieldComponent* txtField = new GuiComponentStuff::TextFieldComponent(
+            Colors.white,
+            Colors.black,
+            GuiComponentStuff::ComponentSize(150, 80),
+            GuiComponentStuff::Position(100, 260), testGui->screen
+            );
+            //btn->mouseClickedCallBack = TestClickHandler;
+            //btn->keyHitCallBack = TestKeyHandler;
+            //btn->stickToDefaultColor = true;
+            
+            testGui->screen->children->add(txtField);
+        }
+
+        testGui->screen->children->add(testRect);
+
+
+        {
+            uint64_t bleh = 0;
+            *((int*)&bleh) = 1;
+            testGui->SetBaseComponentAttribute(993344, GuiInstanceBaseAttributeType::POSITION_Y, bleh);
+        }
+
+        {
+            uint64_t bleh = 0;
+            *((uint32_t*)&bleh) = Colors.red;
+            testGui->SetSpecificComponentAttribute(995544, 10, bleh);
+        }
+
+        {
+            uint64_t bleh = 0;
+            *((double*)&bleh) = 0.3;
+            testGui->SetBaseComponentAttribute(995544, GuiInstanceBaseAttributeType::SIZE_SCALED_Y, bleh);
+        }
+
+        {
+            uint64_t bleh = 0;
+            *((bool*)&bleh) = false;
+            testGui->SetBaseComponentAttribute(995544, GuiInstanceBaseAttributeType::SIZE_IS_FIXED_Y, bleh);
+        }
     }
+    RemoveFromStack();
     
 
     
@@ -150,6 +423,7 @@ extern "C" void _start(BootInfo* bootInfo)
 
     for (int i = 0; i < 8; i++)
         debugTerminalWindow->Log("<STAT>");
+    debugTerminalWindow->renderer->CursorPosition.y = 16 * 16;
 
     ((TerminalInstance*)mainWindow->instance)->Cls();
     ((TerminalInstance*)mainWindow->instance)->KeyboardPrintStart();
@@ -168,11 +442,25 @@ extern "C" void _start(BootInfo* bootInfo)
 
     uint64_t frameSum = 0;
 
+    osData.wantedFps = 150;
+    uint32_t TwantedFps = 1000;
+    uint64_t timeForFps = 1000;
+
+
     while(!osData.exit)
     {
         AddToStack();
         freeCount = 0;
         mallocCount = 0;
+        osStats.frameStartTime = PIT::TimeSinceBootMicroS();
+
+
+        if (TwantedFps != osData.wantedFps)
+        {
+            TwantedFps = osData.wantedFps;
+            timeForFps = 1000000 / osData.wantedFps;
+        }
+
 
 
         if (++tFrame >= 1000)
@@ -194,48 +482,55 @@ extern "C" void _start(BootInfo* bootInfo)
         }
         RemoveFromStack();
 
+        testRect->position.x = frame * 5;
+        //testRect->position.y = frame * 3;
+
+        box->position.x = frame * 6;
+        
+
+
         ProcessMousePackets();
 
-        AddToStack();
-        if (true)// (false)
-        {
-            frameSum++;
-            if (frameSum == 10)
-                newTerminaltest->WriteText("This is a test (2)!");
-            if (frameSum == 300)
-                newTerminaltest->WriteText("This is a test (3)!");
+        // AddToStack();
+        // if (true)// (false)
+        // {
+        //     frameSum++;
+        //     if (frameSum == 10)
+        //         newTerminaltest->WriteText("This is a test (2)!");
+        //     if (frameSum == 300)
+        //         newTerminaltest->WriteText("This is a test (3)!");
             
-            if (frameSum > 1000 && frameSum < 1500 && frameSum % 4 == 0)
-                newTerminaltest->scrollX += 1;
-            if (frameSum == 1500)
-                newTerminaltest->WriteText("This is a test (4)!");
+        //     if (frameSum > 1000 && frameSum < 1500 && frameSum % 4 == 0)
+        //         newTerminaltest->scrollX += 1;
+        //     if (frameSum == 1500)
+        //         newTerminaltest->WriteText("This is a test (4)!");
 
-            if (frameSum > 2000 && frameSum < 3000 && frameSum % 4 == 0)
-                newTerminaltest->scrollX -= 1;
-            if (frameSum == 3000)
-                newTerminaltest->WriteText("This is a test (5)!");
+        //     if (frameSum > 2000 && frameSum < 3000 && frameSum % 4 == 0)
+        //         newTerminaltest->scrollX -= 1;
+        //     if (frameSum == 3000)
+        //         newTerminaltest->WriteText("This is a test (5)!");
 
-            if (frameSum > 3500 && frameSum < 4000 && frameSum % 4 == 0)
-                newTerminaltest->scrollY -= 1;
-            if (frameSum == 4000)
-                newTerminaltest->WriteText("This is a test (6)!");
+        //     if (frameSum > 3500 && frameSum < 4000 && frameSum % 4 == 0)
+        //         newTerminaltest->scrollY -= 1;
+        //     if (frameSum == 4000)
+        //         newTerminaltest->WriteText("This is a test (6)!");
 
-            if (frameSum > 4500 && frameSum < 5400 && frameSum % 4 == 0)
-                newTerminaltest->scrollY += 1;
-            if (frameSum == 5400)
-                newTerminaltest->WriteText("This is a test (7)!");
+        //     if (frameSum > 4500 && frameSum < 5400 && frameSum % 4 == 0)
+        //         newTerminaltest->scrollY += 1;
+        //     if (frameSum == 5400)
+        //         newTerminaltest->WriteText("This is a test (7)!");
 
-            if (frameSum > 6000 && frameSum < 6500 && frameSum % 4 == 0)
-                newTerminaltest->scrollY -= 1;
-            if (frameSum == 6500)
-                newTerminaltest->WriteText("This is a test (8)!");
+        //     if (frameSum > 6000 && frameSum < 6500 && frameSum % 4 == 0)
+        //         newTerminaltest->scrollY -= 1;
+        //     if (frameSum == 6500)
+        //         newTerminaltest->WriteText("This is a test (8)!");
 
 
-            // newTerminaltest->scrollX = 60 - ((tFrame % 300) * 2);
-            // newTerminaltest->scrollY = 50 - ((tFrame/3 % 250) * 1);
-            newTerminaltest->Render();
-        }
-        RemoveFromStack();
+        //     // newTerminaltest->scrollX = 60 - ((tFrame % 300) * 2);
+        //     // newTerminaltest->scrollY = 50 - ((tFrame/3 % 250) * 1);
+        //     newTerminaltest->Render();
+        // }
+        // RemoveFromStack();
 
         if (bgm != osData.drawBackground)
         {
@@ -249,82 +544,102 @@ extern "C" void _start(BootInfo* bootInfo)
         //     realMainWindow->renderer->Clear(Colors.dblue);
 
 
-        if (activeWindow != NULL)
-        {
-            updateBorder = true;
-            if (activeWindow->moveToFront)
-            {
-                activeWindow->moveToFront = false;
-                int index = osData.windows.getIndexOf(activeWindow);
-                if (index == osData.windows.getCount() - 1)
-                {
-                    osData.windowPointerThing->UpdateWindowBorder(activeWindow);
-                    osData.windowPointerThing->RenderWindow(activeWindow);
-                }
-                else if (index != -1)
-                {
-                    Window* oldActive = osData.windows[osData.windows.getCount() - 1];
-                    osData.windows.removeAt(index);
-                    osData.windows.add(activeWindow);
-                    
-                    osData.windowPointerThing->RenderWindow(activeWindow);
-                    osData.windowPointerThing->UpdateWindowBorder(oldActive);
-                }
-            }
-        }
-        else
-        {
-            if (updateBorder)
-            {
-                updateBorder = false;
-                {
-                    Window* oldActive = osData.windows[osData.windows.getCount() - 1];
-                    
-                    osData.windowPointerThing->UpdateWindowBorder(oldActive);
-                }
-            }
-        }
+        
 
         AddToStack();
-        for (int i = 0; i < osData.windows.getCount(); i++)
-        {            
-            Window* window = osData.windows[i];
+        {
+            uint64_t tS = PIT::TimeSinceBootMicroS();
 
-            if (window == osData.debugTerminalWindow && !osData.showDebugterminal)
-                continue;
-            
-            if (window->hidden != window->oldHidden)
+            if (activeWindow != NULL)
             {
-                window->oldHidden = window->hidden;
-                osData.windowPointerThing->UpdatePointerRect(
-                    window->position.x - 1, 
-                    window->position.y - 23, 
-                    window->position.x + window->size.width, 
-                    window->position.y + window->size.height
-                    );
+                updateBorder = true;
+                if (activeWindow->moveToFront)
+                {
+                    activeWindow->moveToFront = false;
+                    int index = osData.windows.getIndexOf(activeWindow);
+                    if (index == osData.windows.getCount() - 1)
+                    {
+                        osData.windowPointerThing->UpdateWindowBorder(activeWindow);
+                        osData.windowPointerThing->RenderWindow(activeWindow);
+                    }
+                    else if (index != -1)
+                    {
+                        Window* oldActive = osData.windows[osData.windows.getCount() - 1];
+                        osData.windows.removeAt(index);
+                        osData.windows.add(activeWindow);
+                        
+                        osData.windowPointerThing->UpdateWindowBorder(oldActive);
+
+                        osData.windowPointerThing->RenderWindow(activeWindow);
+                        osData.windowPointerThing->UpdateWindowBorder(activeWindow);
+                    }
+                }
+            }
+            else
+            {
+                if (updateBorder)
+                {
+                    updateBorder = false;
+                    {
+                        Window* oldActive = osData.windows[osData.windows.getCount() - 1];
+                        
+                        osData.windowPointerThing->UpdateWindowBorder(oldActive);
+                    }
+                }
             }
 
-            {
-                int x1 = window->position.x - 1;
-                int y1 = window->position.y - 23;
-                int sx1 = window->size.width + 3;
-                int sy1 = window->size.height + 25;
+            for (int i = 0; i < osData.windows.getCount(); i++)
+            {            
+                Window* window = osData.windows[i];
 
-                bool update = false;
-
-                int x2 = x1;
-                int y2 = y1;
-                int sx2 = sx1;
-                int sy2 = sy2;
-
-                Size nSize = window->newSize;
-                Position nPos = window->newPosition;
-
-
-                if (window->size != nSize)
+                if (window == osData.debugTerminalWindow && !osData.showDebugterminal)
+                    continue;
+                
+                if (window->hidden != window->oldHidden)
                 {
-                    window->Resize(nSize);
+                    window->oldHidden = window->hidden;
+                    osData.windowPointerThing->UpdatePointerRect(
+                        window->position.x - 1, 
+                        window->position.y - 23, 
+                        window->position.x + window->size.width, 
+                        window->position.y + window->size.height
+                        );
+                }
+
+                {
+                    int x1 = window->position.x - 1;
+                    int y1 = window->position.y - 23;
+                    int sx1 = window->size.width + 3;
+                    int sy1 = window->size.height + 25;
+
+                    bool update = false;
+
+                    int x2 = x1;
+                    int y2 = y1;
+                    int sx2 = sx1;
+                    int sy2 = sy2;
+
+                    Size nSize = window->newSize;
+                    Position nPos = window->newPosition;
+
+
+                    if (window->size != nSize)
                     {
+                        window->Resize(nSize);
+                        {
+                            x2 = window->position.x - 1;
+                            y2 = window->position.y - 23;
+                            sx2 = window->size.width + 3;
+                            sy2 = window->size.height + 25;
+
+                            update = true;
+                        }
+                    }
+
+                    if (window->position != nPos)
+                    {
+                        window->position = nPos;
+
                         x2 = window->position.x - 1;
                         y2 = window->position.y - 23;
                         sx2 = window->size.width + 3;
@@ -332,118 +647,261 @@ extern "C" void _start(BootInfo* bootInfo)
 
                         update = true;
                     }
-                }
 
-                if (window->position != nPos)
-                {
-                    window->position = nPos;
-
-                    x2 = window->position.x - 1;
-                    y2 = window->position.y - 23;
-                    sx2 = window->size.width + 3;
-                    sy2 = window->size.height + 25;
-
-                    update = true;
-                }
-
-                if (update)
-                {
-                    int rx1 = min(x1, x2);
-                    int ry1 = min(y1, y2);
-                    int rx2 = max(x1 + sx1, x2 + sx2);
-                    int ry2 = max(y1 + sy1, y2 + sy2);
-
-                    int AR = (rx2 - rx1) * (ry2 - ry1);
-                    int A1 = sx1 * sy1;
-                    int A2 = sx2 * sy2;
-
-                    if (AR <= A1+A2)
+                    if (update)
                     {
-                        osData.windowPointerThing->UpdatePointerRect(rx1, ry1, rx2, ry2);
-                    }
-                    else
-                    {
-                        osData.windowPointerThing->UpdatePointerRect(x1, y1, x1 + sx1, y1 + sy1);
-                        osData.windowPointerThing->UpdatePointerRect(x2, y2, x2 + sx2, y2 + sy2);
+                        int rx1 = min(x1, x2);
+                        int ry1 = min(y1, y2);
+                        int rx2 = max(x1 + sx1, x2 + sx2);
+                        int ry2 = max(y1 + sy1, y2 + sy2);
+
+                        int AR = (rx2 - rx1) * (ry2 - ry1);
+                        int A1 = sx1 * sy1;
+                        int A2 = sx2 * sy2;
+
+                        if (AR <= A1+A2)
+                        {
+                            osData.windowPointerThing->UpdatePointerRect(rx1, ry1, rx2, ry2);
+                        }
+                        else
+                        {
+                            osData.windowPointerThing->UpdatePointerRect(x1, y1, x1 + sx1, y1 + sy1);
+                            osData.windowPointerThing->UpdatePointerRect(x2, y2, x2 + sx2, y2 + sy2);
+                        }
                     }
                 }
+                if (window->instance != NULL && (activeWindow == window || frame % 10 == (i%8)))
+                {
+                    if (window->instance->instanceType == InstanceType::Terminal)
+                    {
+                        TerminalInstance* termInst1 = (TerminalInstance*)window->instance;
+                        if (termInst1->newTermInstance != NULL)
+                        {
+                            NewTerminalInstance* termInst2 = (NewTerminalInstance*)termInst1->newTermInstance;
+                            termInst2->DoRender();
+                        }
+                    }   
+                    else if (window->instance->instanceType == InstanceType::GUI)
+                    {
+                        GuiInstance* guiInst = (GuiInstance*)window->instance;
+                        guiInst->Render();
+                    }   
+                }
+                
             }
-            if (window->instance != NULL && frame % 4 == 0)
-                if (window->instance->instanceType == InstanceType::Terminal)
-                {
-                    TerminalInstance* termInst1 = (TerminalInstance*)window->instance;
-                    if (termInst1->newTermInstance != NULL)
-                    {
-                        NewTerminalInstance* termInst2 = (NewTerminalInstance*)termInst1->newTermInstance;
-                        termInst2->Render();
-                    }
-                }
-            
+
+            osStats.totalWindowUpdateTime = PIT::TimeSinceBootMicroS() - tS;
         }
         RemoveFromStack();
 
-        AddToStack();
-        Taskbar::RenderTaskbar();
-        MPoint mPos = MousePosition;
-        DrawMousePointer2(osData.windowPointerThing->virtualScreenBuffer, mPos);
-        osData.windowPointerThing->fps = fps;
-        osData.windowPointerThing->Render();
-        osData.windowPointerThing->UpdatePointerRect(mPos.x - 32, mPos.y - 32, mPos.x + 32, mPos.y + 32);
-        RemoveFromStack();
 
-        AddToStack();
-        //double endTime = PIT::TimeSinceBoot + 0.02;
-        for (int ax = 0; ax < 10; ax++)
+
         {
-            //GlobalRenderer->Print("A");
-            for (int i = 0; i < osData.windows.getCount(); i++)
-            {     
-                //GlobalRenderer->Print("B");
-                   
-                Window* window = osData.windows[i];
-                if (window->instance == NULL)
-                    continue;
-                if (window->instance->instanceType != InstanceType::Terminal)
-                    continue;
-
-                TerminalInstance* terminal = (TerminalInstance*)window->instance;
-
-                if (terminal->tasks.getCount() != 0)
-                {
-                    Task* task = terminal->tasks[0];
-                    DoTask(task);
-                    if (task->GetDone())
-                    {
-                        terminal->tasks.removeFirst();
-                        FreeTask(task);
-                        //GlobalRenderer->Println("TASK DONE");
-                        terminal->PrintUserIfNeeded();
-                    }
-                    else
-                    {
-                        //GlobalRenderer->Println("TASK NOT DONE");
-                    }
-                }
-            }
-            //PIT::Sleep(10);
-            //asm("hlt");
+            uint64_t tS = PIT::TimeSinceBootMicroS();
+            AddToStack();
+            Taskbar::RenderTaskbar();
+            MPoint mPos = MousePosition;
+            DrawMousePointer2(osData.windowPointerThing->virtualScreenBuffer, mPos);
+            osData.windowPointerThing->fps = fps;
+            osData.windowPointerThing->Render();
+            osData.windowPointerThing->UpdatePointerRect(mPos.x - 32, mPos.y - 32, mPos.x + 32, mPos.y + 32);
+            osStats.totalRenderTime = PIT::TimeSinceBootMicroS() - tS;
+            RemoveFromStack();
         }
-        
 
-        while(osData.osTasks.getCount() > 0)
+
+
         {
-            Task* task = osData.osTasks[0];
-            DoTask(task);
-            if (task->GetDone())
+            AddToStack();
+            uint64_t totTaskTemp = 0;
+            uint64_t totOsTaskTemp = 0;
+
+            uint64_t tS1 = PIT::TimeSinceBootMicroS();
+            uint64_t tempVal = osStats.frameStartTime + timeForFps;
+
+
             {
-                osData.osTasks.removeFirst();
-                FreeTask(task);
+                for (int i = 0; i < osData.windows.getCount(); i++)
+                {     
+                    Window* window = osData.windows[i];
+                    if (window->instance == NULL)
+                        continue;
+                    if (window->instance->instanceType != InstanceType::Terminal)
+                        continue;
+
+                    TerminalInstance* terminal = (TerminalInstance*)window->instance;
+
+                    if (terminal->tasks.getCount() != 0)
+                    {
+                        Task* task = terminal->tasks[0];
+                        task->tempTime = 0;
+                    }
+                }
             }
+
+            bool startThing = true;
+            while (PIT::TimeSinceBootMicroS() < tempVal || startThing)
+            {
+                startThing = false;
+                //double endTime = PIT::TimeSinceBoot + 0.02;
+                {
+                    uint64_t tS = PIT::TimeSinceBootMicroS();
+                    //for (int ax = 0; ax < 10; ax++)
+                    {
+                        //GlobalRenderer->Print("A");
+                        for (int i = 0; i < osData.windows.getCount(); i++)
+                        {     
+                            //GlobalRenderer->Print("B");
+                            
+                            Window* window = osData.windows[i];
+                            if (window->instance == NULL)
+                                continue;
+                            if (window->instance->instanceType != InstanceType::Terminal)
+                                continue;
+
+                            TerminalInstance* terminal = (TerminalInstance*)window->instance;
+
+                            if (terminal->tasks.getCount() != 0)
+                            {
+                                uint64_t tS2 = PIT::TimeSinceBootMicroS();
+                                Task* task = terminal->tasks[0];
+                                DoTask(task);
+                                task->tempTime += PIT::TimeSinceBootMicroS() - tS2;
+                                if (task->GetDone())
+                                {
+                                    terminal->tasks.removeFirst();
+                                    FreeTask(task);
+                                    //GlobalRenderer->Println("TASK DONE");
+                                    terminal->PrintUserIfNeeded();
+                                }
+                                else
+                                {
+                                    
+                                    //GlobalRenderer->Println("TASK NOT DONE");
+                                }
+                            }
+                        }
+                        //PIT::Sleep(10);
+                        //asm("hlt");
+                    }
+                    totTaskTemp += PIT::TimeSinceBootMicroS() - tS;
+                }
+                
+
+                {
+                    uint64_t tS = PIT::TimeSinceBootMicroS();
+                    if (osData.osTasks.getCount() > 0)
+                    {
+                        uint64_t tS2 = PIT::TimeSinceBootMicroS();
+                        Task* task = osData.osTasks[0];
+                        DoTask(task);
+                        task->tempTime += PIT::TimeSinceBootMicroS() - tS2;
+                        if (task->GetDone())
+                        {
+                            osData.osTasks.removeFirst();
+                            FreeTask(task);
+                        }
+                    }
+                    totOsTaskTemp += PIT::TimeSinceBootMicroS() - tS;
+                }
+            }
+
+            {
+                for (int i = 0; i < osData.windows.getCount(); i++)
+                {     
+                    Window* window = osData.windows[i];
+                    if (window->instance == NULL)
+                        continue;
+                    if (window->instance->instanceType != InstanceType::Terminal)
+                        continue;
+
+                    TerminalInstance* terminal = (TerminalInstance*)window->instance;
+
+                    if (terminal->tasks.getCount() != 0)
+                    {
+                        Task* task = terminal->tasks[0];
+                        task->actTime = task->tempTime;
+                    }
+                }
+            }
+
+            osStats.totalIdleTime = PIT::TimeSinceBootMicroS() - tS1;
+            osStats.totalTaskTime = totTaskTemp;
+            osStats.totalOsTaskTime = totOsTaskTemp;
+            RemoveFromStack();
         }
-        RemoveFromStack();
+
+
+
 
         //GlobalRenderer->Print("C");
         //asm("hlt");
+        // {
+        //     uint64_t tS = PIT::TimeSinceBootMicroS();
+        //     uint64_t tempVal = osStats.frameStartTime + timeForFps;
+        //     while (PIT::TimeSinceBootMicroS() < tempVal)
+        //         asm("hlt");
+        //     osStats.totalIdleTime = PIT::TimeSinceBootMicroS() - tS;
+        // }
+
+        IO_CHECK();
+        osStats.testThing = port64Val;
+        if (keyboardWeird && !oldKeyboardWeird)
+        {
+            oldKeyboardWeird = true;
+            
+            Window* msgWindow;
+            {
+
+
+                msgWindow = (Window*)malloc(sizeof(Window), "Warning Window");
+                Size size = Size(800, 16*10);
+                Position pos = Position(((GlobalRenderer->framebuffer->Width - size.width) / 2), ((GlobalRenderer->framebuffer->Height) / 5));
+                
+                if (msgWindow != NULL)
+                {
+                    //GlobalRenderer->Println("BRUH 4.5", Colors.yellow);
+                    *(msgWindow) = Window(NULL, size, pos, "WARNING ABOUT YOUR PS/2 KEYBOARD", true, true, true);
+                    //GlobalRenderer->Println("BRUH 4.6", Colors.yellow);
+                    osData.windows.add(msgWindow);
+                    //GlobalRenderer->Println("BRUH 4.7", Colors.yellow);
+
+                    activeWindow = msgWindow;
+                    //osData.mainTerminalWindow = msgWindow;
+                    msgWindow->moveToFront = true;
+                }
+            }
+            // it crashes between 4 and 5, probably while trying to allocate memory since it used all the memory
+            //GlobalRenderer->Println("BRUH 5", Colors.yellow);
+            
+            if (msgWindow != NULL)
+            {
+                //GlobalRenderer->Println("BRUH 5.1", Colors.yellow);
+                //GlobalRenderer->Print("Win x: {}", to_string(crashWindow->size.width), Colors.yellow);
+                //GlobalRenderer->Println(", y: {}", to_string(crashWindow->size.height), Colors.yellow);
+                msgWindow->renderer->Clear(Colors.black);
+                //GlobalRenderer->Println("BRUH 5.2", Colors.yellow);
+                msgWindow->renderer->Println("------------------------------------------------", Colors.bred);
+                msgWindow->renderer->Println("WARNING: Your PS/2 Keyboard is having issues!", Colors.bred);
+                msgWindow->renderer->Println("------------------------------------------------", Colors.bred);
+                msgWindow->renderer->Println();
+                //GlobalRenderer->Println("BRUH 5.3", Colors.yellow);
+                msgWindow->renderer->Println("It should still work but it will probably cause issues if used with the mouse at the same time.", Colors.yellow);
+                msgWindow->renderer->Println("The issue should be fixable with a restart.", Colors.yellow);
+                msgWindow->renderer->Println();
+
+            }
+
+            msgWindow->hidden = false;
+            msgWindow->oldHidden = true;
+
+
+            
+
+        }
+
+        osStats.frameEndTime = PIT::TimeSinceBootMicroS();
+        osStats.totalFrameTime = osStats.frameEndTime - osStats.frameStartTime;
     }
 
     GlobalRenderer->Clear(Colors.black);

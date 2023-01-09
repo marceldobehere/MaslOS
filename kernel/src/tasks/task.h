@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 enum TaskType
 {
@@ -8,10 +9,11 @@ enum TaskType
     CLOSEWINDOW,
     BEEP,
     BF,
-    MAAB
+    MAAB,
+    TASK_MGR
 };
 
-
+const char* TaskTypeToString(TaskType type);
 
 class Task
 {
@@ -20,6 +22,8 @@ class Task
         TaskType type;
 
     public:
+        int32_t tempTime = 0;
+        int32_t actTime = 0;
         bool GetDone();
         TaskType GetType();
         Task();

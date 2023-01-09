@@ -10,6 +10,19 @@ namespace WindowManager
     Window *getWindowAtMousePosition();
     Window *getWindowAtMousePosition(int distance);
 
+    enum WindowAttributeType : int32_t
+    {
+        BLEH
+    };
+
+    Window* GetWindowById(int64_t id);
+    bool DeleteWindowWithId(int64_t id);
+    bool CreateWindowWithId(int64_t id);
+    uint64_t GetWindowAttributeWithId(int64_t id, WindowAttributeType type);
+    bool SetWindowAttributeWithId(int64_t id, WindowAttributeType type, uint64_t value);
+    
+
+
     static struct _windowButtonIconEnum
     {
         static const int 

@@ -23,6 +23,7 @@ void InitializeHeap(void* heapAddress, size_t pageCount);
 
 void* malloc(size_t size);
 void free(void* address);
+bool tryFree(void* address);
 
 void* _malloc(size_t size);
 void _free(void* address);

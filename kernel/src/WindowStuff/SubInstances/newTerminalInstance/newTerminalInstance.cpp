@@ -263,6 +263,7 @@ NewTerminalInstance::NewTerminalInstance()
     AddToStack();
     textData = List<List<ConsoleChar>*>(4);
     instanceType = InstanceType::NewTerminal;
+    RenderCalled = true;
     //this->currentUser = user;
     this->window = NULL;
     backgroundColor = Colors.black;
@@ -394,6 +395,22 @@ void NewTerminalInstance::RenderCharChanges()
 
 void NewTerminalInstance::Render()
 {
+    RenderCalled = true;
+}
+
+void NewTerminalInstance::Reload()
+{
+    oldScrollX = scrollX + 1;
+    Render();
+}
+
+void NewTerminalInstance::DoRender()
+{
+    if (scrollX == oldScrollX && scrollY == oldScrollY && oldHeight == window->size.height && oldWidth == window->size.width)
+        if (!RenderCalled)
+            return;
+    RenderCalled = false;
+
     AddToStack();
     if (window == NULL)
         Panic("Trying to Render with window being NULL!");

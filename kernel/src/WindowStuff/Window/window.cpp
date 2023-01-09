@@ -80,6 +80,10 @@ Window::Window(DefaultInstance* instance, Size size, Position position, const ch
     RemoveFromStack();
 }
 
+Position Window::GetMousePosRelativeToWindow()
+{
+    return Position(MousePosition.x - position.x, MousePosition.y - position.y);
+}
 
 WindowActionEnum Window::GetCurrentAction()
 {
@@ -139,7 +143,7 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size,
     for (int64_t y = 0; y < from->Height; y++)
     {
         int64_t newY = y + pos.y;
-        uint32_t* pointerP = (uint32_t*)((uint64_t)to->BaseAddress + ((pos.x + (newY * to->Width)) * 4));
+        uint32_t* pointerP = (uint32_t*)((uint64_t)to->BaseAddress + ((pos.x + (newY * to->PixelsPerScanLine)) * 4));
         for (int64_t x = 0; x < from->Width; x++)
         {
             int64_t newX = x + pos.x;
@@ -193,16 +197,16 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size,
             int64_t newX = x + pos.x;
             int64_t newY = -1 + pos.y;
             if (newX >= 0 && newY >= 0 && newX < to->Width && newY < to->Height && (counter % 2) == 1)
-                *(uint32_t*)(toBaseAddr + ((newX + (newY * to->Width)) * 4)) = cBorder;
+                *(uint32_t*)(toBaseAddr + ((newX + (newY * to->PixelsPerScanLine)) * 4)) = cBorder;
             
             
             newY = size.height + pos.y;
             if (newX >= 0 && newY >= 0 && newX < to->Width && newY < to->Height && (counter % 2) == 0)
-                *(uint32_t*)(toBaseAddr + ((newX + (newY * to->Width)) * 4)) = cBorder;
+                *(uint32_t*)(toBaseAddr + ((newX + (newY * to->PixelsPerScanLine)) * 4)) = cBorder;
 
             newY = -22 + pos.y;
             if (newX >= 0 && newY >= 0 && newX < to->Width && newY < to->Height && (counter % 2) == 0)
-                *(uint32_t*)(toBaseAddr + ((newX + (newY * to->Width)) * 4)) = cBorder;
+                *(uint32_t*)(toBaseAddr + ((newX + (newY * to->PixelsPerScanLine)) * 4)) = cBorder;
         
             counter++;
         }
@@ -213,11 +217,11 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size,
             int64_t newX = size.width + pos.x;
             int64_t newY = y + pos.y;
             if (newX >= 0 && newY >= 0 && newX < to->Width && newY < to->Height && (counter % 2) == 1)
-                *(uint32_t*)((uint64_t)toBaseAddr + ((newX + (newY * to->Width)) * 4)) = cBorder;
+                *(uint32_t*)((uint64_t)toBaseAddr + ((newX + (newY * to->PixelsPerScanLine)) * 4)) = cBorder;
             
             newX = -1 + pos.x;
             if (newX >= 0 && newY >= 0 && newX < to->Width && newY < to->Height && (counter % 2) == 0)
-                *(uint32_t*)((uint64_t)toBaseAddr + ((newX + (newY * to->Width)) * 4)) = cBorder;
+                *(uint32_t*)((uint64_t)toBaseAddr + ((newX + (newY * to->PixelsPerScanLine)) * 4)) = cBorder;
             
             counter++;
         } 
