@@ -99,10 +99,12 @@ Go into the MaslOS Folder and run the `RUN.sh` file
 
 ![The MaslOS Splashscreen](/images/boot.PNG "The MaslOS Splashscreen")
 ![The Desktop with some windows open](/images/desktop.PNG "The Desktop with some windows open")
+![Pong running on real hardware](/images/pongus.jpg "Pong running on real hardware")
 ![MAAB Interpreter](/images/maab.png "MAAB Interpreter running with the windows interpreter next to it")
 ![The Desktop](/images/desktop%20background.PNG "The Desktop")
 ![Playing around with the Terminals](/images/terminal%20test%201.PNG "Playing around with the Terminals")
 ![A lot of windows](/images/yes.PNG "A lot of windows")
+![Old Pong Gif](/images/pong%202.gif "Old Pong Gif")
 ![FS Test](/images/filesystem%20test.PNG "A short test showing the filesystem working")
 ![The Crash Window](/images/crash%20window.PNG "The Crash window")
 ![The Panic screen](/images/new%20kernel%20panic.PNG "The new Panic screen")
