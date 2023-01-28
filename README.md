@@ -1,9 +1,7 @@
 # MaslOS
 an OS written in C++ and a bit of C.
 The base was made following [Ponchos OS Dev Youtube Playlist](https://www.youtube.com/playlist?list=PLxN4E629pPnJxCQCLy7E0SQY_zuumOVyZ)
-
-
-MaslOS is 1000% the best os ever!11!1
+The OS is now using [limine](https://github.com/limine-bootloader/limine) as the bootloader.
 
 
 
@@ -15,11 +13,14 @@ MaslOS is 1000% the best os ever!11!1
   - Taskbar
 * Window Manager
   - Working Window Manager with dynamic windows
+  - Start Menu Window
 * GUI Framework
-  - Still WIP but it exists!
+  - With support in MAAL!
 * Apps
   - Terminal using a scrollable Text Window
   - Connect Four Game
+  - Pong Game
+  - Mandelbrot renderer
 * Audio
   - (In planning) Audio Device Driver of some sorts
 * Keyboard
