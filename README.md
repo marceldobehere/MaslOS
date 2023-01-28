@@ -99,7 +99,7 @@ Go into the MaslOS Folder and run the `RUN.sh` file
 
 ![The MaslOS Splashscreen](/images/boot.PNG "The MaslOS Splashscreen")
 ![The Desktop with some windows open](/images/desktop.PNG "The Desktop with some windows open")
-![Pong running on real hardware](/images/new%20kernel%20pong.jpg "Pong running on real hardware")
+![Pong running on real hardware](/images/pongus.jpg "Pong running on real hardware")
 ![MAAB Interpreter](/images/maab.png "MAAB Interpreter running with the windows interpreter next to it")
 ![The Desktop](/images/desktop%20background.PNG "The Desktop")
 ![Playing around with the Terminals](/images/terminal%20test%201.PNG "Playing around with the Terminals")
