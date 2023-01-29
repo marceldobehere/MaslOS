@@ -19,10 +19,11 @@ class TerminalInstance : public DefaultInstance
 {
     private:
         Window* window;
-        bool printUser;
         
+    
 
     public:
+    bool printUser;
     List<Task*> tasks = List<Task*>(4);
     OSUser* currentUser;
     char lastTerminalInput[256];

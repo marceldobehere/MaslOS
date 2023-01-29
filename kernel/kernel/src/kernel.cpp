@@ -547,12 +547,17 @@ void RecoverDed()
                 FreeTask(tsk);
                 terminal->tasks.removeFirst();
             }
+
             NewTerminalInstance* bruh2 = ((NewTerminalInstance*)terminal->newTermInstance);
             if (bruh2 != NULL)
             {
                 bruh2->Println("\n\nCurrent Tasks forcibly stopped, due them possibly having crashed the OS!", Colors.bred);
-                terminal->PrintUserIfNeeded();
             }
+
+
+            terminal->userlen = 0;
+            terminal->printUser = true;
+            terminal->PrintUserIfNeeded();
         }
     }
 
