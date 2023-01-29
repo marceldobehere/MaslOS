@@ -326,7 +326,7 @@ void RenderLoop()
                     Window* window = osData.windows[i];
                     if (window->instance == NULL)
                         continue;
-                    if (window->hidden)
+                    if (window->hidden && !osData.bgTaskRun)
                         continue;
                     if (window->instance->instanceType != InstanceType::Terminal)
                         continue;
@@ -362,7 +362,7 @@ void RenderLoop()
                             Window* window = osData.windows[i];
                             if (window->instance == NULL)
                                 continue;
-                            if (window->hidden)
+                            if (window->hidden && !osData.bgTaskRun)
                                 continue;
                             if (window->instance->instanceType != InstanceType::Terminal)
                                 continue;
@@ -520,6 +520,8 @@ void RenderLoop()
 void RecoverDed()
 {
     //osData.osTasks.clear();
+
+    osData.bgTaskRun = false;
 
     for (int i = 0; i < osData.windows.getCount(); i++)
     {
@@ -940,15 +942,7 @@ void boot(BootInfo* bootInfo)
 
 
     osData.wantedFps = 150;
-
-
-    //PIT::Sleep(4000);
-
-    // int Ax = 0;
-    // int Ay = 0;
-
-    // int Az = Ax/Ay;
-
+    osData.bgTaskRun = true;
     RenderLoop();
 
 

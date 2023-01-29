@@ -1558,6 +1558,10 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
         else
             LogError("Color \"{}\" could not be Parsed!", val, window);
     }
+    if (StrEquals(name, "bg task run"))
+    {
+        osData.bgTaskRun = StrEquals(val, "true");
+    }
     else if (StrEquals(name, "default color"))
     {
         ParsedColData data = ParseColor(val);
@@ -1799,6 +1803,13 @@ void GetCmd(const char* name, OSUser* user, Window* window)
     else if (StrEquals(name, "free pages"))
     {
         Println(window, "Free Page Count: {} pages.", to_string(GlobalAllocator->GetFreePageCount()), Colors.bgreen);
+    }
+    else if (StrEquals(name, "bg task run"))
+    {
+        if (osData.bgTaskRun)
+            Println(window, "Background Task Running is enabled!", Colors.bgreen);
+        else
+            Println(window, "Background Task Running is disabled!", Colors.bred);
     }
     else if (StrEquals(name, "window resolution") || StrEquals(name, "window size"))
     {
