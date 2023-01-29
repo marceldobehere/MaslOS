@@ -27,49 +27,547 @@ void TestKeyHandler(GuiComponentStuff::BaseComponent* btn, GuiComponentStuff::Ke
 {
     btn->position.y -= 20;
 
-    // AddToStack();
-    // //return;
-    // if (btn->componentType != GuiComponentStuff::ComponentType::BUTTON)
-    //     return;
-
-    // const char** txt = &((GuiComponentStuff::ButtonComponent*)btn)->textComp->text;
-
-    // int len = StrLen(*txt);
-    // if (info.Scancode == 0x0E)
-    // {
-    //     if (len < 1)
-    //     {
-    //         RemoveFromStack();
-    //         return;
-    //     }
-    //     char* bleh = (char*)malloc(len);
-    //     for (int i = 0; i < len - 1; i++)
-    //         bleh[i] = (*txt)[i];
-    //     bleh[len - 1] = 0;
-
-    //     AddToStack();
-    //     tryFree((void*)*txt);
-    //     RemoveFromStack();
-    //     *txt = bleh; 
-    // }
-    // else
-    // {
-        
-    //     char* bleh = (char*)malloc(len + 2);
-    //     for (int i = 0; i < len; i++)
-    //         bleh[i] = (*txt)[i];
-    //     bleh[len] = info.Chr;
-    //     bleh[len + 1] = 0;
-
-    //     AddToStack();
-    //     tryFree((void*)*txt);
-    //     RemoveFromStack();
-    //     *txt = bleh; 
-    // }
-
-
-    // RemoveFromStack();
 }
+
+
+
+
+
+
+void RenderLoop()
+{
+    osData.windowPointerThing->Clear();
+    osData.windowPointerThing->RenderWindows();
+    bool updateBorder = true;
+    bool bgm = osData.drawBackground;
+    int frame = 0;
+    int tFrame = 0;
+    uint64_t oldTime = PIT::TimeSinceBootMS();
+    //double fps = 1;
+    uint64_t fps = 1;
+
+    uint64_t frameSum = 0;
+
+    
+    uint32_t TwantedFps = 1000;
+    uint64_t timeForFps = 1000;
+
+
+    while(!osData.exit)
+    {
+        RND::lehmer64();
+        AddToStack();
+        freeCount = 0;
+        mallocCount = 0;
+        osStats.frameStartTime = PIT::TimeSinceBootMicroS();
+
+        if (!osData.startMenuWindow->hidden && activeWindow != osData.startMenuWindow)
+        {
+            osData.startMenuWindow->hidden = true;
+            osData.startMenuWindow->oldHidden = false;
+            activeWindow = NULL;
+        }
+
+        if (TwantedFps != osData.wantedFps)
+        {
+            TwantedFps = osData.wantedFps;
+            timeForFps = 1000000 / osData.wantedFps;
+        }
+
+
+
+        if (++tFrame >= 1000)
+            tFrame = 0;
+
+        frame++;  
+        if (frame >= 30)
+        {
+            uint64_t currTime = PIT::TimeSinceBootMS();
+            //fps = ((frame - 1)*1000.0) / (currTime - oldTime);
+            if ((currTime - oldTime) == 0)
+            {
+                fps = 9999;
+            }
+            else
+                fps = ((frame - 1)*1000) / (currTime - oldTime);
+            oldTime = currTime;
+            frame = 0;
+        }
+        RemoveFromStack();
+
+        //testRect->position.x = frame * 5;
+        //testRect->position.y = frame * 3;
+
+        //box->position.x = frame * 6;
+        
+
+
+        ProcessMousePackets();
+        HandleKeyboardList(20);
+
+      
+
+        if (bgm != osData.drawBackground)
+        {
+            osData.windowPointerThing->RenderWindows();
+            bgm = osData.drawBackground;
+        }
+
+   
+
+        AddToStack();
+        {
+            uint64_t tS = PIT::TimeSinceBootMicroS();
+
+            if (activeWindow != NULL)
+            {
+                updateBorder = true;
+                if (activeWindow->moveToFront)
+                {
+                    activeWindow->moveToFront = false;
+                    int index = osData.windows.getIndexOf(activeWindow);
+                    if (index == osData.windows.getCount() - 1)
+                    {
+                        osData.windowPointerThing->UpdateWindowBorder(activeWindow);
+                        osData.windowPointerThing->RenderWindow(activeWindow);
+                    }
+                    else if (index != -1)
+                    {
+                        Window* oldActive = osData.windows[osData.windows.getCount() - 1];
+                        osData.windows.removeAt(index);
+                        osData.windows.add(activeWindow);
+                        
+                        osData.windowPointerThing->UpdateWindowBorder(oldActive);
+
+                        osData.windowPointerThing->RenderWindow(activeWindow);
+                        osData.windowPointerThing->UpdateWindowBorder(activeWindow);
+                    }
+                }
+            }
+            else
+            {
+                if (updateBorder)
+                {
+                    updateBorder = false;
+                    {
+                        Window* oldActive = osData.windows[osData.windows.getCount() - 1];
+                        
+                        osData.windowPointerThing->UpdateWindowBorder(oldActive);
+                    }
+                }
+            }
+
+            for (int i = 0; i < osData.windows.getCount(); i++)
+            {            
+                Window* window = osData.windows[i];
+
+                if (window == osData.debugTerminalWindow && !osData.showDebugterminal)
+                    continue;
+                
+                if (window->hidden != window->oldHidden)
+                {
+                    window->oldHidden = window->hidden;
+                    osData.windowPointerThing->UpdatePointerRect(
+                        window->position.x - 1, 
+                        window->position.y - 23, 
+                        window->position.x + window->size.width, 
+                        window->position.y + window->size.height
+                        );
+                }
+
+                {
+                    int x1 = window->position.x - 1;
+                    int y1 = window->position.y - 23;
+                    int sx1 = window->size.width + 3;
+                    int sy1 = window->size.height + 25;
+
+                    bool update = false;
+
+                    int x2 = x1;
+                    int y2 = y1;
+                    int sx2 = sx1;
+                    int sy2 = sy2;
+
+                    if (window->maximize != window->oldMaximize)
+                    {
+                        if (window->maximize)
+                        {
+                            window->oldPreMaxPosition = window->position;
+                            window->oldPreMaxSize = window->size;
+
+                            window->oldPreMaxBorder = window->showBorder;
+                            window->oldPreMaxTitle = window->showTitleBar;
+
+                            window->newPosition = Position(0, 23);
+                            window->newSize = Size(GlobalRenderer->framebuffer->Width, GlobalRenderer->framebuffer->Height);
+
+                            window->showBorder = false;
+                            //window->showTitleBar = false;
+
+                            window->oldMaximize = true;
+                        }
+                        else
+                        {
+                            window->newPosition = window->oldPreMaxPosition;
+                            window->newSize = window->oldPreMaxSize;
+
+                            window->showBorder = window->oldPreMaxBorder;
+                            window->showTitleBar = window->oldPreMaxTitle;
+
+                            window->oldMaximize = false;
+                        }
+                    }
+
+
+                    Size nSize = window->newSize;
+                    Position nPos = window->newPosition;
+
+
+                    if (window->size != nSize)
+                    {
+                        window->Resize(nSize);
+                        {
+                            x2 = window->position.x - 1;
+                            y2 = window->position.y - 23;
+                            sx2 = window->size.width + 3;
+                            sy2 = window->size.height + 25;
+
+                            update = true;
+                        }
+                    }
+
+                    if (window->position != nPos)
+                    {
+                        window->position = nPos;
+
+                        x2 = window->position.x - 1;
+                        y2 = window->position.y - 23;
+                        sx2 = window->size.width + 3;
+                        sy2 = window->size.height + 25;
+
+                        update = true;
+                    }
+
+                    if (update)
+                    {
+                        int rx1 = min(x1, x2);
+                        int ry1 = min(y1, y2);
+                        int rx2 = max(x1 + sx1, x2 + sx2);
+                        int ry2 = max(y1 + sy1, y2 + sy2);
+
+                        int AR = (rx2 - rx1) * (ry2 - ry1);
+                        int A1 = sx1 * sy1;
+                        int A2 = sx2 * sy2;
+
+                        if (AR <= A1+A2)
+                        {
+                            osData.windowPointerThing->UpdatePointerRect(rx1, ry1, rx2, ry2);
+                        }
+                        else
+                        {
+                            osData.windowPointerThing->UpdatePointerRect(x1, y1, x1 + sx1, y1 + sy1);
+                            osData.windowPointerThing->UpdatePointerRect(x2, y2, x2 + sx2, y2 + sy2);
+                        }
+                    }
+                }
+                if (window->instance != NULL && !window->hidden && (activeWindow == window || frame % 5 == (i%8)))
+                {
+                    if (window->instance->instanceType == InstanceType::Terminal)
+                    {
+                        TerminalInstance* termInst1 = (TerminalInstance*)window->instance;
+                        if (termInst1->newTermInstance != NULL)
+                        {
+                            NewTerminalInstance* termInst2 = (NewTerminalInstance*)termInst1->newTermInstance;
+                            termInst2->DoRender();
+                        }
+                    }   
+                    else if (window->instance->instanceType == InstanceType::GUI)
+                    {
+                        GuiInstance* guiInst = (GuiInstance*)window->instance;
+                        guiInst->Render();
+                    }   
+                }
+                
+            }
+
+            osStats.totalWindowUpdateTime = PIT::TimeSinceBootMicroS() - tS;
+        }
+        RemoveFromStack();
+
+
+
+        {
+            uint64_t tS = PIT::TimeSinceBootMicroS();
+            AddToStack();
+            Taskbar::RenderTaskbar();
+            MPoint mPos = MousePosition;
+            DrawMousePointer2(osData.windowPointerThing->virtualScreenBuffer, mPos);
+            osData.windowPointerThing->fps = fps;
+            osData.windowPointerThing->Render();
+            osData.windowPointerThing->UpdatePointerRect(mPos.x - 32, mPos.y - 32, mPos.x + 32, mPos.y + 32);
+            osStats.totalRenderTime = PIT::TimeSinceBootMicroS() - tS;
+            RemoveFromStack();
+        }
+
+
+
+        {
+            AddToStack();
+            uint64_t totTaskTemp = 0;
+            uint64_t totOsTaskTemp = 0;
+
+            uint64_t tS1 = PIT::TimeSinceBootMicroS();
+            uint64_t tempVal = osStats.frameStartTime + timeForFps;
+
+
+            {
+                for (int i = 0; i < osData.windows.getCount(); i++)
+                {     
+                    Window* window = osData.windows[i];
+                    if (window->instance == NULL)
+                        continue;
+                    if (window->hidden)
+                        continue;
+                    if (window->instance->instanceType != InstanceType::Terminal)
+                        continue;
+
+                    TerminalInstance* terminal = (TerminalInstance*)window->instance;
+
+                    if (terminal->tasks.getCount() != 0)
+                    {
+                        Task* task = terminal->tasks[0];
+                        task->tempTime = 0;
+                    }
+                    else if (terminal->closeWindowAfterTask)
+                    {
+                        osData.osTasks.add(NewWindowCloseTask(window));
+                    }
+                }
+            }
+
+            bool startThing = true;
+            while (PIT::TimeSinceBootMicroS() < tempVal || startThing)
+            {
+                startThing = false;
+                //double endTime = PIT::TimeSinceBoot + 0.02;
+                {
+                    uint64_t tS = PIT::TimeSinceBootMicroS();
+                    //for (int ax = 0; ax < 10; ax++)
+                    {
+                        //GlobalRenderer->Print("A");
+                        for (int i = 0; i < osData.windows.getCount(); i++)
+                        {     
+                            //GlobalRenderer->Print("B");
+                            
+                            Window* window = osData.windows[i];
+                            if (window->instance == NULL)
+                                continue;
+                            if (window->hidden)
+                                continue;
+                            if (window->instance->instanceType != InstanceType::Terminal)
+                                continue;
+
+                            TerminalInstance* terminal = (TerminalInstance*)window->instance;
+
+                            if (terminal->tasks.getCount() != 0)
+                            {
+                                uint64_t tS2 = PIT::TimeSinceBootMicroS();
+                                Task* task = terminal->tasks[0];
+                                DoTask(task);
+                                task->tempTime += PIT::TimeSinceBootMicroS() - tS2;
+                                if (task->GetDone())
+                                {
+                                    terminal->tasks.removeFirst();
+                                    FreeTask(task);
+                                    //GlobalRenderer->Println("TASK DONE");
+                                    terminal->PrintUserIfNeeded();
+                                }
+                                else
+                                {
+                                    
+                                    //GlobalRenderer->Println("TASK NOT DONE");
+                                }
+                            }
+                        }
+                        //PIT::Sleep(10);
+                        //asm("hlt");
+                    }
+                    totTaskTemp += PIT::TimeSinceBootMicroS() - tS;
+                }
+                
+
+                {
+                    uint64_t tS = PIT::TimeSinceBootMicroS();
+                    if (osData.osTasks.getCount() > 0)
+                    {
+                        uint64_t tS2 = PIT::TimeSinceBootMicroS();
+                        Task* task = osData.osTasks[0];
+                        DoTask(task);
+                        task->tempTime += PIT::TimeSinceBootMicroS() - tS2;
+                        if (task->GetDone())
+                        {
+                            osData.osTasks.removeFirst();
+                            FreeTask(task);
+                        }
+                    }
+                    totOsTaskTemp += PIT::TimeSinceBootMicroS() - tS;
+                }
+            }
+
+            {
+                for (int i = 0; i < osData.windows.getCount(); i++)
+                {     
+                    Window* window = osData.windows[i];
+                    if (window->instance == NULL)
+                        continue;
+                    if (window->instance->instanceType != InstanceType::Terminal)
+                        continue;
+
+                    TerminalInstance* terminal = (TerminalInstance*)window->instance;
+
+                    if (terminal->tasks.getCount() != 0)
+                    {
+                        Task* task = terminal->tasks[0];
+                        task->actTime = task->tempTime;
+                    }
+                }
+            }
+
+            osStats.totalIdleTime = PIT::TimeSinceBootMicroS() - tS1;
+            osStats.totalTaskTime = totTaskTemp;
+            osStats.totalOsTaskTime = totOsTaskTemp;
+            RemoveFromStack();
+        }
+
+
+
+
+        //GlobalRenderer->Print("C");
+        //asm("hlt");
+        // {
+        //     uint64_t tS = PIT::TimeSinceBootMicroS();
+        //     uint64_t tempVal = osStats.frameStartTime + timeForFps;
+        //     while (PIT::TimeSinceBootMicroS() < tempVal)
+        //         asm("hlt");
+        //     osStats.totalIdleTime = PIT::TimeSinceBootMicroS() - tS;
+        // }
+
+        // IO_CHECK();
+        // osStats.testThing = port64Val;
+        // if (keyboardWeird && !oldKeyboardWeird)
+        // {
+        //     oldKeyboardWeird = true;
+            
+        //     Window* msgWindow;
+        //     {
+
+
+        //         msgWindow = (Window*)_Malloc(sizeof(Window), "Warning Window");
+        //         Size size = Size(800, 16*10);
+        //         Position pos = Position(((GlobalRenderer->framebuffer->Width - size.width) / 2), ((GlobalRenderer->framebuffer->Height) / 5));
+                
+        //         if (msgWindow != NULL)
+        //         {
+        //             //GlobalRenderer->Println("BRUH 4.5", Colors.yellow);
+        //             *(msgWindow) = Window(NULL, size, pos, "WARNING ABOUT YOUR PS/2 KEYBOARD", true, true, true);
+        //             //GlobalRenderer->Println("BRUH 4.6", Colors.yellow);
+        //             osData.windows.add(msgWindow);
+        //             //GlobalRenderer->Println("BRUH 4.7", Colors.yellow);
+
+        //             activeWindow = msgWindow;
+        //             //osData.mainTerminalWindow = msgWindow;
+        //             msgWindow->moveToFront = true;
+        //         }
+        //     }
+        //     // it crashes between 4 and 5, probably while trying to allocate memory since it used all the memory
+        //     //GlobalRenderer->Println("BRUH 5", Colors.yellow);
+            
+        //     if (msgWindow != NULL)
+        //     {
+        //         //GlobalRenderer->Println("BRUH 5.1", Colors.yellow);
+        //         //GlobalRenderer->Print("Win x: {}", to_string(crashWindow->size.width), Colors.yellow);
+        //         //GlobalRenderer->Println(", y: {}", to_string(crashWindow->size.height), Colors.yellow);
+        //         msgWindow->renderer->Clear(Colors.black);
+        //         //GlobalRenderer->Println("BRUH 5.2", Colors.yellow);
+        //         msgWindow->renderer->Println("------------------------------------------------", Colors.bred);
+        //         msgWindow->renderer->Println("WARNING: Your PS/2 Keyboard is having issues!", Colors.bred);
+        //         msgWindow->renderer->Println("------------------------------------------------", Colors.bred);
+        //         msgWindow->renderer->Println();
+        //         //GlobalRenderer->Println("BRUH 5.3", Colors.yellow);
+        //         msgWindow->renderer->Println("It should still work but it will probably cause issues if used with the mouse at the same time.", Colors.yellow);
+        //         msgWindow->renderer->Println("The issue should be fixable with a restart.", Colors.yellow);
+        //         msgWindow->renderer->Println();
+
+        //     }
+
+        //     msgWindow->hidden = false;
+        //     msgWindow->oldHidden = true;
+
+
+            
+
+        // }
+
+        osStats.frameEndTime = PIT::TimeSinceBootMicroS();
+        osStats.totalFrameTime = osStats.frameEndTime - osStats.frameStartTime;
+    }
+}
+
+
+
+
+
+void RecoverDed()
+{
+    //osData.osTasks.clear();
+
+    for (int i = 0; i < osData.windows.getCount(); i++)
+    {
+        osData.windows.elementAt(i)->hidden = true;
+        osData.windows.elementAt(i)->oldHidden = true;
+    }
+
+    if (osData.activeCrashWindow != NULL)
+    {
+        osData.activeCrashWindow->hidden = false;
+        osData.activeCrashWindow->oldHidden = true;
+    }
+
+    if (osData.preCrashWindow != NULL)
+    {
+        osData.preCrashWindow->hidden = true;
+        osData.preCrashWindow->oldHidden = true;
+        //osData.osTasks.add(NewWindowCloseTask(osData.preCrashWindow));
+        if (osData.preCrashWindow->instance != NULL && osData.preCrashWindow->instance->instanceType == InstanceType::Terminal)
+        {
+            TerminalInstance* terminal = (TerminalInstance*)osData.preCrashWindow->instance;
+            while (terminal->tasks.getCount() > 0)
+            {
+                Task* tsk = terminal->tasks.elementAt(0);
+                FreeTask(tsk);
+                terminal->tasks.removeFirst();
+            }
+            NewTerminalInstance* bruh2 = ((NewTerminalInstance*)terminal->newTermInstance);
+            if (bruh2 != NULL)
+            {
+                bruh2->Println("\n\nCurrent Tasks forcibly stopped, due them possibly having crashed the OS!", Colors.bred);
+                terminal->PrintUserIfNeeded();
+            }
+        }
+    }
+
+    MStackData::stackPointer = 0;
+
+    RenderLoop();
+}
+
+
+
+
+
+
+
+
 
 uint8_t port64Val = 0;
 bool keyboardWeird = false;
@@ -165,8 +663,6 @@ void boot(BootInfo* bootInfo)
     // GlobalRenderer->Clear(Colors.black);
     // GlobalRenderer->Println("LESS GO!");
     // while (true);
-
-
 
 
     
@@ -435,478 +931,23 @@ void boot(BootInfo* bootInfo)
 
 
 
-    
-    osData.windowPointerThing->Clear();
-    osData.windowPointerThing->RenderWindows();
-    bool updateBorder = true;
-    bool bgm = osData.drawBackground;
-    int frame = 0;
-    int tFrame = 0;
-    uint64_t oldTime = PIT::TimeSinceBootMS();
-    //double fps = 1;
-    uint64_t fps = 1;
 
-    uint64_t frameSum = 0;
+
 
     osData.wantedFps = 150;
-    uint32_t TwantedFps = 1000;
-    uint64_t timeForFps = 1000;
 
 
-    while(!osData.exit)
-    {
-        RND::lehmer64();
-        AddToStack();
-        freeCount = 0;
-        mallocCount = 0;
-        osStats.frameStartTime = PIT::TimeSinceBootMicroS();
+    //PIT::Sleep(4000);
 
-        if (!osData.startMenuWindow->hidden && activeWindow != osData.startMenuWindow)
-        {
-            osData.startMenuWindow->hidden = true;
-            osData.startMenuWindow->oldHidden = false;
-            activeWindow = NULL;
-        }
+    // int Ax = 0;
+    // int Ay = 0;
 
-        if (TwantedFps != osData.wantedFps)
-        {
-            TwantedFps = osData.wantedFps;
-            timeForFps = 1000000 / osData.wantedFps;
-        }
+    // int Az = Ax/Ay;
 
+    RenderLoop();
 
 
-        if (++tFrame >= 1000)
-            tFrame = 0;
 
-        frame++;  
-        if (frame >= 30)
-        {
-            uint64_t currTime = PIT::TimeSinceBootMS();
-            //fps = ((frame - 1)*1000.0) / (currTime - oldTime);
-            if ((currTime - oldTime) == 0)
-            {
-                fps = 9999;
-            }
-            else
-                fps = ((frame - 1)*1000) / (currTime - oldTime);
-            oldTime = currTime;
-            frame = 0;
-        }
-        RemoveFromStack();
-
-        testRect->position.x = frame * 5;
-        //testRect->position.y = frame * 3;
-
-        box->position.x = frame * 6;
-        
-
-
-        ProcessMousePackets();
-        HandleKeyboardList(20);
-
-      
-
-        if (bgm != osData.drawBackground)
-        {
-            osData.windowPointerThing->RenderWindows();
-            bgm = osData.drawBackground;
-        }
-
-   
-
-        AddToStack();
-        {
-            uint64_t tS = PIT::TimeSinceBootMicroS();
-
-            if (activeWindow != NULL)
-            {
-                updateBorder = true;
-                if (activeWindow->moveToFront)
-                {
-                    activeWindow->moveToFront = false;
-                    int index = osData.windows.getIndexOf(activeWindow);
-                    if (index == osData.windows.getCount() - 1)
-                    {
-                        osData.windowPointerThing->UpdateWindowBorder(activeWindow);
-                        osData.windowPointerThing->RenderWindow(activeWindow);
-                    }
-                    else if (index != -1)
-                    {
-                        Window* oldActive = osData.windows[osData.windows.getCount() - 1];
-                        osData.windows.removeAt(index);
-                        osData.windows.add(activeWindow);
-                        
-                        osData.windowPointerThing->UpdateWindowBorder(oldActive);
-
-                        osData.windowPointerThing->RenderWindow(activeWindow);
-                        osData.windowPointerThing->UpdateWindowBorder(activeWindow);
-                    }
-                }
-            }
-            else
-            {
-                if (updateBorder)
-                {
-                    updateBorder = false;
-                    {
-                        Window* oldActive = osData.windows[osData.windows.getCount() - 1];
-                        
-                        osData.windowPointerThing->UpdateWindowBorder(oldActive);
-                    }
-                }
-            }
-
-            for (int i = 0; i < osData.windows.getCount(); i++)
-            {            
-                Window* window = osData.windows[i];
-
-                if (window == osData.debugTerminalWindow && !osData.showDebugterminal)
-                    continue;
-                
-                if (window->hidden != window->oldHidden)
-                {
-                    window->oldHidden = window->hidden;
-                    osData.windowPointerThing->UpdatePointerRect(
-                        window->position.x - 1, 
-                        window->position.y - 23, 
-                        window->position.x + window->size.width, 
-                        window->position.y + window->size.height
-                        );
-                }
-
-                {
-                    int x1 = window->position.x - 1;
-                    int y1 = window->position.y - 23;
-                    int sx1 = window->size.width + 3;
-                    int sy1 = window->size.height + 25;
-
-                    bool update = false;
-
-                    int x2 = x1;
-                    int y2 = y1;
-                    int sx2 = sx1;
-                    int sy2 = sy2;
-
-                    if (window->maximize != window->oldMaximize)
-                    {
-                        if (window->maximize)
-                        {
-                            window->oldPreMaxPosition = window->position;
-                            window->oldPreMaxSize = window->size;
-
-                            window->oldPreMaxBorder = window->showBorder;
-                            window->oldPreMaxTitle = window->showTitleBar;
-
-                            window->newPosition = Position(0, 23);
-                            window->newSize = Size(GlobalRenderer->framebuffer->Width, GlobalRenderer->framebuffer->Height);
-
-                            window->showBorder = false;
-                            //window->showTitleBar = false;
-
-                            window->oldMaximize = true;
-                        }
-                        else
-                        {
-                            window->newPosition = window->oldPreMaxPosition;
-                            window->newSize = window->oldPreMaxSize;
-
-                            window->showBorder = window->oldPreMaxBorder;
-                            window->showTitleBar = window->oldPreMaxTitle;
-
-                            window->oldMaximize = false;
-                        }
-                    }
-
-
-                    Size nSize = window->newSize;
-                    Position nPos = window->newPosition;
-
-
-                    if (window->size != nSize)
-                    {
-                        window->Resize(nSize);
-                        {
-                            x2 = window->position.x - 1;
-                            y2 = window->position.y - 23;
-                            sx2 = window->size.width + 3;
-                            sy2 = window->size.height + 25;
-
-                            update = true;
-                        }
-                    }
-
-                    if (window->position != nPos)
-                    {
-                        window->position = nPos;
-
-                        x2 = window->position.x - 1;
-                        y2 = window->position.y - 23;
-                        sx2 = window->size.width + 3;
-                        sy2 = window->size.height + 25;
-
-                        update = true;
-                    }
-
-                    if (update)
-                    {
-                        int rx1 = min(x1, x2);
-                        int ry1 = min(y1, y2);
-                        int rx2 = max(x1 + sx1, x2 + sx2);
-                        int ry2 = max(y1 + sy1, y2 + sy2);
-
-                        int AR = (rx2 - rx1) * (ry2 - ry1);
-                        int A1 = sx1 * sy1;
-                        int A2 = sx2 * sy2;
-
-                        if (AR <= A1+A2)
-                        {
-                            osData.windowPointerThing->UpdatePointerRect(rx1, ry1, rx2, ry2);
-                        }
-                        else
-                        {
-                            osData.windowPointerThing->UpdatePointerRect(x1, y1, x1 + sx1, y1 + sy1);
-                            osData.windowPointerThing->UpdatePointerRect(x2, y2, x2 + sx2, y2 + sy2);
-                        }
-                    }
-                }
-                if (window->instance != NULL && (activeWindow == window || frame % 5 == (i%8)))
-                {
-                    if (window->instance->instanceType == InstanceType::Terminal)
-                    {
-                        TerminalInstance* termInst1 = (TerminalInstance*)window->instance;
-                        if (termInst1->newTermInstance != NULL)
-                        {
-                            NewTerminalInstance* termInst2 = (NewTerminalInstance*)termInst1->newTermInstance;
-                            termInst2->DoRender();
-                        }
-                    }   
-                    else if (window->instance->instanceType == InstanceType::GUI)
-                    {
-                        GuiInstance* guiInst = (GuiInstance*)window->instance;
-                        guiInst->Render();
-                    }   
-                }
-                
-            }
-
-            osStats.totalWindowUpdateTime = PIT::TimeSinceBootMicroS() - tS;
-        }
-        RemoveFromStack();
-
-
-
-        {
-            uint64_t tS = PIT::TimeSinceBootMicroS();
-            AddToStack();
-            Taskbar::RenderTaskbar();
-            MPoint mPos = MousePosition;
-            DrawMousePointer2(osData.windowPointerThing->virtualScreenBuffer, mPos);
-            osData.windowPointerThing->fps = fps;
-            osData.windowPointerThing->Render();
-            osData.windowPointerThing->UpdatePointerRect(mPos.x - 32, mPos.y - 32, mPos.x + 32, mPos.y + 32);
-            osStats.totalRenderTime = PIT::TimeSinceBootMicroS() - tS;
-            RemoveFromStack();
-        }
-
-
-
-        {
-            AddToStack();
-            uint64_t totTaskTemp = 0;
-            uint64_t totOsTaskTemp = 0;
-
-            uint64_t tS1 = PIT::TimeSinceBootMicroS();
-            uint64_t tempVal = osStats.frameStartTime + timeForFps;
-
-
-            {
-                for (int i = 0; i < osData.windows.getCount(); i++)
-                {     
-                    Window* window = osData.windows[i];
-                    if (window->instance == NULL)
-                        continue;
-                    if (window->instance->instanceType != InstanceType::Terminal)
-                        continue;
-
-                    TerminalInstance* terminal = (TerminalInstance*)window->instance;
-
-                    if (terminal->tasks.getCount() != 0)
-                    {
-                        Task* task = terminal->tasks[0];
-                        task->tempTime = 0;
-                    }
-                    else if (terminal->closeWindowAfterTask)
-                    {
-                        osData.osTasks.add(NewWindowCloseTask(window));
-                    }
-                }
-            }
-
-            bool startThing = true;
-            while (PIT::TimeSinceBootMicroS() < tempVal || startThing)
-            {
-                startThing = false;
-                //double endTime = PIT::TimeSinceBoot + 0.02;
-                {
-                    uint64_t tS = PIT::TimeSinceBootMicroS();
-                    //for (int ax = 0; ax < 10; ax++)
-                    {
-                        //GlobalRenderer->Print("A");
-                        for (int i = 0; i < osData.windows.getCount(); i++)
-                        {     
-                            //GlobalRenderer->Print("B");
-                            
-                            Window* window = osData.windows[i];
-                            if (window->instance == NULL)
-                                continue;
-                            if (window->instance->instanceType != InstanceType::Terminal)
-                                continue;
-
-                            TerminalInstance* terminal = (TerminalInstance*)window->instance;
-
-                            if (terminal->tasks.getCount() != 0)
-                            {
-                                uint64_t tS2 = PIT::TimeSinceBootMicroS();
-                                Task* task = terminal->tasks[0];
-                                DoTask(task);
-                                task->tempTime += PIT::TimeSinceBootMicroS() - tS2;
-                                if (task->GetDone())
-                                {
-                                    terminal->tasks.removeFirst();
-                                    FreeTask(task);
-                                    //GlobalRenderer->Println("TASK DONE");
-                                    terminal->PrintUserIfNeeded();
-                                }
-                                else
-                                {
-                                    
-                                    //GlobalRenderer->Println("TASK NOT DONE");
-                                }
-                            }
-                        }
-                        //PIT::Sleep(10);
-                        //asm("hlt");
-                    }
-                    totTaskTemp += PIT::TimeSinceBootMicroS() - tS;
-                }
-                
-
-                {
-                    uint64_t tS = PIT::TimeSinceBootMicroS();
-                    if (osData.osTasks.getCount() > 0)
-                    {
-                        uint64_t tS2 = PIT::TimeSinceBootMicroS();
-                        Task* task = osData.osTasks[0];
-                        DoTask(task);
-                        task->tempTime += PIT::TimeSinceBootMicroS() - tS2;
-                        if (task->GetDone())
-                        {
-                            osData.osTasks.removeFirst();
-                            FreeTask(task);
-                        }
-                    }
-                    totOsTaskTemp += PIT::TimeSinceBootMicroS() - tS;
-                }
-            }
-
-            {
-                for (int i = 0; i < osData.windows.getCount(); i++)
-                {     
-                    Window* window = osData.windows[i];
-                    if (window->instance == NULL)
-                        continue;
-                    if (window->instance->instanceType != InstanceType::Terminal)
-                        continue;
-
-                    TerminalInstance* terminal = (TerminalInstance*)window->instance;
-
-                    if (terminal->tasks.getCount() != 0)
-                    {
-                        Task* task = terminal->tasks[0];
-                        task->actTime = task->tempTime;
-                    }
-                }
-            }
-
-            osStats.totalIdleTime = PIT::TimeSinceBootMicroS() - tS1;
-            osStats.totalTaskTime = totTaskTemp;
-            osStats.totalOsTaskTime = totOsTaskTemp;
-            RemoveFromStack();
-        }
-
-
-
-
-        //GlobalRenderer->Print("C");
-        //asm("hlt");
-        // {
-        //     uint64_t tS = PIT::TimeSinceBootMicroS();
-        //     uint64_t tempVal = osStats.frameStartTime + timeForFps;
-        //     while (PIT::TimeSinceBootMicroS() < tempVal)
-        //         asm("hlt");
-        //     osStats.totalIdleTime = PIT::TimeSinceBootMicroS() - tS;
-        // }
-
-        IO_CHECK();
-        osStats.testThing = port64Val;
-        if (keyboardWeird && !oldKeyboardWeird)
-        {
-            oldKeyboardWeird = true;
-            
-            Window* msgWindow;
-            {
-
-
-                msgWindow = (Window*)_Malloc(sizeof(Window), "Warning Window");
-                Size size = Size(800, 16*10);
-                Position pos = Position(((GlobalRenderer->framebuffer->Width - size.width) / 2), ((GlobalRenderer->framebuffer->Height) / 5));
-                
-                if (msgWindow != NULL)
-                {
-                    //GlobalRenderer->Println("BRUH 4.5", Colors.yellow);
-                    *(msgWindow) = Window(NULL, size, pos, "WARNING ABOUT YOUR PS/2 KEYBOARD", true, true, true);
-                    //GlobalRenderer->Println("BRUH 4.6", Colors.yellow);
-                    osData.windows.add(msgWindow);
-                    //GlobalRenderer->Println("BRUH 4.7", Colors.yellow);
-
-                    activeWindow = msgWindow;
-                    //osData.mainTerminalWindow = msgWindow;
-                    msgWindow->moveToFront = true;
-                }
-            }
-            // it crashes between 4 and 5, probably while trying to allocate memory since it used all the memory
-            //GlobalRenderer->Println("BRUH 5", Colors.yellow);
-            
-            if (msgWindow != NULL)
-            {
-                //GlobalRenderer->Println("BRUH 5.1", Colors.yellow);
-                //GlobalRenderer->Print("Win x: {}", to_string(crashWindow->size.width), Colors.yellow);
-                //GlobalRenderer->Println(", y: {}", to_string(crashWindow->size.height), Colors.yellow);
-                msgWindow->renderer->Clear(Colors.black);
-                //GlobalRenderer->Println("BRUH 5.2", Colors.yellow);
-                msgWindow->renderer->Println("------------------------------------------------", Colors.bred);
-                msgWindow->renderer->Println("WARNING: Your PS/2 Keyboard is having issues!", Colors.bred);
-                msgWindow->renderer->Println("------------------------------------------------", Colors.bred);
-                msgWindow->renderer->Println();
-                //GlobalRenderer->Println("BRUH 5.3", Colors.yellow);
-                msgWindow->renderer->Println("It should still work but it will probably cause issues if used with the mouse at the same time.", Colors.yellow);
-                msgWindow->renderer->Println("The issue should be fixable with a restart.", Colors.yellow);
-                msgWindow->renderer->Println();
-
-            }
-
-            msgWindow->hidden = false;
-            msgWindow->oldHidden = true;
-
-
-            
-
-        }
-
-        osStats.frameEndTime = PIT::TimeSinceBootMicroS();
-        osStats.totalFrameTime = osStats.frameEndTime - osStats.frameStartTime;
-    }
 
     GlobalRenderer->Clear(Colors.black);
     GlobalRenderer->color = Colors.white;

@@ -9,18 +9,52 @@
 #include "../OSDATA/MStack/MStackM.h"
 #include "../OSDATA/osStats.h"
 
+#define SURVIVE_CRASH     void** p = search((void**)&p, __builtin_return_address(0)); \
+    *p = (void*)BruhusSafus;
+
+
+#include "../kernel.h"
+
+extern "C" void BruhusSafus()
+{
+    //GlobalRenderer->Clear(Colors.green);
+    //PIT::Sleep(1000);
+    // GlobalRenderer->Clear(Colors.red);
+    // while (true);
+    RecoverDed();
+}
+
+void** search(void** addr, void* value) __attribute__((noinline));
+void** search(void** addr, void* value)
+{
+    while(*addr != value) addr++;
+    return addr;
+}
+// https://stackoverflow.com/questions/27213382/how-to-modify-return-address-on-stack-in-c-or-assembly
+
+
+
+
+
+
+
+
 __attribute__((interrupt)) void PageFault_handler(interrupt_frame* frame)//, uint64_t error)
 {
     AddToStack();
-    Panic("Page Fault Detected!");
+    Panic("Page Fault Detected!", false);
     RemoveFromStack();
+
+    SURVIVE_CRASH
 }
 
 __attribute__((interrupt)) void DoubleFault_handler(interrupt_frame* frame)//, uint64_t error)
 {
     AddToStack();
-    Panic("Double Fault Detected!");
+    Panic("Double Fault Detected!", false);
     RemoveFromStack();
+
+    SURVIVE_CRASH
 }
 
 __attribute__((interrupt)) void GPFault_handler(interrupt_frame* frame)//, uint64_t error)
@@ -29,49 +63,67 @@ __attribute__((interrupt)) void GPFault_handler(interrupt_frame* frame)//, uint6
     Panic("General Protection Fault Detected! (ERROR: {})", to_string(frame->base_frame.error_code), false);
     //Panic("General Protection Fault Detected! {}", to_string(*((uint64_t*)frame)), true);
     RemoveFromStack();
+
+    SURVIVE_CRASH
 }
 
 __attribute__((interrupt)) void GenFault_handler(interrupt_frame* frame)
 {
     AddToStack();
-    Panic("General Fault Detected!", true);
+    Panic("General Fault Detected!", false);
     RemoveFromStack();
+
+    SURVIVE_CRASH
 }
 
 __attribute__((interrupt)) void GenFaultWithError_handler(interrupt_frame* frame)//, uint64_t error)
 {
     AddToStack();
-    Panic("General Fault Detected!", true);
+    Panic("General Fault Detected!", false);
     RemoveFromStack();
+
+    SURVIVE_CRASH
 }
 
 
 __attribute__((interrupt)) void GenFloatFault_handler(interrupt_frame* frame)
 {
     AddToStack();
-    Panic("General Float Fault Detected!");
+    Panic("General Float Fault Detected!", false);
     RemoveFromStack();
+
+    SURVIVE_CRASH
 }
+
+
 
 __attribute__((interrupt)) void GenMathFault_handler(interrupt_frame* frame)
 {
     AddToStack();
-    Panic("General Math Fault Detected!");
+    Panic("General Math Fault Detected!", false);
     RemoveFromStack();
+
+
+
+    SURVIVE_CRASH
 }
 
 __attribute__((interrupt)) void Debug_handler(interrupt_frame* frame)
 {
     AddToStack();
-    Panic("Debug thing Detected!");
+    Panic("Debug thing Detected!", false);
     RemoveFromStack();
+
+    SURVIVE_CRASH
 }
 
 __attribute__((interrupt)) void Breakpoint_handler(interrupt_frame* frame)
 {
     AddToStack();
-    Panic("Breakpoint Detected!", true);
+    Panic("Breakpoint Detected!", false);
     RemoveFromStack();
+
+    SURVIVE_CRASH
 }
  
 __attribute__((interrupt)) void KeyboardInt_handler(interrupt_frame* frame)
@@ -113,29 +165,37 @@ __attribute__((interrupt)) void PITInt_handler(interrupt_frame* frame)
 __attribute__((interrupt)) void VirtualizationFault_handler(interrupt_frame* frame)
 {
     AddToStack();
-    Panic("Virtualization Fault Detected!", true);
+    Panic("Virtualization Fault Detected!", false);
     RemoveFromStack();
+
+    SURVIVE_CRASH
 }
 
 __attribute__((interrupt)) void ControlProtectionFault_handler(interrupt_frame* frame)//, uint64_t error)
 {
     AddToStack();
-    Panic("Control Protection Fault Detected!", true);
+    Panic("Control Protection Fault Detected!", false);
     RemoveFromStack();
+
+    SURVIVE_CRASH
 }
 
 __attribute__((interrupt)) void HypervisorFault_handler(interrupt_frame* frame)
 {
     AddToStack();
-    Panic("Hypervisor Fault Detected!", true);
+    Panic("Hypervisor Fault Detected!", false);
     RemoveFromStack();
+
+    SURVIVE_CRASH
 }
 
 __attribute__((interrupt)) void VMMCommunicationFault_handler(interrupt_frame* frame)//, uint64_t error)
 {
     AddToStack();
-    Panic("VMM Communication Fault Detected!", true);
+    Panic("VMM Communication Fault Detected!", false);
     RemoveFromStack();
+
+    SURVIVE_CRASH
 }
 
 

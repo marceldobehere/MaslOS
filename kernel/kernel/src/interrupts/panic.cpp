@@ -78,6 +78,8 @@ void Panic(const char* panicMessage, const char* var, bool lock)
     // ok so it crashes
     // just get a good cmd working with good fs stuff and a programming lang
 
+    osData.preCrashWindow = activeWindow;
+
     if (osData.maxNonFatalCrashCount-- > 0 && !lock && !osData.booting)
     {
         //GlobalRenderer->Println("BRUH 1", Colors.yellow);
@@ -108,6 +110,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
 
                     activeWindow = crashWindow;
                     osData.mainTerminalWindow = crashWindow;
+                    osData.activeCrashWindow = crashWindow;
                     crashWindow->moveToFront = true;
                 }
             }

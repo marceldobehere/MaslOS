@@ -445,9 +445,12 @@ void HandleClick(bool L, bool R, bool M)
     //activeWindow->renderer->Println("Click");
     if (L || R || M)
     {
+        AddToStack();
         Window* oldActive = activeWindow;
         Window* window = WindowManager::getWindowAtMousePosition();
+        RemoveFromStack();
 
+        AddToStack();
         WindowActionEnum action = WindowActionEnum::_NONE;
         if (L && WindowManager::currentActionWindow != NULL)
         {
@@ -458,11 +461,15 @@ void HandleClick(bool L, bool R, bool M)
                     WindowManager::currentActionWindow = NULL;
             }
         }
+        RemoveFromStack();
 
+        AddToStack();
         if (action != WindowActionEnum::_NONE) // Window Button Clicked
         {
+            AddToStack();
             if (action == WindowActionEnum::CLOSE)
             {
+                AddToStack();
                 if (osData.debugTerminalWindow != WindowManager::currentActionWindow)
                 {
                     // osData.debugTerminalWindow->Log("Count: {}", to_string(osData.osTasks.getCount()), Colors.yellow);
@@ -471,6 +478,7 @@ void HandleClick(bool L, bool R, bool M)
                 }
                 else
                 {
+                    AddToStack();
                     osData.showDebugterminal = false;
                     osData.windowPointerThing->UpdatePointerRect(
                         osData.debugTerminalWindow->position.x - 1, 
@@ -478,24 +486,31 @@ void HandleClick(bool L, bool R, bool M)
                         osData.debugTerminalWindow->position.x + osData.debugTerminalWindow->size.width, 
                         osData.debugTerminalWindow->position.y + osData.debugTerminalWindow->size.height
                         );
+                    RemoveFromStack();
                 }
+                RemoveFromStack();
             }
             else if (action == WindowActionEnum::HIDE)
             {
+                AddToStack();
                 WindowManager::currentActionWindow->hidden = true;
                 if (activeWindow == WindowManager::currentActionWindow)
                     activeWindow = NULL;
+                RemoveFromStack();
             }
             else if (action == WindowActionEnum::MIN_MAX)
             {
+                AddToStack();
                 WindowManager::currentActionWindow->maximize = !WindowManager::currentActionWindow->maximize;
                 activeWindow = WindowManager::currentActionWindow;
                 activeWindow->moveToFront = true;
+                AddToStack();
             }
+            RemoveFromStack();
         }
         else
         {
-            
+            AddToStack();
             oldActive = activeWindow;
             //if (L)
             {
@@ -503,9 +518,12 @@ void HandleClick(bool L, bool R, bool M)
                 
                 dragWindow = window;
             }
+            RemoveFromStack();
+
             startDrag = false;
             if (window != NULL)
             {
+                AddToStack();
                 activeDragOn = false;
                 for (int i = 0; i < 4; i++)
                 {
@@ -516,12 +534,13 @@ void HandleClick(bool L, bool R, bool M)
                 diff.x = MousePosition.x;
                 diff.y = MousePosition.y;
                 window->moveToFront = true;
+                RemoveFromStack();
 
-
+                AddToStack();
                 if (!activeDragOn && MousePosition.y > window->position.y + 20)
                 {
                     dragWindow = NULL;
-                    if (window->instance->instanceType == InstanceType::GUI)
+                    if (window->instance != NULL && window->instance->instanceType == InstanceType::GUI)
                     {
                         GuiInstance* gui = (GuiInstance*)window->instance;
                         // if (gui->screen != NULL && gui->screen->selectedComponent != NULL)
@@ -533,6 +552,7 @@ void HandleClick(bool L, bool R, bool M)
                         }
                     }
                 }
+                RemoveFromStack();
                 //osData.windowPointerThing->UpdateWindowBorder(osData.windows[osData.windows.getCount() - 1]);
             }
             else
@@ -540,14 +560,23 @@ void HandleClick(bool L, bool R, bool M)
 
                 //osData.windowPointerThing->UpdateWindowBorder(osData.windows[osData.windows.getCount() - 1]);
 
-
+                AddToStack();
                 if (L && Taskbar::activeTabWindow != NULL) // Taskbar Button Clicked
                 {
                     activeWindow = Taskbar::activeTabWindow;
                     Taskbar::activeTabWindow->moveToFront = true;
                     activeWindow->hidden = false;
                 }
+                RemoveFromStack();
 
+                AddToStack();
+                if (M && Taskbar::activeTabWindow != NULL) // Taskbar Button Middle-Clicked
+                {
+                    osData.osTasks.add(NewWindowCloseTask(Taskbar::activeTabWindow));
+                }
+                RemoveFromStack();
+
+                AddToStack();
                 if (L && Taskbar::MButtonSelected)
                 {
                     if (oldActive == osData.startMenuWindow)
@@ -561,15 +590,18 @@ void HandleClick(bool L, bool R, bool M)
                         activeWindow = osData.startMenuWindow;
                     }
                 }
-
+                RemoveFromStack();
 
             }
         }
+        RemoveFromStack();
         
+        AddToStack();
         if (oldActive != NULL)
         {
             osData.windowPointerThing->UpdateWindowBorder(oldActive);
         }
+        RemoveFromStack();
     }  
     RemoveFromStack(); 
 }

@@ -295,6 +295,12 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     if (StrEquals(input, "crash"))
     {
         Println(window, "Crashing...");
+        
+            // int Ax = 0;
+            // int Ay = 0;
+
+            // int Az = Ax/Ay;
+        
         asm("int $0x01");
         RemoveFromStack();
         return;

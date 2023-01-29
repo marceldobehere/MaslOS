@@ -182,6 +182,8 @@ void InitializeHeap(void* heapAddress, size_t pageCount)
         MallocCache16BytesFree[i] = true;
         MallocCache16BytesAddr[i] = _Malloc(MallocCacheSize, "Init malloc cache");
         MallocCache16BytesTime[i] = 0;
+        if (MallocCache16BytesAddr[i] == NULL)
+            Panic("Malloc Cache is NULL", true);
     }
     mallocToCache = false;
     lastUpdateTime = 0;
@@ -198,7 +200,7 @@ void UpdateMallocCache()
 
     AddToStack();
     uint64_t now = PIT::TimeSinceBootMS();
-    if (now > lastUpdateTime + 500)
+    if (now < lastUpdateTime + 500)
     {
         RemoveFromStack();
         return;
@@ -211,9 +213,9 @@ void UpdateMallocCache()
     {
         if (!MallocCache16BytesFree[i] && now > MallocCache16BytesTime[i] + 800)
         {
-            MallocCache16BytesFree[i] = true;
             MallocCache16BytesAddr[i] = _Malloc(MallocCacheSize, "Malloc cache");
             MallocCache16BytesTime[i] = PIT::TimeSinceBootMS();
+            MallocCache16BytesFree[i] = true;
         }
     }
     mallocToCache = false;

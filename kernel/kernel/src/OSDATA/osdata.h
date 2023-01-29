@@ -33,6 +33,8 @@ struct OSData
     Window* mainTerminalWindow;
     Window* debugTerminalWindow;
     Window* startMenuWindow;
+    Window* activeCrashWindow;
+    Window* preCrashWindow;
     bool showDebugterminal;
     // MStack stackArr[1000];
     // int64_t stackPointer = 0;

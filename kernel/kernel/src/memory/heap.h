@@ -90,7 +90,7 @@ void* _Xmalloc(size_t size, const char* text, const char* func, const char* file
 
 
 
-#define MallocCacheCount 4
+#define MallocCacheCount 16
 #define MallocCacheSize 16
 
 extern void* MallocCache16BytesAddr [MallocCacheCount];
