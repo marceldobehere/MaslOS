@@ -35,7 +35,7 @@ void* _Xmalloc(size_t size, const char* text, const char* func, const char* file
 // void* _X_malloc(size_t size, const char* text, const char* func, const char* file, int line);
 
 
-
+bool HeapCheck();
 
 
 

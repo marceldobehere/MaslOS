@@ -602,6 +602,8 @@ void RecoverDed()
     MStackData::stackPointer = 0;
     WindowManager::testInterlace = 1;
 
+    HeapCheck();
+
     RenderLoop();
 }
 

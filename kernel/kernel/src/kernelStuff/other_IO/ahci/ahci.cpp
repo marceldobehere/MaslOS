@@ -356,7 +356,8 @@ namespace AHCI
 
         ABAR = (HBAMemory*)(uint64_t)((PCI::PCIHeader0*)(uint64_t)pciBaseAddress)->BAR5;
 
-        //GlobalPageTableManager.MapMemory(ABAR, ABAR);
+        GlobalPageTableManager.MapMemory(ABAR, ABAR);
+        ABAR->globalHostControl |= 0x80000000;
 
         ProbePorts();
 

@@ -247,6 +247,13 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         return;
     }
 
+    if (StrEquals(input, "heap check"))
+    {
+        HeapCheck();
+        RemoveFromStack();
+        return;
+    }
+
     if (StrEquals(input, "exit"))
     {
         Println(window, "Exiting...");

@@ -240,6 +240,75 @@ uint64_t mCount = 0;
 
 
 
+bool HeapCheck()
+{
+    GlobalRenderer->Clear(Colors.black);
+    GlobalRenderer->Println("> Performing Heap Check...", Colors.white);
+    PIT::Sleep(100);
+    bool foundError = false;
+
+    HeapSegHdr* current = (HeapSegHdr*) heapStart;
+    int counter = 0;
+    while(true)
+    {
+        counter++;
+        if (GlobalRenderer->CursorPosition.y >= ((GlobalRenderer->framebuffer->Height * 3) / 4))
+        {
+            //PIT::Sleep(200);
+            GlobalRenderer->Clear(Colors.black);
+            GlobalRenderer->Println("> Heap Check:", Colors.white);
+        }
+        GlobalRenderer->Println("<Heapseg: {}>", to_string(counter), Colors.yellow);
+
+        if ((uint64_t)current < 10000)
+        {
+            GlobalRenderer->Println("*Heapseg is at NULL!", Colors.bred);
+            GlobalRenderer->Println("-> Heapseg addr: 0x{}", ConvertHexToString((uint64_t)current), Colors.bred);
+            break;
+        }
+
+        if (current->magicNum != HeapMagicNum)
+        {
+            GlobalRenderer->Println("*Heapseg is invalid!", Colors.bred);
+            GlobalRenderer->Println("-> Heapseg addr: 0x{}", ConvertHexToString((uint64_t)current), Colors.bred);
+            break;
+        }
+
+        if (current->next == NULL)
+            break;
+        
+        if (((uint64_t)(current->length + sizeof(HeapSegHdr) + (uint64_t)current)) != (uint64_t)current->next)
+        {
+            GlobalRenderer->Print("* Heapseg at 0x{} ", ConvertHexToString((uint64_t)current), Colors.bred);
+            GlobalRenderer->Print("with size: {} ", to_string(current->length), Colors.bred);
+            GlobalRenderer->Print("+ {} ", to_string(sizeof(HeapSegHdr)), Colors.bred);
+            GlobalRenderer->Println("= 0x{}", ConvertHexToString(((uint64_t)(current->length + sizeof(HeapSegHdr) + (uint64_t)current))), Colors.bred);
+            GlobalRenderer->Println("-> Points to 0x{}!", ConvertHexToString((uint64_t)current->next), Colors.bred);
+
+            GlobalRenderer->Println();
+            break;
+        }
+
+
+        current = current->next;
+    }
+
+
+    GlobalRenderer->Println("> Heap Check Done!", Colors.white);
+    if (foundError)
+    {
+        GlobalRenderer->Println("> Heap has Errors!", Colors.white);
+        while (true)
+            ;
+        return false;
+    }
+    PIT::Sleep(500);
+    osData.windowPointerThing->Clear();
+    osData.windowPointerThing->RenderWindows();
+    return true;
+}
+
+
 void* _Xmalloc(size_t size, const char* text, const char* func, const char* file, int line)
 {
     mCount++;
@@ -304,7 +373,7 @@ void* _Xmalloc(size_t size, const char* text, const char* func, const char* file
 
         if (current->free)
         {
-            if (current->length > size)
+            if (current->length > (size + sizeof(HeapSegHdr) + 0x10))
             {
                 if (current->Split(size) == NULL)
                 {
