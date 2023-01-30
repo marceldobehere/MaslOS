@@ -555,6 +555,8 @@ void RenderLoop()
 
 void RecoverDed()
 {
+    HeapCheck();
+    
     //osData.osTasks.clear();
 
     osData.bgTaskRun = false;
@@ -601,8 +603,6 @@ void RecoverDed()
 
     MStackData::stackPointer = 0;
     WindowManager::testInterlace = 1;
-
-    HeapCheck();
 
     RenderLoop();
 }

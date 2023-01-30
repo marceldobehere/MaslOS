@@ -250,6 +250,8 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     if (StrEquals(input, "heap check"))
     {
         HeapCheck();
+        osData.windowPointerThing->Clear();
+        osData.windowPointerThing->RenderWindows();
         RemoveFromStack();
         return;
     }

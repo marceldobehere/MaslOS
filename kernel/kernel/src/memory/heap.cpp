@@ -242,6 +242,7 @@ uint64_t mCount = 0;
 
 bool HeapCheck()
 {
+    AddToStack();
     GlobalRenderer->Clear(Colors.black);
     GlobalRenderer->Println("> Performing Heap Check...", Colors.white);
     PIT::Sleep(100);
@@ -300,11 +301,13 @@ bool HeapCheck()
         GlobalRenderer->Println("> Heap has Errors!", Colors.white);
         while (true)
             ;
+        
+        RemoveFromStack();
         return false;
     }
     PIT::Sleep(500);
-    osData.windowPointerThing->Clear();
-    osData.windowPointerThing->RenderWindows();
+
+    RemoveFromStack();
     return true;
 }
 
