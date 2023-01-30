@@ -807,7 +807,7 @@ if (window != NULL)
             uint32_t*  cPixel = (uint32_t*)  copyOfScreenBuffer->BaseAddress;
             uint32_t*  aPixel = (uint32_t*)  actualScreenBuffer->BaseAddress;
 
-
+            AddToStack();
             for (int64_t y = 0; y < h; y++)
             {
                 aPixel = (uint32_t*)  actualScreenBuffer->BaseAddress + y * actualScreenBuffer->PixelsPerScanLine;
@@ -824,6 +824,8 @@ if (window != NULL)
                     aPixel++;
                 } 
             }
+            RemoveFromStack();
+
             RemoveFromStack();
         }
 

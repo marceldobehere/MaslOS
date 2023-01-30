@@ -53,8 +53,25 @@ void RenderLoop()
     uint64_t timeForFps = 1000;
 
 
+
     while(!osData.exit)
     {
+
+        // {
+        //     void* a = _Malloc(16, "bruh 1");
+        //     void* b = _Malloc(16, "bruh 2");
+        //     void* c = _Malloc(16, "bruh 3");
+               
+        //     ((uint8_t*)a)[0] = 'A';
+        //     ((uint8_t*)b)[1] = 'B';
+        //     ((uint8_t*)c)[2] = 'C';
+
+        //     _Free(a);
+        //     _Free(b);
+        //     _Free(c);
+        // }
+
+
         RND::lehmer64();
         AddToStack();
         freeCount = 0;

@@ -200,7 +200,7 @@ void UpdateMallocCache()
 
     AddToStack();
     uint64_t now = PIT::TimeSinceBootMS();
-    if (now < lastUpdateTime + 500)
+    if (now < lastUpdateTime + 400)
     {
         RemoveFromStack();
         return;
@@ -213,8 +213,8 @@ void UpdateMallocCache()
     {
         if (!MallocCache16BytesFree[i] && now > MallocCache16BytesTime[i] + 800)
         {
-            MallocCache16BytesAddr[i] = _Malloc(MallocCacheSize, "Malloc cache");
-            MallocCache16BytesTime[i] = PIT::TimeSinceBootMS();
+            MallocCache16BytesAddr[i] = _Malloc(MallocCacheSize, "Malloc cache 2");
+            MallocCache16BytesTime[i] = 0;
             MallocCache16BytesFree[i] = true;
         }
     }
@@ -265,6 +265,8 @@ void* _Xmalloc(size_t size, const char* text, const char* func, const char* file
                 MallocCache16BytesFree[i] = false;
                 MallocCache16BytesTime[i] = PIT::TimeSinceBootMS();
 
+                if (MallocCache16BytesAddr[i] < (void*)100)
+                    Panic("Malloc Cache Thing is NULL", true);
                 
                 HeapSegHdr* current = ((HeapSegHdr*)MallocCache16BytesAddr[i]) - 1;
                 current->text = "<BYTE CACHE>";
@@ -365,6 +367,8 @@ void* _Xmalloc(size_t size, const char* text, const char* func, const char* file
 void _Xfree(void* address, const char* func, const char* file, int line)
 {
     AddToStack();
+    if (address == NULL)
+        Panic("Tried to free NULL address!", true);
     HeapSegHdr* segment = ((HeapSegHdr*)address) - 1;
 
     if (segment->magicNum == HeapMagicNum)
@@ -567,6 +571,9 @@ bool ExpandHeap(size_t length)
 
 bool _XtryFree(void* address, const char* func, const char* file, int line)
 {
+    if (address == NULL)
+        return false;
+
     AddToStack();
     HeapSegHdr* segment = ((HeapSegHdr*)address) - 1;
 
