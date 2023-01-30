@@ -78,8 +78,10 @@ namespace WindowManager
             copyOfScreenBuffer = (Framebuffer*)_Malloc(sizeof(Framebuffer), "New Copy Framebuffer (struct)");
             copyOfScreenBuffer->Width = actualScreenBuffer->Width;
             copyOfScreenBuffer->Height = actualScreenBuffer->Height;
-            copyOfScreenBuffer->PixelsPerScanLine = actualScreenBuffer->PixelsPerScanLine;
-            copyOfScreenBuffer->BufferSize = actualScreenBuffer->BufferSize;
+            // copyOfScreenBuffer->PixelsPerScanLine = actualScreenBuffer->PixelsPerScanLine;
+            // copyOfScreenBuffer->BufferSize = actualScreenBuffer->BufferSize;
+            copyOfScreenBuffer->PixelsPerScanLine = actualScreenBuffer->Width;
+            copyOfScreenBuffer->BufferSize = copyOfScreenBuffer->Width * copyOfScreenBuffer->Height * 4;
             copyOfScreenBuffer->BaseAddress = _Malloc(copyOfScreenBuffer->BufferSize, "New Copy Framebuffer");
         }
 

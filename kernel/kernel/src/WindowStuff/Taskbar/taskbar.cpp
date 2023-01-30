@@ -63,6 +63,9 @@ namespace Taskbar
             for (uint32_t* addr = (uint32_t*)taskbarBuffer->BaseAddress; addr < endAddr; addr++)
                 *addr = col;
         }
+        RemoveFromStack();
+
+        AddToStack();
         int64_t ypos = osData.windowPointerThing->virtualScreenBuffer->Height - taskbarBuffer->Height;
         RemoveFromStack();
 
