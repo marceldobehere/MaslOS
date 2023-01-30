@@ -89,7 +89,7 @@ HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
 
     //AddToStack();
     //GlobalRenderer->Println("this len: {}", to_string(length), Colors.bgreen);
-    int64_t splitSegLength = (length - splitLength) - sizeof(HeapSegHdr);
+    int64_t splitSegLength = ((int64_t)length - (int64_t)splitLength) - (int64_t)sizeof(HeapSegHdr);
     //GlobalRenderer->Println("Splitseg len: {}", to_string(splitSegLength), Colors.bgreen);
     if (splitSegLength < 0x10)
     {
@@ -374,7 +374,7 @@ void _Xfree(void* address, const char* func, const char* file, int line)
     if (!heapInited)
         Panic("Trying to free with Heap not being initialized!", true);
     
-    if (address == NULL)
+    if (address < (void*)1000)
         Panic("Tried to free NULL address!", true);
     HeapSegHdr* segment = ((HeapSegHdr*)address) - 1;
 
@@ -579,7 +579,7 @@ bool ExpandHeap(size_t length)
 
 bool _XtryFree(void* address, const char* func, const char* file, int line)
 {
-    if (address == NULL)
+    if (address  < (void*)1000)
         return false;
 
     AddToStack();
