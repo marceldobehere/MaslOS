@@ -14,7 +14,7 @@ namespace PIT
     void InitPIT()
     {
         TicksSinceBoot = 0;
-        SetDivisor(500 /*65535*/);
+        SetDivisor(400 /*65535*/);
         freq = GetFrequency();
         Inited = true;
     }

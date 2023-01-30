@@ -525,13 +525,15 @@ void InitStartMenuWindow(BootInfo* bootInfo)
         osData.startMenuWindow = window;
         GuiInstance* gui = (GuiInstance*)_Malloc(sizeof(GuiInstance), "GUI Instance");
         *gui = GuiInstance(window);
-        *(window) = Window((DefaultInstance*)gui, Size(sW, sH), Position(0, GlobalRenderer->framebuffer->Height - sH - osData.windowPointerThing->taskbar->Height), "Start Menu", false, false, false);
+        *(window) = Window((DefaultInstance*)gui, Size(sW, sH), Position(1, GlobalRenderer->framebuffer->Height - sH - osData.windowPointerThing->taskbar->Height), "Start Menu", false, true, false);
         window->moveToFront = true;
         window->hidden = true;
+        window->resizeable = false;
+        window->selectedBorderColor = Colors.orange;
         osData.windows.add(window);
         
         gui->Init();
-        gui->screen->backgroundColor = Colors.white;
+        gui->screen->backgroundColor = Colors.black;
 
         testGui = gui;
 
@@ -540,7 +542,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
             GuiComponentStuff::TextComponent* txt = new GuiComponentStuff::TextComponent
             (
                 testGui->screen,
-                Colors.tblack, Colors.black, 
+                Colors.tblack, Colors.white, 
                 "Start Menu", 
                 GuiComponentStuff::Position(0, 10)
             );
@@ -552,8 +554,8 @@ void InitStartMenuWindow(BootInfo* bootInfo)
 
         {
             GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("Pong.maab", 
-            Colors.brown, Colors.brown, Colors.white, 
-            Colors.white, Colors.bgray, Colors.black, 
+            Colors.cyan, Colors.yellow, Colors.black, 
+            Colors.black, Colors.black, Colors.white, 
             GuiComponentStuff::ComponentSize(80, 20),
             GuiComponentStuff::Position(0, 40), testGui->screen
             );
@@ -564,8 +566,8 @@ void InitStartMenuWindow(BootInfo* bootInfo)
         }
         {
             GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("Mandelbrot.maab", 
-            Colors.brown, Colors.brown, Colors.white, 
-            Colors.white, Colors.bgray, Colors.black, 
+            Colors.cyan, Colors.yellow, Colors.black, 
+            Colors.black, Colors.black, Colors.white, 
             GuiComponentStuff::ComponentSize(128, 20),
             GuiComponentStuff::Position(0, 60), testGui->screen
             );
@@ -576,8 +578,8 @@ void InitStartMenuWindow(BootInfo* bootInfo)
         }
         {
             GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("Alert.maab", 
-            Colors.brown, Colors.brown, Colors.white, 
-            Colors.white, Colors.bgray, Colors.black, 
+            Colors.cyan, Colors.yellow, Colors.black, 
+            Colors.black, Colors.black, Colors.white, 
             GuiComponentStuff::ComponentSize(88, 20),
             GuiComponentStuff::Position(0, 80), testGui->screen
             );
@@ -589,8 +591,8 @@ void InitStartMenuWindow(BootInfo* bootInfo)
 
         {
             GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("New Terminal", 
-            Colors.black, Colors.black, Colors.white, 
-            Colors.white, Colors.bgray, Colors.black, 
+            Colors.bgray, Colors.yellow, Colors.black, 
+            Colors.black, Colors.black, Colors.white,
             GuiComponentStuff::ComponentSize(104, 20),
             GuiComponentStuff::Position(0, 120), testGui->screen
             );
@@ -602,8 +604,8 @@ void InitStartMenuWindow(BootInfo* bootInfo)
 
         {
             GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("Task Manager", 
-            Colors.black, Colors.black, Colors.white, 
-            Colors.white, Colors.bgray, Colors.black, 
+            Colors.bgray, Colors.yellow, Colors.black, 
+            Colors.black, Colors.black, Colors.white,
             GuiComponentStuff::ComponentSize(104, 20),
             GuiComponentStuff::Position(0, 140), testGui->screen
             );

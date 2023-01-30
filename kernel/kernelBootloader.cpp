@@ -207,12 +207,12 @@ kernelFiles::ImageFile getImage(const char* path)
 
     kernelFiles::ImageFile img;
 
-    img.width = *((uint32_t*)((uint64_t)file->address + 0));
-    img.height = *((uint32_t*)((uint64_t)file->address + 4));
-    img.xOff = *((uint32_t*)((uint64_t)file->address + 8));
-    img.yOff = *((uint32_t*)((uint64_t)file->address + 12));
+    img.width = *((int32_t*)((uint64_t)file->address + 0));
+    img.height = *((int32_t*)((uint64_t)file->address + 4));
+    img.xOff = *((int32_t*)((uint64_t)file->address + 8));
+    img.yOff = *((int32_t*)((uint64_t)file->address + 12));
 
-    img.size = *((uint64_t*)((uint64_t)file->address + 16));
+    img.size = *((int64_t*)((uint64_t)file->address + 16));
     img.imageBuffer = ((void*)((uint64_t)file->address + 24));
 
     return img;
