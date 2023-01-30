@@ -202,7 +202,7 @@ void UpdateMallocCache()
 
     AddToStack();
     uint64_t now = PIT::TimeSinceBootMS();
-    if (now < lastUpdateTime + 400)
+    if (now < lastUpdateTime + 200)
     {
         RemoveFromStack();
         return;
@@ -213,10 +213,10 @@ void UpdateMallocCache()
     mallocToCache = true;
     for (int i = 0; i < MallocCacheCount; i++)
     {
-        if (!MallocCache16BytesFree[i] && now > MallocCache16BytesTime[i] + 800)
+        if (!MallocCache16BytesFree[i] && now > MallocCache16BytesTime[i] + 400)
         {
             MallocCache16BytesAddr[i] = _Malloc(MallocCacheSize, "Malloc cache 2");
-            MallocCache16BytesTime[i] = 0;
+            MallocCache16BytesTime[i] = now;
             MallocCache16BytesFree[i] = true;
         }
     }
@@ -390,6 +390,7 @@ void _Xfree(void* address, const char* func, const char* file, int line)
                     if (!MallocCache16BytesFree[i])
                     {
                         MallocCache16BytesFree[i] = true;
+                        MallocCache16BytesTime[i] = PIT::TimeSinceBootMS();
                         RemoveFromStack();
                         return;
                     }
@@ -600,6 +601,7 @@ bool _XtryFree(void* address, const char* func, const char* file, int line)
                     if (!MallocCache16BytesFree[i])
                     {
                         MallocCache16BytesFree[i] = true;
+                        MallocCache16BytesTime[i] = PIT::TimeSinceBootMS();
                         RemoveFromStack();
                         return true;
                     }

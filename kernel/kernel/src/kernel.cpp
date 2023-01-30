@@ -82,7 +82,7 @@ void RenderLoop()
         {
             osData.startMenuWindow->hidden = true;
             osData.startMenuWindow->oldHidden = false;
-            activeWindow = NULL;
+            //activeWindow = NULL;
         }
 
         if (TwantedFps != osData.wantedFps)
@@ -204,6 +204,14 @@ void RenderLoop()
                     int y2 = y1;
                     int sx2 = sx1;
                     int sy2 = sy2;
+
+                    if (window->maximize && window->oldMaximize)
+                    {
+                        if (window->position.x != 0 || window->position.y != 23 || 
+                        window->size.width != GlobalRenderer->framebuffer->Width ||
+                        window->size.height != GlobalRenderer->framebuffer->Height)
+                            window->maximize = false;
+                    }
 
                     if (window->maximize != window->oldMaximize)
                     {
