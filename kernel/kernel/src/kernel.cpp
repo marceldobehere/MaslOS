@@ -662,13 +662,15 @@ void boot(BootInfo* bootInfo)
     GlobalRenderer->Clear(Colors.black);
 
     {
-        int _x = 0;
-        int _y = 0;
+        int64_t _x = 0;
+        int64_t _y = 0;
 
-        _x = (bootInfo->bootImage->width - GlobalRenderer->framebuffer->Width) / 2;
-        _y = (bootInfo->bootImage->height - GlobalRenderer->framebuffer->Height) / 2;
+        _x = ((int)GlobalRenderer->framebuffer->Width - bootInfo->bootImage->width) / 2;
+        _y = ((int)GlobalRenderer->framebuffer->Height - bootInfo->bootImage->height) / 2;
 
         GlobalRenderer->DrawImage(bootInfo->bootImage, _x, _y, 1, 1);
+        // GlobalRenderer->Println("X: {}", to_string(_x), Colors.yellow);
+        // GlobalRenderer->Println("Y: {}", to_string(_y), Colors.yellow);
     }
     
 
