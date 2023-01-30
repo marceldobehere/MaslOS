@@ -124,9 +124,9 @@ void Panic(const char* panicMessage, const char* var, bool lock)
                 //GlobalRenderer->Println(", y: {}", to_string(crashWindow->size.height), Colors.yellow);
                 crashWindow->renderer->Clear(Colors.black);
                 //GlobalRenderer->Println("BRUH 5.2", Colors.yellow);
-                crashWindow->renderer->Println("------------------------------------------------", Colors.bred);
-                crashWindow->renderer->Println("A (probably) non-fatal Kernel Panic has occured!", Colors.bred);
-                crashWindow->renderer->Println("------------------------------------------------", Colors.bred);
+                crashWindow->renderer->Println("-------------------------------------------------------", Colors.bred);
+                crashWindow->renderer->Println("A (probably) non-fatal Kernel Panic has occured! (MNFCC: {})", to_string(osData.maxNonFatalCrashCount), Colors.bred);
+                crashWindow->renderer->Println("-------------------------------------------------------", Colors.bred);
                 crashWindow->renderer->Println();
                 //GlobalRenderer->Println("BRUH 5.3", Colors.yellow);
                 crashWindow->renderer->Println("Panic Message:", Colors.yellow);
@@ -148,7 +148,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         GlobalRenderer->ClearDotted(Colors.red);
         GlobalRenderer->Println();
         GlobalRenderer->Println();
-        GlobalRenderer->Println("KERNEL PANIC AAAAAAAAAAAAAAAAAAAAAAAAAAA", Colors.white);
+        GlobalRenderer->Println("KERNEL PANIC AAAAAAAAAAAAAAAAAAAAAAAAAAA (MNFCC: {})", to_string(osData.maxNonFatalCrashCount), Colors.white);
         for (int i = 0; i < kernelPanicCount; i++)
             GlobalRenderer->Println();
         GlobalRenderer->Println(panicMessage, var, Colors.white);

@@ -320,6 +320,7 @@ void RenderLoop()
             uint64_t tempVal = osStats.frameStartTime + timeForFps;
 
 
+            AddToStack();
             {
                 for (int i = 0; i < osData.windows.getCount(); i++)
                 {     
@@ -344,7 +345,9 @@ void RenderLoop()
                     }
                 }
             }
+            RemoveFromStack();
 
+            AddToStack();
             bool startThing = true;
             while (PIT::TimeSinceBootMicroS() < tempVal || startThing)
             {
@@ -413,7 +416,9 @@ void RenderLoop()
                     totOsTaskTemp += PIT::TimeSinceBootMicroS() - tS;
                 }
             }
+            RemoveFromStack();
 
+            AddToStack();
             {
                 for (int i = 0; i < osData.windows.getCount(); i++)
                 {     
@@ -432,6 +437,7 @@ void RenderLoop()
                     }
                 }
             }
+            RemoveFromStack();
 
             osStats.totalIdleTime = PIT::TimeSinceBootMicroS() - tS1;
             osStats.totalTaskTime = totTaskTemp;
