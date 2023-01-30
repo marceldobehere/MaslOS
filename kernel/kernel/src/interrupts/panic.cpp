@@ -80,7 +80,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
 
     osData.preCrashWindow = activeWindow;
 
-    if (osData.maxNonFatalCrashCount-- > 0 && !lock && !osData.booting)
+    if (osData.maxNonFatalCrashCount-- > 0 && !lock && !osData.booting && !osData.tempCrash)
     {
         //GlobalRenderer->Println("BRUH 1", Colors.yellow);
         if (osData.tempCrash)
@@ -92,6 +92,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         }
         else
         {
+            AddToStack();
             osData.tempCrash = true;
             //GlobalRenderer->Println("BRUH 4", Colors.yellow);
             Window* crashWindow;
@@ -106,6 +107,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
                     *(crashWindow) = Window(NULL, size, pos, "Crash Window", true, true, true);
                     //GlobalRenderer->Println("BRUH 4.6", Colors.yellow);
                     osData.windows.add(crashWindow);
+                    
                     //GlobalRenderer->Println("BRUH 4.7", Colors.yellow);
 
                     activeWindow = crashWindow;
@@ -130,7 +132,10 @@ void Panic(const char* panicMessage, const char* var, bool lock)
                 crashWindow->renderer->Println();
                 //GlobalRenderer->Println("BRUH 5.3", Colors.yellow);
                 crashWindow->renderer->Println("Panic Message:", Colors.yellow);
-                crashWindow->renderer->Println(panicMessage, var, Colors.bred);
+                crashWindow->renderer->Print(panicMessage, var, Colors.bred);
+                crashWindow->renderer->Println("  (MNFCC: {})",  to_string(osData.maxNonFatalCrashCount), Colors.white);
+
+                crashWindow->renderer->Println();
                 crashWindow->renderer->Println();
                 //GlobalRenderer->Println("BRUH 5.4", Colors.yellow);
                 PrintMStackTrace(MStackData::stackArr, MStackData::stackPointer, crashWindow->renderer, Colors.yellow);
@@ -139,6 +144,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
             //GlobalRenderer->Println("BRUH 6", Colors.yellow);
 
             osData.tempCrash = false;    
+            RemoveFromStack();
         }
         //GlobalRenderer->Println("<BRUH END>", Colors.yellow);
     }
@@ -148,10 +154,13 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         GlobalRenderer->ClearDotted(Colors.red);
         GlobalRenderer->Println();
         GlobalRenderer->Println();
-        GlobalRenderer->Println("KERNEL PANIC AAAAAAAAAAAAAAAAAAAAAAAAAAA (MNFCC: {})", to_string(osData.maxNonFatalCrashCount), Colors.white);
+        GlobalRenderer->Println("KERNEL PANIC AAAAAAAAAAAAAAAAAAAAAAAAAAA", Colors.white);
         for (int i = 0; i < kernelPanicCount; i++)
             GlobalRenderer->Println();
-        GlobalRenderer->Println(panicMessage, var, Colors.white);
+        GlobalRenderer->Print(panicMessage, var, Colors.white);
+        GlobalRenderer->Println("  (MNFCC: {})",  to_string(osData.maxNonFatalCrashCount), Colors.white);
+
+        GlobalRenderer->Println();
         GlobalRenderer->Println();
 
         osData.crashCount++;
@@ -185,7 +194,9 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         while(true)
             asm("hlt");
     }
-    
+
+    osData.tempCrash = false;   
+
     if (!lock)
         RemoveFromStack(); 
 } 
