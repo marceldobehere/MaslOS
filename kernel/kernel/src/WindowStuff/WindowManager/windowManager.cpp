@@ -836,6 +836,7 @@ if (window != NULL)
         osData.debugTerminalWindow->renderer->CursorPosition.x = 0;
         osData.debugTerminalWindow->renderer->CursorPosition.y -= 16 * 9;
 
+        AddToStack();
         osData.debugTerminalWindow->renderer->Clear(
             osData.debugTerminalWindow->renderer->CursorPosition.x,
             osData.debugTerminalWindow->renderer->CursorPosition.y,
@@ -843,7 +844,9 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
         osData.debugTerminalWindow->Log("Pixel changed: {}", to_string(counta), Colors.yellow);
+        RemoveFromStack();
 
+        AddToStack();
         osData.debugTerminalWindow->renderer->Clear(
             osData.debugTerminalWindow->renderer->CursorPosition.x,
             osData.debugTerminalWindow->renderer->CursorPosition.y,
@@ -851,8 +854,9 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
         osData.debugTerminalWindow->Log("FPS: {}", to_string(fps), Colors.yellow);
+        RemoveFromStack();
 
-
+        AddToStack();
         osData.debugTerminalWindow->renderer->Clear(
             osData.debugTerminalWindow->renderer->CursorPosition.x,
             osData.debugTerminalWindow->renderer->CursorPosition.y,
@@ -860,7 +864,9 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
         osData.debugTerminalWindow->Log("Heap count: {}", to_string(heapCount), Colors.yellow);
+        RemoveFromStack();
 
+        AddToStack();
         osData.debugTerminalWindow->renderer->Clear(
             osData.debugTerminalWindow->renderer->CursorPosition.x,
             osData.debugTerminalWindow->renderer->CursorPosition.y,
@@ -868,7 +874,9 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
         osData.debugTerminalWindow->Log("Used Heap count: {}", to_string(usedHeapCount), Colors.yellow);
+        RemoveFromStack();
 
+        AddToStack();
         osData.debugTerminalWindow->renderer->Clear(
             osData.debugTerminalWindow->renderer->CursorPosition.x,
             osData.debugTerminalWindow->renderer->CursorPosition.y,
@@ -876,7 +884,9 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
         osData.debugTerminalWindow->Log("Mouse Packet Count: {}", to_string(mousePackets.getCount()), Colors.yellow);
+        RemoveFromStack();
 
+        AddToStack();
         osData.debugTerminalWindow->renderer->Clear(
             osData.debugTerminalWindow->renderer->CursorPosition.x,
             osData.debugTerminalWindow->renderer->CursorPosition.y,
@@ -884,7 +894,9 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
         osData.debugTerminalWindow->Log("Malloc Count: {}", to_string(mallocCount), Colors.yellow);
+        RemoveFromStack();
 
+        AddToStack();
         osData.debugTerminalWindow->renderer->Clear(
             osData.debugTerminalWindow->renderer->CursorPosition.x,
             osData.debugTerminalWindow->renderer->CursorPosition.y,
@@ -892,7 +904,9 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
         osData.debugTerminalWindow->Log("Free Count: {}", to_string(freeCount), Colors.yellow);
+        RemoveFromStack();
 
+        AddToStack();
         osData.debugTerminalWindow->renderer->Clear(
             osData.debugTerminalWindow->renderer->CursorPosition.x,
             osData.debugTerminalWindow->renderer->CursorPosition.y,
@@ -900,7 +914,9 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
         osData.debugTerminalWindow->Log("Stack Trace Count: {}", to_string(MStackData::stackPointer+1), Colors.yellow);
-        
+        RemoveFromStack();
+
+        AddToStack();
         osData.debugTerminalWindow->renderer->Clear(
             osData.debugTerminalWindow->renderer->CursorPosition.x,
             osData.debugTerminalWindow->renderer->CursorPosition.y,
@@ -908,7 +924,8 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
         osData.debugTerminalWindow->Log("Last Free Size: {}", to_string(lastFreeSize), Colors.yellow);
-        
+        RemoveFromStack();
+
         RemoveFromStack();
 
      

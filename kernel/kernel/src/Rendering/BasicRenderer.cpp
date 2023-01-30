@@ -270,7 +270,6 @@ void BasicRenderer::Clear(int64_t x1, int64_t y1, int64_t x2, int64_t y2, uint32
 {
     uint64_t fbBase = (uint64_t)framebuffer->BaseAddress;
     uint64_t pxlsPerScanline = framebuffer->PixelsPerScanLine;
-    uint64_t fbHeight = framebuffer->Height;
 
     if (y1 < 0)
         y1 = 0;
