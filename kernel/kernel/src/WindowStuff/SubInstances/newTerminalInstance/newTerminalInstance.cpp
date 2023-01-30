@@ -35,7 +35,7 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
     AddToStack();
 
     if ((uint64_t)chrs < 100)
-        Panic("STR IS NULL");
+        Panic("STR IS NULL", true);
 
     //allowEscape = false;
     int len = StrLen(chrs);
@@ -46,7 +46,7 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
 
     List<ConsoleChar>* currList = textData.elementAt(textData.getCount() - 1);
     if (currList == 0)
-        Panic("LAST LIST IS NULL");
+        Panic("LAST LIST IS NULL", true);
 
 
     uint32_t fg = foregroundColor;
@@ -415,7 +415,7 @@ void NewTerminalInstance::DoRender()
 
     AddToStack();
     if (window == NULL)
-        Panic("Trying to Render with window being NULL!");
+        Panic("Trying to Render with window being NULL!", true);
 
 
     if (scrollX == oldScrollX && scrollY == oldScrollY && oldHeight == window->size.height && oldWidth == window->size.width)
@@ -473,7 +473,7 @@ void NewTerminalInstance::DoRender()
                     window->renderer->putChar(chr.chr, dx*8-fx1, dy*16-fy1, chr.fg, chr.bg);
 
                     if (((dx - dx1) + ((dy - dy1) * (oldWidth / 8)) < 0) || ((dx - dx1) + ((dy - dy1) * (oldWidth / 8)) > (oldWidth / 8)*(oldHeight / 16)))
-                        Panic("OUT OF BOUNDS OMGGGGGGGGGGGGGGGGGGG!");
+                        Panic("OUT OF BOUNDS OMGGGGGGGGGGGGGGGGGGG!", true);
                     tempPixels[(dx - dx1) + ((dy - dy1) * (oldWidth / 8))] = chr;
                 }
             }
@@ -491,7 +491,7 @@ void NewTerminalInstance::DoRender()
 void NewTerminalInstance::Clear()
 {
     if (window == NULL)
-        Panic("Trying to clear window which is NULL!");
+        Panic("Trying to clear window which is NULL!", true);
     AddToStack();
     //window->brenderer->Clear(backgroundColor);
     //window->renderer->Clear(backgroundColor);

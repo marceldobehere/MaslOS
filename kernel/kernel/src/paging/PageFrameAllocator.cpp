@@ -87,7 +87,7 @@ void* PageFrameAllocator::RequestPage()
         return(void*)(pageBitmapIndex * 4096);
     }
 
-
+    
     GlobalRenderer->Println("ERROR: NO MORE RAM AVAIABLE!", Colors.red);
     GlobalRenderer->Println("REQ COUNT: {}", to_string(reqCount), Colors.red);
     GlobalRenderer->Println("FREE MEM: {}", to_string(freeMemory), Colors.yellow);
@@ -95,10 +95,7 @@ void* PageFrameAllocator::RequestPage()
     GlobalRenderer->Println("RES MEM: {}", to_string(reservedMemory), Colors.yellow);
     
     
-    //Panic("No more RAM avaiable! (Count: {})", to_string(reqCount), true);
-
-    // thats why it froooooooze ahhh
-    while (true);
+    Panic("No more RAM avaiable! (Count: {})", to_string(reqCount), true);
 
 
     return NULL; // Page Frame Swap to file

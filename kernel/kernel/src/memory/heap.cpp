@@ -388,7 +388,7 @@ void _Xfree(void* address, const char* func, const char* file, int line)
                     }
                     else
                     {
-                        Panic("Tried to free already free Segment!");
+                        Panic("Tried to free already free Segment!", true);
                         RemoveFromStack();
                         return;
                     }
@@ -415,14 +415,14 @@ void _Xfree(void* address, const char* func, const char* file, int line)
         }
         else
         {
-            Panic("Tried to free already free Segment!");
+            Panic("Tried to free already free Segment!", true);
             RemoveFromStack();
             return;
         }
     }
     else
     {
-        Panic("Tried to free invalid Segment!");
+        Panic("Tried to free invalid Segment!", true);
         RemoveFromStack();
         return;
     }
@@ -558,7 +558,7 @@ bool ExpandHeap(size_t length)
     // newSegment->magicNum = HeapMagicNum;
 
     if (newSegment == NULL)
-        Panic("NEW SEGMENT IS NULL!");
+        Panic("NEW SEGMENT IS NULL!", true);
 
     // newSegment->next = NULL;
     // newSegment->text = "<FREE>";

@@ -240,7 +240,7 @@ template <typename T> T& Array<T>::operator[](uint64_t index)
 {
     AddToStack();
     if (index >= this->size || freed)
-        Panic("Accessing Array out of bounds!");
+        Panic("Accessing Array out of bounds!", true);
 
     T& t = arr[index];
     RemoveFromStack();

@@ -39,7 +39,7 @@ void ClearInput(TerminalInstance* instance)
 
 void HandleEnter()
 {
-    Panic("Old Function used!");
+    Panic("Old Function used!", true);
 }
 
 bool KeyboardScancodeState[256];
