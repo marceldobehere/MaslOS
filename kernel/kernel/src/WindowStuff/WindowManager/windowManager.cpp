@@ -767,6 +767,7 @@ if (window != NULL)
                         //                                         min(y + testInterlace, h - 1)
                         //                                     );
 
+                        AddToStack();
                         counta += RenderActualSquare(
                             x - (testInterlace * 2 - 1), 
                             y - (testInterlace * 2 - 1), 
@@ -774,6 +775,7 @@ if (window != NULL)
                             x + testInterlace * 4 - 2, 
                             y + testInterlace * 4 - 2
                             );
+                        RemoveFromStack();
 
                         // vPixel += testInterlace * 2;
                         // cPixel += testInterlace * 2;

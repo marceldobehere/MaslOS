@@ -177,7 +177,7 @@ void HandleKeyboard(uint8_t scancode)
 
     if (scancode == ARR_LEFT)
     {  
-        if (lshift)
+        if (lshift || rshift)
         {
             if (activeWindow != NULL)
                 if (activeWindow->instance != NULL)
@@ -185,18 +185,25 @@ void HandleKeyboard(uint8_t scancode)
                         if (((TerminalInstance*)activeWindow->instance)->newTermInstance != NULL)
                             ((NewTerminalInstance*)((TerminalInstance*)activeWindow->instance)->newTermInstance)->scrollX -= scrollSpeed;
         }
+        // else if (lAlt)
+        // {
+        //     if (activeWindow != NULL)
+        //         activeWindow->position.x--;
+        // }
         else
         {
-            int64_t count = Taskbar::taskWindowList->getCount();
-            int64_t index = Taskbar::taskWindowList->getIndexOf(activeWindow);
-            index = (index + count - 1) % count;
-            activeWindow = Taskbar::taskWindowList->elementAt(index);
-            activeWindow->moveToFront = true;
+            if (activeWindow != NULL)
+                activeWindow->newPosition.x -= 5;
+            // int64_t count = Taskbar::taskWindowList->getCount();
+            // int64_t index = Taskbar::taskWindowList->getIndexOf(activeWindow);
+            // index = (index + count - 1) % count;
+            // activeWindow = Taskbar::taskWindowList->elementAt(index);
+            // activeWindow->moveToFront = true;
         }
     }
     else if (scancode == ARR_RIGHT)
     {
-        if (lshift)
+        if (lshift || rshift)
         {
             if (activeWindow != NULL)
                 if (activeWindow->instance != NULL)
@@ -206,16 +213,18 @@ void HandleKeyboard(uint8_t scancode)
         }
         else
         {
-            int64_t count = Taskbar::taskWindowList->getCount();
-            int64_t index = Taskbar::taskWindowList->getIndexOf(activeWindow);
-            index = (index + count + 1) % count;
-            activeWindow = Taskbar::taskWindowList->elementAt(index);
-            activeWindow->moveToFront = true;
+            if (activeWindow != NULL)
+                activeWindow->newPosition.x += 5;
+            // int64_t count = Taskbar::taskWindowList->getCount();
+            // int64_t index = Taskbar::taskWindowList->getIndexOf(activeWindow);
+            // index = (index + count + 1) % count;
+            // activeWindow = Taskbar::taskWindowList->elementAt(index);
+            // activeWindow->moveToFront = true;
         }
     }
     else if (scancode == ARR_UP)
     {  
-        if (lshift)
+        if (lshift || rshift)
         {
             if (activeWindow != NULL)
                 if (activeWindow->instance != NULL)
@@ -225,12 +234,13 @@ void HandleKeyboard(uint8_t scancode)
         }
         else
         {
-            
+            if (activeWindow != NULL)
+                activeWindow->newPosition.y -= 5;
         }
     }
     else if (scancode == ARR_DOWN)
     {
-        if (lshift)
+        if (lshift || rshift)
         {
             if (activeWindow != NULL)
                 if (activeWindow->instance != NULL)
@@ -240,28 +250,30 @@ void HandleKeyboard(uint8_t scancode)
         }
         else
         {
-            Window* oldActive = activeWindow;
-            Window* mainWindow = (Window*)_Malloc(sizeof(Window), "Main Window");
-            TerminalInstance* terminal = (TerminalInstance*)_Malloc(sizeof(TerminalInstance), "Terminal Instance");
-            *terminal = TerminalInstance(&guestUser);
-            *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(10, 40), "Terminal Window", true, true, true);
-            osData.windows.add(mainWindow);
-            terminal->SetWindow(mainWindow);
-            ((TerminalInstance*)mainWindow->instance)->Cls();
-            //KeyboardPrintStart(mainWindow);
-            ((TerminalInstance*)mainWindow->instance)->KeyboardPrintStart();
+            if (activeWindow != NULL)
+                activeWindow->newPosition.y += 5;
+            // Window* oldActive = activeWindow;
+            // Window* mainWindow = (Window*)_Malloc(sizeof(Window), "Main Window");
+            // TerminalInstance* terminal = (TerminalInstance*)_Malloc(sizeof(TerminalInstance), "Terminal Instance");
+            // *terminal = TerminalInstance(&guestUser);
+            // *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(10, 40), "Terminal Window", true, true, true);
+            // osData.windows.add(mainWindow);
+            // terminal->SetWindow(mainWindow);
+            // ((TerminalInstance*)mainWindow->instance)->Cls();
+            // //KeyboardPrintStart(mainWindow);
+            // ((TerminalInstance*)mainWindow->instance)->KeyboardPrintStart();
 
-            activeWindow = mainWindow;          
-            mainWindow->moveToFront = true;
-            osData.mainTerminalWindow = mainWindow;
+            // activeWindow = mainWindow;          
+            // mainWindow->moveToFront = true;
+            // osData.mainTerminalWindow = mainWindow;
 
-            if (oldActive != NULL)
-            {
-                osData.windowPointerThing->UpdateWindowBorder(oldActive);
-            }
+            // if (oldActive != NULL)
+            // {
+            //     osData.windowPointerThing->UpdateWindowBorder(oldActive);
+            // }
 
-            RemoveFromStack();
-            return;
+            // RemoveFromStack();
+            // return;
         }
     }
 

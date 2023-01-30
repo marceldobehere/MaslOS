@@ -117,21 +117,26 @@ namespace WindowManager
 
             if (_x1 < 0)
                 _x1 = 0;
-            if (_x2 < 0)
-                _x2 = 0;
+            // if (_x2 < 0)
+            //     _x2 = 0;
             if (_y1 < 0)
                 _y1 = 0;
-            if (_y2 < 0)
-                _y2 = 0;
+            // if (_y2 < 0)
+            //     _y2 = 0;
 
-            if (_x1 >= w)
-                _x1 = w - 1;
+            // if (_x1 >= w)
+            //     _x1 = w - 1;
             if (_x2 >= w)
                 _x2 = w - 1;
-            if (_y1 >= h)
-                _y1 = h - 1;
+            // if (_y1 >= h)
+            //     _y1 = h - 1;
             if (_y2 >= h)
                 _y2 = h - 1;
+
+            if (_x1 > _x2)
+                return 0;
+            if (_y1 > _y2)
+                return 0;
 
             //
             uint64_t counta = 0;
@@ -142,10 +147,10 @@ namespace WindowManager
             int64_t wMinusSomeStuff = w - (xdiff+1);
 
             // DRAW SQUARE
-            for (uint64_t y1 = _y1; y1 <= _y2; y1++)
+            for (int64_t y1 = _y1; y1 <= _y2; y1++)
             {
-                uint64_t y1TimesBpl = y1 * bpl;
-                for (uint64_t x1 = _x1; x1 <= _x2; x1++)
+                int64_t y1TimesBpl = y1 * bpl;
+                for (int64_t x1 = _x1; x1 <= _x2; x1++)
                 {
                     uint32_t col = **vPixel;
                     if (*cPixel != col)

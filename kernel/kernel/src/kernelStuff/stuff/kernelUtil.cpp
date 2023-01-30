@@ -386,7 +386,7 @@ void PrepareWindows(Framebuffer* img)
         
 
 
-        *(debugTerminalWindow) = Window(dterminal, Size(1000, 2000), Position(600, 20), "Debug Terminal", true, true, true);
+        *(debugTerminalWindow) = Window(dterminal, Size(1000, 3000), Position(600, 20), "Debug Terminal", true, true, true);
         //osData.windows.add(debugTerminalWindow);
 
 

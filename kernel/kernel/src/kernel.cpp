@@ -564,6 +564,7 @@ void RecoverDed()
     }
 
     MStackData::stackPointer = 0;
+    WindowManager::testInterlace = 1;
 
     RenderLoop();
 }
@@ -942,7 +943,7 @@ void boot(BootInfo* bootInfo)
 
     for (int i = 0; i < 9; i++)
         debugTerminalWindow->Log("<STAT>");
-    debugTerminalWindow->renderer->CursorPosition.y = 16 * 16;
+    //debugTerminalWindow->renderer->CursorPosition.y = 16 * 16;
 
     ((TerminalInstance*)mainWindow->instance)->Cls();
     ((TerminalInstance*)mainWindow->instance)->KeyboardPrintStart();
