@@ -17,7 +17,7 @@ int64_t mallocCount = 0;
 int64_t freeCount = 0;
 int64_t activeMemFlagVal = 0;
 
-
+bool heapInited = false;
 
 void* MallocCache16BytesAddr [MallocCacheCount];
 bool MallocCache16BytesFree [MallocCacheCount];
@@ -176,6 +176,8 @@ void InitializeHeap(void* heapAddress, size_t pageCount)
     heapCount = 1;
     usedHeapCount = 0;
 
+    heapInited = true;
+
     mallocToCache = true;
     for (int i = 0; i < MallocCacheCount; i++)
     {
@@ -242,6 +244,8 @@ void* _Xmalloc(size_t size, const char* text, const char* func, const char* file
 {
     mCount++;
     AddToStack();
+    if (!heapInited)
+        Panic("Trying to malloc with Heap not being initialized!", true);
     
     if (!mallocToCache)
         UpdateMallocCache();
@@ -367,6 +371,9 @@ void* _Xmalloc(size_t size, const char* text, const char* func, const char* file
 void _Xfree(void* address, const char* func, const char* file, int line)
 {
     AddToStack();
+    if (!heapInited)
+        Panic("Trying to free with Heap not being initialized!", true);
+    
     if (address == NULL)
         Panic("Tried to free NULL address!", true);
     HeapSegHdr* segment = ((HeapSegHdr*)address) - 1;
@@ -575,6 +582,10 @@ bool _XtryFree(void* address, const char* func, const char* file, int line)
         return false;
 
     AddToStack();
+
+    if (!heapInited)
+        Panic("Trying to free with Heap not being initialized!", true);
+
     HeapSegHdr* segment = ((HeapSegHdr*)address) - 1;
 
     if (segment->magicNum == HeapMagicNum)
