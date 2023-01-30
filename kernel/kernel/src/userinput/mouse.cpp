@@ -504,7 +504,7 @@ void HandleClick(bool L, bool R, bool M)
                 WindowManager::currentActionWindow->maximize = !WindowManager::currentActionWindow->maximize;
                 activeWindow = WindowManager::currentActionWindow;
                 activeWindow->moveToFront = true;
-                AddToStack();
+                RemoveFromStack();
             }
             RemoveFromStack();
         }
