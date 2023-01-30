@@ -116,9 +116,11 @@ namespace WindowManager
 
     void ClearFrameBuffer(Framebuffer* buffer, uint32_t col)
     {
-        uint32_t* endAddr = (uint32_t*)((uint64_t)buffer->BaseAddress + buffer->BufferSize);
-        for (uint32_t* pixel = (uint32_t*)buffer->BaseAddress; pixel < endAddr; pixel++)
-            *pixel = col;
+        AddToStack();
+        for (uint32_t y = 0; y < buffer->Height; y++)
+            for (uint32_t x = 0; x < buffer->Width; x++)
+                *((uint32_t*)buffer->BaseAddress + x + (y * buffer->PixelsPerScanLine)) = col;
+        RemoveFromStack();
     }
 
     void ClearPointerBuffer(PointerFramebuffer* buffer, uint32_t* col)
