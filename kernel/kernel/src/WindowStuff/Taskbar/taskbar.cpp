@@ -55,6 +55,8 @@ namespace Taskbar
 
 
         AddToStack();
+        
+        AddToStack();
         {
             uint32_t* endAddr = (uint32_t*)((uint64_t)taskbarBuffer->BaseAddress + taskbarBuffer->BufferSize);
             uint32_t col = backgroundColor;
@@ -62,22 +64,30 @@ namespace Taskbar
                 *addr = col;
         }
         int64_t ypos = osData.windowPointerThing->virtualScreenBuffer->Height - taskbarBuffer->Height;
+        RemoveFromStack();
 
-
+        AddToStack();
         MButtonSelected = (MousePosition.x >= 0 && MousePosition.x < 40 && MousePosition.y >= ypos && MousePosition.y < ypos + 40);
         if (MButtonSelected)
             GlobDrawImage(MButtonS, 0, 0, 1, 1, taskbarBuffer);
         else
             GlobDrawImage(MButton, 0, 0, 1, 1, taskbarBuffer);
+        RemoveFromStack();
         
         //GlobDrawImage(currentMouseImage, 10, 10, 1, 1, taskbarBuffer);
+        AddToStack();
         if (Scounter % 5 == 0)
             taskWindowList->sync();
+        RemoveFromStack();
 
+        AddToStack();
         int64_t wCount = taskWindowList->getCount();
         int64_t size = 200;
         int64_t width = taskbarBuffer->Width;
         int64_t height = taskbarBuffer->Height;
+        RemoveFromStack();
+
+        AddToStack();
         if (wCount != 0)
         {
             size = (width - 400) / wCount;
@@ -86,25 +96,32 @@ namespace Taskbar
             if (size < 60)
                 size = 60;
         }
+        RemoveFromStack();
 
+        AddToStack();
         {
+            AddToStack();
             int64_t x = 46;
             int iconSize = 24;
             int ydiff = ((height)-iconSize)/2;
             int textStart = iconSize + 12;
             Window* tempWindow = NULL;
+            RemoveFromStack();
+
             for (int i = 0; i < wCount; i++)
             {
                 if (x + size > width)
                     break;
 
+                AddToStack();
                 Window* window = taskWindowList->elementAt(i);
+                RemoveFromStack();
 
                 if (window == osData.debugTerminalWindow && !osData.showDebugterminal)
                     continue;
                 if (window == osData.startMenuWindow)
                     continue;
-
+                
 
                 bool hover = window == activeWindow;
 
@@ -114,27 +131,36 @@ namespace Taskbar
                     tempWindow = window;
                 }
 
+                AddToStack();
                 if (hover)
                     renderer->Clear(x, 2, x + size, height - 3, selectedTabBackgroundColor); // Clear whole Rect
                 else
                     renderer->Clear(x, 2, x + size, height - 3, defaultTabBackgroundColor); // Clear whole Rect
-                
+                RemoveFromStack();
+
+                AddToStack();
                 bool drawIcon = (window->icon != NULL);
                 if (drawIcon)
                     drawIcon = (window->icon->height == iconSize && window->icon->width == iconSize);
+                RemoveFromStack();
 
+                AddToStack();
                 if (drawIcon)
                     renderer->DrawImage(window->icon, x + 6, ydiff, 1, 1);
                 else
                     renderer->Clear(x + 6, ydiff, x + 5 + iconSize, height - (ydiff+1), Colors.black); // Clear Icon Rect
+                RemoveFromStack();
 
-
+                AddToStack();
                 {
+                    AddToStack();
                     char* stitle = StrSubstr(window->title, 0, ((size-8) - textStart) / 8);
 
                     int strLen1 = ((size-8) - textStart) / 8;
                     int strLen2 = StrLen(window->title);
+                    RemoveFromStack();
 
+                    AddToStack();
                     if (strLen1 < strLen2)
                     {
                         int amount = min(3, strLen1);
@@ -145,15 +171,19 @@ namespace Taskbar
                             index--;
                         }
                     }
+                    RemoveFromStack();
 
+                    AddToStack();
                     if (hover)
                         renderer->color = selectedTabTextColor;
                     else
                         renderer->color = defaultTabTextColor;
+                    RemoveFromStack();
 
                     renderer->putStr(stitle, x + textStart, (height/2)-6);
                     _Free((void*)stitle);
                 }
+                RemoveFromStack();
 
                 activeTabWindow = tempWindow;
 
@@ -162,7 +192,7 @@ namespace Taskbar
                 x += size + 6;
             }
         }
-
+        RemoveFromStack();
 
         osData.windowPointerThing->UpdatePointerRect(0, ypos, osData.windowPointerThing->virtualScreenBuffer->Width - 1, ypos + taskbarBuffer->Height - 1);
         RemoveFromStack();
