@@ -370,6 +370,7 @@ void RenderLoop()
             {
                 startThing = false;
                 //double endTime = PIT::TimeSinceBoot + 0.02;
+                AddToStack();
                 {
                     uint64_t tS = PIT::TimeSinceBootMicroS();
                     //for (int ax = 0; ax < 10; ax++)
@@ -389,11 +390,13 @@ void RenderLoop()
 
                             TerminalInstance* terminal = (TerminalInstance*)window->instance;
 
-                            if (terminal->tasks.getCount() != 0)
+                            if (terminal->tasks.getCount() > 0)
                             {
                                 uint64_t tS2 = PIT::TimeSinceBootMicroS();
                                 Task* task = terminal->tasks[0];
+                                AddToStack();
                                 DoTask(task);
+                                RemoveFromStack();
                                 task->tempTime += PIT::TimeSinceBootMicroS() - tS2;
                                 if (task->GetDone())
                                 {
@@ -414,8 +417,9 @@ void RenderLoop()
                     }
                     totTaskTemp += PIT::TimeSinceBootMicroS() - tS;
                 }
+                RemoveFromStack();
                 
-
+                AddToStack();
                 {
                     uint64_t tS = PIT::TimeSinceBootMicroS();
                     if (osData.osTasks.getCount() > 0)
@@ -432,6 +436,7 @@ void RenderLoop()
                     }
                     totOsTaskTemp += PIT::TimeSinceBootMicroS() - tS;
                 }
+                RemoveFromStack();
             }
             RemoveFromStack();
 
