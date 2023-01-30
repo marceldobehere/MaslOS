@@ -660,7 +660,14 @@ void boot(BootInfo* bootInfo)
     
     
     GlobalRenderer->Clear(Colors.black);
+
+    GlobalRenderer->Clear(Colors.white);
     GlobalRenderer->DrawImage(bootInfo->bootImage, 0, 0, 1, 1);
+    GlobalRenderer->Println("Offset X: {}", to_string(bootInfo->bootImage->xOff), Colors.yellow);
+    GlobalRenderer->Println("Offset Y: {}", to_string(bootInfo->bootImage->yOff), Colors.yellow);
+
+
+    while (true);
 
     osData.mouseSensitivity = 1.0;
 
