@@ -290,6 +290,17 @@ bool HeapCheck()
             break;
         }
 
+        if (current->last != NULL)
+        {
+            if (current->last->next != current)
+            {
+                GlobalRenderer->Println("*Heapseg prev is not pointing to current!", Colors.bred);
+                GlobalRenderer->Println("-> Heapseg at addr: 0x{}", ConvertHexToString((uint64_t)current), Colors.bred);
+                GlobalRenderer->Println("-> Prev Heapseg at addr: 0x{}", ConvertHexToString((uint64_t)current->last), Colors.bred);
+                break;
+            }
+        }
+
 
         current = current->next;
     }

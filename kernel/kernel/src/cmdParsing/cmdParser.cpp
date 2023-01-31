@@ -1926,7 +1926,7 @@ void GetCmd(const char* name, OSUser* user, Window* window)
         
         {
             uint64_t totCount = 0;
-            for (HeapSegHdr* current = (HeapSegHdr*) heapStart; current->next != NULL; current = current->next)
+            for (HeapSegHdr* current = (HeapSegHdr*) heapStart; current != NULL; current = current->next)
                 totCount++;
 
 
@@ -1982,6 +1982,56 @@ void GetCmd(const char* name, OSUser* user, Window* window)
                     totalSegCount += 1;
                     totalSegSpace += current->length;
                     current = current->next;
+                }
+
+                while (current != NULL && current->next != NULL)
+                    current = current->next;
+                if (current != NULL)
+                {
+uint32_t col = Colors.gray;
+                    if (current->free)
+                    {
+                        freeSegCount += 1;
+                        freeSegSpace += current->length;
+                        if (current->activeMemFlagVal == oA && oA != 0)
+                            col = Colors.bgreen;
+                        else
+                            col = Colors.green;
+                    }
+                    else
+                    {
+                        usedSegCount += 1;
+                        usedSegSpace += current->length;
+                        if (current->activeMemFlagVal == oA && oA != 0)
+                            col = Colors.yellow;
+                        else
+                            col = Colors.bred;
+                    }
+                    
+                    dispVar vars[] = 
+                    {
+                        dispVar(totalSegCount), dispVar(current->length), 
+                        dispVar(current->text), dispVar(current->activeMemFlagVal), 
+                        dispVar(current->func), dispVar(current->file),
+                        dispVar(current->line)
+                    };
+                    
+
+                    //GlobalRenderer->Println("> Heap# {0} - Size: {1} Bytes, Title: \"{2}\", AMFV: {3}, ADDR: {4}, NEXT: {5}", vars, col);
+                    if (oA == 0 || current->activeMemFlagVal == oA)
+                        Println(window, "> Heap# {0} - Size: {1} Bytes, Title: \"{2}\", Func: \"{4}\", File: \"{5}\", Line: {6}, AMFV: {3}", vars, col);
+                    //GlobalRenderer->Print("<T>");
+                    //GlobalRenderer->Println(" Heap# {0} - Size: {1} Bytes, Title: \"{2}\", AMFV: {3}, ADDR: {4}, NEXT: {5}", vars, col);
+
+                    // if(GlobalRenderer->CursorPosition.y > 600)
+                    // {
+                    //     PIT::Sleep(2000);
+                    //     GlobalRenderer->Clear(Colors.dgray);
+                    // }
+
+                    totalSegCount += 1;
+                    totalSegSpace += current->length;
+
                 }
             }
 
