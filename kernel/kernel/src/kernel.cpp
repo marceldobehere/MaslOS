@@ -555,7 +555,7 @@ void RenderLoop()
 
 void RecoverDed()
 {
-    HeapCheck();
+    HeapCheck(true);
     
     //osData.osTasks.clear();
 

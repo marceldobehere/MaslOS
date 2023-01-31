@@ -61,7 +61,7 @@ __attribute__((interrupt)) void GPFault_handler(interrupt_frame* frame)//, uint6
 {
     AddToStack();
 
-    HeapCheck();
+    HeapCheck(false);
 
     Panic("General Protection Fault Detected! (ERROR: {})", to_string(frame->base_frame.error_code), false);
     //Panic("General Protection Fault Detected! {}", to_string(*((uint64_t*)frame)), true);

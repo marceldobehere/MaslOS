@@ -240,12 +240,13 @@ uint64_t mCount = 0;
 
 
 
-bool HeapCheck()
+bool HeapCheck(bool wait)
 {
     AddToStack();
     GlobalRenderer->Clear(Colors.black);
     GlobalRenderer->Println("> Performing Heap Check...", Colors.white);
-    PIT::Sleep(100);
+    if (wait)
+        PIT::Sleep(100);
     bool foundError = false;
 
     HeapSegHdr* current = (HeapSegHdr*) heapStart;
@@ -316,8 +317,9 @@ bool HeapCheck()
         RemoveFromStack();
         return false;
     }
-    PIT::Sleep(500);
-
+    if (wait)
+        PIT::Sleep(500);
+    
     RemoveFromStack();
     return true;
 }
