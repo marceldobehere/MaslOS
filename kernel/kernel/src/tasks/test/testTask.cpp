@@ -12,57 +12,11 @@
 
 
 
+// BIG SHOUTOUTS TO https://github.com/cloudflare/cloudflare-blog/tree/master/2021-03-obj-file/3
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* compile and link:
- * $ gcc -o loader loader.c
- */
-
-// #include <stdio.h>
-//#include <stdint.h>
-//#include <stdlib.h>
-//#include <string.h>
-
-/* for open(2), fstat(2) */
-// #include <sys/types.h>
-//#include <sys/stat.h>
-//#include <fcntl.h>
-
-/* for close(2), fstat(2) */
-//#include <unistd.h>
-
-/* for mmap(2) */
-//#include <sys/mman.h>
 
 /* parsing ELF files */
 #include <elf.h>
-
-/* for errno */
-//#include <errno.h>
 
 /* from https://elixir.bootlin.com/linux/v5.11.6/source/arch/x86/include/asm/elf.h#L51 */
 #define R_X86_64_PC32 2
@@ -94,6 +48,8 @@ static uint8_t *text_runtime_base;
 static uint8_t *data_runtime_base;
 /* runtime base of the .rodata section */
 static uint8_t *rodata_runtime_base;
+/* runtime base of the .bss section */
+static uint8_t *bss_runtime_base;
 
 /* number of external symbols in the symbol table */
 static int num_ext_symbols = 0;
@@ -119,6 +75,7 @@ static int my_puts(const char *s)
 
 void perror(const char* s)
 {
+    GlobalRenderer->Clear(Colors.black);
     GlobalRenderer->Println(s, Colors.bred);
     PIT::Sleep(5000);
 }
@@ -128,20 +85,15 @@ static inline uint64_t page_align(uint64_t n)
     return (n + (page_size - 1)) & ~(page_size - 1);
 }
 
-void close (int fd)
-{
-
-}
-
-static void load_obj(void* data, uint64_t len)
+void TaskTest::load_obj(void* data, uint64_t len)
 {
     AddToStack();
     uint64_t AMT = (len + 0x0FFF) / 0x1000;
 
-    AddToStack();
-    GlobalRenderer->Println("LEN 0: {}", to_string(len), Colors.yellow);
-    GlobalRenderer->Println("AMT 0: {}", to_string(AMT), Colors.yellow);
-    RemoveFromStack();
+    // AddToStack();
+    // GlobalRenderer->Println("LEN 0: {}", to_string(len), Colors.yellow);
+    // GlobalRenderer->Println("AMT 0: {}", to_string(AMT), Colors.yellow);
+    // RemoveFromStack();
 
     
 
@@ -155,8 +107,8 @@ static void load_obj(void* data, uint64_t len)
     }
     RemoveFromStack();
 
-    GlobalRenderer->Println("ADDR 0: {}", ConvertHexToString((uint64_t)posTest), Colors.yellow);
-    GlobalRenderer->Println("ADDR 1: {}", ConvertHexToString((uint64_t)oldPosTest), Colors.yellow);
+    // GlobalRenderer->Println("ADDR 0: {}", ConvertHexToString((uint64_t)posTest), Colors.yellow);
+    // GlobalRenderer->Println("ADDR 1: {}", ConvertHexToString((uint64_t)oldPosTest), Colors.yellow);
 
     //PIT::Sleep(4000);
 
@@ -245,6 +197,33 @@ static void *lookup_function(const char *name)
     return NULL;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void FN_OS_Window_Log(OS_Window* window, const char* msg)
+{
+    // puts("Testo: ");
+    // puts(msg);
+    // printf("ADDR: %llx\n", (uint64_t)window);
+    // printf("VAL: %d\n", window->value);
+    ((Window*)window->window)->Log(msg);
+}
+
+
+
+
+
 static void *lookup_ext_function(const char *name)
 {
     size_t name_len = StrLen(name);
@@ -252,6 +231,9 @@ static void *lookup_ext_function(const char *name)
     if (name_len == StrLen("puts") && StrEquals(name, "puts"))
         return (void*)my_puts;
 
+    if (name_len == StrLen("_ZN9OS_Window3LogEPKc") && StrEquals(name, "_ZN9OS_Window3LogEPKc"))
+        return (void*)FN_OS_Window_Log;
+   
     perror("No address for function %s\n");
     //exit(ENOENT);
     return NULL;
@@ -292,6 +274,9 @@ static uint8_t *section_runtime_base(const Elf64_Shdr *section)
 
     if (StrLen(".rodata") == section_name_len && StrEquals(".rodata", section_name))
         return rodata_runtime_base;
+
+    if (StrLen(".bss") == section_name_len && StrEquals(".bss", section_name))
+        return bss_runtime_base;
 
     perror("No runtime base address for section %s\n");
     //exit(ENOENT);
@@ -367,9 +352,9 @@ static void parse_obj(void)
     /* the index of `.shstrtab` in the sections table is encoded in the ELF header
      * so we can find it without actually using a name lookup
      */
-    GlobalRenderer->Println("BASE: {}", ConvertHexToString((uint64_t)obj.base), Colors.yellow);
-    GlobalRenderer->Println("HDR: {}", ConvertHexToString((uint64_t)obj.hdr), Colors.yellow);
-    GlobalRenderer->Println("OFFSET: {}", ConvertHexToString(obj.hdr->e_shoff), Colors.yellow);
+    // GlobalRenderer->Println("BASE: {}", ConvertHexToString((uint64_t)obj.base), Colors.yellow);
+    // GlobalRenderer->Println("HDR: {}", ConvertHexToString((uint64_t)obj.hdr), Colors.yellow);
+    // GlobalRenderer->Println("OFFSET: {}", ConvertHexToString(obj.hdr->e_shoff), Colors.yellow);
     RemoveFromStack();
 
     AddToStack();
@@ -392,8 +377,8 @@ static void parse_obj(void)
     /* the symbols table */
     symbols = (const Elf64_Sym *)(obj.base + symtab_hdr->sh_offset);
     /* number of entries in the symbols table = table size / entry size */
-    GlobalRenderer->Println("SYMBOLS: {}", ConvertHexToString((uint64_t)symbols), Colors.yellow);
-    GlobalRenderer->Println("SIZE: {}", to_string(symtab_hdr->sh_entsize), Colors.yellow);
+    // GlobalRenderer->Println("SYMBOLS: {}", ConvertHexToString((uint64_t)symbols), Colors.yellow);
+    // GlobalRenderer->Println("SIZE: {}", to_string(symtab_hdr->sh_entsize), Colors.yellow);
 
     num_symbols = symtab_hdr->sh_size / symtab_hdr->sh_entsize;
     RemoveFromStack();
@@ -441,15 +426,17 @@ static void parse_obj(void)
     RemoveFromStack();
 
     AddToStack();
-    count_external_symbols();
+    /* find the `.rodata` entry in the sections table */
+    const Elf64_Shdr *bss_hdr = lookup_section(".bss");
+    if (!rodata_hdr) {
+        perror("Failed to find .bss\n");
+        //exit(ENOEXEC);
+    }
     RemoveFromStack();
 
-    /* allocate memory for `.text`, `.data` and `.rodata` copies and the "jumptable" for external symbols, rounding up each section to whole pages */
-    // text_runtime_base = (uint8_t*)mmap(NULL, page_align(text_hdr->sh_size) + \
-    //                                page_align(data_hdr->sh_size) + \
-    //                                page_align(rodata_hdr->sh_size) + \
-    //                                page_align(sizeof(struct ext_jump) * num_ext_symbols),
-    //                                PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    AddToStack();
+    count_external_symbols();
+    RemoveFromStack();
 
     AddToStack();
 
@@ -457,9 +444,10 @@ static void parse_obj(void)
     uint64_t AMT = page_align(text_hdr->sh_size) + 
                         page_align(data_hdr->sh_size) + 
                         page_align(rodata_hdr->sh_size) + 
+                        page_align(bss_hdr->sh_size) + 
                         page_align(sizeof(struct ext_jump) * num_ext_symbols);
 
-    GlobalRenderer->Println("AMT: {}", ConvertHexToString(AMT), Colors.yellow);
+    //GlobalRenderer->Println("AMT: {}", ConvertHexToString(AMT), Colors.yellow);
 
     void* posTest = (void*) 0x50000000000;
     void* oldPosTest = posTest;
@@ -470,8 +458,8 @@ static void parse_obj(void)
     }
 
     text_runtime_base = (uint8_t*)oldPosTest;
-    GlobalRenderer->Println("RUNTIME BASE: {}", ConvertHexToString((uint64_t)text_runtime_base), Colors.yellow);
-    GlobalRenderer->Println("RUNTIME END: {}", ConvertHexToString((uint64_t)posTest), Colors.yellow);
+    // GlobalRenderer->Println("RUNTIME BASE: {}", ConvertHexToString((uint64_t)text_runtime_base), Colors.yellow);
+    // GlobalRenderer->Println("RUNTIME END: {}", ConvertHexToString((uint64_t)posTest), Colors.yellow);
 
     RemoveFromStack();
 
@@ -487,8 +475,10 @@ static void parse_obj(void)
     data_runtime_base = text_runtime_base + page_align(text_hdr->sh_size);
     /* .rodata will come after .data */
     rodata_runtime_base = data_runtime_base + page_align(data_hdr->sh_size);
+
+    bss_runtime_base = rodata_runtime_base + page_align(rodata_hdr->sh_size);
     /* jumptable will come after .rodata */
-    jumptable = (struct ext_jump *)(rodata_runtime_base + page_align(rodata_hdr->sh_size));
+    jumptable = (struct ext_jump *)(bss_runtime_base + page_align(bss_hdr->sh_size));
     RemoveFromStack();
 
     AddToStack();
@@ -498,6 +488,7 @@ static void parse_obj(void)
     _memcpy((void*)(obj.base + data_hdr->sh_offset), data_runtime_base, data_hdr->sh_size);
     /* copy .rodata */
     _memcpy((void*)(obj.base + rodata_hdr->sh_offset), rodata_runtime_base, rodata_hdr->sh_size);
+    _memcpy((void*)(obj.base + bss_hdr->sh_offset), bss_runtime_base, bss_hdr->sh_size);
     RemoveFromStack();
 
     AddToStack();
@@ -526,47 +517,33 @@ static void parse_obj(void)
 }
 
 
-extern "C" void Test()
+
+
+void TaskTest::execute_funcs()
 {
-    GlobalRenderer->Println("Hi!");
-}
+    // /* pointers to imported functions */
+    // int (*add5)(int);
+    // void (*hello)(KernelAppData);
 
-extern "C" int addX(int num)
-{
-    return num + 5;
-}
+    // AddToStack();
+    // add5 = (int (*)(int))lookup_function("add5");
+    // hello = (void (*)(KernelAppData))lookup_function("HELLO");
+    // if (!add5) {
+    //     perror("Failed to find add5 function\n");
+    //     //exit(ENOENT);
+    // }
+    // RemoveFromStack();
 
-
-uint8_t bruhus[0x1000];
-
-
-#include "commonStructs.h"
-
-static void execute_funcs(void)
-{
-    /* pointers to imported functions */
-    int (*add5)(int);
-    void (*hello)(KernelAppData);
-
-    AddToStack();
-    add5 = (int (*)(int))lookup_function("add5");
-    hello = (void (*)(KernelAppData))lookup_function("HELLO");
-    if (!add5) {
-        perror("Failed to find add5 function\n");
-        //exit(ENOENT);
-    }
-    RemoveFromStack();
-
-    AddToStack();
-    my_puts("Executing add5...");
+    // AddToStack();
+    // my_puts("Executing add5...");
     //printf("add5(%d) = %d\n", 42, add5(42));
     
-    AddToStack();
-    GlobalRenderer->Println("ADDR ADD: {}", ConvertHexToString((uint64_t)add5), Colors.bgreen);
-    GlobalRenderer->Println("ADDR HELLO: {}", ConvertHexToString((uint64_t)hello), Colors.bgreen);
-    RemoveFromStack();
+    // AddToStack();
+    // // GlobalRenderer->Println("ADDR ADD: {}", ConvertHexToString((uint64_t)add5), Colors.bgreen);
+    // // GlobalRenderer->Println("ADDR HELLO: {}", ConvertHexToString((uint64_t)hello), Colors.bgreen);
+    // RemoveFromStack();
 
-    Test();
+
 
     // void (*test2)();
     // test2 = &Test;
@@ -590,68 +567,7 @@ static void execute_funcs(void)
 
 
 
-    AddToStack();
-    {
-        GlobalRenderer->Println("A 1");
-        char* bleh = (char*)add5;
-        for (int i = 0; i < 20; i++)
-        {
-            uint64_t x = 0;
-            x = (uint8_t)bleh[i] + 0;
-            GlobalRenderer->Print("{} ", to_string(x), Colors.yellow);
-        }
-        GlobalRenderer->Println();
-        GlobalRenderer->Println();
-    }
-    RemoveFromStack();
-    AddToStack();
-    {
-        GlobalRenderer->Println("A 2");
-        char* bleh = (char*)&addX;
-        for (int i = 0; i < 20; i++)
-        {
-            uint64_t x = 0;
-            x = (uint8_t)bleh[i] + 0;
-            GlobalRenderer->Print("{} ", to_string(x), Colors.yellow);
-        }
-        GlobalRenderer->Println();
-        GlobalRenderer->Println();
-    }
-    RemoveFromStack();
 
-
-    AddToStack();
-    {
-        GlobalRenderer->Println("A 3");
-        char* bleh = (char*)hello;
-        for (int i = 0; i < 20; i++)
-        {
-            uint64_t x = 0;
-            x = (uint8_t)bleh[i] + 0;
-            GlobalRenderer->Print("{} ", to_string(x), Colors.yellow);
-        }
-        GlobalRenderer->Println();
-        GlobalRenderer->Println();
-    }
-    RemoveFromStack();
-
-
-
-
-    // AddToStack();
-    // {
-    //     GlobalRenderer->Println("A 2");
-    //     char* bleh = (char*)test3 + 100;
-    //     for (int i = 0; i < 200; i++)
-    //     {
-    //         uint64_t x = 0;
-    //         x = (uint8_t)bleh[i] + 0;
-    //         GlobalRenderer->Print("{} ", to_string(x), Colors.yellow);
-    //     }
-    //     GlobalRenderer->Println();
-    //     GlobalRenderer->Println();
-    // }
-    // RemoveFromStack();
 
 
     // AddToStack();
@@ -666,32 +582,62 @@ static void execute_funcs(void)
     // return;
 
 
-    AddToStack();
-    int res = add5(42);
-    RemoveFromStack();
+    // AddToStack();
+    // int res = add5(42);
+    // RemoveFromStack();
     
-    GlobalRenderer->Println("add5(42) = {}", to_string(res), Colors.yellow);
-    RemoveFromStack();
+    // GlobalRenderer->Println("add5(42) = {}", to_string(res), Colors.yellow);
+    // RemoveFromStack();
 
-    AddToStack();
+    // AddToStack();
     
-    if (!hello) {
-        perror("Failed to find hello function\n");
-        //exit(ENOENT);
+    // if (!hello) {
+    //     perror("Failed to find hello function\n");
+    //     //exit(ENOENT);
+    // }
+    // RemoveFromStack();
+
+    // AddToStack();
+    // my_puts("Executing hello...");
+    // KernelAppData x;
+    // x.test = false;
+    // hello(x);
+    // x.test = true;
+    // hello(x);
+    // RemoveFromStack();
+
+
+
+
+    void (*_init)(KernelAppData);
+    _init = (void (*)(KernelAppData))lookup_function("Module_Init");
+    if (!_init) {
+        perror("Failed to find Module_Init function\n");
     }
-    RemoveFromStack();
+    bool (*_do)();
+    _do = (bool (*)())lookup_function("Module_Do");
+    if (!_do) {
+        perror("Failed to find Module_Do function\n");
+    }
+    void (*_free)();
+    _free = (void (*)())lookup_function("Module_Free");
+    if (!_free) {
+        perror("Failed to find Module_Free function\n");
+    }
 
-    AddToStack();
-    my_puts("Executing hello...");
-    KernelAppData x;
-    x.test = false;
-    hello(x);
-    x.test = true;
-    hello(x);
-    RemoveFromStack();
+
+
+    _init(kernelAppData);
+    // move this to the do thing of task
+    while (!_do())
+        ;
+    _free();
+
+
+
 }
 
-int DoStuff(void* data, uint16_t len)
+int TaskTest::DoStuff(void* data, uint16_t len)
 {
     AddToStack();
     load_obj(data, len);
@@ -707,28 +653,36 @@ int DoStuff(void* data, uint16_t len)
 
 
 
-TaskTest::TaskTest(void* data, uint64_t len)
+TaskTest::TaskTest(void* data, uint64_t len, Window* window)
 {
     done = false;
     type = TaskType::TESTO;
     dataCopy = _Malloc(len);
     dataLen = len;
     _memcpy(data, dataCopy, len);
+    this->window = window;
+
+
+
+    kernelAppData.test = false;
+    kernelAppData.window = (OS_Window*)_Malloc(sizeof(OS_Window));
+    kernelAppData.window->window = (void*)window;
+
 }
 
 
 void TaskTest::Do()
 {
-    GlobalRenderer->Clear(Colors.black);
+    //GlobalRenderer->Clear(Colors.black);
     DoStuff(dataCopy, dataLen);
-    PIT::Sleep(500);
+    //PIT::Sleep(500);
     done = true;
 }
 
-TaskTest* NewTestTask(void* data, uint64_t len)
+TaskTest* NewTestTask(void* data, uint64_t len, Window* window)
 {
     TaskTest* task = (TaskTest*)_Malloc(sizeof(TaskTest), "New Test Task");
-    *task = TaskTest(data, len);
+    *task = TaskTest(data, len, window);
     return task;
 }
 

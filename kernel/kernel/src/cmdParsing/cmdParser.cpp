@@ -565,7 +565,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                             //Println(window, "> File exists!");
                             int fSize = fsInterface->GetFileInfo(relPath)->sizeInBytes;
 
-                            terminal->tasks.add(NewTestTask(buf, fSize));
+                            terminal->tasks.add(NewTestTask(buf, fSize, window));
 
                             _Free((void*)buf);
                         }
