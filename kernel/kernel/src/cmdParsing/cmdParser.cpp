@@ -11,6 +11,7 @@
 #include "../kernelStuff/other_IO/pit/pit.h"
 #include "../tasks/sleep/taskSleep.h"
 #include "../tasks/playBeep/playBeep.h"
+#include "../tasks/test/testTask.h"
 #include "../kernelStuff/Disk_Stuff/Disk_Interfaces/ram/ramDiskInterface.h"
 #include "../kernelStuff/Disk_Stuff/Disk_Interfaces/file/fileDiskInterface.h"
 #include "../kernelStuff/Disk_Stuff/Partition_Interfaces/mraps/mrapsPartitionInterface.h"
@@ -397,6 +398,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         RemoveFromStack();
         return;
     }
+    
 
     if (StrEquals(data->data[0], "sleep"))
     {
@@ -498,6 +500,72 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                             int fSize = fsInterface->GetFileInfo(relPath)->sizeInBytes;
 
                             terminal->tasks.add(NewMAABTask(fSize, buf, window, terminal));
+
+                            _Free((void*)buf);
+                        }
+                        else
+                            LogError("Reading File failed!", window);
+                    }
+                    else
+                        LogError("File does not exist!", window);
+
+                    _Free(relPath);
+                }
+                else
+                    LogError("Path is invalid!", window);
+            }
+            else
+                LogError("Path is invalid!", window);
+
+        }
+        else
+            LogInvalidArgumentCount(1, data->len-1, window);
+        
+        _Free(data);
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(data->data[0], "testo"))
+    {
+        if (data->len == 2)
+        {
+            //Println(window, "Reading File \"{}\"...", data->data[1], Colors.yellow);
+
+            // {
+            //     char* t = FS_STUFF::GetDriveNameFromFullPath(data->data[1]);
+            //     if (t != NULL)
+            //     {
+            //         Println(window, "Drive: \"{}\"", t, Colors.yellow);
+            //         free((void*)t);
+            //     }
+            // }
+
+            // {
+            //     char* t = FS_STUFF::GetFilePathFromFullPath(data->data[1]);
+            //     if (t != NULL)
+            //     {
+            //         Println(window, "Path: \"{}\"", t, Colors.yellow);
+            //         free((void*)t);
+            //     }
+            // }
+
+            FilesystemInterface::GenericFilesystemInterface* fsInterface = FS_STUFF::GetFsInterfaceFromFullPath(data->data[1]);
+            if (fsInterface != NULL)
+            {
+                char* relPath = FS_STUFF::GetFilePathFromFullPath(data->data[1]);
+                if (relPath != NULL)
+                {
+                    if (fsInterface->FileExists(relPath))
+                    {
+                        uint8_t* buf = NULL;
+                        fsInterface->ReadFile(relPath, (void**)(&buf));
+                        if (buf != NULL)
+                        {   
+                            //Println(window, "> File exists!");
+                            int fSize = fsInterface->GetFileInfo(relPath)->sizeInBytes;
+
+                            terminal->tasks.add(NewTestTask(buf, fSize));
 
                             _Free((void*)buf);
                         }
@@ -1674,8 +1742,8 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
     else if (StrEquals(name, "test interlace"))
     {
         int interlace = to_int(val);
-        if (interlace < 1)
-            LogError("Interlace cannot be less than 1", window);
+        if (interlace < 0)
+            LogError("Interlace cannot be less than 0", window);
         else if (interlace > 8)
             LogError("Interlace cannot be higher than 8", window);
         else
@@ -1683,6 +1751,8 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
             int inter = 1;
             for (int i = 0; i < interlace - 1; i++)
                 inter *= 2;
+            if (interlace == 0)
+                inter = 0;
             
             WindowManager::testInterlace = inter;
         }

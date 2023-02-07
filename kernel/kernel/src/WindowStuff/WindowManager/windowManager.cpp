@@ -734,7 +734,7 @@ if (window != NULL)
         //         vPixel++;
         //     }
         // }
-        if (testInterlace != 1)
+        if (testInterlace > 1)
         {
             AddToStack();
             uint64_t h = actualScreenBuffer->Height, w = actualScreenBuffer->Width;
@@ -804,33 +804,59 @@ if (window != NULL)
         }
         else
         {
-            AddToStack();
-            uint64_t h = actualScreenBuffer->Height, w = actualScreenBuffer->Width;
-
-            uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress;
-            uint32_t*  cPixel = (uint32_t*)  copyOfScreenBuffer->BaseAddress;
-            uint32_t*  aPixel = (uint32_t*)  actualScreenBuffer->BaseAddress;
-
-            AddToStack();
-            for (int64_t y = 0; y < h; y++)
+            if (testInterlace == 1)
             {
-                aPixel = (uint32_t*)  actualScreenBuffer->BaseAddress + y * actualScreenBuffer->PixelsPerScanLine;
-                for (int64_t x = 0; x < w; x++)
-                {
-                    uint32_t col = **vPixel;
-                    if (*cPixel != col)
-                    {
-                        *aPixel = col;
-                        *cPixel = col;
-                    }
-                    vPixel++;
-                    cPixel++;
-                    aPixel++;
-                } 
-            }
-            RemoveFromStack();
+                AddToStack();
+                uint64_t h = actualScreenBuffer->Height, w = actualScreenBuffer->Width;
 
-            RemoveFromStack();
+                uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress;
+                uint32_t*  cPixel = (uint32_t*)  copyOfScreenBuffer->BaseAddress;
+                uint32_t*  aPixel = (uint32_t*)  actualScreenBuffer->BaseAddress;
+
+                AddToStack();
+                for (int64_t y = 0; y < h; y++)
+                {
+                    aPixel = (uint32_t*)  actualScreenBuffer->BaseAddress + y * actualScreenBuffer->PixelsPerScanLine;
+                    for (int64_t x = 0; x < w; x++)
+                    {
+                        uint32_t col = **vPixel;
+                        if (*cPixel != col)
+                        {
+                            *aPixel = col;
+                            *cPixel = col;
+                        }
+                        vPixel++;
+                        cPixel++;
+                        aPixel++;
+                    } 
+                }
+                RemoveFromStack();
+
+                RemoveFromStack();
+            }
+            else
+            {
+                AddToStack();
+                uint64_t h = actualScreenBuffer->Height, w = actualScreenBuffer->Width;
+
+                uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress;
+                uint32_t*  aPixel = (uint32_t*)  actualScreenBuffer->BaseAddress;
+
+                AddToStack();
+                for (int64_t y = 0; y < h; y++)
+                {
+                    aPixel = (uint32_t*)  actualScreenBuffer->BaseAddress + y * actualScreenBuffer->PixelsPerScanLine;
+                    for (int64_t x = 0; x < w; x++)
+                    {
+                        *aPixel = **vPixel;
+                        vPixel++;
+                        aPixel++;
+                    } 
+                }
+                RemoveFromStack();
+
+                RemoveFromStack();
+            }
         }
 
         AddToStack();

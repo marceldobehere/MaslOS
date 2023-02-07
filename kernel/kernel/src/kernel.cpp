@@ -555,7 +555,7 @@ void RenderLoop()
 
 void RecoverDed()
 {
-    HeapCheck(true);
+    HeapCheck(false);
     
     //osData.osTasks.clear();
 
@@ -591,7 +591,7 @@ void RecoverDed()
             NewTerminalInstance* bruh2 = ((NewTerminalInstance*)terminal->newTermInstance);
             if (bruh2 != NULL)
             {
-                bruh2->Println("\n\nCurrent Tasks forcibly stopped, due them possibly having crashed the OS!", Colors.bred);
+                bruh2->Println("\n\nCurrent Tasks forcibly stopped, due to them possibly having crashed the OS!", Colors.bred);
             }
 
 
@@ -1026,6 +1026,7 @@ void boot(BootInfo* bootInfo)
 
 #include "kernel.h"
 
+ 
 void bootTest(Framebuffer fb, ACPI::RSDP2* rsdp, PSF1_FONT* psf1_font, MaslOsAssetStruct* assets, void* freeMemStart, void* extraMemStart, uint64_t freeMemSize, void* kernelStart, uint64_t kernelSize, void* kernelStartV)
 {
     

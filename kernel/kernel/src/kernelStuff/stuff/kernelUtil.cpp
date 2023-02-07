@@ -172,10 +172,29 @@ void PrepareMemory(BootInfo* bootInfo)
     //GlobalAllocator->LockPages((void*)earlyVirtualToPhysicalAddr((void*)fbBase), fbSize / 0x1000);
 
 
-    for (uint64_t i = fbBase; i < fbBase + fbSize; i+=4096)
-        GlobalPageTableManager.MapMemory((void*)i, (void*)i);
+    if (true)
+    {
+        for (uint64_t i = fbBase; i < fbBase + fbSize; i+=4096)
+            GlobalPageTableManager.MapMemory((void*)i, (void*)i);
+    }
+    else
+    {
+        for (int i = 0; i < 50; i++)
+            GlobalRenderer->Clear(Colors.red);
 
+        for (uint64_t i = fbBase; i < fbBase + fbSize; i+=4096)
+            GlobalPageTableManager.MapFramebufferMemory((void*)i, (void*)i);
 
+        for (int i = 0; i < 50; i++)
+            GlobalRenderer->Clear(Colors.green);
+
+        doMagicWithPAT();
+
+        for (int i = 0; i < 50; i++)
+            GlobalRenderer->Clear(Colors.purple);
+
+        GlobalRenderer->Clear(Colors.black);
+    }
 
 
 
@@ -315,18 +334,18 @@ void PrepareInterrupts()
     SetIDTGate((void*)GenFault_handler, 0x2, IDT_TA_InterruptGate, 0x08); // Non Maskable interrupt
     SetIDTGate((void*)GenFault_handler, 0x4, IDT_TA_InterruptGate, 0x08); // Overflow
     SetIDTGate((void*)GenFault_handler, 0x5, IDT_TA_InterruptGate, 0x08); // Bound Range Exceeded
-    SetIDTGate((void*)GenFault_handler, 0x6, IDT_TA_InterruptGate, 0x08); // Invalid OPCODE
+    SetIDTGate((void*)InvalidOpCode_handler, 0x6, IDT_TA_InterruptGate, 0x08); // Invalid OPCODE
     SetIDTGate((void*)GenFault_handler, 0x7, IDT_TA_InterruptGate, 0x08); // Device not avaiable
-    SetIDTGate((void*)GenFaultWithError_handler, 0xA, IDT_TA_InterruptGate, 0x08); // Invalid TSS
-    SetIDTGate((void*)GenFaultWithError_handler, 0xB, IDT_TA_InterruptGate, 0x08); // Segment not present
-    SetIDTGate((void*)GenFaultWithError_handler, 0xC, IDT_TA_InterruptGate, 0x08); // Stack segment fault
-    SetIDTGate((void*)GenFaultWithError_handler, 0x11, IDT_TA_InterruptGate, 0x08); //  Alligment check
-    SetIDTGate((void*)GenFault_handler, 0x12, IDT_TA_InterruptGate, 0x08); // machine check
+    SetIDTGate((void*)GenFault1_handler, 0xA, IDT_TA_InterruptGate, 0x08); // Invalid TSS
+    SetIDTGate((void*)GenFault1_handler, 0xB, IDT_TA_InterruptGate, 0x08); // Segment not present
+    SetIDTGate((void*)GenFault1_handler, 0xC, IDT_TA_InterruptGate, 0x08); // Stack segment fault
+    SetIDTGate((void*)GenFault1_handler, 0x11, IDT_TA_InterruptGate, 0x08); //  Alligment check
+    SetIDTGate((void*)GenFault1_handler, 0x12, IDT_TA_InterruptGate, 0x08); // machine check
     SetIDTGate((void*)VirtualizationFault_handler, 0x14, IDT_TA_InterruptGate, 0x08); // Virtualization Exception
     SetIDTGate((void*)ControlProtectionFault_handler, 0x15, IDT_TA_InterruptGate, 0x08); // Control Protection Exception
     SetIDTGate((void*)HypervisorFault_handler, 0x1C, IDT_TA_InterruptGate, 0x08); // Hypervisor Injection Exception
     SetIDTGate((void*)VMMCommunicationFault_handler, 0x1D, IDT_TA_InterruptGate, 0x08); // VMM Communication Exception
-    SetIDTGate((void*)GenFaultWithError_handler, 0x1E, IDT_TA_InterruptGate, 0x08); // Security Exception
+    SetIDTGate((void*)SecurityException_handler, 0x1E, IDT_TA_InterruptGate, 0x08); // Security Exception
 
     io_wait();    
     __asm__ volatile ("lidt %0" : : "m" (idtr));

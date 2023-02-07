@@ -7,6 +7,7 @@
 #include "playBeep/playBeep.h"
 #include "maab/maabTask.h"
 #include "taskMgrTask/taskMgrTask.h"
+#include "test/testTask.h"
 
 
 
@@ -45,6 +46,8 @@ const char* TaskTypeToString(TaskType type)
         return "SLEEP / WAIT";
     if (type == TaskType::TASK_MGR)
         return "TASK MANAGER";
+    if (type == TaskType::TESTO)
+        return "TESTO";
 
     return "UNKNOWN!";
 }
@@ -107,6 +110,12 @@ void DoTask(Task* task)
             maab->Do();
             break;
         }
+        case TaskType::TESTO:
+        {
+            TaskTest* test = (TaskTest*)task;
+            test->Do();
+            break;
+        }
     }
 }
 
@@ -163,9 +172,16 @@ void FreeTask(Task* task)
         }
         case TaskType::TASK_MGR:
         {
-            TaskTaskManager* maab = (TaskTaskManager*)task;
-            maab->Free();
-            _Free((void*)maab);
+            TaskTaskManager* taskMgr = (TaskTaskManager*)task;
+            taskMgr->Free();
+            _Free((void*)taskMgr);
+            break;
+        }
+        case TaskType::TESTO:
+        {
+            TaskTest* testo = (TaskTest*)task;
+            testo->Free();
+            _Free((void*)testo);
             break;
         }
     }  

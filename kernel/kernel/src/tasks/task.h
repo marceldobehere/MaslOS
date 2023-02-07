@@ -10,7 +10,8 @@ enum TaskType
     BEEP,
     BF,
     MAAB,
-    TASK_MGR
+    TASK_MGR,
+    TESTO
 };
 
 const char* TaskTypeToString(TaskType type);

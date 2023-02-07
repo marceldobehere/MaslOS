@@ -79,6 +79,24 @@ __attribute__((interrupt)) void GenFault_handler(interrupt_frame* frame)
     SURVIVE_CRASH
 }
 
+__attribute__((interrupt)) void GenFault1_handler(interrupt_frame* frame)
+{
+    AddToStack();
+    Panic("General Fault 1 Detected!", false);
+    RemoveFromStack();
+
+    SURVIVE_CRASH
+}
+
+__attribute__((interrupt)) void GenFault2_handler(interrupt_frame* frame)
+{
+    AddToStack();
+    Panic("General Fault 2 Detected!", false);
+    RemoveFromStack();
+
+    SURVIVE_CRASH
+}
+
 __attribute__((interrupt)) void GenFaultWithError_handler(interrupt_frame* frame)//, uint64_t error)
 {
     AddToStack();
@@ -201,6 +219,24 @@ __attribute__((interrupt)) void VMMCommunicationFault_handler(interrupt_frame* f
     SURVIVE_CRASH
 }
 
+__attribute__((interrupt)) void SecurityException_handler(interrupt_frame* frame)//, uint64_t error)
+{
+    AddToStack();
+    Panic("Security Exception Detected!", false);
+    RemoveFromStack();
+
+    SURVIVE_CRASH
+}
+
+
+__attribute__((interrupt)) void InvalidOpCode_handler(interrupt_frame* frame)//, uint64_t error)
+{
+    AddToStack();
+    Panic("Invalid Opcode Detected!", false);
+    RemoveFromStack();
+
+    SURVIVE_CRASH
+}
 
 
 

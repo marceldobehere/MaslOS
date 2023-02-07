@@ -5,16 +5,15 @@
 class TaskTest : public Task
 {
     private:
-        uint64_t startTime;
-        uint64_t endTime;
-
+        void* dataCopy;
+        uint64_t dataLen;
     public:
 
         //TaskSleep(double time);
-        TaskTest(uint64_t ms);
+        TaskTest(void* data, uint64_t len);
         void Do();
         void Free();
 };
 
 //TaskSleep* NewSleepTask(double time);
-TaskTest* NewTestTask(uint64_t ms);
+TaskTest* NewTestTask(void* data, uint64_t len);

@@ -13,6 +13,7 @@ enum PT_Flag
     Custom0 = 9,
     Custom1 = 10,
     Custom2 = 11,
+    PAT = 12,
     NX = 63 // only if supported
 };
 
@@ -52,3 +53,8 @@ struct PageTable
     
 
 }__attribute__((aligned(0x1000)));
+
+
+void* GetPhysAddr(void *virtualaddr);
+
+void doMagicWithPAT();
