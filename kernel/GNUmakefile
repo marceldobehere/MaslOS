@@ -135,7 +135,8 @@ kernel/src/WindowStuff/WindowManager/%.o: kernel/src/WindowStuff/WindowManager/%
 
 
 
-
+%/test/testTask.o: %/test/testTask.cpp
+	$(CC) $(CFLAGS2) -c $^ -o $@ -lm
 
 
 

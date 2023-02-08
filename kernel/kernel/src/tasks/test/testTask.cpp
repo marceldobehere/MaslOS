@@ -220,7 +220,22 @@ void FN_OS_Window_Log(OS_Window* window, const char* msg)
     ((Window*)window->window)->Log(msg);
 }
 
+// #include <cmath>
 
+// double _Floor(double val)
+// {
+//     return floor(val);
+// }
+
+// double _Pow(double x, double y)
+// {
+//     return pow(x, y);
+// }
+
+// double _Sqrt(double val)
+// {
+//     return sqrt(val);
+// }
 
 
 
@@ -233,6 +248,13 @@ static void *lookup_ext_function(const char *name)
 
     if (name_len == StrLen("_ZN9OS_Window3LogEPKc") && StrEquals(name, "_ZN9OS_Window3LogEPKc"))
         return (void*)FN_OS_Window_Log;
+
+    // if (name_len == StrLen("floor") && StrEquals(name, "floor"))
+    //     return (void*)_Floor;
+    // if (name_len == StrLen("sqrt") && StrEquals(name, "sqrt"))
+    //     return (void*)_Sqrt;
+    // if (name_len == StrLen("pow") && StrEquals(name, "pow"))
+    //     return (void*)_Pow;
    
     perror("No address for function %s\n");
     //exit(ENOENT);
@@ -625,15 +647,25 @@ void TaskTest::execute_funcs()
         perror("Failed to find Module_Free function\n");
     }
 
+    AddToStack();
 
-
+    AddToStack();
     _init(kernelAppData);
+    RemoveFromStack();
+
+
+    AddToStack();
     // move this to the do thing of task
     while (!_do())
         ;
+    RemoveFromStack();
+
+    AddToStack();
     _free();
+    RemoveFromStack();
 
 
+    RemoveFromStack();
 
 }
 
@@ -650,6 +682,15 @@ int TaskTest::DoStuff(void* data, uint16_t len)
 
 
 
+void* tMalloc(uint64_t size)
+{
+    return _Malloc(size);
+}
+
+void tFree(void* addr)
+{
+    _Free(addr);
+}
 
 
 
@@ -667,7 +708,13 @@ TaskTest::TaskTest(void* data, uint64_t len, Window* window)
     kernelAppData.test = false;
     kernelAppData.window = (OS_Window*)_Malloc(sizeof(OS_Window));
     kernelAppData.window->window = (void*)window;
-
+    kernelAppData.window->windowFramebuffer.height = window->framebuffer->Height;
+    kernelAppData.window->windowFramebuffer.width = window->framebuffer->Width;
+    kernelAppData.window->windowFramebuffer.size = window->framebuffer->BufferSize;
+    kernelAppData.window->windowFramebuffer.pps = window->framebuffer->PixelsPerScanLine;
+    kernelAppData.window->windowFramebuffer.start = window->framebuffer->BaseAddress;
+    kernelAppData.OS_Malloc = tMalloc;
+    kernelAppData.OS_Free = tFree;
 }
 
 
