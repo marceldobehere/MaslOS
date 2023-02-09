@@ -734,7 +734,7 @@ if (window != NULL)
         //         vPixel++;
         //     }
         // }
-        if (testInterlace > 1)
+        if (testInterlace != 1 && testInterlace != 0)
         {
             AddToStack();
             uint64_t h = actualScreenBuffer->Height, w = actualScreenBuffer->Width;

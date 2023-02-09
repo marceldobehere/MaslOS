@@ -539,7 +539,9 @@ static void parse_obj(void)
 }
 
 
-
+void (*_init)(KernelAppData);
+bool (*_do)();
+void (*_free)();
 
 void TaskTest::execute_funcs()
 {
@@ -629,19 +631,16 @@ void TaskTest::execute_funcs()
     // RemoveFromStack();
 
 
-
-
-    void (*_init)(KernelAppData);
     _init = (void (*)(KernelAppData))lookup_function("Module_Init");
     if (!_init) {
         perror("Failed to find Module_Init function\n");
     }
-    bool (*_do)();
+    
     _do = (bool (*)())lookup_function("Module_Do");
     if (!_do) {
         perror("Failed to find Module_Do function\n");
     }
-    void (*_free)();
+   
     _free = (void (*)())lookup_function("Module_Free");
     if (!_free) {
         perror("Failed to find Module_Free function\n");
@@ -654,22 +653,13 @@ void TaskTest::execute_funcs()
     RemoveFromStack();
 
 
-    AddToStack();
-    // move this to the do thing of task
-    while (!_do())
-        ;
-    RemoveFromStack();
-
-    AddToStack();
-    _free();
-    RemoveFromStack();
 
 
     RemoveFromStack();
 
 }
 
-int TaskTest::DoStuff(void* data, uint16_t len)
+int TaskTest::InitTheStuff(void* data, uint16_t len)
 {
     AddToStack();
     load_obj(data, len);
@@ -703,8 +693,6 @@ TaskTest::TaskTest(void* data, uint64_t len, Window* window)
     _memcpy(data, dataCopy, len);
     this->window = window;
 
-
-
     kernelAppData.test = false;
     kernelAppData.window = (OS_Window*)_Malloc(sizeof(OS_Window));
     kernelAppData.window->window = (void*)window;
@@ -715,15 +703,18 @@ TaskTest::TaskTest(void* data, uint64_t len, Window* window)
     kernelAppData.window->windowFramebuffer.start = window->framebuffer->BaseAddress;
     kernelAppData.OS_Malloc = tMalloc;
     kernelAppData.OS_Free = tFree;
+
+
+
+    InitTheStuff(dataCopy, dataLen);
 }
 
 
 void TaskTest::Do()
 {
-    //GlobalRenderer->Clear(Colors.black);
-    DoStuff(dataCopy, dataLen);
-    //PIT::Sleep(500);
-    done = true;
+    AddToStack();
+    done = _do();
+    RemoveFromStack();
 }
 
 TaskTest* NewTestTask(void* data, uint64_t len, Window* window)
@@ -735,6 +726,10 @@ TaskTest* NewTestTask(void* data, uint64_t len, Window* window)
 
 void TaskTest::Free()
 {
+    AddToStack();
+    _free();
+    RemoveFromStack();
+
     _Free(dataCopy);
 }
 

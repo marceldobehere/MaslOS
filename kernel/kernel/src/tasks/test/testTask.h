@@ -22,7 +22,7 @@ class TaskTest : public Task
 
 
         void load_obj(void* data, uint64_t len);
-        int DoStuff(void* data, uint16_t len);
+        int InitTheStuff(void* data, uint16_t len);
         void execute_funcs();
 
 

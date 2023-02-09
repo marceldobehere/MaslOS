@@ -197,6 +197,9 @@ void InitializeHeap(void* heapAddress, size_t pageCount)
 
 void UpdateMallocCache()
 {
+    if (mallocToCache)
+        Panic("MALLOC TO CACHE IS ON!", true);
+    
     if (!PIT::Inited)
         return;
 
@@ -331,9 +334,6 @@ void* _Xmalloc(size_t size, const char* text, const char* func, const char* file
     AddToStack();
     if (!heapInited)
         Panic("Trying to malloc with Heap not being initialized!", true);
-    
-    if (!mallocToCache)
-        UpdateMallocCache();
 
 
     if (size == 0)
@@ -344,6 +344,9 @@ void* _Xmalloc(size_t size, const char* text, const char* func, const char* file
         size -= (size % 0x10);
         size += 0x10;
     }
+
+    if (!mallocToCache)
+        UpdateMallocCache();
 
     if (size == MallocCacheSize && !mallocToCache && PIT::Inited)
     {
@@ -357,12 +360,12 @@ void* _Xmalloc(size_t size, const char* text, const char* func, const char* file
                 if (MallocCache16BytesAddr[i] < (void*)100)
                     Panic("Malloc Cache Thing is NULL", true);
                 
-                HeapSegHdr* current = ((HeapSegHdr*)MallocCache16BytesAddr[i]) - 1;
-                current->text = "<BYTE CACHE>";
-                current->activeMemFlagVal = activeMemFlagVal;
-                current->file = text;
-                current->func = file;
-                current->line = line;
+                HeapSegHdr* tempHdr = ((HeapSegHdr*)MallocCache16BytesAddr[i]) - 1;
+                tempHdr->text = "<BYTE CACHE>";
+                tempHdr->activeMemFlagVal = activeMemFlagVal;
+                tempHdr->file = text;
+                tempHdr->func = file;
+                tempHdr->line = line;
 
 
                 RemoveFromStack();
@@ -458,6 +461,8 @@ void _Xfree(void* address, const char* func, const char* file, int line)
     AddToStack();
     if (!heapInited)
         Panic("Trying to free with Heap not being initialized!", true);
+    if (mallocToCache)
+        Panic("Malloc to cache on when trying to free!");
     
     if (address < (void*)1000)
         Panic("Tried to free NULL address!", true);
@@ -466,7 +471,7 @@ void _Xfree(void* address, const char* func, const char* file, int line)
     if (segment->magicNum == HeapMagicNum)
     {
 
-        if (segment->length == MallocCacheSize && !mallocToCache && PIT::Inited)
+        if (segment->length == MallocCacheSize)
         {
             for (int i = 0; i < MallocCacheCount; i++)
             {
@@ -475,13 +480,13 @@ void _Xfree(void* address, const char* func, const char* file, int line)
                     if (!MallocCache16BytesFree[i])
                     {
                         MallocCache16BytesFree[i] = true;
-                        MallocCache16BytesTime[i] = PIT::TimeSinceBootMS();
+                        //MallocCache16BytesTime[i] = PIT::TimeSinceBootMS();
                         RemoveFromStack();
                         return;
                     }
                     else
                     {
-                        Panic("Tried to free already free Segment!", true);
+                        Panic("Tried to free already free cache!");
                         RemoveFromStack();
                         return;
                     }
@@ -671,13 +676,16 @@ bool _XtryFree(void* address, const char* func, const char* file, int line)
 
     if (!heapInited)
         Panic("Trying to free with Heap not being initialized!", true);
+    if (mallocToCache)
+        Panic("Malloc to cache on when trying to free!");
+
 
     HeapSegHdr* segment = ((HeapSegHdr*)address) - 1;
 
     if (segment->magicNum == HeapMagicNum)
     {
 
-        if (segment->length == MallocCacheSize && !mallocToCache && PIT::Inited)
+        if (segment->length == MallocCacheSize)
         {
             for (int i = 0; i < MallocCacheCount; i++)
             {
@@ -686,7 +694,7 @@ bool _XtryFree(void* address, const char* func, const char* file, int line)
                     if (!MallocCache16BytesFree[i])
                     {
                         MallocCache16BytesFree[i] = true;
-                        MallocCache16BytesTime[i] = PIT::TimeSinceBootMS();
+                        //MallocCache16BytesTime[i] = PIT::TimeSinceBootMS();
                         RemoveFromStack();
                         return true;
                     }

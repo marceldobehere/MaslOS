@@ -175,7 +175,7 @@ void PrepareMemory(BootInfo* bootInfo)
     if (true)
     {
         for (uint64_t i = fbBase; i < fbBase + fbSize; i+=4096)
-            GlobalPageTableManager.MapMemory((void*)i, (void*)i);
+            GlobalPageTableManager.MapFramebufferMemory((void*)i, (void*)i);
     }
     else
     {
