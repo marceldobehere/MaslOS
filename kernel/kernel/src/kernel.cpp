@@ -569,7 +569,7 @@ void RenderLoop()
 
 
                 msgWindow = (Window*)_Malloc(sizeof(Window), "Warning Window");
-                Size size = Size(800, 16*10);
+                Size size = Size(55*8, 16*10);
                 Position pos = Position(((GlobalRenderer->framebuffer->Width - size.width) / 2), ((GlobalRenderer->framebuffer->Height) / 5));
                 
                 if (msgWindow != NULL)
@@ -595,9 +595,9 @@ void RenderLoop()
                 //GlobalRenderer->Println(", y: {}", to_string(crashWindow->size.height), Colors.yellow);
                 msgWindow->renderer->Clear(Colors.black);
                 //GlobalRenderer->Println("BRUH 5.2", Colors.yellow);
-                msgWindow->renderer->Println("------------------------------------------------", Colors.bred);
+                msgWindow->renderer->Println("------------------------------------------------------", Colors.bred);
                 msgWindow->renderer->Println("WARNING: MaslOS just had a fatal but recoverable crash", Colors.bred);
-                msgWindow->renderer->Println("------------------------------------------------", Colors.bred);
+                msgWindow->renderer->Println("------------------------------------------------------", Colors.bred);
                 msgWindow->renderer->Println();
                 //GlobalRenderer->Println("BRUH 5.3", Colors.yellow);
                 msgWindow->renderer->Println("The OS has experienced a fatal crash!", Colors.yellow);
