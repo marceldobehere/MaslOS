@@ -3,6 +3,7 @@
 #include "../Rendering/Cols.h" 
 #include "../OSDATA/osdata.h"
 #include "../OSDATA/MStack/MStackM.h"
+#include "../WindowStuff/SubInstances/customInstance/customInstance.h"
 
 void PrintRegisterDump(BasicRenderer* renderer)
 {
@@ -104,7 +105,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
                 if (crashWindow != NULL)
                 {
                     //GlobalRenderer->Println("BRUH 4.5", Colors.yellow);
-                    *(crashWindow) = Window(NULL, size, pos, "Crash Window", true, true, true);
+                    *(crashWindow) = Window(new CustomInstance(InstanceType::WARNING), size, pos, "Crash Warning", true, true, true);
                     //GlobalRenderer->Println("BRUH 4.6", Colors.yellow);
                     osData.windows.add(crashWindow);
                     

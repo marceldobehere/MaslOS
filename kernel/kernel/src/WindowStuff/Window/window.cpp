@@ -47,6 +47,14 @@ Window::Window(DefaultInstance* instance, Size size, Position position, const ch
         icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.TERMINAL];
     else if (instance->instanceType == InstanceType::DebugTerminal)
         icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.DEBUG];
+    else if (instance->instanceType == InstanceType::GUI)
+        icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.GUI_PGM];
+    else if (instance->instanceType == InstanceType::TESTO_PGM)
+        icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.TESTO_PGM];
+    else if (instance->instanceType == InstanceType::WARNING)
+        icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.WARNING];
+    else if (instance->instanceType == InstanceType::CRASH)
+        icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.CRASH];
     else
         icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.DEFAULT];
 

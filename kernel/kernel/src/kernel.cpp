@@ -6,6 +6,7 @@
 #include "WindowStuff/SubInstances/guiInstance/guiStuff/components/text/textComponent.h"
 #include "WindowStuff/SubInstances/guiInstance/guiStuff/components/button/buttonComponent.h"
 #include "WindowStuff/SubInstances/guiInstance/guiStuff/components/textField/textFieldComponent.h"
+#include "WindowStuff/SubInstances/customInstance/customInstance.h"
 #include "tasks/closeWindow/taskWindowClose.h"
 
 #include "rnd/rnd.h"
@@ -575,9 +576,10 @@ void RenderLoop()
                 if (msgWindow != NULL)
                 {
                     //GlobalRenderer->Println("BRUH 4.5", Colors.yellow);
-                    *(msgWindow) = Window(NULL, size, pos, "OS FATAL CRASH WARNING", true, true, true);
+                    *(msgWindow) = Window(new CustomInstance(InstanceType::CRASH), size, pos, "OS FATAL CRASH WARNING", true, true, true);
                     //GlobalRenderer->Println("BRUH 4.6", Colors.yellow);
                     osData.windows.add(msgWindow); 
+                    //msgWindow->instance
                     //GlobalRenderer->Println("BRUH 4.7", Colors.yellow);
 
                     activeWindow = msgWindow;

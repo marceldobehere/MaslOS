@@ -11,6 +11,7 @@ class TaskTest : public Task
         uint64_t dataLen;
         Window* window;
         KernelAppData kernelAppData;
+        kernelFiles::ImageFile* oldIcon;
 
     public:
 

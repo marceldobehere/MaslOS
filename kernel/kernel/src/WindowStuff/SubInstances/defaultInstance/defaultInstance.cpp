@@ -11,6 +11,8 @@ void DefaultInstance::DefaultFree()
     switch (this->instanceType)
     {
         case InstanceType::Default:
+        case InstanceType::WARNING:
+        case InstanceType::CRASH:
         {
             _Free(this);
             break;
@@ -21,6 +23,7 @@ void DefaultInstance::DefaultFree()
             break;
         }
         case InstanceType::Terminal:
+        case InstanceType::TESTO_PGM:
         {
             ((TerminalInstance*)this)->Free();
             _Free(this);

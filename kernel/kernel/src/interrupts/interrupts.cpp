@@ -23,7 +23,7 @@ extern "C" void BruhusSafus()
     RecoverDed();
 
     GlobalRenderer->Clear(Colors.black);
-    GlobalRenderer->Println("You can now shutdown the Computer.", Colors.white);
+    GlobalRenderer->Println("You can now shut down the Computer.", Colors.white);
     while (true)
         asm("hlt");
 }

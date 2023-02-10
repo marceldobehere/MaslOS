@@ -703,6 +703,8 @@ TaskTest::TaskTest(void* data, uint64_t len, Window* window)
     kernelAppData.window->windowFramebuffer.start = window->framebuffer->BaseAddress;
     kernelAppData.OS_Malloc = tMalloc;
     kernelAppData.OS_Free = tFree;
+    oldIcon = window->icon;
+    window->icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.TESTO_PGM];
 
 
 
@@ -726,6 +728,7 @@ TaskTest* NewTestTask(void* data, uint64_t len, Window* window)
 
 void TaskTest::Free()
 {
+    window->icon = oldIcon;
     AddToStack();
     _free();
     RemoveFromStack();

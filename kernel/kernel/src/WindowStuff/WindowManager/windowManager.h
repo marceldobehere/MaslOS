@@ -55,17 +55,25 @@ namespace WindowManager
         DEBUG = 0,
         DEFAULT = 1,
         TASK_MANAGER = 2,
-        TERMINAL = 3;
+        TERMINAL = 3,
+        WARNING = 4,
+        CRASH = 5,
+        GUI_PGM = 6,
+        TESTO_PGM = 7;
 
     } windowIconEnum;
 
-    static const int countOfWindowIcons = 4;
+    static const int countOfWindowIcons = 8;
 
     static const char* windowIconNames[countOfWindowIcons] = {
         "debug.mbif",
         "generic.mbif",
         "task_manager.mbif",
-        "terminal.mbif"
+        "terminal.mbif",
+        "warning.mbif",
+        "crash.mbif",
+        "gui.mbif",
+        "testo_pgm.mbif"
     };
 
 

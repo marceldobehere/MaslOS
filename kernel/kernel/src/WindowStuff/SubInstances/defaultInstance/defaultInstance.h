@@ -7,7 +7,10 @@ enum InstanceType
     DebugTerminal,
     NewTerminal,
     Connect4,
-    GUI
+    GUI,
+    CRASH,
+    WARNING,
+    TESTO_PGM
 };
 
 class DefaultInstance

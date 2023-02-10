@@ -579,7 +579,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                             int fSize = fsInterface->GetFileInfo(relPath)->sizeInBytes;
 
                             terminal->tasks.add(NewTestTask(buf, fSize, window));
-
+                            
                             _Free((void*)buf);
                         }
                         else
