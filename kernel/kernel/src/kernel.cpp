@@ -577,7 +577,7 @@ void RenderLoop()
                     //GlobalRenderer->Println("BRUH 4.5", Colors.yellow);
                     *(msgWindow) = Window(NULL, size, pos, "OS FATAL CRASH WARNING", true, true, true);
                     //GlobalRenderer->Println("BRUH 4.6", Colors.yellow);
-                    osData.windows.add(msgWindow);
+                    osData.windows.add(msgWindow); 
                     //GlobalRenderer->Println("BRUH 4.7", Colors.yellow);
 
                     activeWindow = msgWindow;
