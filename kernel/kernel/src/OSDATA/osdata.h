@@ -36,6 +36,7 @@ struct OSData
     Window* activeCrashWindow;
     Window* preCrashWindow;
     bool showDebugterminal;
+    bool NO_INTERRUPTS = false;
     // MStack stackArr[1000];
     // int64_t stackPointer = 0;
     bool drawBackground;
@@ -50,6 +51,8 @@ struct OSData
     List<DiskInterface::GenericDiskInterface*> diskInterfaces;
 
     double mouseSensitivity = 1;
+
+    uint8_t port64Val;
 
     uint32_t wantedFps = 60;
 

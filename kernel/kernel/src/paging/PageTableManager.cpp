@@ -6,7 +6,7 @@ PageTableManager::PageTableManager(PageTable* PML4Address)
 {
     this->PML4 = PML4Address;
 }
-void PageTableManager::MapMemory(void* virtualMemory, void* physicalMemory)
+void PageTableManager::MapMemory(void* virtualMemory, void* physicalMemory, bool allowCache)
 {
     //return;
     PageMapIndexer indexer = PageMapIndexer((uint64_t)virtualMemory);
@@ -21,6 +21,7 @@ void PageTableManager::MapMemory(void* virtualMemory, void* physicalMemory)
         PDE.SetAddress((uint64_t)PDP >> 12);
         PDE.SetFlag(PT_Flag::Present, true);
         PDE.SetFlag(PT_Flag::ReadWrite, true);
+        PDE.SetFlag(PT_Flag::CacheDisabled, !allowCache);
         // PDE.SetFlag(PT_Flag::WriteThrough, true);
         // PDE.SetFlag(PT_Flag::CacheDisabled, false);
         // PDE.SetFlag(PT_Flag::NX, false);
@@ -42,6 +43,7 @@ void PageTableManager::MapMemory(void* virtualMemory, void* physicalMemory)
         PDE.SetAddress((uint64_t)PD >> 12);
         PDE.SetFlag(PT_Flag::Present, true);
         PDE.SetFlag(PT_Flag::ReadWrite, true);
+        PDE.SetFlag(PT_Flag::CacheDisabled, !allowCache);
         // PDE.SetFlag(PT_Flag::WriteThrough, true);
         // PDE.SetFlag(PT_Flag::CacheDisabled, false);
         // PDE.SetFlag(PT_Flag::NX, false);
@@ -63,6 +65,7 @@ void PageTableManager::MapMemory(void* virtualMemory, void* physicalMemory)
         PDE.SetAddress((uint64_t)PT >> 12);
         PDE.SetFlag(PT_Flag::Present, true);
         PDE.SetFlag(PT_Flag::ReadWrite, true);
+        PDE.SetFlag(PT_Flag::CacheDisabled, !allowCache);
         // PDE.SetFlag(PT_Flag::WriteThrough, true);
         // PDE.SetFlag(PT_Flag::CacheDisabled, false);
         // PDE.SetFlag(PT_Flag::NX, false);
@@ -80,6 +83,7 @@ void PageTableManager::MapMemory(void* virtualMemory, void* physicalMemory)
     PDE.SetAddress((uint64_t)physicalMemory >> 12);
     PDE.SetFlag(PT_Flag::Present, true);
     PDE.SetFlag(PT_Flag::ReadWrite, true);        
+    PDE.SetFlag(PT_Flag::CacheDisabled, !allowCache);
     // PDE.SetFlag(PT_Flag::WriteThrough, true);
     // PDE.SetFlag(PT_Flag::CacheDisabled, false);
     // PDE.SetFlag(PT_Flag::NX, false);

@@ -1,5 +1,6 @@
 #include "pit.h"
 #include "../../IO/IO.h"
+#include "../../../OSDATA/osdata.h"
 
 namespace PIT
 {
@@ -35,6 +36,8 @@ namespace PIT
 
     void Sleep(uint64_t milliseconds)
     {
+        if (osData.NO_INTERRUPTS)
+            return;
         uint64_t endTime = TimeSinceBootMS() + milliseconds;
         while (TimeSinceBootMS() < endTime)
             asm("hlt");
@@ -42,6 +45,8 @@ namespace PIT
 
     void Sleepd(double seconds)
     {
+        if (osData.NO_INTERRUPTS)
+            return;
         Sleepd((uint64_t)(seconds * 1000));
     }
 

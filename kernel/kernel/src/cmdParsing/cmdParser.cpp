@@ -315,6 +315,19 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         RemoveFromStack();
         return;
     }
+    if (StrEquals(input, "crash 2"))
+    {
+        Println(window, "Crashing 2...");
+        
+            // int Ax = 0;
+            // int Ay = 0;
+
+            // int Az = Ax/Ay;
+        osData.NO_INTERRUPTS = true;
+        asm("int $0x0D");
+        RemoveFromStack();
+        return;
+    }
     //return;
 
     StringArrData* data = SplitLine(oldInput);

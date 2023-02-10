@@ -862,7 +862,7 @@ if (window != NULL)
         AddToStack();
         //osData.debugTerminalWindow->Log("             : ################", Colors.black);
         osData.debugTerminalWindow->renderer->CursorPosition.x = 0;
-        osData.debugTerminalWindow->renderer->CursorPosition.y -= 16 * 9;
+        osData.debugTerminalWindow->renderer->CursorPosition.y -= 16 * 10;
 
         AddToStack();
         osData.debugTerminalWindow->renderer->Clear(
@@ -952,6 +952,16 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
         osData.debugTerminalWindow->Log("Last Free Size: {}", to_string(lastFreeSize), Colors.yellow);
+        RemoveFromStack();
+
+        AddToStack();
+        osData.debugTerminalWindow->renderer->Clear(
+            osData.debugTerminalWindow->renderer->CursorPosition.x,
+            osData.debugTerminalWindow->renderer->CursorPosition.y,
+            osData.debugTerminalWindow->renderer->CursorPosition.x + 240,
+            osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
+            Colors.black);
+        osData.debugTerminalWindow->Log("PORT 64 VAL: {}", ConvertHexToString(osData.port64Val), Colors.yellow);
         RemoveFromStack();
 
         RemoveFromStack();

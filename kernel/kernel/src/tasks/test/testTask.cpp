@@ -102,7 +102,7 @@ void TaskTest::load_obj(void* data, uint64_t len)
     void* oldPosTest = posTest;
     for (int i = 0; i < AMT; i++)
     {
-        GlobalPageTableManager.MapMemory(posTest, GlobalAllocator->RequestPage());
+        GlobalPageTableManager.MapMemory(posTest, GlobalAllocator->RequestPage(), false);
         posTest = (void*)((uint64_t)posTest + 0x1000);
     }
     RemoveFromStack();
@@ -475,7 +475,7 @@ static void parse_obj(void)
     void* oldPosTest = posTest;
     for (int i = 0; i < AMT / 0x1000; i++)
     {
-        GlobalPageTableManager.MapMemory(posTest, GlobalAllocator->RequestPage());
+        GlobalPageTableManager.MapMemory(posTest, GlobalAllocator->RequestPage(), false);
         posTest = (void*)((uint64_t)posTest + 0x1000);
     }
 

@@ -18,6 +18,75 @@ if (osData.enableStackTrace)
 
 */
 
+
+
+
+
+uint8_t port64Val = 0;
+bool keyboardWeird = false;
+bool oldKeyboardWeird = false;
+
+void IO_CHECK()
+{
+    uint8_t t = inb(0x64);
+    if (t == 0x1C)
+        return;
+    port64Val = t;
+    osData.port64Val = port64Val;
+
+    //uint64_t now = PIT::TimeSinceBootMS();
+    
+    if (port64Val == 0x1D)
+    {
+        port64Val = inb(0x60);
+        keyboardWeird = true;
+        
+        uint8_t real = port64Val;//TranslateScancode2(port64Val);
+        //HandleKeyboard(real);
+        
+        real &= (~0b10000000);
+
+        if (KeyboardScancodeState[real])
+            HandleKeyboard(real | (0b10000000));
+        else
+            HandleKeyboard(real & (~0b10000000));
+
+        
+
+        // io_wait();
+        // outb(0x60, 0xF0);
+        // io_wait();
+        // outb(0x60, 0x01);
+        // io_wait();
+        // inb(0x60);
+        // io_wait();
+        //outb(0x60, 0x1C);
+        //io_wait();
+        //PIC_EndMaster();
+        //PIC_EndSlave();
+    }
+    else if ((port64Val & 0b1 == 1))
+    {
+        uint8_t b = inb(0x60);
+        HandlePS2Mouse(b);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void TestClickHandler(GuiComponentStuff::BaseComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
 {
     btn->position.y += 20;
@@ -374,7 +443,7 @@ void RenderLoop()
 
             AddToStack();
             bool startThing = true;
-            while (PIT::TimeSinceBootMicroS() < tempVal || startThing)
+            while (!osData.NO_INTERRUPTS && PIT::TimeSinceBootMicroS() < tempVal || startThing)
             {
                 startThing = false;
                 //double endTime = PIT::TimeSinceBoot + 0.02;
@@ -488,7 +557,9 @@ void RenderLoop()
         //     osStats.totalIdleTime = PIT::TimeSinceBootMicroS() - tS;
         // }
 
-        // IO_CHECK();
+
+        if (osData.NO_INTERRUPTS)
+            IO_CHECK();
         // osStats.testThing = port64Val;
         // if (keyboardWeird && !oldKeyboardWeird)
         // {
@@ -544,6 +615,9 @@ void RenderLoop()
 
         // }
 
+        if (osData.NO_INTERRUPTS)
+            PIT::TicksSinceBoot += 100;
+
         osStats.frameEndTime = PIT::TimeSinceBootMicroS();
         osStats.totalFrameTime = osStats.frameEndTime - osStats.frameStartTime;
     }
@@ -555,51 +629,79 @@ void RenderLoop()
 
 void RecoverDed()
 {
+    AddToStack();
+
+    AddToStack();
     HeapCheck(false);
+    RemoveFromStack();
+
+    // AddToStack();
+    // for (int i = 0; i < 20; i++)
+    //     GlobalRenderer->Clear(Colors.bblue);
+    // RemoveFromStack();
     
     //osData.osTasks.clear();
-
+    AddToStack();
     osData.bgTaskRun = false;
+    RemoveFromStack();
 
+    AddToStack();
     for (int i = 0; i < osData.windows.getCount(); i++)
     {
         osData.windows.elementAt(i)->hidden = true;
         osData.windows.elementAt(i)->oldHidden = true;
     }
+    RemoveFromStack();
 
+    AddToStack();
     if (osData.activeCrashWindow != NULL)
     {
         osData.activeCrashWindow->hidden = false;
         osData.activeCrashWindow->oldHidden = true;
     }
+    RemoveFromStack();
 
+    AddToStack();
     if (osData.preCrashWindow != NULL)
     {
+        AddToStack();
         osData.preCrashWindow->hidden = true;
         osData.preCrashWindow->oldHidden = true;
+        RemoveFromStack();
+
         //osData.osTasks.add(NewWindowCloseTask(osData.preCrashWindow));
+        AddToStack();
         if (osData.preCrashWindow->instance != NULL && osData.preCrashWindow->instance->instanceType == InstanceType::Terminal)
         {
+            AddToStack();
             TerminalInstance* terminal = (TerminalInstance*)osData.preCrashWindow->instance;
             while (terminal->tasks.getCount() > 0)
             {
                 Task* tsk = terminal->tasks.elementAt(0);
-                FreeTask(tsk);
+                //FreeTask(tsk);
                 terminal->tasks.removeFirst();
             }
+            RemoveFromStack();
 
+            AddToStack();
             NewTerminalInstance* bruh2 = ((NewTerminalInstance*)terminal->newTermInstance);
             if (bruh2 != NULL)
             {
                 bruh2->Println("\n\nCurrent Tasks forcibly stopped, due to them possibly having crashed the OS!", Colors.bred);
             }
+            RemoveFromStack();
 
-
+            AddToStack();
             terminal->userlen = 0;
             terminal->printUser = true;
             terminal->PrintUserIfNeeded();
+            RemoveFromStack();
         }
+        RemoveFromStack();
     }
+    RemoveFromStack();
+
+    RemoveFromStack();
 
     MStackData::stackPointer = 0;
     WindowManager::testInterlace = 1;
@@ -615,61 +717,12 @@ void RecoverDed()
 
 
 
-uint8_t port64Val = 0;
-bool keyboardWeird = false;
-bool oldKeyboardWeird = false;
-
-void IO_CHECK()
-{
-    return;
-    uint8_t t = inb(0x64);
-    if (t == 0x1C)
-        return;
-    port64Val = t;
-
-    uint64_t now = PIT::TimeSinceBootMS();
-    if (port64Val == 0x1D && (now - osStats.lastKeyboardCall > 4000))
-    {
-        port64Val = inb(0x60);
-        keyboardWeird = true;
-        
-        uint8_t real = TranslateScancode2(port64Val);
-        //HandleKeyboard(real);
-        
-        if (KeyboardScancodeState[real])
-            HandleKeyboard(real | (0b10000000));
-        else
-            HandleKeyboard(real & (~0b10000000));
-
-        
-
-        // io_wait();
-        // outb(0x60, 0xF0);
-        // io_wait();
-        // outb(0x60, 0x01);
-        // io_wait();
-        // inb(0x60);
-        // io_wait();
-        //outb(0x60, 0x1C);
-        //io_wait();
-        //PIC_EndMaster();
-        //PIC_EndSlave();
-    }
-    else if ((port64Val & 0b1 == 1) && (now - osStats.lastMouseCall > 2000))
-    {
-        uint8_t b = inb(0x60);
-        //HandlePS2Mouse(b);
-    }
-}
-
-
-
-
 
 
 //extern "C" void _start(BootInfo* bootInfo)
 void boot(BootInfo* bootInfo)
 {  
+    osData.NO_INTERRUPTS = false;
     osData.booting = false;
     osData.maxNonFatalCrashCount = 5;
     MStackData::stackPointer = 0;

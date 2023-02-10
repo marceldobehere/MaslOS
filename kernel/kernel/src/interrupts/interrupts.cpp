@@ -9,8 +9,7 @@
 #include "../OSDATA/MStack/MStackM.h"
 #include "../OSDATA/osStats.h"
 
-#define SURVIVE_CRASH     void** p = search((void**)&p, __builtin_return_address(0)); \
-    *p = (void*)BruhusSafus;
+
 
 
 #include "../kernel.h"
@@ -18,13 +17,13 @@
 extern "C" void BruhusSafus()
 {
     //GlobalRenderer->Clear(Colors.green);
-    //PIT::Sleep(1000);
-    // GlobalRenderer->Clear(Colors.red);
-    // while (true);
+    //PIT::Sleep(500);
+    //GlobalRenderer->Clear(Colors.red);
+    //PIT::Sleep(500);
     RecoverDed();
 }
 
-void** search(void** addr, void* value) __attribute__((noinline));
+//void** search(void** addr, void* value) __attribute__((noinline));
 void** search(void** addr, void* value)
 {
     while(*addr != value) addr++;
@@ -33,10 +32,15 @@ void** search(void** addr, void* value)
 // https://stackoverflow.com/questions/27213382/how-to-modify-return-address-on-stack-in-c-or-assembly
 
 
+#define SURVIVE_CRASH_OLD     void** p = search((void**)&p, __builtin_return_address(0)); \
+    *p = (void*)BruhusSafus;
 
+#define SURVIVE_CRASH asm volatile("mov %0 ,8(%%rbp)" : : "r"((void*)BruhusSafus) );
 
-
-
+//asm volatile("mov 8(%%rbp),%0" : "=r"(returnaddr) : : );
+//asm volatile("mov %%rax, %0" : "=r"(Register));
+//asm volatile("mov %0, %%cr3" : : "r" (PML4) );
+//asm volatile("mov %0, 8(%%rbp)" : "r"((void*)BruhusSafus) : : );
 
 
 __attribute__((interrupt)) void PageFault_handler(interrupt_frame* frame)//, uint64_t error)
@@ -67,8 +71,10 @@ __attribute__((interrupt)) void GPFault_handler(interrupt_frame* frame)//, uint6
     //Panic("General Protection Fault Detected! {}", to_string(*((uint64_t*)frame)), true);
     RemoveFromStack();
 
-    SURVIVE_CRASH
-}
+    osData.NO_INTERRUPTS = true;
+    BruhusSafus();
+    //SURVIVE_CRASH
+}   
 
 __attribute__((interrupt)) void GenFault_handler(interrupt_frame* frame)
 {

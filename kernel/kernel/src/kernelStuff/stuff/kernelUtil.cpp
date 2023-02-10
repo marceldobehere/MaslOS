@@ -715,6 +715,18 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     PIT::InitPIT();
     
 
+    #define STAT 0x64
+    #define CMD 0x60
+    
+
+    {
+        // Clear the input buffer.
+        size_t timeout = 1024;
+        while ((inb(STAT) & 1) && timeout > 0) {
+            timeout--;
+            inb(CMD);
+        }
+    }
 
     
     InitPS2Mouse(bootInfo->mouseZIP, "default.mbif");
@@ -729,7 +741,14 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     PrepareInterrupts();
 
-
+    {
+        // Clear the input buffer.
+        size_t timeout = 1024;
+        while ((inb(STAT) & 1) && timeout > 0) {
+            timeout--;
+            inb(CMD);
+        }
+    }
     
 
     initUsers();

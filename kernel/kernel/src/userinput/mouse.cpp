@@ -344,6 +344,9 @@ void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName)
     mouseCycleSkip = 0;
     MouseCycle = 0;
 
+
+
+
     outb(0x64, 0xA8);
     Mousewait();
 
