@@ -21,6 +21,11 @@ extern "C" void BruhusSafus()
     //GlobalRenderer->Clear(Colors.red);
     //PIT::Sleep(500);
     RecoverDed();
+
+    GlobalRenderer->Clear(Colors.black);
+    GlobalRenderer->Println("You can now shutdown the Computer.", Colors.white);
+    while (true)
+        asm("hlt");
 }
 
 //void** search(void** addr, void* value) __attribute__((noinline));
@@ -73,6 +78,8 @@ __attribute__((interrupt)) void GPFault_handler(interrupt_frame* frame)//, uint6
 
     osData.NO_INTERRUPTS = true;
     BruhusSafus();
+
+
     //SURVIVE_CRASH
 }   
 
