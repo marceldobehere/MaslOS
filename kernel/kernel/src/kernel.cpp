@@ -36,7 +36,7 @@ void IO_CHECK()
 
     //uint64_t now = PIT::TimeSinceBootMS();
     
-    if (port64Val == 0x1D)
+    if (port64Val == 0x1D || port64Val == 0x15)
     {
         port64Val = inb(0x60);
         keyboardWeird = true;
