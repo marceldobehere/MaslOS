@@ -560,60 +560,60 @@ void RenderLoop()
 
         if (osData.NO_INTERRUPTS)
             IO_CHECK();
-        // osStats.testThing = port64Val;
-        // if (keyboardWeird && !oldKeyboardWeird)
-        // {
-        //     oldKeyboardWeird = true;
+        if (keyboardWeird && !oldKeyboardWeird)
+        {
+            oldKeyboardWeird = true;
             
-        //     Window* msgWindow;
-        //     {
+            Window* msgWindow;
+            {
 
 
-        //         msgWindow = (Window*)_Malloc(sizeof(Window), "Warning Window");
-        //         Size size = Size(800, 16*10);
-        //         Position pos = Position(((GlobalRenderer->framebuffer->Width - size.width) / 2), ((GlobalRenderer->framebuffer->Height) / 5));
+                msgWindow = (Window*)_Malloc(sizeof(Window), "Warning Window");
+                Size size = Size(800, 16*10);
+                Position pos = Position(((GlobalRenderer->framebuffer->Width - size.width) / 2), ((GlobalRenderer->framebuffer->Height) / 5));
                 
-        //         if (msgWindow != NULL)
-        //         {
-        //             //GlobalRenderer->Println("BRUH 4.5", Colors.yellow);
-        //             *(msgWindow) = Window(NULL, size, pos, "WARNING ABOUT YOUR PS/2 KEYBOARD", true, true, true);
-        //             //GlobalRenderer->Println("BRUH 4.6", Colors.yellow);
-        //             osData.windows.add(msgWindow);
-        //             //GlobalRenderer->Println("BRUH 4.7", Colors.yellow);
+                if (msgWindow != NULL)
+                {
+                    //GlobalRenderer->Println("BRUH 4.5", Colors.yellow);
+                    *(msgWindow) = Window(NULL, size, pos, "OS FATAL CRASH WARNING", true, true, true);
+                    //GlobalRenderer->Println("BRUH 4.6", Colors.yellow);
+                    osData.windows.add(msgWindow);
+                    //GlobalRenderer->Println("BRUH 4.7", Colors.yellow);
 
-        //             activeWindow = msgWindow;
-        //             //osData.mainTerminalWindow = msgWindow;
-        //             msgWindow->moveToFront = true;
-        //         }
-        //     }
-        //     // it crashes between 4 and 5, probably while trying to allocate memory since it used all the memory
-        //     //GlobalRenderer->Println("BRUH 5", Colors.yellow);
+                    activeWindow = msgWindow;
+                    //osData.mainTerminalWindow = msgWindow;
+                    msgWindow->moveToFront = true;
+                }
+            }
+            // it crashes between 4 and 5, probably while trying to allocate memory since it used all the memory
+            //GlobalRenderer->Println("BRUH 5", Colors.yellow);
             
-        //     if (msgWindow != NULL)
-        //     {
-        //         //GlobalRenderer->Println("BRUH 5.1", Colors.yellow);
-        //         //GlobalRenderer->Print("Win x: {}", to_string(crashWindow->size.width), Colors.yellow);
-        //         //GlobalRenderer->Println(", y: {}", to_string(crashWindow->size.height), Colors.yellow);
-        //         msgWindow->renderer->Clear(Colors.black);
-        //         //GlobalRenderer->Println("BRUH 5.2", Colors.yellow);
-        //         msgWindow->renderer->Println("------------------------------------------------", Colors.bred);
-        //         msgWindow->renderer->Println("WARNING: Your PS/2 Keyboard is having issues!", Colors.bred);
-        //         msgWindow->renderer->Println("------------------------------------------------", Colors.bred);
-        //         msgWindow->renderer->Println();
-        //         //GlobalRenderer->Println("BRUH 5.3", Colors.yellow);
-        //         msgWindow->renderer->Println("It should still work but it will probably cause issues if used with the mouse at the same time.", Colors.yellow);
-        //         msgWindow->renderer->Println("The issue should be fixable with a restart.", Colors.yellow);
-        //         msgWindow->renderer->Println();
+            if (msgWindow != NULL)
+            {
+                //GlobalRenderer->Println("BRUH 5.1", Colors.yellow);
+                //GlobalRenderer->Print("Win x: {}", to_string(crashWindow->size.width), Colors.yellow);
+                //GlobalRenderer->Println(", y: {}", to_string(crashWindow->size.height), Colors.yellow);
+                msgWindow->renderer->Clear(Colors.black);
+                //GlobalRenderer->Println("BRUH 5.2", Colors.yellow);
+                msgWindow->renderer->Println("------------------------------------------------", Colors.bred);
+                msgWindow->renderer->Println("WARNING: MaslOS just had a fatal but recoverable crash", Colors.bred);
+                msgWindow->renderer->Println("------------------------------------------------", Colors.bred);
+                msgWindow->renderer->Println();
+                //GlobalRenderer->Println("BRUH 5.3", Colors.yellow);
+                msgWindow->renderer->Println("The OS has experienced a fatal crash!", Colors.yellow);
+                msgWindow->renderer->Println("(The issue should be fixable with a restart)", Colors.yellow);
+                msgWindow->renderer->Println("Please save your work and restart your computer.", Colors.yellow);
+                msgWindow->renderer->Println();
 
-        //     }
+            }
 
-        //     msgWindow->hidden = false;
-        //     msgWindow->oldHidden = true;
+            msgWindow->hidden = false;
+            msgWindow->oldHidden = true;
 
 
             
 
-        // }
+        }
 
         if (osData.NO_INTERRUPTS)
             PIT::TicksSinceBoot += 100;
@@ -749,6 +749,7 @@ void boot(BootInfo* bootInfo)
     //Window* realMainWindow2 = osData.realMainWindow2;
     
     osData.drawBackground = true;
+    keyboardWeird = false;
     
     
     GlobalRenderer->Clear(Colors.black);
