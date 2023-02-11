@@ -4,7 +4,7 @@
 namespace ACPI
 {
 
-    void* FindTable(SDTHeader* sdtHeader, char* signature, int div)
+    void* FindTable(SDTHeader* sdtHeader, const char* signature, int div)
     {
         AddToStack();
         SDTHeader* xsdt = sdtHeader;

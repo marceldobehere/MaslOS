@@ -60,3 +60,17 @@ void _memcpy(void* src, void* dest, uint64_t size)
         _src++;
     }
 }
+
+int _memcmp(void* src, void* dest, int amt)
+{
+    char* fi = (char*)src;
+    char* la = (char*)dest;
+    for (int i = 0; i < amt; i++)
+    {
+        if (fi[i] > la[i])
+            return 1;
+        if (fi[i] < la[i])
+            return -1;
+    }
+    return 0;
+}

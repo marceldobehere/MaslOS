@@ -8,6 +8,7 @@
 #include "WindowStuff/SubInstances/guiInstance/guiStuff/components/textField/textFieldComponent.h"
 #include "WindowStuff/SubInstances/customInstance/customInstance.h"
 #include "tasks/closeWindow/taskWindowClose.h"
+#include "kernelStuff/other_IO/acpi/acpiShutdown.h"
 
 #include "rnd/rnd.h"
 
@@ -569,14 +570,14 @@ void RenderLoop()
             {
 
 
-                msgWindow = (Window*)_Malloc(sizeof(Window), "Warning Window");
-                Size size = Size(55*8, 16*10);
+                msgWindow = (Window*)_Malloc(sizeof(Window), "Crash Window");
+                Size size = Size(64*8, 16*10);
                 Position pos = Position(((GlobalRenderer->framebuffer->Width - size.width) / 2), ((GlobalRenderer->framebuffer->Height) / 5));
                 
                 if (msgWindow != NULL)
                 {
                     //GlobalRenderer->Println("BRUH 4.5", Colors.yellow);
-                    *(msgWindow) = Window(new CustomInstance(InstanceType::CRASH), size, pos, "OS FATAL CRASH WARNING", true, true, true);
+                    *(msgWindow) = Window(new CustomInstance(InstanceType::CRASH), size, pos, "FATAL OS CRASH WARNING", true, true, true);
                     //GlobalRenderer->Println("BRUH 4.6", Colors.yellow);
                     osData.windows.add(msgWindow); 
                     //msgWindow->instance
@@ -597,14 +598,14 @@ void RenderLoop()
                 //GlobalRenderer->Println(", y: {}", to_string(crashWindow->size.height), Colors.yellow);
                 msgWindow->renderer->Clear(Colors.black);
                 //GlobalRenderer->Println("BRUH 5.2", Colors.yellow);
-                msgWindow->renderer->Println("------------------------------------------------------", Colors.bred);
-                msgWindow->renderer->Println("WARNING: MaslOS just had a fatal but recoverable crash", Colors.bred);
-                msgWindow->renderer->Println("------------------------------------------------------", Colors.bred);
+                msgWindow->renderer->Println("---------------------------------------------------------------", Colors.bred);
+                msgWindow->renderer->Println("WARNING: MaslOS just had a fatal but somewhat recoverable crash", Colors.bred);
+                msgWindow->renderer->Println("---------------------------------------------------------------", Colors.bred);
                 msgWindow->renderer->Println();
                 //GlobalRenderer->Println("BRUH 5.3", Colors.yellow);
-                msgWindow->renderer->Println("The OS has experienced a fatal crash!", Colors.yellow);
+                msgWindow->renderer->Println("The OS has experienced a fatal crash, but somehow survived!", Colors.yellow);
                 msgWindow->renderer->Println("(The issue should be fixable with a restart)", Colors.yellow);
-                msgWindow->renderer->Println("Please save your work and restart your computer.", Colors.yellow);
+                msgWindow->renderer->Println("So please save your work if needed and restart your computer.", Colors.yellow);
                 msgWindow->renderer->Println();
 
             }
@@ -618,7 +619,7 @@ void RenderLoop()
         }
 
         if (osData.NO_INTERRUPTS)
-            PIT::TicksSinceBoot += 100;
+            PIT::TicksSinceBoot += PIT::freq / 60;
 
         osStats.frameEndTime = PIT::TimeSinceBootMicroS();
         osStats.totalFrameTime = osStats.frameEndTime - osStats.frameStartTime;
@@ -1035,7 +1036,7 @@ void boot(BootInfo* bootInfo)
 
     debugTerminalWindow->Log("Kernel Initialised Successfully!");
 
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < 10; i++)
         debugTerminalWindow->Log("<STAT>");
     //debugTerminalWindow->renderer->CursorPosition.y = 16 * 16;
 
@@ -1056,12 +1057,23 @@ void boot(BootInfo* bootInfo)
 
 
 
-    GlobalRenderer->Clear(Colors.black);
+    for (int i = 0; i < 50; i++)
+        GlobalRenderer->ClearDotted(Colors.black);    
+    for (int i = 0; i < 50; i++)
+        GlobalRenderer->Clear(Colors.black);
     GlobalRenderer->color = Colors.white;
-    GlobalRenderer->Println("Goodbye.");
-    PIT::Sleep(1000);
-    GlobalRenderer->Clear(Colors.black);
+    GlobalRenderer->Println("Shutting down...");
+    for (int i = 0; i < 50; i++)
+        GlobalRenderer->ClearButDont();    
 
+    PowerOffAcpi();
+
+    GlobalRenderer->Clear(Colors.black);
+    GlobalRenderer->Println("The ACPI shutdown failed!", Colors.yellow);
+    GlobalRenderer->Println("Please shut down the computer manually.", Colors.white);
+
+    while (true)
+        asm("hlt");
 
     RemoveFromStack();
     return;

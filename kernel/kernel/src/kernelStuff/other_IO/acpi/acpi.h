@@ -54,7 +54,7 @@ namespace ACPI
     } __attribute__((packed));
 
 
-    void* FindTable(SDTHeader* sdtHeader, char* signature, int div);
+    void* FindTable(SDTHeader* sdtHeader, const char* signature, int div);
     bool CheckSumHeader(void* start, uint8_t extra, uint32_t len);
 
 }  

@@ -23,7 +23,7 @@ extern bool KeyboardScancodeState[256];
 
 void HandleKeyboardList(int amt);
 
-void AddToKeyboardList(uint8_t scancode);
+void AddScancodeToKeyboardList(uint8_t scancode);
 
 int GetKeyboardCount();
 

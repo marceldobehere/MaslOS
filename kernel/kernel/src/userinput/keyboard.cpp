@@ -220,7 +220,11 @@ void HandleKeyboard(uint8_t scancode)
                 if (activeWindow->instance != NULL)
                     if (activeWindow->instance->instanceType == InstanceType::Terminal)
                         if (((TerminalInstance*)activeWindow->instance)->newTermInstance != NULL)
+                        {
                             ((NewTerminalInstance*)((TerminalInstance*)activeWindow->instance)->newTermInstance)->scrollX -= scrollSpeed;
+                            RemoveFromStack();
+                            return;
+                        }
         }
         // else if (lAlt)
         // {
@@ -230,7 +234,11 @@ void HandleKeyboard(uint8_t scancode)
         else
         {
             if (activeWindow != NULL)
+            {
                 activeWindow->newPosition.x -= 5;
+                RemoveFromStack();
+                return;
+            }
             // int64_t count = Taskbar::taskWindowList->getCount();
             // int64_t index = Taskbar::taskWindowList->getIndexOf(activeWindow);
             // index = (index + count - 1) % count;
@@ -246,12 +254,21 @@ void HandleKeyboard(uint8_t scancode)
                 if (activeWindow->instance != NULL)
                     if (activeWindow->instance->instanceType == InstanceType::Terminal)
                         if (((TerminalInstance*)activeWindow->instance)->newTermInstance != NULL)
+                        {
                             ((NewTerminalInstance*)((TerminalInstance*)activeWindow->instance)->newTermInstance)->scrollX += scrollSpeed;
+                            RemoveFromStack();
+                            return;
+                        }
         }
         else
         {
             if (activeWindow != NULL)
+            {
                 activeWindow->newPosition.x += 5;
+                RemoveFromStack();
+                return;
+            }
+
             // int64_t count = Taskbar::taskWindowList->getCount();
             // int64_t index = Taskbar::taskWindowList->getIndexOf(activeWindow);
             // index = (index + count + 1) % count;
@@ -267,12 +284,20 @@ void HandleKeyboard(uint8_t scancode)
                 if (activeWindow->instance != NULL)
                     if (activeWindow->instance->instanceType == InstanceType::Terminal)
                         if (((TerminalInstance*)activeWindow->instance)->newTermInstance != NULL)
+                        {
                             ((NewTerminalInstance*)((TerminalInstance*)activeWindow->instance)->newTermInstance)->scrollY -= 2*scrollSpeed;
+                            RemoveFromStack();
+                            return;
+                        }
         }
         else
         {
             if (activeWindow != NULL)
+            {
                 activeWindow->newPosition.y -= 5;
+                RemoveFromStack();
+                return;
+            }
         }
     }
     else if (scancode == ARR_DOWN)
@@ -283,12 +308,20 @@ void HandleKeyboard(uint8_t scancode)
                 if (activeWindow->instance != NULL)
                     if (activeWindow->instance->instanceType == InstanceType::Terminal)
                         if (((TerminalInstance*)activeWindow->instance)->newTermInstance != NULL)
+                        {
                             ((NewTerminalInstance*)((TerminalInstance*)activeWindow->instance)->newTermInstance)->scrollY += 2*scrollSpeed;
+                            RemoveFromStack();
+                            return;
+                        }
         }
         else
         {
             if (activeWindow != NULL)
+            {
                 activeWindow->newPosition.y += 5;
+                RemoveFromStack();
+                return;
+            }
             // Window* oldActive = activeWindow;
             // Window* mainWindow = (Window*)_Malloc(sizeof(Window), "Main Window");
             // TerminalInstance* terminal = (TerminalInstance*)_Malloc(sizeof(TerminalInstance), "Terminal Instance");
@@ -324,6 +357,12 @@ void HandleKeyboard(uint8_t scancode)
 
     if (scancode == Enter)
     {
+        if (activeWindow->instance == NULL)
+        {
+            RemoveFromStack();
+            return;
+        }
+
         if (activeWindow->instance->instanceType == InstanceType::Terminal)
         {
             TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
@@ -366,6 +405,12 @@ void HandleKeyboard(uint8_t scancode)
     }
     else if (scancode == Backspace)
     {
+        if (activeWindow->instance == NULL)
+        {
+            RemoveFromStack();
+            return;
+        }
+
         if (activeWindow->instance->instanceType == InstanceType::Terminal)
         {
             TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
@@ -451,6 +496,12 @@ void HandleKeyboard(uint8_t scancode)
     else
     {
         char ascii = QWERTYKeyboard::Translate(scancode, lshift || rshift);
+
+        if (activeWindow->instance == NULL)
+        {
+            RemoveFromStack();
+            return;
+        }
 
         if (ascii != 0)
         {
@@ -592,7 +643,7 @@ void HandleKeyboardList(int amt)
     RemoveFromStack();
 }
 
-void AddToKeyboardList(uint8_t scancode)
+void AddScancodeToKeyboardList(uint8_t scancode)
 {
     if (!keyListInit)
         return;

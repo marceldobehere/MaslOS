@@ -3,6 +3,7 @@
 uint64_t _KernelStart; 
 uint64_t _KernelEnd;
 
+#include "../other_IO/acpi/acpiShutdown.h"
 
 // #include "../../interrupts/panic.h"
 
@@ -37,6 +38,13 @@ void PrepareACPI(BootInfo* bootInfo)
         if (rootThing == NULL)
         {
             Panic("RSDT Header is at NULL!", true);
+        }
+        else
+        {
+            GlobalRenderer->Clear(Colors.black);
+            GlobalRenderer->Println("Testing ACPI Loader...");
+
+            InitAcpiShutdownThing(rootThing);
         }
     }
     else
@@ -740,6 +748,9 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
 
     PrepareInterrupts();
+
+
+
 
     {
         // Clear the input buffer.

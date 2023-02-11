@@ -9,6 +9,7 @@
 #include "../OSDATA/MStack/MStackM.h"
 #include "../OSDATA/osStats.h"
 
+#include "../kernelStuff/other_IO/acpi/acpiShutdown.h"
 
 
 
@@ -22,8 +23,22 @@ extern "C" void BruhusSafus()
     //PIT::Sleep(500);
     RecoverDed();
 
+    for (int i = 0; i < 50; i++)
+        GlobalRenderer->ClearDotted(Colors.black);    
+    for (int i = 0; i < 50; i++)
+        GlobalRenderer->Clear(Colors.black);
+    GlobalRenderer->color = Colors.white;
+    GlobalRenderer->Println("Shutting down...");
+    for (int i = 0; i < 50; i++)
+        GlobalRenderer->ClearButDont();    
+
+    PowerOffAcpi();
+
+
     GlobalRenderer->Clear(Colors.black);
-    GlobalRenderer->Println("You can now shut down the Computer.", Colors.white);
+    GlobalRenderer->Println("The ACPI shutdown failed!", Colors.yellow);
+    GlobalRenderer->Println("Please shut down the computer manually.", Colors.white);
+
     while (true)
         asm("hlt");
 }
@@ -169,7 +184,7 @@ __attribute__((interrupt)) void KeyboardInt_handler(interrupt_frame* frame)
     if (osData.booting)
         osData.booting = false;
     else
-        AddToKeyboardList(scancode);
+        AddScancodeToKeyboardList(scancode);
         //HandleKeyboard(scancode);  
     PIC_EndMaster();
     RemoveFromStack();

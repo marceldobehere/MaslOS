@@ -54,6 +54,7 @@ class BasicRenderer
         void Clear(uint32_t col, bool resetCursor);
         void ClearDotted(uint32_t col, bool resetCursor);
         void ClearDotted(uint32_t col);
+        void ClearButDont();
 
         void Cls();
         void DrawImage(kernelFiles::ImageFile* image, int64_t x, int64_t y, int64_t sx, int64_t sy);

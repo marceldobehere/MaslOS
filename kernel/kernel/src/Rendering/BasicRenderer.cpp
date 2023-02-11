@@ -266,6 +266,17 @@ void BasicRenderer::Clear(uint32_t col, bool resetCursor)
         CursorPosition = {0, 0};
 }
 
+void BasicRenderer::ClearButDont()
+{
+    uint64_t fbBase = (uint64_t)framebuffer->BaseAddress;
+    uint64_t pxlsPerScanline = framebuffer->PixelsPerScanLine;
+    uint64_t fbHeight = framebuffer->Height;
+
+    for (int64_t y = 0; y < framebuffer->Height; y++)
+        for (int64_t x = 0; x < framebuffer->Width; x++)
+            *((uint32_t*)(fbBase + 4 * (x + pxlsPerScanline * y))) = *((uint32_t*)(fbBase + 4 * (x + pxlsPerScanline * y)));
+}
+
 void BasicRenderer::Clear(int64_t x1, int64_t y1, int64_t x2, int64_t y2, uint32_t col)
 {
     uint64_t fbBase = (uint64_t)framebuffer->BaseAddress;

@@ -19,6 +19,18 @@ uint8_t inb(uint16_t port)
     return val;
 }
 
+void outw(uint16_t port, uint16_t value)
+{
+    __asm__ volatile("outw %w0, %w1" : : "a" (value), "Nd" (port));
+}
+
+uint16_t inw(uint16_t port)
+{
+    uint16_t value;
+    __asm__ volatile("inw %w1, %w0" : "=a" (value) : "Nd" (port));
+    return value;
+}
+
 void io_wait()
 {
     outb(0x80, 0);

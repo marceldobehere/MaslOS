@@ -18,6 +18,7 @@
 #include "../kernelStuff/Disk_Stuff/Filesystem_Interfaces/mrafs/mrafsFileSystemInterface.h"
 #include "../WindowStuff/SubInstances/connect4Instance/connect4Instance.h"
 #include "../tasks/taskMgrTask/taskMgrTask.h"
+#include "../tasks/closeWindow/taskWindowClose.h"
 #include "../tasks/bfTask/bfTask.h"
 #include "../fsStuff/fsStuff.h"
 #include "../tasks/maab/maabTask.h"
@@ -257,10 +258,17 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         return;
     }
 
+    if (StrEquals(input, "shutdown"))
+    {
+        Println(window, "Shutting down...");
+        osData.exit = true;
+        RemoveFromStack();
+        return;
+    }
+
     if (StrEquals(input, "exit"))
     {
-        Println(window, "Exiting...");
-        osData.exit = true;
+        osData.osTasks.add(NewWindowCloseTask(window));
         RemoveFromStack();
         return;
     }
