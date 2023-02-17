@@ -178,9 +178,9 @@ template <typename T> void List<T>::removeLast()
 
 template <typename T> T& List<T>::operator[](uint64_t index)
 {
-    AddToStack();
+    //AddToStack();
     T& data = arr[index];
-    RemoveFromStack();
+    //RemoveFromStack();
     return data;
 }
 
@@ -238,12 +238,16 @@ template <typename T> void Array<T>::reInit(uint64_t size)
 
 template <typename T> T& Array<T>::operator[](uint64_t index)
 {
-    AddToStack();
+    //AddToStack();
     if (index >= this->size || freed)
+    {
+        AddToStack();
         Panic("Accessing Array out of bounds!", true);
+        RemoveFromStack();
+    }
 
     T& t = arr[index];
-    RemoveFromStack();
+    //RemoveFromStack();
     return t;
 }
 

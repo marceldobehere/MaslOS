@@ -141,7 +141,11 @@ void RenderLoop()
         //     _Free(b);
         //     _Free(c);
         // }
-
+        MStackData::BenchmarkMode = (MStackData::BenchmarkMode + 1) % 2;
+        if (MStackData::BenchmarkMode == 0)
+            MStackData::BenchmarkStackPointer1 = 0;
+        else
+            MStackData::BenchmarkStackPointer2 = 0;
 
         RND::lehmer64();
         AddToStack();
@@ -449,7 +453,7 @@ void RenderLoop()
             {
                 startThing = false;
                 //double endTime = PIT::TimeSinceBoot + 0.02;
-                AddToStack();
+                //AddToStack();
                 {
                     uint64_t tS = PIT::TimeSinceBootMicroS();
                     //for (int ax = 0; ax < 10; ax++)
@@ -496,16 +500,18 @@ void RenderLoop()
                     }
                     totTaskTemp += PIT::TimeSinceBootMicroS() - tS;
                 }
-                RemoveFromStack();
+                //RemoveFromStack();
                 
-                AddToStack();
+                //AddToStack();
                 {
                     uint64_t tS = PIT::TimeSinceBootMicroS();
                     if (osData.osTasks.getCount() > 0)
                     {
                         uint64_t tS2 = PIT::TimeSinceBootMicroS();
                         Task* task = osData.osTasks[0];
+                        AddToStack();
                         DoTask(task);
+                        RemoveFromStack();
                         task->tempTime += PIT::TimeSinceBootMicroS() - tS2;
                         if (task->GetDone())
                         {
@@ -515,7 +521,7 @@ void RenderLoop()
                     }
                     totOsTaskTemp += PIT::TimeSinceBootMicroS() - tS;
                 }
-                RemoveFromStack();
+                //RemoveFromStack();
             }
             RemoveFromStack();
 
@@ -1097,7 +1103,7 @@ void boot(BootInfo* bootInfo)
  
 void bootTest(Framebuffer fb, ACPI::RSDP2* rsdp, PSF1_FONT* psf1_font, MaslOsAssetStruct* assets, void* freeMemStart, void* extraMemStart, uint64_t freeMemSize, void* kernelStart, uint64_t kernelSize, void* kernelStartV)
 {
-    
+    MStackData::BenchmarkEnabled = false;
     BootInfo tempBootInfo;
     tempBootInfo.framebuffer = &fb;
     tempBootInfo.rsdp = rsdp;

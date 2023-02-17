@@ -1656,9 +1656,17 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
         else
             LogError("Color \"{}\" could not be Parsed!", val, window);
     }
-    if (StrEquals(name, "bg task run"))
+    else if (StrEquals(name, "bg task run"))
     {
         osData.bgTaskRun = StrEquals(val, "true");
+    }
+    else if (StrEquals(name, "benchmark"))
+    {
+        MStackData::BenchmarkEnabled = StrEquals(val, "true");
+    }
+    else if (StrEquals(name, "benchmark val"))
+    {
+        MStackData::BenchmarkStackPointerSave = to_int(val);
     }
     else if (StrEquals(name, "default color"))
     {
@@ -1864,6 +1872,36 @@ void GetCmd(const char* name, OSUser* user, Window* window)
     if (StrEquals(name, "free ram"))
     {
         Println(window, "Free: {} Bytes.", to_string(GlobalAllocator->GetFreeRAM()), Colors.bgreen);
+    }
+    else if (StrEquals(name, "benchmark"))
+    {
+        bool tempBench = MStackData::BenchmarkEnabled;
+        MStackData::BenchmarkEnabled = false;
+        int bMax = MStackData::BenchmarkStackPointerSave;
+        if (bMax > 1500)
+            bMax = 1500;
+        Println(window, "Benchmark:");
+        for (int i = 0; i < bMax; i++)
+        {
+            for (int x = 0; x < MStackData::BenchmarkStackArrSave[i].layer; x++)
+                Print(window, "--", Colors.yellow);
+
+            if (MStackData::BenchmarkStackArrSave[i].close)
+                Print(window, "< {}: ", to_string(i), Colors.yellow);
+            else
+                Print(window, "> {}: ", to_string(i), Colors.yellow);
+            
+            Print(window, "L: {}, ", to_string(MStackData::BenchmarkStackArrSave[i].layer), Colors.bgreen);
+            Print(window, ", Name: {}, ", MStackData::BenchmarkStackArrSave[i].name, Colors.yellow);
+            Print(window, ", File {}", MStackData::BenchmarkStackArrSave[i].filename, Colors.orange);
+            Print(window, ", Line {}", to_string(MStackData::BenchmarkStackArrSave[i].line), Colors.orange);
+            Print(window, ", Time {}", to_string(MStackData::BenchmarkStackArrSave[i].time), Colors.orange);
+
+            Println(window);
+        }
+
+
+        MStackData::BenchmarkEnabled = tempBench;
     }
     else if (StrEquals(name, "malloc cache"))
     {

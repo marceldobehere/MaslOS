@@ -685,6 +685,7 @@ if (window != NULL)
     uint8_t testCounterY = 0;
 
 
+
     // inline uint64_t WindowPointerBufferThing::RenderActualSquare(int _x1, int _y1, int _x2, int _y2)
     // {
     //     AddToStack();
@@ -771,7 +772,7 @@ if (window != NULL)
                         //                                         min(y + testInterlace, h - 1)
                         //                                     );
 
-                        AddToStack();
+                        //AddToStack();
                         counta += RenderActualSquare(
                             x - (testInterlace * 2 - 1), 
                             y - (testInterlace * 2 - 1), 
@@ -779,7 +780,7 @@ if (window != NULL)
                             x + testInterlace * 4 - 2, 
                             y + testInterlace * 4 - 2
                             );
-                        RemoveFromStack();
+                        //RemoveFromStack();
 
                         // vPixel += testInterlace * 2;
                         // cPixel += testInterlace * 2;
@@ -862,7 +863,7 @@ if (window != NULL)
         AddToStack();
         //osData.debugTerminalWindow->Log("             : ################", Colors.black);
         osData.debugTerminalWindow->renderer->CursorPosition.x = 0;
-        osData.debugTerminalWindow->renderer->CursorPosition.y -= 16 * 10;
+        osData.debugTerminalWindow->renderer->CursorPosition.y -= 16 * 12;
 
         AddToStack();
         osData.debugTerminalWindow->renderer->Clear(
@@ -962,6 +963,38 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
         osData.debugTerminalWindow->Log("PORT 64 VAL: {}", ConvertHexToString(osData.port64Val), Colors.yellow);
+        RemoveFromStack();
+
+        AddToStack();
+        osData.debugTerminalWindow->renderer->Clear(
+            osData.debugTerminalWindow->renderer->CursorPosition.x,
+            osData.debugTerminalWindow->renderer->CursorPosition.y,
+            osData.debugTerminalWindow->renderer->CursorPosition.x + 240,
+            osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
+            Colors.black);
+        
+        uint64_t tVal = 0;
+
+        if (MStackData::BenchmarkMode == 0)
+            tVal = MStackData::BenchmarkStackPointer2;//osData.debugTerminalWindow->Log("MSTACK: {}", to_string(MStackData::BenchmarkStackPointer2), Colors.yellow);
+        else
+            tVal = MStackData::BenchmarkStackPointer1;//osData.debugTerminalWindow->Log("MSTACK: {}", to_string(MStackData::BenchmarkStackPointer1), Colors.yellow);
+        if (tVal > MStackData::BenchmarkStackPointerSave)
+        {
+            SaveBenchmarkStack(((MStackData::BenchmarkMode + 1) % 2));
+        }
+
+        osData.debugTerminalWindow->Log("MSTACK: {}", to_string(tVal), Colors.yellow);
+        RemoveFromStack();
+
+        AddToStack();
+        osData.debugTerminalWindow->renderer->Clear(
+            osData.debugTerminalWindow->renderer->CursorPosition.x,
+            osData.debugTerminalWindow->renderer->CursorPosition.y,
+            osData.debugTerminalWindow->renderer->CursorPosition.x + 240,
+            osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
+            Colors.black);
+        osData.debugTerminalWindow->Log("MSTACK MAX: {}", to_string(MStackData::BenchmarkStackPointerSave), Colors.yellow);
         RemoveFromStack();
 
         RemoveFromStack();

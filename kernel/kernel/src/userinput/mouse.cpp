@@ -394,6 +394,7 @@ void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName)
 
 uint8_t mousePacketArr[4];
 
+#include "../rnd/rnd.h"
 
 void HandlePS2Mouse(uint8_t data)
 {
@@ -410,7 +411,7 @@ void HandlePS2Mouse(uint8_t data)
         {
             if (data & 0b00001000 == 0)
             {
-                mouseCycleSkip = (PIT::TimeSinceBootMS() / 10) % 4;
+                mouseCycleSkip = (RND::lehmer64() / 100) % 4;
                 break;
             }
 
