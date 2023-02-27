@@ -541,7 +541,7 @@ void HandleClick(bool L, bool R, bool M)
                 RemoveFromStack();
 
                 AddToStack();
-                if (!activeDragOn && MousePosition.y > window->position.y + 20)
+                if (!activeDragOn && MousePosition.y > window->position.y + 0)
                 {
                     dragWindow = NULL;
                     if (window->instance != NULL && window->instance->instanceType == InstanceType::GUI)

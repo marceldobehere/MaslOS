@@ -9,6 +9,7 @@
 #include "WindowStuff/SubInstances/customInstance/customInstance.h"
 #include "tasks/closeWindow/taskWindowClose.h"
 #include "kernelStuff/other_IO/acpi/acpiShutdown.h"
+#include "sysApps/explorer/explorer.h"
 
 #include "rnd/rnd.h"
 
@@ -1053,7 +1054,7 @@ void boot(BootInfo* bootInfo)
 
 
 
-
+    new SysApps::Explorer();
 
 
     osData.wantedFps = 150;

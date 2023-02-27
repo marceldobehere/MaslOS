@@ -102,17 +102,24 @@ template <typename T> void List<T>::add(T item)
 
 template <typename T> void List<T>::insertAt(T item, uint64_t index)
 {
-    if (index > count)
+    int64_t indx = index;
+    if (index > count || indx < 0)
         return;
     
     AddToStack();
     if (count + 1 > cap)
         expandArr();
     
-    for (uint64_t i = count - 1; i >= index; i--)
+
+
+    AddToStack();
+    for (int64_t i = count - 1; i >= indx; i--)
+    {
         arr[i+1] = arr[i];
+    }
+    RemoveFromStack();
     
-    arr[index] = item;
+    arr[indx] = item;
 
     count++;
     RemoveFromStack();

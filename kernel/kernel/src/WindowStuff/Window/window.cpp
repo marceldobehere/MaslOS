@@ -8,6 +8,7 @@ Window* activeWindow = NULL;
 Window::Window(DefaultInstance* instance, Size size, Position position, const char* title, bool showTitleBar, bool showBorder, bool moveable)
 {
     AddToStack();
+    OnClose = NULL;
     this->instance = instance;
     this->position = position;
     this->size = size;
@@ -126,6 +127,9 @@ WindowActionEnum Window::GetCurrentAction()
 void Window::Free()
 {
     AddToStack();
+    if (OnClose != NULL)
+        OnClose(OnCloseHelp, this);
+
     _Free(framebuffer->BaseAddress);
     _Free(framebuffer);
     _Free(backbuffer->BaseAddress);

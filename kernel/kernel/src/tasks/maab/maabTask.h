@@ -79,6 +79,7 @@ private:
     void ShowBytes(uint8_t amount, uint64_t addr);
     void Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint64_t addr2, uint64_t addrRes);
 
+    void OnExternalWindowClose(Window* window);
 
 
 public:

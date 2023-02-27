@@ -78,6 +78,17 @@ TaskMAAB::TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInst
 		subLastPos[i] = 0;
 }
 
+#include "../../interrupts/panic.h"
+
+void TaskMAAB::OnExternalWindowClose(Window* window)
+{
+	int indx = windowsCreated->getIndexOf(window);
+	if (indx == -1)
+		return;
+	windowsCreated->removeAt(indx);	
+	//Panic("BLEHUS MAXIMUS 2", true);
+}
+
 void TaskMAAB::PrintMem()
 {
 	newTerm->Println("Data:");
@@ -594,7 +605,12 @@ void TaskMAAB::Do()
 					//newTerm->Println("<PRINTING STR AT {}>", to_string(printAddr), defCol);
 					if (CreateWindowWithId(id))
 					{
-						windowsCreated->add(FindWindowWithId(id));
+						Window* win = FindWindowWithId(id);
+						
+						win->OnCloseHelp = (void*)this;
+						win->OnClose = (void(*)(void*, Window*))(void*)&OnExternalWindowClose;
+						
+						windowsCreated->add(win);
 					}
 					//tempTask = NewSleepTask(amt);
 

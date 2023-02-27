@@ -112,6 +112,9 @@ class Window
     void Log(const char* message, uint32_t col);
     void Log(const char* message, const char* var, uint32_t col);
 
+    void* OnCloseHelp;
+    void (*OnClose)(void* bruh, Window* window);
+
     Position GetMousePosRelativeToWindow();
 
     WindowActionEnum GetCurrentAction();

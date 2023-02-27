@@ -36,7 +36,7 @@ namespace PIT
 
     void Sleep(uint64_t milliseconds)
     {
-        if (osData.NO_INTERRUPTS)
+        if (osData.NO_INTERRUPTS || !Inited)
             return;
         uint64_t endTime = TimeSinceBootMS() + milliseconds;
         while (TimeSinceBootMS() < endTime)
