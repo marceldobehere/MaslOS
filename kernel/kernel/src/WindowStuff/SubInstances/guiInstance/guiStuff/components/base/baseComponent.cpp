@@ -77,6 +77,18 @@ namespace GuiComponentStuff
 
     bool BaseComponent::Destroy(bool destroyChildren, void (*callBackFunc)(BaseComponent* comp))
     {
+        if (parent != NULL)
+        {
+            GuiInstance* blehus = ((GuiInstance*)((Window*)GetWindow())->instance);
+            int indx = blehus->GetIndexOfChildFromComponentWithId(parent->id, id);
+            // GlobalRenderer->Clear(Colors.dgray);
+            // GlobalRenderer->Println("P: {}", to_string(parent->id), Colors.white);
+            // GlobalRenderer->Println("C: {}", to_string(id), Colors.white);
+            // GlobalRenderer->Println("TEST: {}", to_string(indx), Colors.white);
+            // while (true);
+            blehus->RemoveChildFromComponentWithId(parent->id, indx);
+        }
+
         if (componentType == RECT)
             ((RectangleComponent*)this)->Destroy(destroyChildren, callBackFunc);
         if (componentType == SCREEN)
@@ -90,11 +102,7 @@ namespace GuiComponentStuff
         if (componentType == TEXTFIELD)
             ((TextFieldComponent*)this)->Destroy(destroyChildren, callBackFunc);
 
-        if (parent != NULL)
-        {
-            int indx = ((GuiInstance*)((Window*)GetWindow())->instance)->GetIndexOfChildFromComponentWithId(parent->id, id);
-            return ((GuiInstance*)((Window*)GetWindow())->instance)->RemoveChildFromComponentWithId(parent->id, indx);
-        }
+
 
         return true;
     }

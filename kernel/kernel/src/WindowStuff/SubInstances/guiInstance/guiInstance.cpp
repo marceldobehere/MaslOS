@@ -4,6 +4,7 @@
 #include "guiStuff/components/screenComponent/screenComponent.h"
 #include "guiStuff/components/textField/textFieldComponent.h"
 #include "../../../memory/heap.h"
+#include "../../../cmdParsing/cstrTools.h"
 
 GuiInstance::GuiInstance(Window* window)
 {
@@ -61,7 +62,7 @@ void GuiInstance::Render()
     if (screen == NULL)
         return;
     //window->renderer->Clear(Colors.orange);
-    screen->Render(GuiComponentStuff::Field(GuiComponentStuff::Position(), GuiComponentStuff::Position(window->size.width, window->size.height)));
+    screen->Render(GuiComponentStuff::Field(GuiComponentStuff::Position(), GuiComponentStuff::Position(window->size.width - 1, window->size.height - 1)));
     long t = window->size.height * (long)window->size.width;
 
     for (long i = 0; i < t; i++)
@@ -140,6 +141,8 @@ int GuiInstance::GetIndexOfChildFromComponentWithId(uint64_t id, uint64_t childI
     if (child == NULL)
         return -1;
 
+    
+
     if (base->componentType == GuiComponentStuff::ComponentType::BOX)
     {
         GuiComponentStuff::BoxComponent* box = (GuiComponentStuff::BoxComponent*)base;
@@ -158,15 +161,17 @@ int GuiInstance::GetIndexOfChildFromComponentWithId(uint64_t id, uint64_t childI
 bool GuiInstance::RemoveChildFromComponentWithId(uint64_t id, int index)
 {
     GuiComponentStuff::BaseComponent* base = GetComponentFromId(id);
+    
     if (base == NULL)
         return false;
     if (index < 0)
         return false;
+        
 
     if (base->componentType == GuiComponentStuff::ComponentType::BOX)
     {
         GuiComponentStuff::BoxComponent* box = (GuiComponentStuff::BoxComponent*)base;
-        if (index >= box->children->getCount())
+        if (index >= box->children->getCount() || index < 0)
             return false;
         box->children->removeAt(index);
         return true;
@@ -227,9 +232,9 @@ bool GuiInstance::DeleteComponentWithId(int64_t id, bool destroyChildren)
     if (screen == base)
         return false;
     currentInst = this;
-    RemoveThingFromList(base);
-
+  
     bool res = base->Destroy(destroyChildren, RemoveThingFromList);
+    RemoveThingFromList(base);
     _Free(base);
     return res;
 }
@@ -517,7 +522,7 @@ bool GuiInstance::CreateComponentWithIdAndParent(int64_t id, GuiComponentStuff::
     if (type == GuiComponentStuff::ComponentType::BUTTON)
     {
         GuiComponentStuff::ButtonComponent* comp =
-        new GuiComponentStuff::ButtonComponent("", 
+        new GuiComponentStuff::ButtonComponent(StrCopy(""), 
             Colors.black, Colors.dgray, Colors.white,
             Colors.white, Colors.bgray, Colors.black,
             GuiComponentStuff::ComponentSize(50, 50),
@@ -553,7 +558,7 @@ bool GuiInstance::CreateComponentWithIdAndParent(int64_t id, GuiComponentStuff::
             parentComp,
             Colors.white,
             Colors.black,
-            "",
+            StrCopy(""),
             GuiComponentStuff::Position(0, 0)
         );
         comp->id = id;

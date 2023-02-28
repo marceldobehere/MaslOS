@@ -82,6 +82,61 @@ namespace FS_STUFF
         return name;
     }
     
+    char* GetFolderPathFromFullPath(const char* path)
+    {
+        if (path == NULL)
+            return NULL;
+
+        AddToStack();
+
+        int fIndex = -1;
+        int len = StrLen(path);
+        for (int i = 0; i < len; i++)
+            if (path[i] == ':')
+            {
+                fIndex = i;
+                break;
+            }
+        if (fIndex < 1)
+        {
+            RemoveFromStack();
+            return NULL;
+        }
+        
+        int lSI = -1;
+        for (int i = len - 1; i > 0; i--)
+            if (path[i] == '/')
+            {
+                lSI = i;
+                break;
+            }
+
+
+        char* name;
+
+
+        // AB :  XYZ (6)
+        // 01 2 345
+        // 6 - (2 + 1) => 3
+
+
+
+        if (lSI == -1)
+        {
+            lSI = fIndex + 1;
+        }
+
+        int nLen = lSI - (fIndex + 1);
+        name = (char*)_Malloc(nLen + 1, "path name malloc");
+        for (int i = 0; i < nLen; i++)
+            name[i] = path[fIndex + 1 + i];
+        name[nLen] = 0;
+
+        RemoveFromStack();
+        return name;
+    }
+
+
     FilesystemInterface::GenericFilesystemInterface* GetFsInterfaceFromFullPath(const char* path)
     {
         if (path == NULL)

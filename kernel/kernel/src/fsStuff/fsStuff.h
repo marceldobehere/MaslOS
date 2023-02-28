@@ -10,6 +10,7 @@ namespace FS_STUFF
 {
     char* GetDriveNameFromFullPath(const char* path);
     char* GetFilePathFromFullPath(const char* path);
+    char* GetFolderPathFromFullPath(const char* path);
     
     FilesystemInterface::GenericFilesystemInterface* GetFsInterfaceFromFullPath(const char* path);
 

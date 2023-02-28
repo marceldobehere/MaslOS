@@ -115,6 +115,9 @@ class Window
     void* OnCloseHelp;
     void (*OnClose)(void* bruh, Window* window);
 
+    void* OnResizeHelp;
+    void (*OnResize)(void* bruh, Window* window);
+
     Position GetMousePosRelativeToWindow();
 
     WindowActionEnum GetCurrentAction();

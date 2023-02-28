@@ -51,9 +51,11 @@ namespace GuiComponentStuff
         if (oldSize != temp)
         {
             renderer->Resize(temp);
-            renderer->Fill(backgroundColor);
+            
             oldSize = temp;
         }
+
+        renderer->Fill(backgroundColor);
 
         Field bruh = field - position;
 

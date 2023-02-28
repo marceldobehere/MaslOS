@@ -187,6 +187,30 @@ unsigned int ConvertStringToHex(const char* data)
     return hex; 
 }
 
+unsigned long ConvertStringToLongHex(const char* data)
+{
+    unsigned long hex = 0;
+
+    for (unsigned int i = 0; i < 16;  i++)
+    {
+        if (data[i] == 0)
+            break;
+        unsigned char temp = 0;
+        {
+            if (data[i] >= '0' && data[i] <= '9')
+                temp += (data[i] - '0');
+            else if (data[i] >= 'A' && data[i] <= 'F')
+                temp += (data[i] + 10 - 'A') ;
+            else if (data[i] >= 'a' && data[i] <= 'f')
+                temp += (data[i] + 10 - 'a') ;
+        }
+        hex = hex << 4;
+        hex += temp;
+    }
+    
+    return hex; 
+}
+
 
 char hexTo_stringOutput[128];
 const char* hexABC = "0123456789ABCDEF";

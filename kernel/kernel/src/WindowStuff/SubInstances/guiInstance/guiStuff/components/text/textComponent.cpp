@@ -100,6 +100,8 @@ namespace GuiComponentStuff
 
     void TextComponent::Destroy(bool destroyChildren, void (*callBackFunc)(BaseComponent* comp))
     {
+        if (callBackFunc != NULL)
+            callBackFunc(this);
         renderer->Free();
         _Free(oldText);
         _TryFree(text);

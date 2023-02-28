@@ -25,3 +25,4 @@ const char* ConvertHexToString(uint64_t hex);
 const char* ConvertHexToString(uint32_t hex);
 const char* ConvertHexToString(uint16_t hex);
 const char* ConvertHexToString(uint8_t hex);
+unsigned long ConvertStringToLongHex(const char* data);

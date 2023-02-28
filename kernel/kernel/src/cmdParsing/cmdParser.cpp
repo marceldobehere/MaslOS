@@ -222,6 +222,8 @@ void EditPartitionSetting(PartitionInterface::PartitionInfo* part, const char* p
     
 }
 
+#include "../sysApps/explorer/explorer.h"
+
 void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 {
     AddToStack();
@@ -245,6 +247,13 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     if (StrEquals(input, "malloc"))
     {
         _Malloc(0x5000, "Test malloc command");
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(input, "explorer"))
+    {
+        new SysApps::Explorer();
         RemoveFromStack();
         return;
     }
@@ -1656,6 +1665,38 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
         else
             LogError("Color \"{}\" could not be Parsed!", val, window);
     }
+    else if (StrEquals(name, "str"))
+    {
+        uint64_t addr = ConvertStringToLongHex(val);
+        //Println(window, "VAL: {}",ConvertHexToString(addr), Colors.yellow);
+        
+        Print(window, "STR: \"", Colors.yellow);
+        // for (int i = 0; i < 50; i++)
+        // {
+        //     char blehus[2];
+        //     blehus[0] = ((const char*)addr)[i];
+        //     blehus[1] = 0;
+        //     Print(window, blehus, Colors.yellow);
+        // }
+        Print(window, ((const char*)addr), Colors.yellow);
+        Println(window, "\"", Colors.yellow);
+    }
+    else if (StrEquals(name, "str2"))
+    {
+        uint64_t addr = ConvertStringToLongHex(val);
+        //Println(window, "VAL: {}",ConvertHexToString(addr), Colors.yellow);
+        
+        Print(window, "STR: \"", Colors.yellow);
+        for (int i = 0; i < 50; i++)
+        {
+            char blehus[2];
+            blehus[0] = ((const char*)addr)[i];
+            blehus[1] = 0;
+            Print(window, blehus, Colors.yellow);
+        }
+        //Print(window, ((const char*)addr), Colors.yellow);
+        Println(window, "\"", Colors.yellow);
+    }
     else if (StrEquals(name, "bg task run"))
     {
         osData.bgTaskRun = StrEquals(val, "true");
@@ -1921,7 +1962,7 @@ void GetCmd(const char* name, OSUser* user, Window* window)
     }
     else if (StrEquals(name, "drives"))
     {
-        Println(window, "Avaiable Drives:", Colors.bgreen);
+        Println(window, "Available Drives:", Colors.bgreen);
         for (int i = 0; i < osData.diskInterfaces.getCount(); i++)
         {
             DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[i];
@@ -2092,13 +2133,15 @@ void GetCmd(const char* name, OSUser* user, Window* window)
                         dispVar(totalSegCount), dispVar(current->length), 
                         dispVar(current->text), dispVar(current->activeMemFlagVal), 
                         dispVar(current->func), dispVar(current->file),
-                        dispVar(current->line)
+                        dispVar(current->line),
+                        dispVar(current->time),
+                        dispVar(ConvertHexToString((uint64_t)current + sizeof(HeapSegHdr)))
                     };
                     
 
                     //GlobalRenderer->Println("> Heap# {0} - Size: {1} Bytes, Title: \"{2}\", AMFV: {3}, ADDR: {4}, NEXT: {5}", vars, col);
                     if (oA == 0 || current->activeMemFlagVal == oA)
-                        Println(window, "> Heap# {0} - Size: {1} Bytes, Title: \"{2}\", Func: \"{4}\", File: \"{5}\", Line: {6}, AMFV: {3}", vars, col);
+                        Println(window, "> Heap# {0} - Size: {1} Bytes, Title: \"{2}\", Func: \"{4}\", File: \"{5}\", Line: {6}, AMFV: {3}, TIME: {7}, Addr: {8}", vars, col);
                     //GlobalRenderer->Print("<T>");
                     //GlobalRenderer->Println(" Heap# {0} - Size: {1} Bytes, Title: \"{2}\", AMFV: {3}, ADDR: {4}, NEXT: {5}", vars, col);
 

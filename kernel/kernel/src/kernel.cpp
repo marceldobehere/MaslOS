@@ -1054,7 +1054,7 @@ void boot(BootInfo* bootInfo)
 
 
 
-    new SysApps::Explorer();
+    //new SysApps::Explorer();
 
 
     osData.wantedFps = 150;

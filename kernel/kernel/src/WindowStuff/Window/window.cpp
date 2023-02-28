@@ -431,6 +431,10 @@ void Window::Resize(Size _newSize)
     }
     this->newSize = _newSize;
     this->size = _newSize;
+
+    if (OnResize != NULL)
+        OnResize(OnResizeHelp, this);
+
     RemoveFromStack();
 }
 

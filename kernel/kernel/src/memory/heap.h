@@ -14,6 +14,7 @@ struct HeapSegHdr
     const char* file = "<DEF>";
     const char* func = "<DEF>";
     int line = 0;
+    uint64_t time = 0;
     bool free;
     void CombineForward();
     void CombineBackward();

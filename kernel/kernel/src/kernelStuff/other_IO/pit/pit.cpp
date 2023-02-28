@@ -78,16 +78,22 @@ namespace PIT
 
     double TimeSinceBootS()
     {
+        if (!Inited)
+            return 0;
         return (TicksSinceBoot)/(double)freq;
     }
     
     uint64_t TimeSinceBootMS()
     {
+        if (!Inited)
+            return 0;
         return (TicksSinceBoot*1000)/freq;
     }
 
     uint64_t TimeSinceBootMicroS()
     {
+        if (!Inited)
+            return 0;
         return (TicksSinceBoot*1000000)/freq;
     }
 

@@ -16,6 +16,7 @@ namespace SysApps
         GuiComponentStuff::TextFieldComponent* pathComp;
         
         const char* path;
+        int ScrollY;
 
 
         public:
@@ -29,6 +30,7 @@ namespace SysApps
         bool PathTypeCallBack(GuiComponentStuff::TextFieldComponent* comp, GuiComponentStuff::KeyHitEventInfo event);
 
         void OnExternalWindowClose(Window* window);
+        void OnExternalWindowResize(Window* window);
         void Free();
     };
 

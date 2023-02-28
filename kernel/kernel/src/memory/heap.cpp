@@ -366,6 +366,7 @@ void* _Xmalloc(size_t size, const char* text, const char* func, const char* file
                 tempHdr->file = text;
                 tempHdr->func = file;
                 tempHdr->line = line;
+                tempHdr->time = PIT::TimeSinceBootMS();
 
 
                 RemoveFromStack();
@@ -408,6 +409,7 @@ void* _Xmalloc(size_t size, const char* text, const char* func, const char* file
                 current->file = file;
                 current->func = func;
                 current->line = line;
+                current->time = PIT::TimeSinceBootMS();
                 mallocCount++;
                 usedHeapCount++;
                 RemoveFromStack();
@@ -421,6 +423,7 @@ void* _Xmalloc(size_t size, const char* text, const char* func, const char* file
                 current->file = file;
                 current->func = func;
                 current->line = line;
+                current->time = PIT::TimeSinceBootMS();
                 mallocCount++;
                 usedHeapCount++;
                 RemoveFromStack();
