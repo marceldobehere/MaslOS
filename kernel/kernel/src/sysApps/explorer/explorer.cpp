@@ -2,7 +2,6 @@
 #include "../../cmdParsing/cstrTools.h"
 #include "../../memory/heap.h"
 #include "../../OSDATA/osdata.h"
-#include "../../WindowStuff/SubInstances/guiInstance/guiStuff/components/textField/textFieldComponent.h"
 
 namespace SysApps
 {
@@ -12,7 +11,7 @@ namespace SysApps
 
         //window =
 
-        Window* window = (Window*)_Malloc(sizeof(Window), "Explorer Window");
+        window = (Window*)_Malloc(sizeof(Window), "Explorer Window");
         GuiInstance* gui = (GuiInstance*)_Malloc(sizeof(GuiInstance), "Explorer GUI");
         *gui = GuiInstance(window);
         *(window) = Window((DefaultInstance*)gui, Size(400, 300), Position(100, 100), "Explorer", true, true, true);
@@ -32,18 +31,33 @@ namespace SysApps
         lastClickedComp = NULL;
 
         guiInstance->CreateComponentWithId(1021, GuiComponentStuff::ComponentType::TEXTFIELD);
-        GuiComponentStuff::TextFieldComponent* txtSearchField = (GuiComponentStuff::TextFieldComponent*)guiInstance->GetComponentFromId(1021);
-        txtSearchField->position.x = 0;
-        txtSearchField->position.y = 0;
+        pathComp = (GuiComponentStuff::TextFieldComponent*)guiInstance->GetComponentFromId(1021);
+        pathComp->position.x = 0;
+        pathComp->position.y = 0;
 
-        txtSearchField->size.FixedX = 500;
-        txtSearchField->size.FixedY = 16;
-        
-        
-        
-        Reload();
+        pathComp->AdvancedKeyHitCallBackHelp = (void*)this;
+        pathComp->AdvancedKeyHitCallBack = (bool(*)(void*, GuiComponentStuff::BaseComponent*, GuiComponentStuff::KeyHitEventInfo))(void*)&PathTypeCallBack;
+
+        guiInstance->CreateComponentWithId(1022, GuiComponentStuff::ComponentType::BOX);
+        fileListComp = (GuiComponentStuff::BoxComponent*)guiInstance->GetComponentFromId(1022);
+        fileListComp->position.x = 0;
+        fileListComp->position.y = 20;
+
+        UpdateSizes();
+
+        //Reload();
 
     }
+
+    void Explorer::UpdateSizes()
+    {
+        fileListComp->size.FixedX = window->size.width;
+        fileListComp->size.FixedY = window->size.height - 25;
+        fileListComp->backgroundColor = Colors.white;
+        pathComp->size.FixedX = window->size.width;
+        pathComp->size.FixedY = 16;
+    }
+
     const char* Explorer::GetPath()
     {
         return StrCopy(path);
@@ -52,6 +66,16 @@ namespace SysApps
     {
         _Free(path);
         this->path = StrCopy(path);
+    }
+
+    bool Explorer::PathTypeCallBack(GuiComponentStuff::TextFieldComponent* comp, GuiComponentStuff::KeyHitEventInfo event)
+    {
+        if (event.Chr == '\n')
+        {
+            GlobalRenderer->Clear(Colors.orange);
+            return false;
+        }
+        return true;
     }
 
     void Explorer::ClickCallBack(GuiComponentStuff::BaseComponent* comp, GuiComponentStuff::MouseClickEventInfo event)
@@ -73,6 +97,7 @@ namespace SysApps
 
     void Explorer::Reload()
     {
+        UpdateSizes();
 
     }
     

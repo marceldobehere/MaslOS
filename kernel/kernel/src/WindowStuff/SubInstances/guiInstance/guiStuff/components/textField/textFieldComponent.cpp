@@ -48,7 +48,12 @@ namespace GuiComponentStuff
 
     void TextFieldComponent::KeyHit(KeyHitEventInfo info)
     {
-        KeyHandler(info);
+        bool yes = true;
+        if (AdvancedKeyHitCallBack != NULL)
+            yes = AdvancedKeyHitCallBack(AdvancedKeyHitCallBackHelp, this, info);
+
+        if (yes)
+            KeyHandler(info);
         if (keyHitCallBack != NULL)
             keyHitCallBack(this, info);
     }
@@ -78,6 +83,7 @@ namespace GuiComponentStuff
 
         actualTextFieldStuff->position = position;
         actualTextFieldStuff->size = tSize;
+        textComp->size = tSize;
         rectComp->size = tSize;
 
         

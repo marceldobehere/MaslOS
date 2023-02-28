@@ -37,6 +37,9 @@ namespace GuiComponentStuff
         void (*mouseClickedCallBack)(BaseComponent*, MouseClickEventInfo);
         void (*keyHitCallBack)(BaseComponent*, KeyHitEventInfo);
 
+        void* AdvancedKeyHitCallBackHelp;
+        bool (*AdvancedKeyHitCallBack)(void* bruh, BaseComponent*, KeyHitEventInfo); // true if print
+
         TextFieldComponent(uint32_t textCol, uint32_t bgCol, ComponentSize size, Position position, BaseComponent* parent);
         void MouseClicked(MouseClickEventInfo info);
         void KeyHit(KeyHitEventInfo info);
