@@ -2,6 +2,8 @@
 #include "../../IO/IO.h"
 #include "../../../OSDATA/osdata.h"
 
+#include "../rtc/rtc.h"
+
 namespace PIT
 {
     uint64_t TicksSinceBoot = 0;
@@ -61,9 +63,17 @@ namespace PIT
         freq = GetFrequency();
     }
 
+    
+    int tempus = 0;
     void Tick()
     {
         TicksSinceBoot++;
+        
+        if (tempus++ > 50)
+        {
+            tempus = 0;
+            RTC::UpdateTimeIfNeeded();
+        }
     }
 
     double TimeSinceBootS()

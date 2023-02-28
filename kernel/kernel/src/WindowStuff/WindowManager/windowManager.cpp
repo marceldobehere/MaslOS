@@ -162,7 +162,7 @@ namespace WindowManager
     //     return &defaultBackgroundColor;
     // }
 
-    void WindowPointerBufferThing::DrawBGandTaskbarRect(int x1, int y1, int x2, int y2)
+    void WindowPointerBufferThing::DrawBGRect(int x1, int y1, int x2, int y2)
     {
         if (osData.drawBackground)
         {
@@ -195,7 +195,10 @@ namespace WindowManager
                 }   
             } 
         }
+    }
 
+    void WindowPointerBufferThing::DrawTaskbarRect(int x1, int y1, int x2, int y2)
+    {
         int64_t ypos = virtualScreenBuffer->Height - taskbar->Height;
 
         if (y2 < ypos)
@@ -211,7 +214,6 @@ namespace WindowManager
                 (((uint32_t**)virtualScreenBuffer->BaseAddress)[index]) = &((uint32_t*)taskbar->BaseAddress)[index2];//&defaultBackgroundColor;
             }
     }
-
 
     void WindowPointerBufferThing::UpdatePointerRect(int x1, int y1, int x2, int y2)
     {
@@ -242,12 +244,14 @@ namespace WindowManager
         }
 
 
-        DrawBGandTaskbarRect(x1, y1, x2, y2);
+        DrawBGRect(x1, y1, x2, y2);
         
 
         int count = osData.windows.getCount();
         for (int i = 0; i < count; i++)
             RenderWindowRect(osData.windows[i], x1, y1, x2, y2);
+
+        DrawTaskbarRect(x1, y1, x2, y2);
         RemoveFromStack();
     }
 
@@ -628,11 +632,18 @@ if (window != NULL)
 
     void WindowPointerBufferThing::RenderWindow(Window* window)
     {
+        int x1 = max(0, window->position.x - 1);
+        int y1 = max(0, window->position.y - 24);
+        int x2 = min(virtualScreenBuffer->Width - 1, window->position.x + window->size.width + 1);
+        int y2 = min(virtualScreenBuffer->Height- 1, window->position.y + window->size.height + 1);
+
         RenderWindowRect(window, 
-            max(0, window->position.x - 1), max(0, window->position.y - 24), 
-            min(virtualScreenBuffer->Width - 1, window->position.x + window->size.width + 1),
-            min(virtualScreenBuffer->Height- 1, window->position.y + window->size.height + 1)
-        );//0, 0, actualScreenBuffer->Width - 1, actualScreenBuffer->Height - 1);
+            x1, y1, 
+            x2, y2
+        );
+        
+        DrawTaskbarRect(x1, y1, x2, y2);
+        //0, 0, actualScreenBuffer->Width - 1, actualScreenBuffer->Height - 1);
         // AddToStack();
         // uint32_t* pixel = (uint32_t*)window->framebuffer->BaseAddress;
 

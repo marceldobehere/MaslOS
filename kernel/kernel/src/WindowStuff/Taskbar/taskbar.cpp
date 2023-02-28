@@ -1,6 +1,6 @@
 #include "taskbar.h"
 #include "../../OSDATA/osdata.h"
-
+#include "../../kernelStuff/other_IO/rtc/rtc.h"
 
 namespace Taskbar
 {
@@ -47,11 +47,9 @@ namespace Taskbar
 
     void RenderTaskbar()
     {
-        Scounter++;
-        if (Scounter % 5 != 0)
+        if (Scounter++ < 10)
             return;
-        else if (Scounter > 100)
-            Scounter = 0;
+        Scounter = 0;
 
 
         AddToStack();
@@ -196,6 +194,74 @@ namespace Taskbar
             }
         }
         RemoveFromStack();
+
+
+        AddToStack();
+        char tempTime[9];
+        const char* tempTimeTemplate = "00:00:00";
+        for (int i = 0; i < 9; i++)
+            tempTime[i] = tempTimeTemplate[i];
+        char tempDate[11];
+        const char* tempDateTemplate = "00.00.0000";
+        for (int i = 0; i < 11; i++)
+            tempDate[i] = tempDateTemplate[i];
+        
+        const char* tX = "";
+        int tL = 0;
+
+        //RTC::UpdateTimeIfNeeded();
+        
+        // Time
+        {
+            tX = to_string(RTC::Hour);
+            tL = StrLen(tX);
+            for (int i = 0; i < tL; i++)
+                tempTime[i + 0 + (2 - tL)] = tX[i];
+
+            tX = to_string(RTC::Minute);
+            tL = StrLen(tX);
+            for (int i = 0; i < tL; i++)
+                tempTime[i + 3 + (2 - tL)] = tX[i];
+
+            tX = to_string(RTC::Second);
+            tL = StrLen(tX);
+            for (int i = 0; i < tL; i++)
+                tempTime[i + 6 + (2 - tL)] = tX[i];    
+        }
+
+        // Date
+        {
+            tX = to_string(RTC::Day);
+            tL = StrLen(tX);
+            for (int i = 0; i < tL; i++)
+                tempDate[i + 0 + (2 - tL)] = tX[i];
+
+            tX = to_string(RTC::Month);
+            tL = StrLen(tX);
+            for (int i = 0; i < tL; i++)
+                tempDate[i + 3 + (2 - tL)] = tX[i];
+
+            tX = to_string(RTC::Year);
+            tL = StrLen(tX);
+            for (int i = 0; i < tL; i++)
+                tempDate[i + 6 + (4 - tL)] = tX[i];
+        }
+
+
+        //renderer->Clear(width - 8*13, 0, width - 1, height - 1, Colors.orange);
+        
+        renderer->color = Colors.white;
+        renderer->CursorPosition.x = width - 8*12 + 8*2 - 4;
+        renderer->CursorPosition.y = ((height - 32) / 2);
+        renderer->printStr(tempTime);
+
+        renderer->color = Colors.white;
+        renderer->CursorPosition.x = width - 8*12 + 8*1 - 4;
+        renderer->CursorPosition.y = ((height - 32) / 2) + 16;
+        renderer->printStr(tempDate);
+
+        RemoveFromStack();
+
 
         osData.windowPointerThing->UpdatePointerRect(0, ypos, osData.windowPointerThing->virtualScreenBuffer->Width - 1, ypos + taskbarBuffer->Height - 1);
         RemoveFromStack();

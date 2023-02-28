@@ -7,6 +7,8 @@ uint64_t _KernelEnd;
 
 // #include "../../interrupts/panic.h"
 
+#include "../other_IO/rtc/rtc.h"
+
 
 void DoPCIWithoutMCFG(BootInfo* bootInfo)
 {
@@ -701,7 +703,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     GlobalRenderer->Println("BG IMG: {}", to_string((uint64_t)bootInfo->bgImage), Colors.orange);
 
-    
+
 
     //uint8_t* bleh = (uint8_t*) malloc(sizeof(Framebuffer), "Converting Image to Framebuffer");;
 
@@ -720,8 +722,22 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     //while(true);
     
 
-    PIT::InitPIT();
     
+    
+    RTC::InitRTC();
+    RTC::read_rtc();
+    RTC::UpdateTimeIfNeeded();
+    GlobalRenderer->Println("\nTIME:", Colors.yellow);
+    GlobalRenderer->Print("{}:", to_string((int)RTC::Hour), Colors.yellow);
+    GlobalRenderer->Print("{}:", to_string((int)RTC::Minute), Colors.yellow);
+    GlobalRenderer->Println("{}", to_string((int)RTC::Second), Colors.yellow);
+    
+    GlobalRenderer->Println("DATE:", Colors.yellow);
+    GlobalRenderer->Print("{}.", to_string((int)RTC::Day), Colors.yellow);
+    GlobalRenderer->Print("{}.", to_string((int)RTC::Month), Colors.yellow);
+    GlobalRenderer->Println("{}", to_string((int)RTC::Year), Colors.yellow);
+
+    PIT::InitPIT();
 
     #define STAT 0x64
     #define CMD 0x60
