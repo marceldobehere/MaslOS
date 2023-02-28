@@ -5,6 +5,7 @@ The OS is now using [limine](https://github.com/limine-bootloader/limine) as the
 
 Here's the [Hackaday Page](https://hackaday.io/project/189063-maslos) for MaslOS.
 
+Here are the [Terminal Commands](https://github.com/marceldobehere/MaslOS/wiki/Terminal).
 
 ## Features
 * Display
