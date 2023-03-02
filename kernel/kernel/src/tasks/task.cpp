@@ -8,7 +8,7 @@
 #include "maab/maabTask.h"
 #include "taskMgrTask/taskMgrTask.h"
 #include "test/testTask.h"
-
+#include "debugViewTask/debugViewTask.h"
 
 
 bool Task::GetDone()
@@ -48,6 +48,8 @@ const char* TaskTypeToString(TaskType type)
         return "TASK MANAGER";
     if (type == TaskType::TESTO)
         return "TESTO";
+    if (type == TaskType::DEBUG_VIEWER)
+        return "DEBUG RAM VIEWER";
 
     return "UNKNOWN!";
 }
@@ -116,6 +118,12 @@ void DoTask(Task* task)
             test->Do();
             break;
         }
+        case TaskType::DEBUG_VIEWER:
+        {
+            TaskDebugViewer* dbg = (TaskDebugViewer*)task;
+            dbg->Do();
+            break;
+        }
     }
 }
 
@@ -182,6 +190,13 @@ void FreeTask(Task* task)
             TaskTest* testo = (TaskTest*)task;
             testo->Free();
             _Free((void*)testo);
+            break;
+        }
+        case TaskType::DEBUG_VIEWER:
+        {
+            TaskDebugViewer* dbg = (TaskDebugViewer*)task;
+            dbg->Free();
+            _Free((void*)dbg);
             break;
         }
     }  

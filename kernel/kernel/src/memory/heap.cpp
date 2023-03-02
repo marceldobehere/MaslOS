@@ -143,10 +143,12 @@ HeapSegHdr* HeapSegHdr::Split(size_t splitLength)
 int64_t lastUpdateTime = 0;
 bool mallocToCache = false;
 
+void* RAM_START_ADDR;
 
 void InitializeHeap(void* heapAddress, size_t pageCount)
 {
     AddToStack();
+    RAM_START_ADDR = heapAddress;
     void* pos = heapAddress;
 
     activeMemFlagVal = 0;

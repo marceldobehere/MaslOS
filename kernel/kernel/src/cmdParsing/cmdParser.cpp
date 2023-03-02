@@ -20,6 +20,7 @@
 #include "../tasks/taskMgrTask/taskMgrTask.h"
 #include "../tasks/closeWindow/taskWindowClose.h"
 #include "../tasks/bfTask/bfTask.h"
+#include "../tasks/debugViewTask/debugViewTask.h"
 #include "../fsStuff/fsStuff.h"
 #include "../tasks/maab/maabTask.h"
 
@@ -314,6 +315,13 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     if (StrEquals(input, "taskmgr") || StrEquals(input, "task manager"))
     {
         terminal->tasks.add(NewTaskManagerTask(window));
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(input, "dbg") || StrEquals(input, "debug viewer"))
+    {
+        terminal->tasks.add(NewDebugViewerTask(window));
         RemoveFromStack();
         return;
     }

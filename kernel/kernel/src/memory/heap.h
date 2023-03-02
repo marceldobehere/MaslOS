@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
+extern void* RAM_START_ADDR;
 
 struct HeapSegHdr
 {
