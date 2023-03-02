@@ -24,6 +24,7 @@ Here are the [Terminal Commands](https://github.com/marceldobehere/MaslOS/wiki/T
   - Pong Game
   - Mandelbrot renderer
   - Explorer (WIP but basics work)
+  - RAM Hex Viewer
 * Audio
   - (In planning) Audio Device Driver of some sorts
 * Keyboard
