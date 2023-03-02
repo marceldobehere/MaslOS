@@ -9,6 +9,9 @@ Window::Window(DefaultInstance* instance, Size size, Position position, const ch
 {
     AddToStack();
     OnClose = NULL;
+    OnResize = NULL;
+    OnCloseHelp = NULL;
+    OnResizeHelp = NULL;
     this->instance = instance;
     this->position = position;
     this->size = size;
