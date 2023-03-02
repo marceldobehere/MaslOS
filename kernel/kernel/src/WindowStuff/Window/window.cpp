@@ -130,8 +130,11 @@ WindowActionEnum Window::GetCurrentAction()
 void Window::Free()
 {
     AddToStack();
+
+    AddToStack();
     if (OnClose != NULL)
         OnClose(OnCloseHelp, this);
+    RemoveFromStack();
 
     _Free(framebuffer->BaseAddress);
     _Free(framebuffer);
@@ -139,10 +142,13 @@ void Window::Free()
     _Free(backbuffer);
     _Free(renderer);
     _Free(brenderer);
+
+    AddToStack();
     if (instance != NULL)
     {
         instance->DefaultFree();
     }
+    RemoveFromStack();
     RemoveFromStack();
 }
 

@@ -200,8 +200,11 @@ void RemoveThingFromList(GuiComponentStuff::BaseComponent* comp)
         currentInst->allComponents->removeAt(indx);
 }
 
+#include "../../../OSDATA/MStack/MStackM.h"
+
 void GuiInstance::Free() 
 {
+    AddToStack();
     GuiComponentStuff::ScreenComponent* tScreen = screen;
     screen = NULL;
     currentInst = this;
@@ -222,6 +225,7 @@ void GuiInstance::Free()
 
     allComponents->free();
     _Free(allComponents);
+    RemoveFromStack();
 }
 
 bool GuiInstance::DeleteComponentWithId(int64_t id, bool destroyChildren)

@@ -12,7 +12,9 @@ namespace GuiComponentStuff
 {
     TextFieldComponent::TextFieldComponent(uint32_t textCol, uint32_t bgCol, ComponentSize size, Position position, BaseComponent* parent)
     {
-
+        AdvancedKeyHitCallBack = NULL;
+        keyHitCallBack = NULL;
+        mouseClickedCallBack = NULL;
         componentType = ComponentType::TEXTFIELD;
 
         this->textCol = textCol;

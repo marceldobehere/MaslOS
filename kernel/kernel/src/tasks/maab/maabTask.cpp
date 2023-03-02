@@ -79,14 +79,20 @@ TaskMAAB::TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInst
 }
 
 #include "../../interrupts/panic.h"
+#include "../../OSDATA/MStack/MStackM.h"
 
 void TaskMAAB::OnExternalWindowClose(Window* window)
 {
+	AddToStack();
 	int indx = windowsCreated->getIndexOf(window);
 	if (indx == -1)
+	{
+		RemoveFromStack();
 		return;
+	}
 	windowsCreated->removeAt(indx);	
 	//Panic("BLEHUS MAXIMUS 2", true);
+	RemoveFromStack();
 }
 
 void TaskMAAB::PrintMem()
@@ -2146,7 +2152,10 @@ void TaskMAAB::Free()
 
 	for (int i = 0; i < windowsCreated->getCount(); i++)
 	{
-		osData.osTasks.add(NewWindowCloseTask(windowsCreated->elementAt(i)));
+		Window* win = windowsCreated->elementAt(i);
+		win->OnClose = NULL;
+		win->OnResize = NULL;
+		osData.osTasks.add(NewWindowCloseTask(win));
 	}
 
 
