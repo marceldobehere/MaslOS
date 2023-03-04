@@ -58,10 +58,17 @@ namespace SysApps
 
     void Explorer::UpdateSizes()
     {
-        fileListComp->size.FixedX = window->size.width;
-        fileListComp->size.FixedY = window->size.height - 25;
+        int w = window->size.width;
+        int h = window->size.height;
+        if (w < 50)
+            w = 50;
+        if (h < 50)
+            h = 50;
+
+        fileListComp->size.FixedX = w;
+        fileListComp->size.FixedY = h - 25;
         fileListComp->backgroundColor = Colors.white;
-        pathComp->size.FixedX = window->size.width;
+        pathComp->size.FixedX = w;
         pathComp->size.FixedY = 16;
     }
 
