@@ -224,6 +224,7 @@ void EditPartitionSetting(PartitionInterface::PartitionInfo* part, const char* p
 }
 
 #include "../sysApps/explorer/explorer.h"
+#include "../sysApps/tetris/tetris.h"
 
 void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 {
@@ -255,6 +256,13 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     if (StrEquals(input, "explorer"))
     {
         new SysApps::Explorer();
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(input, "tetris"))
+    {
+        new SysApps::Tetris();
         RemoveFromStack();
         return;
     }
