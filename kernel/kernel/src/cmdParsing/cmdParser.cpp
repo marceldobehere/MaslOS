@@ -260,7 +260,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         return;
     }
 
-    if (StrEquals(input, "tetris"))
+    if (StrEquals(input, "tetris") || StrEquals(input, "tetr"))
     {
         new SysApps::Tetris();
         RemoveFromStack();

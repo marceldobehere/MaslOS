@@ -1,8 +1,8 @@
 #pragma once
 #include "../../WindowStuff/Window/window.h"
-#include "../../WindowStuff/SubInstances/guiInstance/guiInstance.h"
-#include "../../WindowStuff/SubInstances/guiInstance/guiStuff/components/box/boxComponent.h"
-#include "../../WindowStuff/SubInstances/guiInstance/guiStuff/components/textField/textFieldComponent.h"
+// #include "../../WindowStuff/SubInstances/guiInstance/guiInstance.h"
+// #include "../../WindowStuff/SubInstances/guiInstance/guiStuff/components/box/boxComponent.h"
+// #include "../../WindowStuff/SubInstances/guiInstance/guiStuff/components/textField/textFieldComponent.h"
 
 namespace SysApps
 {
@@ -10,27 +10,23 @@ namespace SysApps
     {
         private:
         Window* window;
-        GuiInstance* guiInstance;
-        GuiComponentStuff::BaseComponent* lastClickedComp;
-        GuiComponentStuff::BoxComponent* fileListComp;
-        GuiComponentStuff::TextFieldComponent* pathComp;
         
         const char* path;
         int ScrollY;
+        uint64_t lastSleep;
 
 
         public:
         Tetris();
-        void UpdateSizes();
-        const char* GetPath();
-        void SetPath(const char* path);
+
         void Reload();
 
-        void ClickCallBack(GuiComponentStuff::BaseComponent* comp, GuiComponentStuff::MouseClickEventInfo event);
-        bool PathTypeCallBack(GuiComponentStuff::TextFieldComponent* comp, GuiComponentStuff::KeyHitEventInfo event);
+        // void ClickCallBack(GuiComponentStuff::BaseComponent* comp, GuiComponentStuff::MouseClickEventInfo event);
+        // bool PathTypeCallBack(GuiComponentStuff::TextFieldComponent* comp, GuiComponentStuff::KeyHitEventInfo event);
 
         void OnExternalWindowClose(Window* window);
         void OnExternalWindowResize(Window* window);
+        void OnExternalWindowRender(Window* window);
         void Free();
     };
 
@@ -48,8 +44,8 @@ namespace SysApps
     // void tetris_run(int width, int height);
 
     void tetris_run_init(int width, int height);
-    void tetris_run_loop(int width, int height);
-    void tetris_run_end(int width, int height);
+    void tetris_run_loop();
+    void tetris_run_end();
 
 
     void tetris_new_block(struct tetris *t);

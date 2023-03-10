@@ -12,16 +12,17 @@ namespace SysApps
     Tetris::Tetris()
     {
         path = StrCopy("bruh:");
+        lastSleep = 0;
 
         //window =
 
         window = (Window*)_Malloc(sizeof(Window), "Explorer Window");
-        GuiInstance* gui = (GuiInstance*)_Malloc(sizeof(GuiInstance), "Explorer GUI");
-        *gui = GuiInstance(window);
-        *(window) = Window((DefaultInstance*)gui, Size(400, 300), Position(100, 100), "Explorer", true, true, true);
+        //GuiInstance* gui = (GuiInstance*)_Malloc(sizeof(GuiInstance), "Explorer GUI");
+        //*gui = GuiInstance(window);
+        *(window) = Window(NULL, Size(200, 400), Position(100, 100), "Tetris", true, true, true);
         osData.windows.insertAt(window, 0);
         window->hidden = true;
-        gui->Init();
+        //gui->Init();
 
         window->OnCloseHelp = (void*)this;
         window->OnClose = (void(*)(void*, Window*))(void*)&OnExternalWindowClose;
@@ -29,91 +30,51 @@ namespace SysApps
         window->OnResizeHelp = (void*)this;
         window->OnResize = (void(*)(void*, Window*))(void*)&OnExternalWindowResize;
 
+        window->RenderWhenHidden = true;
+        window->OnPartRenderHelp = (void*)this;
+        window->OnPartRender =  (void(*)(void*, Window*))(void*)&OnExternalWindowRender;
+
         window->moveToFront = true;
         window->oldHidden = true;
         window->hidden = false;
         activeWindow = window;
 
-        guiInstance = gui;
-        lastClickedComp = NULL;
+        lmaoRenderer = window->renderer;
+        lmaoRenderer->Clear(Colors.black);
 
-        guiInstance->CreateComponentWithId(1021, GuiComponentStuff::ComponentType::TEXTFIELD);
-        pathComp = (GuiComponentStuff::TextFieldComponent*)guiInstance->GetComponentFromId(1021);
-        pathComp->position.x = 0;
-        pathComp->position.y = 0;
 
-        pathComp->AdvancedKeyHitCallBackHelp = (void*)this;
-        pathComp->AdvancedKeyHitCallBack = (bool(*)(void*, GuiComponentStuff::BaseComponent*, GuiComponentStuff::KeyHitEventInfo))(void*)&PathTypeCallBack;
-        _Free(pathComp->textComp->text);
-        pathComp->textComp->text = StrCopy(path);
 
-        guiInstance->CreateComponentWithId(1022, GuiComponentStuff::ComponentType::BOX);
-        fileListComp = (GuiComponentStuff::BoxComponent*)guiInstance->GetComponentFromId(1022);
-        fileListComp->position.x = 0;
-        fileListComp->position.y = 20;
 
-        UpdateSizes();
-
-        Reload();
+        tetris_run_init(10, 20);
 
     }
 
-    void Tetris::UpdateSizes()
-    {
-        int w = window->size.width;
-        int h = window->size.height;
-        if (w < 50)
-            w = 50;
-        if (h < 50)
-            h = 50;
 
-        fileListComp->size.FixedX = w;
-        fileListComp->size.FixedY = h - 25;
-        fileListComp->backgroundColor = Colors.white;
-        pathComp->size.FixedX = w;
-        pathComp->size.FixedY = 16;
-    }
 
-    const char* Tetris::GetPath()
-    {
-        return StrCopy(path);
-    }
-    void Tetris::SetPath(const char* path)
-    {
-        _Free(this->path);
-        this->path = StrCopy(path);
-    }
-
-    bool Tetris::PathTypeCallBack(GuiComponentStuff::TextFieldComponent* comp, GuiComponentStuff::KeyHitEventInfo event)
-    {
-        if (event.Chr == '\n')
-        {
-            //GlobalRenderer->Clear(Colors.orange);
-            SetPath(pathComp->textComp->text);
-            Reload();
-            return false;
-        }
-        return true;
-    }
-
-    void Tetris::ClickCallBack(GuiComponentStuff::BaseComponent* comp, GuiComponentStuff::MouseClickEventInfo event)
-    {
-        GlobalRenderer->Clear(Colors.blue);
-    }
 
     void Tetris::OnExternalWindowClose(Window* window)
     {
         //GlobalRenderer->Clear(Colors.purple);
         Free();
     }
-
     void Tetris::OnExternalWindowResize(Window* window)
     {
-        UpdateSizes();
+        lmaoRenderer = window->renderer;
+        lmaoRenderer->Clear(Colors.black);
+    }
+    void Tetris::OnExternalWindowRender(Window* window)
+    {
+        uint64_t now = PIT::TimeSinceBootMS();
+        if (lastSleep + 50 > now)
+            return;
+        lastSleep = now;
+        tetris_run_loop();
+
     }
 
     void Tetris::Free()
     {
+        tetris_run_end();
         _Free(path);
         _Free(this);
     }
@@ -121,137 +82,8 @@ namespace SysApps
     void Tetris::Reload()
     {
         AddToStack();
-        UpdateSizes();
-
-        const char* drive = FS_STUFF::GetDriveNameFromFullPath(path);
-        const char* dir = FS_STUFF::GetFolderPathFromFullPath(path);
-        FilesystemInterface::GenericFilesystemInterface* fsInterface = FS_STUFF::GetFsInterfaceFromFullPath(path);
-        
-        if (fileListComp->children->getCount() > 0)
-        {
-            while (fileListComp->children->getCount() > 0)
-            {
-                GuiComponentStuff::BaseComponent* comp = fileListComp->children->elementAt(0);
-                uint64_t coolId = RND::lehmer64();
-                comp->id = coolId;
-                guiInstance->DeleteComponentWithId(coolId, true);
-            }
-        }
 
 
-        int cutOff = 0;
-        if (dir != NULL)
-            cutOff = StrLen(dir) + 1;
-        if (dir != NULL && StrEquals(dir, ""))
-        {
-            _Free(dir);
-            dir = StrCopy("/");
-            cutOff = 0;
-        }
-        // GlobalRenderer->Clear(Colors.black);
-        // GlobalRenderer->Println("PATH: \"{}\"", path, Colors.white);
-        // GlobalRenderer->Println("Drive: \"{}\"", drive, Colors.white);
-        // GlobalRenderer->Println("Dir: \"{}\"", dir, Colors.white);
-        // GlobalRenderer->Println("Interface: {}",  to_string((uint64_t)fsInterface), Colors.white);
-        // //while (true);
-
-
-        if ( fsInterface != NULL && drive != NULL && dir != NULL)
-        {
-            // GlobalRenderer->Clear(Colors.black);
-            // GlobalRenderer->Println("PATH: \"{}\"", path, Colors.white);
-            // GlobalRenderer->Println("Drive: \"{}\"", drive, Colors.white);
-            // GlobalRenderer->Println("Dir: \"{}\"", dir, Colors.white);
-            // GlobalRenderer->Println("Interface: {}",  ConvertHexToString((uint64_t)fsInterface), Colors.yellow);
-
-            uint64_t tempCount = 0;
-            const char** dataList;
-            int _y = 0;
-            
-            dataList = fsInterface->GetFolders(dir, &tempCount);
-            //GlobalRenderer->Println("Folders: {}", to_string(tempCount), Colors.white);
-            if (dataList != NULL)
-            {
-                for (int i = 0; i < tempCount; i++)
-                {
-                    //GlobalRenderer->Println(" - Folder: \"{}\"", dataList[i], Colors.white);
-                    uint64_t coolId = RND::lehmer64();
-                    guiInstance->CreateComponentWithIdAndParent(coolId, GuiComponentStuff::ComponentType::TEXT, 1022);
-                    GuiComponentStuff::TextComponent* textComp = (GuiComponentStuff::TextComponent*)guiInstance->GetComponentFromId(coolId);
-                    _Free(textComp->text);
-                    const char* tempo = StrSubstr(dataList[i], cutOff);
-                    textComp->text = StrCombine("Folder: ", tempo);
-                    _Free(tempo);
-                    textComp->position.x = 0;
-                    textComp->position.y = _y;
-                    _y += 16;
-                    _Free(dataList[i]);
-                }   
-                _Free(dataList);
-            }
-
-
-            dataList = fsInterface->GetFiles(dir, &tempCount);
-            //GlobalRenderer->Println("Files: {}", to_string(tempCount), Colors.white);
-            if (dataList != NULL)
-            {
-                for (int i = 0; i < tempCount; i++)
-                {
-                    //GlobalRenderer->Println(" - File: \"{}\"", dataList[i], Colors.white);
-                    uint64_t coolId = RND::lehmer64();
-                    guiInstance->CreateComponentWithIdAndParent(coolId, GuiComponentStuff::ComponentType::TEXT, 1022);
-                    GuiComponentStuff::TextComponent* textComp = (GuiComponentStuff::TextComponent*)guiInstance->GetComponentFromId(coolId);
-                    _Free(textComp->text);
-                    const char* tempo = StrSubstr(dataList[i], cutOff);
-                    textComp->text = StrCombine("File: ", tempo);
-                    _Free(tempo);
-                    textComp->position.x = 0;
-                    textComp->position.y = _y;
-                    _y += 16;
-                    _Free(dataList[i]);
-                }
-                _Free(dataList);
-            }
-
-
-            //while (true);
-        }
-        else
-        {
-            int _y = 0;
-            for (int i = 0; i < osData.diskInterfaces.getCount(); i++)
-            {
-                DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[i];
-                if (diskInterface->partitionInterface == NULL)
-                    continue;
-                PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
-                for (int i2 = 0; i2 < partInterface->partitionList.getCount(); i2++)
-                {
-                    PartitionInterface::PartitionInfo* partInfo = partInterface->partitionList[i2];
-                    if (!partInfo->hidden && partInfo->type == PartitionInterface::PartitionType::Normal)
-                    {
-                        //Println(window, " - Drive: \"{}\"", partInfo->driveName, Colors.bgreen);
-                        uint64_t coolId = RND::lehmer64();
-                        guiInstance->CreateComponentWithIdAndParent(coolId, GuiComponentStuff::ComponentType::TEXT, 1022);
-                        GuiComponentStuff::TextComponent* textComp = (GuiComponentStuff::TextComponent*)guiInstance->GetComponentFromId(coolId);
-                        _Free(textComp->text);
-                        textComp->text = StrCombine("Drive: ", partInfo->driveName);
-                        textComp->position.x = 0;
-                        textComp->position.y = _y;
-                        _y += 16;
-                    }
-                }
-            }
-        }
-
-        guiInstance->Render();
-        fileListComp->Render(GuiComponentStuff::Field(GuiComponentStuff::Position(), GuiComponentStuff::Position(fileListComp->size.FixedX, fileListComp->size.FixedY)));
-
-        if (drive != NULL)
-            _Free(drive);
-        if (dir != NULL)
-            _Free(dir);
-        RemoveFromStack();
     }
     
 
@@ -378,17 +210,73 @@ namespace SysApps
         _Free(t->game);
     }
 
+    void funkyPrint(char chr)
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            if (chr == '#')
+            {
+                lmaoRenderer->putChar(' ', 
+                lmaoRenderer->CursorPosition.x, 
+                lmaoRenderer->CursorPosition.y, 
+                Colors.black, Colors.red);
+                lmaoRenderer->CursorPosition.x += 8;
+            }
+            else if (chr == 'X') // @ O Z
+            {
+                lmaoRenderer->putChar(' ', 
+                lmaoRenderer->CursorPosition.x, 
+                lmaoRenderer->CursorPosition.y, 
+                Colors.black, Colors.blue);
+                lmaoRenderer->CursorPosition.x += 8;
+            }
+            else if (chr == '@') // @ O Z
+            {
+                lmaoRenderer->putChar(' ', 
+                lmaoRenderer->CursorPosition.x, 
+                lmaoRenderer->CursorPosition.y, 
+                Colors.black, Colors.green);
+                lmaoRenderer->CursorPosition.x += 8;
+            }
+            else if (chr == 'O') // @ O Z
+            {
+                lmaoRenderer->putChar(' ', 
+                lmaoRenderer->CursorPosition.x, 
+                lmaoRenderer->CursorPosition.y, 
+                Colors.black, Colors.yellow);
+                lmaoRenderer->CursorPosition.x += 8;
+            }
+            else if (chr == 'Z') // @ O Z
+            {
+                lmaoRenderer->putChar(' ', 
+                lmaoRenderer->CursorPosition.x, 
+                lmaoRenderer->CursorPosition.y, 
+                Colors.black, Colors.purple);
+                lmaoRenderer->CursorPosition.x += 8;
+            }
+            else if (chr == '&') // @ O Z
+            {
+                lmaoRenderer->putChar(' ', 
+                lmaoRenderer->CursorPosition.x, 
+                lmaoRenderer->CursorPosition.y, 
+                Colors.black, Colors.orange);
+                lmaoRenderer->CursorPosition.x += 8;
+            }
+            else 
+                lmaoRenderer->Print(chr);
+            }
+    }
+
     void
     tetris_print(struct tetris *t) {
         int x,y;
-        for (x=0; x<30; x++)
-            lmaoRenderer->Print("\n");
-        lmaoRenderer->Print("[LEVEL: %d", to_string(t->level));
-        lmaoRenderer->Print(" | SCORE: %d]\n", to_string(t->score));
+        lmaoRenderer->Clear(Colors.black);
+        lmaoRenderer->Print("[LEVEL: {}", to_string(t->level));
+        lmaoRenderer->Print(" | SCORE: {}]\n\r", to_string(t->score));
         //lmaoRenderer->Print
         for (x=0; x<2*t->w+2; x++)
             lmaoRenderer->Print("~");
-        lmaoRenderer->Print("\n");
+        lmaoRenderer->Print("\n\r");
         for (y=0; y<t->h; y++) {
             lmaoRenderer->Print ("!");
             for (x=0; x<t->w; x++) 
@@ -400,14 +288,13 @@ namespace SysApps
                     chr = t->current.data[y-t->y][x-t->x];
                 else
                     chr = t->game[x][y];
-                char lolTemp[] = {chr, ' ', 0};
-                lmaoRenderer->Print(lolTemp);
+                funkyPrint(chr);
             }
-            lmaoRenderer->Print ("!\n");
+            lmaoRenderer->Print ("!\n\r");
         }
         for (x=0; x<2*t->w+2; x++)
             lmaoRenderer->Print("~");
-        lmaoRenderer->Print("\n");
+        lmaoRenderer->Print("\n\r");
     }
 
     int
@@ -542,37 +429,41 @@ namespace SysApps
     }
     void tetris_run_loop()
     {
-        X_count++;
-        if (X_count%50 == 0) {
-            tetris_print(&X_t);
+        //tetris_print(&X_t);
+        //return;
+        if (X_count%1 == 0) 
+        {
+            if (KeyboardScancodeState[0x1E]) // A
+            {
+                X_t.x--;
+                if (tetris_hittest(&X_t))
+                    X_t.x++;
+            }
+            if (KeyboardScancodeState[0x20]) // D
+            {
+                X_t.x++;
+                if (tetris_hittest(&X_t))
+                    X_t.x--;
+            }
+            if (KeyboardScancodeState[0x11]) // W
+            {
+                tetris_rotate(&X_t);
+            }
+
+            if (KeyboardScancodeState[0x1F]) // S
+            {
+                tetris_gravity(&X_t);
+            }   
         }
-        if (X_count%350 == 0) {
+
+        X_count++;
+        tetris_print(&X_t);
+        if (X_count%4 == 0) {
             tetris_gravity(&X_t);
             tetris_check_lines(&X_t);
         }
-        if (KeyboardScancodeState[0x1E]) // A
-        {
-            X_t.x--;
-            if (tetris_hittest(&X_t))
-                X_t.x++;
-        }
-        if (KeyboardScancodeState[0x20]) // D
-        {
-            X_t.x++;
-            if (tetris_hittest(&X_t))
-                X_t.x--;
-        }
-        if (KeyboardScancodeState[0x11]) // W
-        {
-            tetris_rotate(&X_t);
-        }
-
-        if (KeyboardScancodeState[0x1F]) // S
-        {
-            tetris_gravity(&X_t);
-        }   
     }
-    void tetris_run_end(int width, int height)
+    void tetris_run_end()
     {
         tetris_print(&X_t);
         lmaoRenderer->Print("*** GAME OVER ***\n");

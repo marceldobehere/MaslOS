@@ -10,8 +10,11 @@ Window::Window(DefaultInstance* instance, Size size, Position position, const ch
     AddToStack();
     OnClose = NULL;
     OnResize = NULL;
+    OnPartRender = NULL;
     OnCloseHelp = NULL;
     OnResizeHelp = NULL;
+    OnPartRenderHelp = NULL;
+    RenderWhenHidden = false;
     this->instance = instance;
     this->position = position;
     this->size = size;
@@ -164,9 +167,21 @@ void Window::BlitBackbuffer()
     }
 }
 
+void Window::RenderStuff()
+{
+    AddToStack();
+    if (OnPartRender != NULL && (RenderWhenHidden || !hidden))
+    {
+        OnPartRender(OnPartRenderHelp, this);
+    }
+
+    RemoveFromStack();
+}
+
 void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size, Window* window)
 {
     AddToStack();
+
     uint32_t* pointerC = (uint32_t*)from->BaseAddress;
 
     int64_t x1, y1, x2, y2;

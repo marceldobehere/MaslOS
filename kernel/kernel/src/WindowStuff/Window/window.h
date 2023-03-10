@@ -104,6 +104,7 @@ class Window
     void Resize(Size _newSize);
     void RenderDeprecated();
     void Render(Framebuffer* from, Framebuffer* to, Position pos, Size size, Window* window);
+    
     void Free();
 
     void Log(const char* message);
@@ -117,6 +118,11 @@ class Window
 
     void* OnResizeHelp;
     void (*OnResize)(void* bruh, Window* window);
+
+    bool RenderWhenHidden = false;
+    void* OnPartRenderHelp;
+    void (*OnPartRender)(void* bruh, Window* window);
+    void RenderStuff();
 
     Position GetMousePosRelativeToWindow();
 

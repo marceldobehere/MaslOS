@@ -395,6 +395,15 @@ void RenderLoop()
         }
         RemoveFromStack();
 
+        AddToStack();
+        {
+            for (int i = 0; i < osData.windows.getCount(); i++)
+            {     
+                Window* window = osData.windows[i];
+                window->RenderStuff();
+            }
+        }
+        RemoveFromStack();
 
 
         {
