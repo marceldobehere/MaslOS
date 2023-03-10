@@ -53,6 +53,9 @@ namespace GuiComponentStuff
         void (*mouseClickedCallBack)(BaseComponent*, MouseClickEventInfo);
         void (*keyHitCallBack)(BaseComponent*, KeyHitEventInfo);
 
+        void* OnMouseClickHelp;
+        void (*OnMouseClickedCallBack)(void*, BaseComponent*, MouseClickEventInfo);
+
         ButtonComponent(const char* text, uint32_t textColDef, uint32_t textColHover, uint32_t textColClick, uint32_t bgColDef, uint32_t bgColHover, uint32_t bgColClick, ComponentSize size, Position position, BaseComponent* parent);
         void MouseClicked(MouseClickEventInfo info);
         void KeyHit(KeyHitEventInfo info);

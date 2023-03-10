@@ -5,6 +5,7 @@
 #include "../../fsStuff/fsStuff.h"
 #include "../../rnd/rnd.h"
 
+
 namespace SysApps
 {
     Explorer::Explorer()
@@ -172,16 +173,25 @@ namespace SysApps
             {
                 for (int i = 0; i < tempCount; i++)
                 {
-                    //GlobalRenderer->Println(" - Folder: \"{}\"", dataList[i], Colors.white);
+                    //GlobalRenderer->Println(" - File: \"{}\"", dataList[i], Colors.white);
                     uint64_t coolId = RND::lehmer64();
-                    guiInstance->CreateComponentWithIdAndParent(coolId, GuiComponentStuff::ComponentType::TEXT, 1022);
-                    GuiComponentStuff::TextComponent* textComp = (GuiComponentStuff::TextComponent*)guiInstance->GetComponentFromId(coolId);
+                    //guiInstance->CreateComponentWithIdAndParent(coolId, GuiComponentStuff::ComponentType::TEXT, 1022);
+                    guiInstance->CreateComponentWithIdAndParent(coolId, GuiComponentStuff::ComponentType::BUTTON, 1022);
+                    GuiComponentStuff::ButtonComponent* btnComp = (GuiComponentStuff::ButtonComponent*)guiInstance->GetComponentFromId(coolId);
+
+                    btnComp->OnMouseClickHelp = (void*)this;
+                    btnComp->OnMouseClickedCallBack = (void(*)(void*, GuiComponentStuff::BaseComponent*, GuiComponentStuff::MouseClickEventInfo))(void*)&OnFolderClick;
+
+                    GuiComponentStuff::TextComponent* textComp = btnComp->textComp;
                     _Free(textComp->text);
                     const char* tempo = StrSubstr(dataList[i], cutOff);
                     textComp->text = StrCombine("Folder: ", tempo);
+                    btnComp->size.FixedY = 16;
+                    btnComp->size.FixedX = StrLen(textComp->text) * 8;
+                    
                     _Free(tempo);
-                    textComp->position.x = 0;
-                    textComp->position.y = _y;
+                    btnComp->position.x = 0;
+                    btnComp->position.y = _y;
                     _y += 16;
                     _Free(dataList[i]);
                 }   
@@ -197,14 +207,23 @@ namespace SysApps
                 {
                     //GlobalRenderer->Println(" - File: \"{}\"", dataList[i], Colors.white);
                     uint64_t coolId = RND::lehmer64();
-                    guiInstance->CreateComponentWithIdAndParent(coolId, GuiComponentStuff::ComponentType::TEXT, 1022);
-                    GuiComponentStuff::TextComponent* textComp = (GuiComponentStuff::TextComponent*)guiInstance->GetComponentFromId(coolId);
+                    //guiInstance->CreateComponentWithIdAndParent(coolId, GuiComponentStuff::ComponentType::TEXT, 1022);
+                    guiInstance->CreateComponentWithIdAndParent(coolId, GuiComponentStuff::ComponentType::BUTTON, 1022);
+                    GuiComponentStuff::ButtonComponent* btnComp = (GuiComponentStuff::ButtonComponent*)guiInstance->GetComponentFromId(coolId);
+
+                    btnComp->OnMouseClickHelp = (void*)this;
+                    btnComp->OnMouseClickedCallBack = (void(*)(void*, GuiComponentStuff::BaseComponent*, GuiComponentStuff::MouseClickEventInfo))(void*)&OnFileClick;
+
+                    GuiComponentStuff::TextComponent* textComp = btnComp->textComp;
                     _Free(textComp->text);
                     const char* tempo = StrSubstr(dataList[i], cutOff);
                     textComp->text = StrCombine("File: ", tempo);
+                    btnComp->size.FixedY = 16;
+                    btnComp->size.FixedX = StrLen(textComp->text) * 8;
+                    
                     _Free(tempo);
-                    textComp->position.x = 0;
-                    textComp->position.y = _y;
+                    btnComp->position.x = 0;
+                    btnComp->position.y = _y;
                     _y += 16;
                     _Free(dataList[i]);
                 }
@@ -252,4 +271,20 @@ namespace SysApps
         RemoveFromStack();
     }
     
+    void Explorer::OnFolderClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
+    {
+        const char* temp2 = StrCombine(path, "maab");
+        _Free(path);
+        path = StrCombine(temp2, "/");
+        _Free(temp2);
+
+        _Free(pathComp->textComp->text);
+        pathComp->textComp->text = StrCopy(path);
+        Reload();
+    }
+    void Explorer::OnFileClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
+    {
+        window->renderer->Clear(Colors.blue);
+    }
+
 }

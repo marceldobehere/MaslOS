@@ -3,6 +3,7 @@
 #include "../../WindowStuff/SubInstances/guiInstance/guiInstance.h"
 #include "../../WindowStuff/SubInstances/guiInstance/guiStuff/components/box/boxComponent.h"
 #include "../../WindowStuff/SubInstances/guiInstance/guiStuff/components/textField/textFieldComponent.h"
+#include "../../WindowStuff/SubInstances/guiInstance/guiStuff/components/button/buttonComponent.h"
 
 namespace SysApps
 {
@@ -14,6 +15,8 @@ namespace SysApps
         GuiComponentStuff::BaseComponent* lastClickedComp;
         GuiComponentStuff::BoxComponent* fileListComp;
         GuiComponentStuff::TextFieldComponent* pathComp;
+        List<void*> compsYes;
+        List<const char*> pathsYes;
         
         const char* path;
         int ScrollY;
@@ -31,6 +34,10 @@ namespace SysApps
 
         void OnExternalWindowClose(Window* window);
         void OnExternalWindowResize(Window* window);
+
+        void OnFolderClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info);
+        void OnFileClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info);
+
         void Free();
     };
 
