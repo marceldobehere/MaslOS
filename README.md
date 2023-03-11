@@ -12,7 +12,7 @@ Here are the [Terminal Commands](https://github.com/marceldobehere/MaslOS/wiki/T
 
 ## Features
 * Display
-  - VGA Output with GOP
+  - VGA Output
 * Desktop
   - Background Image
   - Taskbar
