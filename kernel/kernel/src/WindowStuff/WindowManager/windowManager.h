@@ -113,7 +113,7 @@ namespace WindowManager
         //inline uint64_t RenderActualSquare(int _x1, int _y1, int _x2, int _y2);
         void RenderWindowRect(Window *window, int x1, int y1, int x2, int y2);
         void RenderWindows();
-        void Clear();
+        void Clear(bool resetGlobal);
         void Render();
         void UpdateWindowBorder(Window *window);
     

@@ -20,6 +20,8 @@ void PrepareACPI(BootInfo* bootInfo)
 {
     AddToStack();
 
+    
+
     AddToStack();
     osData.debugTerminalWindow->Log("Preparing ACPI...");
     osData.debugTerminalWindow->Log("RSDP Addr: {}", ConvertHexToString((uint64_t)bootInfo->rsdp));
@@ -43,10 +45,11 @@ void PrepareACPI(BootInfo* bootInfo)
         }
         else
         {
-            GlobalRenderer->Clear(Colors.black);
-            GlobalRenderer->Println("Testing ACPI Loader...");
+            //GlobalRenderer->Clear(Colors.black);
+            PrintMsg("> Testing ACPI Loader...");
 
             InitAcpiShutdownThing(rootThing);
+            //while (true);
         }
     }
     else
@@ -61,6 +64,7 @@ void PrepareACPI(BootInfo* bootInfo)
             Panic("XSDT Header is at NULL!", true);
         }
     }
+    
 
     RemoveFromStack();
 
@@ -148,8 +152,9 @@ static inline uint64_t earlyVirtualToPhysicalAddr(const void* vAddr)
 void PrepareMemory(BootInfo* bootInfo)
 {
     GlobalAllocator = &t;
+    PrintMsgStartLayer("EFI Memory Map");
     GlobalAllocator->ReadEFIMemoryMap(bootInfo->mMapStart, bootInfo->mMapSize); 
-    
+    PrintMsgEndLayer("EFI Memory Map");
 
     
 
@@ -163,29 +168,31 @@ void PrepareMemory(BootInfo* bootInfo)
     PageTable* PML4 = (PageTable*)GlobalAllocator->RequestPage();
     //GlobalPageTableManager.MapMemory(PML4, PML4);
     _memset(PML4, 0, 0x1000);
-    GlobalRenderer->Println("PML4 ADDR:          {}", ConvertHexToString((uint64_t)PML4), Colors.yellow);
+    PrintMsg("> Getting PML4 Stuff");
+    //GlobalRenderer->Println("PML4 ADDR:          {}", ConvertHexToString((uint64_t)PML4), Colors.yellow);
     asm volatile("mov %%cr3, %0" : "=r"(PML4));
     // asm("mov %0, %%cr3" : : "r" (PML4) );
-
-    GlobalRenderer->Println("PML4 ADDR:          {}", ConvertHexToString((uint64_t)PML4), Colors.yellow);
-    GlobalRenderer->Println("FB 1 ADDR:          {}", ConvertHexToString(rFB), Colors.yellow);
-    GlobalRenderer->Println("FB 2 ADDR:          {}", ConvertHexToString((uint64_t)GlobalRenderer->framebuffer->BaseAddress), Colors.yellow);
-    GlobalRenderer->Println("MMAP ADDR:          {}", ConvertHexToString((uint64_t)bootInfo->mMapStart), Colors.yellow);
-    GlobalRenderer->Println("KERNEL ADDR:        {}", ConvertHexToString((uint64_t)bootInfo->kernelStart), Colors.yellow);
-    GlobalRenderer->Println("KERNEL V ADDR:      {}", ConvertHexToString((uint64_t)bootInfo->kernelStartV), Colors.yellow);
+    PrintMsgStartLayer("Info");
+    PrintMsgCol("PML4 ADDR:          {}", ConvertHexToString((uint64_t)PML4), Colors.yellow);
+    PrintMsgCol("FB 1 ADDR:          {}", ConvertHexToString(rFB), Colors.yellow);
+    PrintMsgCol("FB 2 ADDR:          {}", ConvertHexToString((uint64_t)GlobalRenderer->framebuffer->BaseAddress), Colors.yellow);
+    PrintMsgCol("FB 3 ADDR:          {}", ConvertHexToString((uint64_t)bootInfo->framebuffer->BaseAddress), Colors.yellow);
+    PrintMsgCol("MMAP ADDR:          {}", ConvertHexToString((uint64_t)bootInfo->mMapStart), Colors.yellow);
+    PrintMsgCol("KERNEL ADDR:        {}", ConvertHexToString((uint64_t)bootInfo->kernelStart), Colors.yellow);
+    PrintMsgCol("KERNEL V ADDR:      {}", ConvertHexToString((uint64_t)bootInfo->kernelStartV), Colors.yellow);
     GlobalPageTableManager = PageTableManager(PML4);
+    PrintMsgEndLayer("Info");
 
-
-
+    
     uint64_t fbBase = (uint64_t)bootInfo->framebuffer->BaseAddress;
     uint64_t fbSize = (uint64_t)bootInfo->framebuffer->BufferSize;
     //GlobalAllocator->LockPages((void*)earlyVirtualToPhysicalAddr((void*)fbBase), fbSize / 0x1000);
 
-
+    PrintMsg("> Mapping Framebuffer Memory");
     if (true)
     {
-        for (uint64_t i = fbBase; i < fbBase + fbSize; i+=4096)
-            GlobalPageTableManager.MapFramebufferMemory((void*)i, (void*)i);
+        //for (uint64_t i = fbBase; i < fbBase + fbSize; i+=4096)
+        //    GlobalPageTableManager.MapFramebufferMemory((void*)i, (void*)i);
     }
     else
     {
@@ -206,7 +213,7 @@ void PrepareMemory(BootInfo* bootInfo)
         GlobalRenderer->Clear(Colors.black);
     }
 
-
+    
 
     // while (true)
     //     ;
@@ -265,6 +272,7 @@ void PrepareMemory(BootInfo* bootInfo)
 
     //while(true);
 
+    PrintMsg("> Setting Page Table Manager");
     kernelInfo.pageTableManager = &GlobalPageTableManager;
 
     //while(true);
@@ -662,6 +670,10 @@ void InitStartMenuWindow(BootInfo* bootInfo)
 #include "../Disk_Stuff/Filesystem_Interfaces/mrafs/mrafsFileSystemInterface.h"
 
 BasicRenderer r = *((BasicRenderer*)NULL);
+
+
+
+
 KernelInfo InitializeKernel(BootInfo* bootInfo)
 {
     AddToStack();
@@ -671,7 +683,26 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     r = BasicRenderer(bootInfo->framebuffer, bootInfo->psf1_font);
     GlobalRenderer = &r;
 
-    
+
+    PrintMsg("> Initializing Kernel");
+    Println();
+    PrintMsgStartLayer("BOOT");
+    // PrintMsg("Test 1");
+    // PrintMsgStartLayer("TEST");
+    // PrintMsg("Test 2");
+
+    // PrintMsgStartLayer("TEST2");
+    // PrintMsg("Test 3");
+    // PrintMsg("Test 4");
+    // PrintMsgColSL("Test 5", Colors.red);
+    // PrintMsgCol(" :)", Colors.green);
+    // PrintMsgEndLayer("TEST2");
+
+    // PrintMsg("Test 5");
+
+    // PrintMsgEndLayer("TEST");
+    // PrintMsg("Test 6");
+
 
     //GlobalRenderer->Clear(Colors.green);
 
@@ -681,68 +712,79 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     AddToStack();
 
+    PrintMsg("> Preparing GDT");
     GDTDescriptor gdtDescriptor;
     gdtDescriptor.Size = sizeof(GDT) - 1;
     gdtDescriptor.Offset = (uint64_t)&DefaultGDT;
     LoadGDT(&gdtDescriptor);
 
+
     RemoveFromStack();
 
     
 
+    //while (true);
+
     AddToStack();
-
+    PrintMsgStartLayer("Prepare Memory");
     PrepareMemory(bootInfo);
-
+    PrintMsgEndLayer("Prepare Memory");
     RemoveFromStack();
     
     //while(true);
     
-
+    PrintMsg("> Initializing Heap");
     InitializeHeap((void*)0x0000100000000000, 0x10);
 
-    GlobalRenderer->Println("BG IMG: {}", to_string((uint64_t)bootInfo->bgImage), Colors.orange);
+    //GlobalRenderer->Println("BG IMG: {}", to_string((uint64_t)bootInfo->bgImage), Colors.orange);
 
 
+    
 
     //uint8_t* bleh = (uint8_t*) malloc(sizeof(Framebuffer), "Converting Image to Framebuffer");;
 
     //*bleh = 5;
 
-    //while(true);
+    
 
+    PrintMsg("> Getting Background Image");
     Framebuffer* bgImg = kernelFiles::ConvertImageToFramebuffer(bootInfo->bgImage);
 
     
     
-    //while(true);
-
+    PrintMsg("> Preparing Windows (1/2)");
     PrepareWindowsTemp(bgImg);
 
-    //while(true);
     
 
-    
-    
+    PrintMsg("> Initing RTC");
     RTC::InitRTC();
+    PrintMsg("> Reading RTC");
     RTC::read_rtc();
-    RTC::UpdateTimeIfNeeded();
-    GlobalRenderer->Println("\nTIME:", Colors.yellow);
-    GlobalRenderer->Print("{}:", to_string((int)RTC::Hour), Colors.yellow);
-    GlobalRenderer->Print("{}:", to_string((int)RTC::Minute), Colors.yellow);
-    GlobalRenderer->Println("{}", to_string((int)RTC::Second), Colors.yellow);
-    
-    GlobalRenderer->Println("DATE:", Colors.yellow);
-    GlobalRenderer->Print("{}.", to_string((int)RTC::Day), Colors.yellow);
-    GlobalRenderer->Print("{}.", to_string((int)RTC::Month), Colors.yellow);
-    GlobalRenderer->Println("{}", to_string((int)RTC::Year), Colors.yellow);
 
+    PrintMsg("> Updating RTC Time");
+    RTC::UpdateTimeIfNeeded();
+
+    PrintMsgStartLayer("RTC Info");
+    PrintMsgColSL("TIME: ", Colors.yellow);
+    PrintMsgColSL("{}:", to_string((int)RTC::Hour), Colors.yellow);
+    PrintMsgColSL("{}:", to_string((int)RTC::Minute), Colors.yellow);
+    PrintMsgCol("{}", to_string((int)RTC::Second), Colors.yellow);
+    
+    PrintMsgColSL("DATE: ", Colors.yellow);
+    PrintMsgColSL("{}.", to_string((int)RTC::Day), Colors.yellow);
+    PrintMsgColSL("{}.", to_string((int)RTC::Month), Colors.yellow);
+    PrintMsgCol("{}", to_string((int)RTC::Year), Colors.yellow);
+    PrintMsgEndLayer("RTC Info");
+
+    PrintMsg("> Initing PIT");
     PIT::InitPIT();
+    
 
     #define STAT 0x64
     #define CMD 0x60
     
-
+    PrintMsg("> Clearing Input Buffer (1/2)");
     {
         // Clear the input buffer.
         size_t timeout = 1024;
@@ -751,23 +793,22 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
             inb(CMD);
         }
     }
-
     
+    PrintMsg("> Initing PS/2 Mouse");
     InitPS2Mouse(bootInfo->mouseZIP, "default.mbif");
     //mouseImage = kernelFiles::ConvertFileToImage(kernelFiles::ZIP::GetFileFromFileName(bootInfo->mouseZIP, "default.mbif"));
 
+    PrintMsg("> Initing Keyboard State List");
     InitKeyboardListRam();
 
+    PrintMsg("> Initing PS/2 Keyboard");
     InitKeyboard();
     
-
-
-
+    PrintMsg("> Preparing Interrupts");
     PrepareInterrupts();
 
 
-
-
+    PrintMsg("> Clearing Input Buffer (2/2)");
     {
         // Clear the input buffer.
         size_t timeout = 1024;
@@ -777,9 +818,11 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
         }
     }
     
-
+    PrintMsg("> Initing Users");
     initUsers();
 
+
+    PrintMsg("> Creating List for Disk Interfaces");
     osData.diskInterfaces = List<DiskInterface::GenericDiskInterface*>();
 
     osData.windowIconZIP = bootInfo->windowIconsZIP;
@@ -789,11 +832,12 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     //GlobalRenderer->Println("                                     COUNT OF WINDOW ICONS: {}", to_string(WindowManager::countOfWindowIcons), Colors.yellow);
 
 
+    PrintMsg("> Loading Window Icons");
     for (int i = 0; i < WindowManager::countOfWindowIcons; i++)
         WindowManager::internalWindowIcons[i] = kernelFiles::ConvertFileToImage(kernelFiles::ZIP::GetFileFromFileName(osData.windowIconZIP, WindowManager::windowIconNames[i]));
     
 
-
+    PrintMsg("> Loading Window Button Icons");
     for (int i = 0; i < WindowManager::countOfButtonIcons; i++)
     {
         //osData.debugTerminalWindow->Log("Loading Window {}.", to_string(i), Colors.yellow);
@@ -805,28 +849,35 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     }
     
 
-
+    PrintMsg("> Preparing Windows (2/2)");
     PrepareWindows(bgImg);
-
-
+    PrintDebugTerminal();
     
+    PrintMsg("> Initing Taskbar");
     Taskbar::InitTaskbar(bootInfo->MButton, bootInfo->MButtonS);
 
     //bootInfo->rsdp = (ACPI::RSDP2*)((uint64_t)bootInfo->rsdp + 20); //idk why but this is very important unless ya want the whole os to crash on boot
 
+    PrintMsg("> Initing Start Menu");
     InitStartMenuWindow(bootInfo);
 
     //while (true);
-
+    PrintMsg("> Prepare ACPI");
+    PrintMsgStartLayer("ACPI");
     PrepareACPI(bootInfo);
+    PrintMsgEndLayer("ACPI");
+    PrintDebugTerminal();
 
-
+    
 
     // for (int i = 0; i < 20; i++)
     //     GlobalRenderer->Clear(Colors.red);
 
+    PrintMsg("> Enabling FPU");
     enable_fpu();
-
+    
+    PrintMsg("> Creating OS Ram Disk");
+    PrintMsgStartLayer("OS RAM DISK");
     AddToStack();
     {
 
@@ -860,8 +911,8 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
         for (int i = 0; i < bootInfo->maabZIP->fileCount; i++)
         {
-            GlobalRenderer->Print("> FILE: \"{}\"", bootInfo->maabZIP->files[i].filename, Colors.orange);
-            GlobalRenderer->Println(" ({} bytes)", to_string(bootInfo->maabZIP->files[i].size), Colors.bblue);
+            PrintMsgColSL("FILE: \"{}\"", bootInfo->maabZIP->files[i].filename, Colors.yellow);
+            PrintMsgCol(" ({} bytes)", to_string(bootInfo->maabZIP->files[i].size), Colors.bgreen);
             fsInterface->CreateFile(bootInfo->maabZIP->files[i].filename, bootInfo->maabZIP->files[i].size);
             fsInterface->WriteFile(bootInfo->maabZIP->files[i].filename, bootInfo->maabZIP->files[i].size, bootInfo->maabZIP->files[i].fileData);
         }
@@ -871,8 +922,11 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     }
     RemoveFromStack();
+    PrintMsgEndLayer("OS RAM DISK");
 
+    PrintMsgEndLayer("BOOT");
 
+    PrintMsgCol("> Inited Kernel!", Colors.bgreen);
     RemoveFromStack();
     return kernelInfo;
 }

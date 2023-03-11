@@ -291,21 +291,24 @@ int acpiEnable(void)
 //
 int InitAcpiShutdownThing(void *RSDT)
 {
-    GlobalRenderer->Println("RSDT: {}", ConvertHexToString((uint64_t)RSDT));
+    PrintMsgStartLayer("Info");
+    PrintMsgCol("RSDT: {}", ConvertHexToString((uint64_t)RSDT), Colors.yellow);
     unsigned int *ptr = (unsigned int *)RSDT; // acpiGetRSDPtr();
 
     if (RSDT == NULL)
     {
-        GlobalRenderer->Println("RSDT IS NULL!", Colors.bred);
+        PrintMsgCol("RSDT IS NULL!", Colors.bred);
+        PrintMsgEndLayer("Info");
         return -1;
     }
 
     FADT* FACP = (FADT*)ACPI::FindTable((ACPI::SDTHeader*)RSDT, "FACP", 4);
-    GlobalRenderer->Println("FACP: {}", ConvertHexToString((uint64_t)FACP));
+    PrintMsgCol("FACP: {}", ConvertHexToString((uint64_t)FACP), Colors.yellow);
 
     if (FACP == NULL)
     {
-        GlobalRenderer->Println("FACP IS NULL!", Colors.bred);
+        PrintMsgCol("FACP IS NULL!", Colors.bred);
+        PrintMsgEndLayer("Info");
         return -1;
     }
 
@@ -314,7 +317,7 @@ int InitAcpiShutdownThing(void *RSDT)
     //FACP->X_Dsdt
 
     {
-        GlobalRenderer->Println("DSDT: {}", ConvertHexToString((uint64_t)FACP->Dsdt));
+        PrintMsgCol("DSDT: {}", ConvertHexToString((uint64_t)FACP->Dsdt), Colors.yellow);
 
         // search the \_S5 package in the DSDT
         char *S5Addr = (char *)FACP->Dsdt + 36; // skip header
@@ -358,18 +361,20 @@ int InitAcpiShutdownThing(void *RSDT)
 
                 SLP_EN = 1 << 13;
                 SCI_EN = 1;
-
-                GlobalRenderer->Println("Init Complete!", Colors.bgreen);
+                PrintMsgEndLayer("Info");
+                PrintMsgCol("> Init Complete!", Colors.bgreen);
                 return 0;
             }
             else
             {
-                GlobalRenderer->Println("\\_S5 parse error.\n", Colors.bred);
+                PrintMsgEndLayer("Info");
+                PrintMsgCol("> S5 parse error.\n", Colors.bred);
             }
         }
         else
         {
-            GlobalRenderer->Println("\\_S5 not present.\n", Colors.bred);
+            PrintMsgEndLayer("Info");
+            PrintMsgCol("> S5 not present.\n", Colors.bred);
         }
     }
 

@@ -108,7 +108,7 @@ void TestKeyHandler(GuiComponentStuff::BaseComponent* btn, GuiComponentStuff::Ke
 
 void RenderLoop()
 {
-    osData.windowPointerThing->Clear();
+    osData.windowPointerThing->Clear(true);
     osData.windowPointerThing->RenderWindows();
     bool updateBorder = true;
     bool bgm = osData.drawBackground;
@@ -770,7 +770,7 @@ void boot(BootInfo* bootInfo)
     osData.drawBackground = true;
     keyboardWeird = false;
     
-    
+    //while(true);
     GlobalRenderer->Clear(Colors.black);
 
     {

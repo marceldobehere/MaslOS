@@ -139,6 +139,12 @@ void Window::Free()
         OnClose(OnCloseHelp, this);
     RemoveFromStack();
 
+    AddToStack();
+    if (instance != NULL)
+        instance->DefaultFree();
+    RemoveFromStack();
+
+
     _Free(framebuffer->BaseAddress);
     _Free(framebuffer);
     _Free(backbuffer->BaseAddress);
@@ -146,12 +152,7 @@ void Window::Free()
     _Free(renderer);
     _Free(brenderer);
 
-    AddToStack();
-    if (instance != NULL)
-    {
-        instance->DefaultFree();
-    }
-    RemoveFromStack();
+
     RemoveFromStack();
 }
 
@@ -208,38 +209,23 @@ void Window::Render(Framebuffer* from, Framebuffer* to, Position pos, Size size,
             *(uint32_t*)((uint64_t)to->BaseAddress + 4 * ((x + pos.x) + (y + pos.y) * to->PixelsPerScanLine)) = 
             *(uint32_t*)((uint64_t)from->BaseAddress + 4 * (x + y * from->PixelsPerScanLine));
 
-    RemoveFromStack();
-    return;
+    //RemoveFromStack();
+    //return;
 
 
     uint64_t toBaseAddr = (uint64_t)to->BaseAddress;
 
     if (window != NULL)
     {
-        if (false)
+        if (true)
         {
             int64_t x = pos.x;
             int64_t y = pos.y- 21;
-            window->parentRenderer->Clear(x,y,pos.x + size.width-1, pos.y-2, Colors.dgray);
+            GlobalRenderer->Clear(x,y,pos.x + size.width-1, pos.y-2, Colors.dgray);
 
             const char* stitle = title;//StrSubstr(title, 0, size.width / 10);
 
-
-            // if (window->instance != NULL)
-            // {
-            //     if (window->instance->instanceType == InstanceType::Terminal)
-            //     {
-            //         TerminalInstance* terminal = (TerminalInstance*)window->instance;
-            //         free((void*)stitle);
-            //         stitle = StrCopy(to_string(terminal->tasks.getCount()));
-            //     }
-            // }
-
-            if (activeWindow == this)
-                window->parentRenderer->putStr(stitle, x, y, Colors.white);
-            else
-                window->parentRenderer->putStr(stitle, x, y, Colors.bgray);
-            //free((void*)stitle);
+            GlobalRenderer->putStr(stitle, x, y, Colors.white);
         }
         
 

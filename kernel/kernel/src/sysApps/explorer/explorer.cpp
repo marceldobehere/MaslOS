@@ -124,6 +124,7 @@ namespace SysApps
 
     void Explorer::Free()
     {
+        AddToStack();
         _Free(path);
         
         //ClearLists();
@@ -131,6 +132,7 @@ namespace SysApps
         pathsYes.free();
 
         _Free(this);
+        RemoveFromStack();
     }
 
     void Explorer::ClearLists()
@@ -319,7 +321,7 @@ namespace SysApps
     }
     void Explorer::OnFileClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
     {
-        window->renderer->Clear(Colors.blue);
+        //window->renderer->Clear(Colors.blue);
     }
 
     void Explorer::OnDriveClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)

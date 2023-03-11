@@ -154,11 +154,12 @@ void PageFrameAllocator::ReadEFIMemoryMap(void* start, uint64_t size)
     usedMemory = 0;
     uint64_t bitmapSize =  (memorySize / 4096 / 8) + 1;
 
+    PrintMsgStartLayer("Info");
+    PrintMsgCol("Largest Mem Size: {} Bytes.", to_string(largestFreeMemSegSize), Colors.yellow);
+    PrintMsgCol("Bitmap Size:      {} Bytes.", to_string(bitmapSize + sizeof(Bitmap)), Colors.yellow);
+    PrintMsgEndLayer("Info");
 
-    GlobalRenderer->Println("Largest Mem Size: {} Bytes.", to_string(largestFreeMemSegSize), Colors.yellow);
-    GlobalRenderer->Println("Bitmap Size:      {} Bytes.", to_string(bitmapSize + sizeof(Bitmap)), Colors.yellow);
-
-
+    PrintMsg("> Initing Bitmap");
     InitBitmap(bitmapSize, largestFreeMemSeg);
 
 
@@ -166,13 +167,14 @@ void PageFrameAllocator::ReadEFIMemoryMap(void* start, uint64_t size)
 
     LockPages(PageBitMap.Buffer, bitmapSize / 4096 + 1);
 
-
-    GlobalRenderer->Println("Bitmap ADDR:      {}", ConvertHexToString((uint64_t)PageBitMap.Buffer), Colors.yellow);
+    PrintMsgStartLayer("Info");
+    PrintMsgCol("Bitmap ADDR:      {}", ConvertHexToString((uint64_t)PageBitMap.Buffer), Colors.yellow);
     //reservedMemory = data;
-    GlobalRenderer->Println("> FREE MEM: {}", to_string(freeMemory), Colors.yellow);
-    GlobalRenderer->Println("> USED MEM: {}", to_string(usedMemory), Colors.yellow);
-    GlobalRenderer->Println("> RES MEM:  {}", to_string(reservedMemory), Colors.yellow);
-    GlobalRenderer->Println();
+    PrintMsgCol("FREE MEM: {}", to_string(freeMemory), Colors.yellow);
+    PrintMsgCol("USED MEM: {}", to_string(usedMemory), Colors.yellow);
+    PrintMsgCol("RES MEM:  {}", to_string(reservedMemory), Colors.yellow);
+    //GlobalRenderer->Println();
+    PrintMsgEndLayer("Info");
 
     //while(true);
 }

@@ -112,7 +112,7 @@ namespace WindowManager
 
         currentActionWindow = NULL;
 
-        Clear();
+        Clear(false);
 
     }
 
@@ -132,9 +132,10 @@ namespace WindowManager
             *pixel = col;
     }
 
-    void WindowPointerBufferThing::Clear()
+    void WindowPointerBufferThing::Clear(bool resetGlobal)
     {
-        ClearFrameBuffer(actualScreenBuffer, defaultBackgroundColor);
+        if (resetGlobal)
+            ClearFrameBuffer(actualScreenBuffer, defaultBackgroundColor);
         ClearFrameBuffer(copyOfScreenBuffer, defaultBackgroundColor);
         ClearFrameBuffer(taskbar, Colors.dgray);
 

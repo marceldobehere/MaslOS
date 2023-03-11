@@ -7,6 +7,7 @@
 #include <stdint.h> 
 #include "dispTypes/dispTypes.h"
 #include "../kernelStuff/kernelFiles/ImageStruct.h"
+#include "testoDebug.h"
 
 class BasicRenderer
 {
