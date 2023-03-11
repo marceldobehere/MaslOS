@@ -5,7 +5,7 @@
 #include "../cmdParsing/cstrTools.h"
 #include "../memory/heap.h"
 
-
+bool PrintAll = true;
 int PrintLayer = 0;
 bool PrintedSpace = false;
 
@@ -37,6 +37,8 @@ void ScrollUp(int amt)
 
 void PrintMsgColSL(const char* msg, const char* var, uint32_t col)
 {
+    if (!PrintAll)
+        return;
     if (!PrintedSpace)
         PrintSpaces();
 
@@ -111,6 +113,9 @@ void PrintMsgColSL(const char* msg, uint32_t col)
 
 void PrintDebugTerminal()
 {
+    if (!PrintAll)
+        return;
+
     osData.debugTerminalWindow->position.x = GlobalRenderer->framebuffer->Width - 500;
     osData.debugTerminalWindow->position.y = 23;
     osData.debugTerminalWindow->parentFrameBuffer = GlobalRenderer->framebuffer;

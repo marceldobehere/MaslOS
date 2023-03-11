@@ -754,6 +754,8 @@ void boot(BootInfo* bootInfo)
     //
     //while(true);
     osData.booting = true;
+
+    PrintAll = true;
     KernelInfo kernelInfo = InitializeKernel(bootInfo);
     PageTableManager* pageTableManager = kernelInfo.pageTableManager;
     //AddToStack();
@@ -770,6 +772,7 @@ void boot(BootInfo* bootInfo)
     osData.drawBackground = true;
     keyboardWeird = false;
     
+
     //while(true);
     GlobalRenderer->Clear(Colors.black);
 

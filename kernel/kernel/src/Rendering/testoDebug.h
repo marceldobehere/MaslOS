@@ -1,6 +1,8 @@
 #pragma once
 #include "stdint.h"
 
+extern bool PrintAll;
+
 void PrintSpaces();
 void PrintMsgColSL(const char* msg, const char* var, uint32_t col);
 void Println();
