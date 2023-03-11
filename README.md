@@ -4,8 +4,11 @@ The base was made following [Ponchos OS Dev Youtube Playlist](https://www.youtub
 The OS is now using [limine](https://github.com/limine-bootloader/limine) as the bootloader.
 
 Here's the [Hackaday Page](https://hackaday.io/project/189063-maslos) for MaslOS.
+Here's the [MaslOS Subreddit](https://www.reddit.com/r/maslos/).
 
+Here is the [Wiki](https://github.com/marceldobehere/MaslOS/wiki).
 Here are the [Terminal Commands](https://github.com/marceldobehere/MaslOS/wiki/Terminal).
+
 
 ## Features
 * Display
