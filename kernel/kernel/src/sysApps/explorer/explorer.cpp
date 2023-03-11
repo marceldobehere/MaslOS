@@ -114,13 +114,29 @@ namespace SysApps
     void Explorer::Free()
     {
         _Free(path);
+        
+        //ClearLists();
+        compsYes.free();
+        pathsYes.free();
+
         _Free(this);
+    }
+
+    void Explorer::ClearLists()
+    {
+        for (int i = 0; i < pathsYes.getCount(); i++)
+            _Free((void*)pathsYes.elementAt(i)); 
+        
+        compsYes.clear();
+        pathsYes.clear();
     }
 
     void Explorer::Reload()
     {
         AddToStack();
         UpdateSizes();
+
+        ClearLists();
 
         const char* drive = FS_STUFF::GetDriveNameFromFullPath(path);
         const char* dir = FS_STUFF::GetFolderPathFromFullPath(path);
@@ -189,7 +205,10 @@ namespace SysApps
                     btnComp->size.FixedY = 16;
                     btnComp->size.FixedX = StrLen(textComp->text) * 8;
                     
-                    _Free(tempo);
+                    compsYes.add(btnComp);
+                    pathsYes.add(tempo);
+
+                    //_Free(tempo);
                     btnComp->position.x = 0;
                     btnComp->position.y = _y;
                     _y += 16;
@@ -273,7 +292,12 @@ namespace SysApps
     
     void Explorer::OnFolderClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
     {
-        const char* temp2 = StrCombine(path, "maab");
+        int indx = compsYes.getIndexOf(btn);
+        if (indx == -1)
+            return;
+        const char* pathThing = pathsYes[indx];
+
+        const char* temp2 = StrCombine(path, pathThing);
         _Free(path);
         path = StrCombine(temp2, "/");
         _Free(temp2);
