@@ -16,8 +16,10 @@ namespace SysApps
         GuiComponentStuff::BoxComponent* fileListComp;
         GuiComponentStuff::TextFieldComponent* pathComp;
         GuiComponentStuff::ButtonComponent* goUpBtn;
-        List<void*> compsYes = List<void*>(4);
-        List<const char*> pathsYes = List<const char*>(4);
+        List<void*> folderCompsYes = List<void*>(4);
+        List<const char*> folderPathsYes = List<const char*>(4);
+        List<void*> driveCompsYes = List<void*>(4);
+        List<const char*> drivePathsYes = List<const char*>(4);
         
         const char* path;
         int ScrollY;

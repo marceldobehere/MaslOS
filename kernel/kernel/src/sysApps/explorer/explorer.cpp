@@ -128,8 +128,10 @@ namespace SysApps
         _Free(path);
         
         //ClearLists();
-        compsYes.free();
-        pathsYes.free();
+        folderCompsYes.free();
+        folderPathsYes.free();
+        driveCompsYes.free();
+        drivePathsYes.free();
 
         _Free(this);
         RemoveFromStack();
@@ -137,11 +139,15 @@ namespace SysApps
 
     void Explorer::ClearLists()
     {
-        for (int i = 0; i < pathsYes.getCount(); i++)
-            _Free((void*)pathsYes.elementAt(i)); 
-        
-        compsYes.clear();
-        pathsYes.clear();
+        for (int i = 0; i < folderPathsYes.getCount(); i++)
+            _Free((void*)folderPathsYes.elementAt(i)); 
+        for (int i = 0; i < drivePathsYes.getCount(); i++)
+            _Free((void*)drivePathsYes.elementAt(i)); 
+
+        folderCompsYes.clear();
+        folderPathsYes.clear();
+        driveCompsYes.clear();
+        drivePathsYes.clear();
     }
 
     void Explorer::Reload()
@@ -218,8 +224,8 @@ namespace SysApps
                     btnComp->size.FixedY = 16;
                     btnComp->size.FixedX = StrLen(textComp->text) * 8;
                     
-                    compsYes.add(btnComp);
-                    pathsYes.add(tempo);
+                    folderCompsYes.add(btnComp);
+                    folderPathsYes.add(tempo);
 
                     //_Free(tempo);
                     btnComp->position.x = 0;
@@ -281,12 +287,31 @@ namespace SysApps
                     {
                         //Println(window, " - Drive: \"{}\"", partInfo->driveName, Colors.bgreen);
                         uint64_t coolId = RND::lehmer64();
-                        guiInstance->CreateComponentWithIdAndParent(coolId, GuiComponentStuff::ComponentType::TEXT, 1022);
-                        GuiComponentStuff::TextComponent* textComp = (GuiComponentStuff::TextComponent*)guiInstance->GetComponentFromId(coolId);
+
+                        guiInstance->CreateComponentWithIdAndParent(coolId, GuiComponentStuff::ComponentType::BUTTON, 1022);
+                        GuiComponentStuff::ButtonComponent* btnComp = (GuiComponentStuff::ButtonComponent*)guiInstance->GetComponentFromId(coolId);
+
+                        btnComp->OnMouseClickHelp = (void*)this;
+                        btnComp->OnMouseClickedCallBack = (void(*)(void*, GuiComponentStuff::BaseComponent*, GuiComponentStuff::MouseClickEventInfo))(void*)&OnDriveClick;
+
+                        GuiComponentStuff::TextComponent* textComp = btnComp->textComp;
+                        driveCompsYes.add(btnComp);
+                        drivePathsYes.add(StrCombine(partInfo->driveName, ":"));
+
+                        // guiInstance->CreateComponentWithIdAndParent(coolId, GuiComponentStuff::ComponentType::TEXT, 1022);
+                        // GuiComponentStuff::TextComponent* textComp = (GuiComponentStuff::TextComponent*)guiInstance->GetComponentFromId(coolId);
                         _Free(textComp->text);
                         textComp->text = StrCombine("Drive: ", partInfo->driveName);
-                        textComp->position.x = 0;
-                        textComp->position.y = _y;
+                        // textComp->position.x = 0;
+                        // textComp->position.y = _y;
+                        btnComp->size.FixedY = 16;
+                        btnComp->size.FixedX = StrLen(textComp->text) * 8;
+                        
+                        btnComp->position.x = 0;
+                        btnComp->position.y = _y;
+
+
+
                         _y += 16;
                     }
                 }
@@ -305,10 +330,10 @@ namespace SysApps
     
     void Explorer::OnFolderClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
     {
-        int indx = compsYes.getIndexOf(btn);
+        int indx = folderCompsYes.getIndexOf(btn);
         if (indx == -1)
             return;
-        const char* pathThing = pathsYes[indx];
+        const char* pathThing = folderPathsYes[indx];
 
         const char* temp2 = StrCombine(path, pathThing);
         _Free(path);
@@ -326,7 +351,16 @@ namespace SysApps
 
     void Explorer::OnDriveClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
     {
+        int indx = driveCompsYes.getIndexOf(btn);
+        if (indx == -1)
+            return;
+        const char* pathThing = drivePathsYes[indx];
+        _Free(path);
+        path = StrCopy(pathThing);
 
+        _Free(pathComp->textComp->text);
+        pathComp->textComp->text = StrCopy(path);
+        Reload();
     }
     void Explorer::OnGoUpClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
     {
