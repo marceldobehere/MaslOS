@@ -29,9 +29,8 @@ namespace GuiComponentStuff
         this->rectComp = new RectangleComponent(bgCol, size, actualTextFieldStuff);
         actualTextFieldStuff->children->add(rectComp);
 
-        char* txt = (char*)_Malloc(1);
-        txt[0] = 0;
-        this->textComp = new TextComponent(actualTextFieldStuff, Colors.tblack, textCol, txt, Position());
+
+        this->textComp = new TextComponent(actualTextFieldStuff, Colors.tblack, textCol, "", Position());
         //_Free(txt);
         textComp->center = false;
         textComp->useFixedSize = true;
@@ -99,8 +98,12 @@ namespace GuiComponentStuff
 
     void TextFieldComponent::Destroy(bool destroyChildren, void (*callBackFunc)(BaseComponent* comp))
     {
+        AddToStack();
+        if (callBackFunc != NULL)
+            callBackFunc(this);
         actualTextFieldStuff->Destroy(destroyChildren, callBackFunc);
         _Free(actualTextFieldStuff);
+        RemoveFromStack();
     }
 
     ComponentSize TextFieldComponent::GetActualComponentSize()

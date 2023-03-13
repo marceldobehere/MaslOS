@@ -9,7 +9,7 @@ namespace GuiComponentStuff
     {
         this->bgColor = bgColor;
         this->fgColor = fgColor;
-        this->text = text;
+        this->text = StrCopy(text);
         oldText = StrCopy(text);
 
         this->size = ComponentSize(10, 10);
@@ -100,11 +100,13 @@ namespace GuiComponentStuff
 
     void TextComponent::Destroy(bool destroyChildren, void (*callBackFunc)(BaseComponent* comp))
     {
+        AddToStack();
         if (callBackFunc != NULL)
             callBackFunc(this);
         renderer->Free();
         _Free(oldText);
-        _TryFree(text);
+        _Free(text);
+        RemoveFromStack();
     }
 
     ComponentSize TextComponent::GetActualComponentSize()

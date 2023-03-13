@@ -70,17 +70,20 @@ namespace GuiComponentStuff
 
     void BoxComponent::Destroy(bool destroyChildren, void (*callBackFunc)(BaseComponent* comp))
     {
-        renderer->Free();
+        AddToStack();
+        if (callBackFunc != NULL)
+            callBackFunc(this);
         if (destroyChildren)
             for (int i = 0; i < children->getCount(); i++)
             {
                 BaseComponent* ch = children->elementAt(i);
-                callBackFunc(ch);
                 ch->Destroy(true, callBackFunc);
                 _Free((void*)ch);
             }
         children->free();
         _Free(children);
+        renderer->Free();
+        RemoveFromStack();
     }
 
     ComponentSize BoxComponent::GetActualComponentSize()

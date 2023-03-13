@@ -77,6 +77,7 @@ namespace GuiComponentStuff
 
     bool BaseComponent::Destroy(bool destroyChildren, void (*callBackFunc)(BaseComponent* comp))
     {
+        AddToStack();
         if (parent != NULL)
         {
             GuiInstance* blehus = ((GuiInstance*)((Window*)GetWindow())->instance);
@@ -88,7 +89,7 @@ namespace GuiComponentStuff
             // while (true);
             blehus->RemoveChildFromComponentWithId(parent->id, indx);
         }
-
+        
         if (componentType == RECT)
             ((RectangleComponent*)this)->Destroy(destroyChildren, callBackFunc);
         if (componentType == SCREEN)
@@ -103,7 +104,7 @@ namespace GuiComponentStuff
             ((TextFieldComponent*)this)->Destroy(destroyChildren, callBackFunc);
 
 
-
+        RemoveFromStack();
         return true;
     }
 

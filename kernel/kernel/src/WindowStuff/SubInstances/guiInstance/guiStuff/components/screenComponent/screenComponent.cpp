@@ -81,17 +81,28 @@ namespace GuiComponentStuff
 
     void ScreenComponent::Destroy(bool destroyChildren, void (*callBackFunc)(BaseComponent* comp))
     {
-        renderer->Free();
+        AddToStack();
+        if (callBackFunc != NULL)
+            callBackFunc(this);
         if (destroyChildren)
             for (int i = 0; i < children->getCount(); i++)
             {
+                AddToStack();
                 BaseComponent* ch = children->elementAt(i);
-                callBackFunc(ch);
                 ch->Destroy(true, callBackFunc);
                 _Free(ch);
+                RemoveFromStack();
             }
+        AddToStack();
         children->free();
         _Free(children);
+        RemoveFromStack();
+
+        AddToStack();
+        renderer->Free();
+        RemoveFromStack();
+        
+        RemoveFromStack();
     }
     
 

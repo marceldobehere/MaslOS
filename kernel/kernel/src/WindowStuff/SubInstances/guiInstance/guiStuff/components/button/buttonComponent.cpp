@@ -124,8 +124,12 @@ namespace GuiComponentStuff
 
     void ButtonComponent::Destroy(bool destroyChildren, void (*callBackFunc)(BaseComponent* comp))
     {
+        AddToStack();
+        if (callBackFunc != NULL)
+            callBackFunc(this);
         actualButtonStuff->Destroy(destroyChildren, callBackFunc);
         _Free(actualButtonStuff);
+        RemoveFromStack();
     }
 
     ComponentSize ButtonComponent::GetActualComponentSize()

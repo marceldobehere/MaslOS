@@ -208,20 +208,33 @@ void GuiInstance::Free()
     GuiComponentStuff::ScreenComponent* tScreen = screen;
     screen = NULL;
     currentInst = this;
+    AddToStack();
     RemoveThingFromList(tScreen);
+    RemoveFromStack();
+
+    AddToStack();
     tScreen->Destroy(true, RemoveThingFromList);
+    RemoveFromStack();
     _Free(tScreen);
     
-   for (int i = 0; i < allComponents->getCount(); i++)
+    AddToStack();
+    for (int i = 0; i < allComponents->getCount(); i++)
     {
         if (allComponents->elementAt(i)->componentType != GuiComponentStuff::ComponentType::SCREEN)
             continue;
         GuiComponentStuff::ScreenComponent* bruh = (GuiComponentStuff::ScreenComponent*)allComponents->elementAt(i);
+        AddToStack();
         RemoveThingFromList(bruh);
+        RemoveFromStack();
+        AddToStack();
         bruh->Destroy(true, RemoveThingFromList);
+        RemoveFromStack();
+        AddToStack();
         _Free(bruh);
+        RemoveFromStack();
         i = -1;
     }
+    RemoveFromStack();
 
     allComponents->free();
     _Free(allComponents);
@@ -526,7 +539,7 @@ bool GuiInstance::CreateComponentWithIdAndParent(int64_t id, GuiComponentStuff::
     if (type == GuiComponentStuff::ComponentType::BUTTON)
     {
         GuiComponentStuff::ButtonComponent* comp =
-        new GuiComponentStuff::ButtonComponent(StrCopy(""), 
+        new GuiComponentStuff::ButtonComponent("", 
             Colors.black, Colors.dgray, Colors.white,
             Colors.white, Colors.bgray, Colors.black,
             GuiComponentStuff::ComponentSize(50, 50),
@@ -562,7 +575,7 @@ bool GuiInstance::CreateComponentWithIdAndParent(int64_t id, GuiComponentStuff::
             parentComp,
             Colors.white,
             Colors.black,
-            StrCopy(""),
+            "",
             GuiComponentStuff::Position(0, 0)
         );
         comp->id = id;
