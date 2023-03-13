@@ -10,7 +10,7 @@ namespace SysApps
 {
     Explorer::Explorer()
     {
-        path = StrCopy("bruh:");
+        path = StrCopy("");
 
         //window =
 
@@ -55,6 +55,8 @@ namespace SysApps
         goUpBtn->textComp->text = StrCopy("Go Up");
         goUpBtn->size.FixedY = 16;
         goUpBtn->size.FixedX = 5*8;
+        goUpBtn->OnMouseClickedCallBack = (void(*)(void*, GuiComponentStuff::BaseComponent*, GuiComponentStuff::MouseClickEventInfo))(void*)&OnGoUpClick;
+        goUpBtn->OnMouseClickHelp = this;
 
 
         guiInstance->CreateComponentWithId(1022, GuiComponentStuff::ComponentType::BOX);
@@ -364,7 +366,55 @@ namespace SysApps
     }
     void Explorer::OnGoUpClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
     {
+        const char* drive = FS_STUFF::GetDriveNameFromFullPath(path);
+        const char* dir = FS_STUFF::GetFolderPathFromFullPath(path);
+        
+        // GlobalRenderer->Clear(Colors.black);
+        // GlobalRenderer->Println("DRIVE:  \"{}\"", drive, Colors.yellow);
+        // GlobalRenderer->Println("DIR:    \"{}\"", dir, Colors.yellow);
+        // GlobalRenderer->Println("PATH:   \"{}\"", path, Colors.yellow);
+        
 
+
+        if (drive != NULL && dir != NULL)
+        {
+            const char* cool1 = StrCombine(drive, ":", dir, "/");
+            //GlobalRenderer->Println("COOL1:  \"{}\"", cool1, Colors.yellow);
+            const char* cool2 = StrCombine(drive, ":");
+            //GlobalRenderer->Println("COOL2:  \"{}\"", cool2, Colors.yellow);
+            if (StrEquals(cool2, path))
+            {
+                _Free(path);
+                path = StrCopy("");
+            }
+            else if (StrEquals(cool1, path))
+            {
+                // GO UP
+                _Free(path);
+                path = StrCopy("test");
+            }
+            else
+            {
+                //broken
+                _Free(path);
+                path = StrCopy(cool1);
+            }
+            _Free(cool1);
+            _Free(cool2);
+        }
+        
+
+        // while (true)
+        //     ;
+
+        if (drive != NULL)
+            _Free(drive);
+        if (dir != NULL)
+            _Free(dir); 
+
+        _Free(pathComp->textComp->text);
+        pathComp->textComp->text = StrCopy(path);
+        Reload();
     }
 
 

@@ -12,6 +12,8 @@ char* StrSubstr(const char* og, int index);
 bool StrStartsWith(const char* og, const char* with);
 
 char* StrCombine(const char* a, const char* b);
+char* StrCombine(const char* a, const char* b, const char* c);
+char* StrCombine(const char* a, const char* b, const char* c, const char* d);
 
 char* StrReplaceStartingStuffWith(const char* og, const char* toReplace, const char* toReplaceWith);
 

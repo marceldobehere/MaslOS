@@ -132,6 +132,51 @@ char* StrCombine(const char* a, const char* b)
     return tempStr;
 }
 
+char* StrCombine(const char* a, const char* b, const char* c)
+{
+    int lenA = StrLen(a);
+    int lenB = StrLen(b);
+    int lenC = StrLen(c);
+    
+    int totalLen = lenA + lenB + lenC;
+    char* tempStr = (char*) _Malloc(totalLen + 1, "Malloc for Combined String");
+    tempStr[totalLen] = 0;
+
+    for (int i = 0; i < lenA; i++)
+        tempStr[i] = a[i];
+    for (int i = 0; i < lenB; i++)
+        tempStr[i + lenA] = b[i];
+    for (int i = 0; i < lenC; i++)
+        tempStr[i + lenA + lenB] = c[i];
+
+    return tempStr;
+}
+
+char* StrCombine(const char* a, const char* b, const char* c, const char* d)
+{
+    int lenA = StrLen(a);
+    int lenB = StrLen(b);
+    int lenC = StrLen(c);
+    int lenD = StrLen(d);
+    
+    int totalLen = lenA + lenB + lenC + lenD;
+    char* tempStr = (char*) _Malloc(totalLen + 1, "Malloc for Combined String");
+    tempStr[totalLen] = 0;
+
+    for (int i = 0; i < lenA; i++)
+        tempStr[i] = a[i];
+    for (int i = 0; i < lenB; i++)
+        tempStr[i + lenA] = b[i];
+    for (int i = 0; i < lenC; i++)
+        tempStr[i + lenA + lenB] = c[i];
+    for (int i = 0; i < lenD; i++)
+        tempStr[i + lenA + lenB + lenC] = d[i];
+
+    return tempStr;
+}
+
+
+
 uint64_t StrCountChr(const char* og, char chr)
 {
     uint64_t count = 0;
