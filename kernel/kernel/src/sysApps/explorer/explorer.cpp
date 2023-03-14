@@ -129,7 +129,7 @@ namespace SysApps
         AddToStack();
         _Free(path);
         
-        //ClearLists();
+        ClearLists();
         folderCompsYes.free();
         folderPathsYes.free();
         driveCompsYes.free();
@@ -390,12 +390,39 @@ namespace SysApps
             else if (StrEquals(cool1, path))
             {
                 // GO UP
-                _Free(path);
-                path = StrCopy("test");
+                int lstIndex = StrLastIndexOf(path, '/', 1);
+                // test:abc/def/ 
+                //          ^
+
+                if (lstIndex != -1)
+                {
+                    const char* nPath = StrSubstr(path, 0, lstIndex + 1);
+                    _Free(path);
+                    path = nPath;
+                }
+                else
+                {
+                    lstIndex = StrLastIndexOf(path, ':');
+                    if (lstIndex != -1)
+                    {
+                        const char* nPath = StrSubstr(path, 0, lstIndex + 1);
+                        _Free(path);
+                        path = nPath;
+                    }
+                    else
+                    {
+                        const char* nPath = StrCopy("");
+                        _Free(path);
+                        path = nPath;
+                    }
+                }
+                // GlobalRenderer->Println("NPATH:  \"{}\"", path, Colors.yellow);
+
+                // while (true);
+            
             }
             else
             {
-                //broken
                 _Free(path);
                 path = StrCopy(cool1);
             }

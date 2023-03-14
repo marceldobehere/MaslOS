@@ -20,3 +20,9 @@ char* StrReplaceStartingStuffWith(const char* og, const char* toReplace, const c
 uint64_t StrCountChr(const char* og, char chr);
 
 int32_t StrLen(const char* og);
+
+int32_t StrIndexOf(const char* str, char chr);
+int32_t StrLastIndexOf(const char* str, char chr);
+
+int32_t StrIndexOf(const char* str, char chr, int ignoreCount);
+int32_t StrLastIndexOf(const char* str, char chr, int ignoreCount);

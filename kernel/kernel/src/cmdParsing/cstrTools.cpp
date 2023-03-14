@@ -202,3 +202,41 @@ char* StrReplaceStartingStuffWith(const char* og, const char* toReplace, const c
     _Free(subStr);
     return combined;
 }
+
+int32_t StrIndexOf(const char* str, char chr)
+{
+    for (int i = 0; str[i] != 0; i++)
+        if (str[i] == chr)
+            return i;
+    return -1;
+}
+
+int32_t StrLastIndexOf(const char* str, char chr)
+{
+    int lastI = -1;
+        for (int i = 0; str[i] != 0; i++)
+        if (str[i] == chr)
+            lastI = i;
+    return lastI;
+}
+
+
+int32_t StrIndexOf(const char* str, char chr, int ignoreCount)
+{
+    for (int i = 0; str[i] != 0; i++)
+        if (str[i] == chr)
+            if (--ignoreCount < 0)
+                return i;
+    return -1;
+}
+
+int32_t StrLastIndexOf(const char* str, char chr, int ignoreCount)
+{
+    int len = StrLen(str);
+
+    for (int i = len-1; i >= 0; i--)
+        if (str[i] == chr)
+            if (--ignoreCount < 0)
+                return i;
+    return -1;
+}
