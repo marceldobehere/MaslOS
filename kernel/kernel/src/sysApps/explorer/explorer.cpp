@@ -20,7 +20,7 @@ namespace SysApps
         *(window) = Window((DefaultInstance*)gui, Size(400, 300), Position(100, 100), "Explorer", true, true, true);
         osData.windows.insertAt(window, 0);
         window->hidden = true;
-        window->resizeable = false;
+        //window->resizeable = false;
         gui->Init();
 
         window->OnCloseHelp = (void*)this;
