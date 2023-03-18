@@ -15,7 +15,7 @@ struct MousePacket
 
     bool operator==(const MousePacket& other)
     {
-        return  this->data[0] == other.data[0] &&
+        return this->data[0] == other.data[0] &&
                 this->data[1] == other.data[1] && 
                 this->data[2] == other.data[2] && 
                 this->data[3] == other.data[3];

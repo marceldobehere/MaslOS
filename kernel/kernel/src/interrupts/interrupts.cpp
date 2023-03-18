@@ -193,10 +193,13 @@ __attribute__((interrupt)) void KeyboardInt_handler(interrupt_frame* frame)
 __attribute__((interrupt)) void MouseInt_handler(interrupt_frame* frame)
 { 
     AddToStack();
-    osStats.lastMouseCall = PIT::TimeSinceBootMS();
+    //osStats.lastMouseCall = PIT::TimeSinceBootMS();
+    io_wait();
+    Mousewait();
     uint8_t mousedata = inb(0x60);
+    Mousewait();
+    io_wait();
     
-
     HandlePS2Mouse(mousedata);
 
     PIC_EndSlave();

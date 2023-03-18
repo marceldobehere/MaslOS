@@ -392,16 +392,18 @@ void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName)
 }
 
 
-uint8_t mousePacketArr[4];
+uint8_t mousePacketArr[4] = {0, 0, 0, 0};
 
 #include "../rnd/rnd.h"
 
 void HandlePS2Mouse(uint8_t data)
 {
+    AddToStack();
     if (mouseCycleSkip != 0)
     {
         MouseCycle = mouseCycleSkip;
         mouseCycleSkip = 0;
+        RemoveFromStack();
         return;
     }
 
@@ -428,8 +430,13 @@ void HandlePS2Mouse(uint8_t data)
         case 2:
         {
             mousePacketArr[2] = data;
+            mousePacketArr[3] = 0;
             MouseCycle = 0;
+
+            AddToStack();
             mousePackets.add(MousePacket(mousePacketArr));
+            RemoveFromStack();
+
             break;
         }
         default:
@@ -438,6 +445,8 @@ void HandlePS2Mouse(uint8_t data)
             break;
         }
     }
+    
+    RemoveFromStack();
 }
 
 bool activeDrag[4] = {false, false, false, false};
@@ -613,6 +622,7 @@ void HandleClick(bool L, bool R, bool M)
 
 void HandleHold(bool L, bool R, bool M)
 {
+    AddToStack();
     if (L)
     {
         Window* window = dragWindow;
@@ -664,17 +674,20 @@ void HandleHold(bool L, bool R, bool M)
             }
         }
     }
+    RemoveFromStack();
 }
 
 
 
 void ProcessMousePackets()
 {
+    //mousePackets.clear();
     ProcessMousePackets(20);
 }
 
 void ProcessMousePackets(int limit)
 {
+    AddToStack();
     int l = mousePackets.getCount();
     if (l > limit)
         l = limit;
@@ -683,10 +696,13 @@ void ProcessMousePackets(int limit)
         ProcessMousePacket(mousePackets[0]);
         mousePackets.removeAt(0);
     }
+    RemoveFromStack();
 }
 
 void ProcessMousePacket(MousePacket packet)
 {
+    AddToStack();
+
     bool xNegative, yNegative, xOverflow, yOverflow, leftButton, middleButton, rightButton;
 
     if(packet.data[0] & PS2XSign)
@@ -738,6 +754,7 @@ void ProcessMousePacket(MousePacket packet)
             if (xOverflow)
             {
                 mouseCycleSkip = (PIT::TicksSinceBoot / 1000) % 4;
+                RemoveFromStack();
                 return;
             }
                 ;//IMousePosition.x += 255;
@@ -745,6 +762,7 @@ void ProcessMousePacket(MousePacket packet)
         else
         {
             mouseCycleSkip = 1;
+            RemoveFromStack();
             return;
         }
     }
@@ -758,6 +776,7 @@ void ProcessMousePacket(MousePacket packet)
             if (xOverflow)
             {
                 mouseCycleSkip = (PIT::TicksSinceBoot / 1000) % 4;
+                RemoveFromStack();
                 return;
             }
                 ;//IMousePosition.x -= 255;   
@@ -765,6 +784,7 @@ void ProcessMousePacket(MousePacket packet)
         else
         {
             mouseCycleSkip = 1;
+            RemoveFromStack();
             return;
         }
         
@@ -780,6 +800,7 @@ void ProcessMousePacket(MousePacket packet)
             if (yOverflow)
             {
                 mouseCycleSkip = (PIT::TicksSinceBoot / 1000) % 4;
+                RemoveFromStack();
                 return;
             }
                 ;//IMousePosition.y += 255;
@@ -787,6 +808,7 @@ void ProcessMousePacket(MousePacket packet)
         else
         {
             mouseCycleSkip = 1;
+            RemoveFromStack();
             return;
         }
     }
@@ -799,6 +821,7 @@ void ProcessMousePacket(MousePacket packet)
             if (yOverflow)
             {
                 mouseCycleSkip = (PIT::TicksSinceBoot / 1000) % 4;
+                RemoveFromStack();
                 return;
             }
                 ;//IMousePosition.y -= 255;
@@ -806,6 +829,7 @@ void ProcessMousePacket(MousePacket packet)
         else
         {
             mouseCycleSkip = 1;
+            RemoveFromStack();
             return;
         }
     }
@@ -890,4 +914,6 @@ void ProcessMousePacket(MousePacket packet)
 
     if(tHolds[0] || tHolds[1] || tHolds[2])
         HandleHold(tHolds[0], tHolds[1], tHolds[2]);
+
+    RemoveFromStack();
 }
