@@ -31,6 +31,7 @@ bool oldKeyboardWeird = false;
 
 void IO_CHECK()
 {
+    keyboardWeird = true;
     uint8_t t = inb(0x64);
     if (t == 0x1C)
         return;
@@ -42,7 +43,7 @@ void IO_CHECK()
     if (port64Val == 0x1D || port64Val == 0x15)
     {
         port64Val = inb(0x60);
-        keyboardWeird = true;
+        //keyboardWeird = true;
         
         uint8_t real = port64Val;//TranslateScancode2(port64Val);
         //HandleKeyboard(real);
