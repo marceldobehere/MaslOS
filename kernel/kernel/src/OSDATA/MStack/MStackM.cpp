@@ -133,6 +133,8 @@ void _AddTheBenchmark(MStack thing)
         return;
     if (PIT::Inited)
         thing.time = PIT::TimeSinceBootMicroS();
+    else
+        thing.time = 0;
     thing.layer = MStackData::stackPointer + 1;   
     thing.close = false;
 
@@ -166,6 +168,8 @@ void _RemoveBenchmark(MStack thing)
         return;
     if (PIT::Inited)
         thing.time = PIT::TimeSinceBootMicroS();
+    else
+        thing.time = 0;
     thing.layer = MStackData::stackPointer;   
     thing.close = true;
 

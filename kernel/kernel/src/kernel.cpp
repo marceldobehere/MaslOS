@@ -768,6 +768,7 @@ void boot(BootInfo* bootInfo)
         MStackData::stackArr[i] = MStack();
 
     osData.enableStackTrace = RECORD_STACK_TRACE;
+    MStackData::BenchmarkEnabled = true;
     AddToStack();
     osData.crashCount = 0;
     //
@@ -1090,6 +1091,9 @@ void boot(BootInfo* bootInfo)
 
     osData.wantedFps = 150;
     osData.bgTaskRun = true;
+    MStackData::BenchmarkStackPointer1 = 0;
+    MStackData::BenchmarkStackPointer2 = 0;
+    MStackData::BenchmarkStackPointerSave = 0;
     RenderLoop();
 
 

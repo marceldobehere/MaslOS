@@ -57,6 +57,88 @@ void PrintRegisterDump(BasicRenderer* renderer)
 
 int kernelPanicCount = 0;
 
+
+void CreateWindowWithBenchmarkData()
+{
+    AddToStack();
+
+    SaveBenchmarkStack(MStackData::BenchmarkMode);
+    int bMax = MStackData::BenchmarkStackPointerSave;
+    if (bMax > 1500)
+        bMax = 1500;
+
+    osData.tempCrash = true;
+    //GlobalRenderer->Println("BRUH 4", Colors.yellow);
+    Window* benchmarkWindow;
+    {
+        benchmarkWindow = (Window*)_Malloc(sizeof(Window), "Benchmark Window");
+        Size size = Size(2000, 16*10 + (bMax * 16)); // 36MB * 2 Max
+        Position pos = Position(0, 0);
+        
+        if (benchmarkWindow != NULL)
+        {
+            //GlobalRenderer->Println("BRUH 4.5", Colors.yellow);
+            *(benchmarkWindow) = Window(new CustomInstance(InstanceType::WARNING), size, pos, "Crash Benchmark", true, true, true);
+            //GlobalRenderer->Println("BRUH 4.6", Colors.yellow);
+            osData.windows.add(benchmarkWindow);
+            
+            //GlobalRenderer->Println("BRUH 4.7", Colors.yellow);
+
+            // activeWindow = benchmarkWindow;
+            // osData.mainTerminalWindow = benchmarkWindow;
+            // osData.activeCrashWindow = benchmarkWindow;
+            // benchmarkWindow->moveToFront = true;
+        }
+    }
+
+
+
+
+    bool tempBench = MStackData::BenchmarkEnabled;
+    MStackData::BenchmarkEnabled = false;
+
+    benchmarkWindow->renderer->Println("Benchmark");
+    for (int i = 0; i < bMax; i++)
+    {
+        for (int x = 0; x < MStackData::BenchmarkStackArrSave[i].layer; x++)
+            //Print(window, "--", Colors.yellow);
+            benchmarkWindow->renderer->Print("--", "", Colors.yellow);
+
+
+        bool skipNext = false;
+        if (i  + 1 < bMax && !MStackData::BenchmarkStackArrSave[i].close && MStackData::BenchmarkStackArrSave[i + 1].close && 
+            StrEquals(MStackData::BenchmarkStackArrSave[i].name, MStackData::BenchmarkStackArrSave[i + 1].name))
+        {
+            skipNext = true;
+            benchmarkWindow->renderer->Print("o {}: ", to_string(i), Colors.yellow);
+        }
+        else
+        {
+            if (MStackData::BenchmarkStackArrSave[i].close)
+                benchmarkWindow->renderer->Print("< {}: ", to_string(i), Colors.yellow);
+            else
+                benchmarkWindow->renderer->Print("> {}: ", to_string(i), Colors.yellow);
+        }   
+
+        benchmarkWindow->renderer->Print("L: {}", to_string(MStackData::BenchmarkStackArrSave[i].layer), Colors.bgreen);
+        benchmarkWindow->renderer->Print(", Name: {}", (MStackData::BenchmarkStackArrSave[i].name), Colors.yellow);
+        benchmarkWindow->renderer->Print(", File {}", (MStackData::BenchmarkStackArrSave[i].filename), Colors.orange);
+        benchmarkWindow->renderer->Print(", Line {}", to_string(MStackData::BenchmarkStackArrSave[i].line), Colors.orange);
+        benchmarkWindow->renderer->Print(", Time {}", to_string(MStackData::BenchmarkStackArrSave[i].time), Colors.orange);
+        benchmarkWindow->renderer->Println();
+
+        if (skipNext)
+                i++;
+    }
+
+
+    MStackData::BenchmarkEnabled = tempBench;
+    RemoveFromStack();
+}
+
+
+
+
 void Panic(const char* panicMessage, const char* var, bool lock)
 {
     if (!lock)
@@ -141,6 +223,10 @@ void Panic(const char* panicMessage, const char* var, bool lock)
                 //GlobalRenderer->Println("BRUH 5.4", Colors.yellow);
                 PrintMStackTrace(MStackData::stackArr, MStackData::stackPointer, crashWindow->renderer, Colors.yellow);
                 //GlobalRenderer->Println("BRUH 5.5", Colors.yellow);
+
+
+
+                CreateWindowWithBenchmarkData();
             }
             //GlobalRenderer->Println("BRUH 6", Colors.yellow);
 

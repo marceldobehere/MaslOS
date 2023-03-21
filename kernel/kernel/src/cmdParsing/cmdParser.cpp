@@ -245,6 +245,12 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         RemoveFromStack();
         return;
     }
+    if (StrEquals(input, "benchmark reset") || StrEquals(input, "bench res"))
+    {
+        MStackData::BenchmarkStackPointerSave = 0;
+        RemoveFromStack();
+        return;
+    }
 
     if (StrEquals(input, "malloc"))
     {
@@ -1943,18 +1949,31 @@ void GetCmd(const char* name, OSUser* user, Window* window)
             for (int x = 0; x < MStackData::BenchmarkStackArrSave[i].layer; x++)
                 Print(window, "--", Colors.yellow);
 
-            if (MStackData::BenchmarkStackArrSave[i].close)
-                Print(window, "< {}: ", to_string(i), Colors.yellow);
+            bool skipNext = false;
+            if (i  + 1 < bMax && !MStackData::BenchmarkStackArrSave[i].close && MStackData::BenchmarkStackArrSave[i + 1].close && 
+                StrEquals(MStackData::BenchmarkStackArrSave[i].name, MStackData::BenchmarkStackArrSave[i + 1].name))
+            {
+                Print(window, "o {}: ", to_string(i), Colors.yellow);
+                skipNext = true;
+            }
             else
-                Print(window, "> {}: ", to_string(i), Colors.yellow);
+            {
+                if (MStackData::BenchmarkStackArrSave[i].close)
+                    Print(window, "< {}: ", to_string(i), Colors.yellow);
+                else
+                    Print(window, "> {}: ", to_string(i), Colors.yellow);
+            }
             
-            Print(window, "L: {}, ", to_string(MStackData::BenchmarkStackArrSave[i].layer), Colors.bgreen);
-            Print(window, ", Name: {}, ", MStackData::BenchmarkStackArrSave[i].name, Colors.yellow);
+            Print(window, "L: {}", to_string(MStackData::BenchmarkStackArrSave[i].layer), Colors.bgreen);
+            Print(window, ", Name: {}", MStackData::BenchmarkStackArrSave[i].name, Colors.yellow);
             Print(window, ", File {}", MStackData::BenchmarkStackArrSave[i].filename, Colors.orange);
             Print(window, ", Line {}", to_string(MStackData::BenchmarkStackArrSave[i].line), Colors.orange);
             Print(window, ", Time {}", to_string(MStackData::BenchmarkStackArrSave[i].time), Colors.orange);
 
             Println(window);
+
+            if (skipNext)
+                i++;
         }
 
 
