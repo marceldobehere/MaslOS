@@ -534,7 +534,41 @@ void HandleClick(bool L, bool R, bool M)
             RemoveFromStack();
 
             startDrag = false;
-            if (window != NULL)
+            if (Taskbar::activeTabWindow != NULL || (L && Taskbar::MButtonSelected))
+            {
+                AddToStack();
+                if (L && Taskbar::activeTabWindow != NULL) // Taskbar Button Clicked
+                {
+                    activeWindow = Taskbar::activeTabWindow;
+                    Taskbar::activeTabWindow->moveToFront = true;
+                    activeWindow->hidden = false;
+                }
+                RemoveFromStack();
+
+                AddToStack();
+                if (M && Taskbar::activeTabWindow != NULL) // Taskbar Button Middle-Clicked
+                {
+                    osData.osTasks.add(NewWindowCloseTask(Taskbar::activeTabWindow));
+                }
+                RemoveFromStack();
+
+                AddToStack();
+                if (L && Taskbar::MButtonSelected)
+                {
+                    if (oldActive == osData.startMenuWindow)
+                    {
+                        activeWindow = NULL;
+                    }
+                    else
+                    {
+                        osData.startMenuWindow->hidden = false;
+                        osData.startMenuWindow->moveToFront = true;
+                        activeWindow = osData.startMenuWindow;
+                    }
+                }
+                RemoveFromStack();
+            }
+            else if (window != NULL)
             {
                 AddToStack();
                 activeDragOn = false;
@@ -573,37 +607,6 @@ void HandleClick(bool L, bool R, bool M)
 
                 //osData.windowPointerThing->UpdateWindowBorder(osData.windows[osData.windows.getCount() - 1]);
 
-                AddToStack();
-                if (L && Taskbar::activeTabWindow != NULL) // Taskbar Button Clicked
-                {
-                    activeWindow = Taskbar::activeTabWindow;
-                    Taskbar::activeTabWindow->moveToFront = true;
-                    activeWindow->hidden = false;
-                }
-                RemoveFromStack();
-
-                AddToStack();
-                if (M && Taskbar::activeTabWindow != NULL) // Taskbar Button Middle-Clicked
-                {
-                    osData.osTasks.add(NewWindowCloseTask(Taskbar::activeTabWindow));
-                }
-                RemoveFromStack();
-
-                AddToStack();
-                if (L && Taskbar::MButtonSelected)
-                {
-                    if (oldActive == osData.startMenuWindow)
-                    {
-                        activeWindow = NULL;
-                    }
-                    else
-                    {
-                        osData.startMenuWindow->hidden = false;
-                        osData.startMenuWindow->moveToFront = true;
-                        activeWindow = osData.startMenuWindow;
-                    }
-                }
-                RemoveFromStack();
 
             }
         }
