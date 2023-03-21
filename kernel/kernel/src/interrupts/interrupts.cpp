@@ -63,6 +63,12 @@ void** search(void** addr, void* value)
 //asm volatile("mov %0, 8(%%rbp)" : "r"((void*)BruhusSafus) : : );
 
 
+__attribute__((interrupt)) void GenericInt_handler(interrupt_frame* frame)
+{
+    
+}
+
+
 __attribute__((interrupt)) void PageFault_handler(interrupt_frame* frame)//, uint64_t error)
 {
     AddToStack();
@@ -198,6 +204,7 @@ __attribute__((interrupt)) void KeyboardInt_handler(interrupt_frame* frame)
 #define MOUSE_F_BIT  0x20
 #define MOUSE_V_BIT  0x08
 // https://github.com/stevej/osdev/blob/master/kernel/devices/mouse.c
+
 
 __attribute__((interrupt)) void MouseInt_handler(interrupt_frame* frame)
 { 
@@ -398,9 +405,9 @@ void PIC_EndSlave()
 {
     AddToStack();
     io_wait();
-    outb(PIC2_COMMAND, PIC_EOI);
-    io_wait();
     outb(PIC1_COMMAND, PIC_EOI);
+    io_wait();
+    outb(PIC2_COMMAND, PIC_EOI);
     io_wait();
     RemoveFromStack();
 }

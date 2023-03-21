@@ -44,6 +44,8 @@ typedef struct {
 } interrupt_frame;
 
 
+__attribute__((interrupt)) void GenericInt_handler(interrupt_frame* frame);
+
 __attribute__((interrupt)) void PageFault_handler(interrupt_frame* frame);//, uint64_t error);
 __attribute__((interrupt)) void DoubleFault_handler(interrupt_frame* frame);//, uint64_t error);
 __attribute__((interrupt)) void GPFault_handler(interrupt_frame* frame);//, uint64_t error);
@@ -56,6 +58,7 @@ __attribute__((interrupt)) void GenFault2_handler(interrupt_frame* frame);
 __attribute__((interrupt)) void GenFaultWithError_handler(interrupt_frame* frame);//, uint64_t error);
 __attribute__((interrupt)) void GenFloatFault_handler(interrupt_frame* frame);
 __attribute__((interrupt)) void GenMathFault_handler(interrupt_frame* frame);
+
 __attribute__((interrupt)) void Debug_handler(interrupt_frame* frame);
 __attribute__((interrupt)) void Breakpoint_handler(interrupt_frame* frame);
  

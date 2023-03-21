@@ -431,7 +431,7 @@ void RenderLoop()
 
             // Remove Mouse
             AddToStack();
-            osData.windowPointerThing->UpdatePointerRect(mPosOld.x - 10, mPosOld.y - 10, mPosOld.x + 40, mPosOld.y + 40);
+            osData.windowPointerThing->UpdatePointerRect(mPosOld.x - 32, mPosOld.y - 32, mPosOld.x + 64, mPosOld.y + 64);
             RemoveFromStack();
 
             osStats.totalRenderTime = PIT::TimeSinceBootMicroS() - tS;

@@ -315,7 +315,7 @@ void PrepareMemory(BootInfo* bootInfo)
     */
 }
 
-uint8_t testIdtrArr[0x2000];
+uint8_t testIdtrArr[0x1000];
 IDTR idtr;
 
 void SetIDTGate(void* handler, uint8_t entryOffset, uint8_t type_attr, uint8_t selector)
@@ -328,13 +328,16 @@ void SetIDTGate(void* handler, uint8_t entryOffset, uint8_t type_attr, uint8_t s
 
 void PrepareInterrupts()
 {  
-    idtr.Limit = 0x2000 - 1;
+    idtr.Limit = 0x1000 - 1;
 
-    for (int i = 0; i < 0x2000; i++)
+    for (int i = 0; i < 0x1000; i++)
         testIdtrArr[i] = 0;
 
     idtr.Offset = (uint64_t)testIdtrArr;//(uint64_t)GlobalAllocator->RequestPage();
 
+    // GenericInt_handler
+    for (int i = 0; i < (0x1000 / sizeof(IDTDescEntry)); i++)
+        SetIDTGate((void*)GenericInt_handler, i, IDT_TA_InterruptGate, 0x08);
 
     SetIDTGate((void*)PageFault_handler, 0xE, IDT_TA_InterruptGate, 0x08);
     SetIDTGate((void*)DoubleFault_handler, 0x8, IDT_TA_InterruptGate, 0x08);
