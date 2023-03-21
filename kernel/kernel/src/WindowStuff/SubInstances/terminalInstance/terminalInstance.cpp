@@ -122,7 +122,7 @@ void TerminalInstance::Cls()
 {
     NewTerminalInstance* tempInst = (NewTerminalInstance*)newTermInstance;
     tempInst->Clear();
-    tempInst->Println("Masl OS v0.47", Colors.green);
+    tempInst->Println("Masl OS v0.51", Colors.green);
     tempInst->Println("-------------", Colors.green);
     tempInst->Println();
     tempInst->Render();
