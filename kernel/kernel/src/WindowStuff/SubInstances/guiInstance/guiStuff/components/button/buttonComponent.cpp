@@ -29,6 +29,8 @@ namespace GuiComponentStuff
         this->parent = parent;
         this->size = size;
 
+        updateFields = new List<Field>(5);
+
         actualButtonStuff = new BoxComponent(parent, size, Colors.tblack);
 
         this->rectComp = new RectangleComponent(bgColDef, size, actualButtonStuff);
@@ -129,6 +131,8 @@ namespace GuiComponentStuff
             callBackFunc(this);
         actualButtonStuff->Destroy(destroyChildren, callBackFunc);
         _Free(actualButtonStuff);
+        updateFields->free();
+        _Free(updateFields);
         RemoveFromStack();
     }
 

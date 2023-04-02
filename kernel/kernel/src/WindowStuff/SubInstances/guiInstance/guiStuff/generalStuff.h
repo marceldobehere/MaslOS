@@ -96,6 +96,12 @@ namespace GuiComponentStuff
             return x != other.x ||
                     y != other.y;
         }
+
+        bool operator==(Position other)
+        {
+            return x == other.x &&
+                    y == other.y;
+        }
     };
 
     struct Field
@@ -117,6 +123,18 @@ namespace GuiComponentStuff
         Field operator- (Position other)
         {
             return Field(TL - other, BR - other);
+        }
+
+        bool operator==(Field other)
+        {
+            return TL == other.TL &&
+                    BR == other.BR;
+        }
+
+        bool operator!=(Field other)
+        {
+            return TL != other.TL ||
+                    BR != other.BR;
         }
     };
 

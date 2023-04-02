@@ -7,6 +7,7 @@ namespace GuiComponentStuff
     ScreenComponent::ScreenComponent(Window* window)
     {
         this->window = window;
+        updateFields = new List<Field>(5);
         size = ComponentSize((int)window->framebuffer->Width, (int)window->framebuffer->Height);
         oldSize = size;
         componentType = SCREEN;
@@ -96,6 +97,8 @@ namespace GuiComponentStuff
         AddToStack();
         children->free();
         _Free(children);
+        updateFields->free();
+        _Free(updateFields);
         RemoveFromStack();
 
         AddToStack();

@@ -11,6 +11,7 @@ namespace GuiComponentStuff
         this->fgColor = fgColor;
         this->text = StrCopy(text);
         oldText = StrCopy(text);
+        updateFields = new List<Field>(5);
 
         this->size = ComponentSize(10, 10);
         componentType = ComponentType::TEXT;
@@ -106,6 +107,8 @@ namespace GuiComponentStuff
         renderer->Free();
         _Free(oldText);
         _Free(text);
+        updateFields->free();
+        _Free(updateFields);
         RemoveFromStack();
     }
 

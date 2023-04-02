@@ -22,6 +22,7 @@ namespace GuiComponentStuff
     {
         this->parent = parent;
         this->size = size;
+        updateFields = new List<Field>(5);
         oldSize = size;
         backgroundColor = bgCol;
         componentType = ComponentType::BOX;
@@ -83,6 +84,8 @@ namespace GuiComponentStuff
         children->free();
         _Free(children);
         renderer->Free();
+        updateFields->free();
+        _Free(updateFields);
         RemoveFromStack();
     }
 

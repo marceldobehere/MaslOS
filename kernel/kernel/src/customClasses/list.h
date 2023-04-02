@@ -110,10 +110,13 @@ template class Array<DiskInterface::GenericDiskInterface*>;
 template class List<DiskInterface::GenericDiskInterface*>;
 
 
-#include "../WindowStuff/SubInstances/guiInstance/guiStuff/components/base/baseComponent.h"
 
-template class Array<GuiComponentStuff::BaseComponent*>;
-template class List<GuiComponentStuff::BaseComponent*>;
+#include "../WindowStuff/SubInstances/guiInstance/guiStuff/generalStuff.h"
+
+template class Array<GuiComponentStuff::Field>;
+template class List<GuiComponentStuff::Field>;
+
+
 
 
 

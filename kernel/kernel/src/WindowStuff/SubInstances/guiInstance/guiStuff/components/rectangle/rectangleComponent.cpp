@@ -16,6 +16,7 @@ namespace GuiComponentStuff
         oldPosition = position;
         oldSize = temp;
         oldFillColor = fillColor;
+        updateFields = new List<Field>(5);
     }
 
     void RectangleComponent::MouseClicked(MouseClickEventInfo info)
@@ -54,6 +55,8 @@ namespace GuiComponentStuff
         if (callBackFunc != NULL)
             callBackFunc(this);
         renderer->Free();
+        updateFields->free();
+        _Free(updateFields);
         RemoveFromStack();
     }
 

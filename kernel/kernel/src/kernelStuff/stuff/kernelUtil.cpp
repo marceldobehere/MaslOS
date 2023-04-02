@@ -476,7 +476,7 @@ void enable_fpu()
 
 void StartMenuButtonClick(GuiComponentStuff::BaseComponent* comp, GuiComponentStuff::MouseClickEventInfo info)
 {
-    if (comp->id >= 1001 && comp->id <= 1005)
+    if (comp->id >= 1001 && comp->id <= 1006)
     {
         // PONG
         const char* BLEHUS_TITLE = "App Terminal Window";
@@ -513,6 +513,12 @@ void StartMenuButtonClick(GuiComponentStuff::BaseComponent* comp, GuiComponentSt
         {
             BLEHUS_TITLE = "Task Manager Window";
             BLEHUS_CMD   = "taskmgr";
+        }
+
+        if (comp->id == 1006)
+        {
+            BLEHUS_TITLE = "Explorer";
+            BLEHUS_CMD   = "explorer";
         }
 
 
@@ -645,6 +651,19 @@ void InitStartMenuWindow(BootInfo* bootInfo)
             );
             btn->mouseClickedCallBack = StartMenuButtonClick;
             btn->id = 1005;
+            
+            testGui->screen->children->add(btn);
+        }
+
+        {
+            GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("Explorer", 
+            Colors.bgray, Colors.yellow, Colors.black, 
+            Colors.black, Colors.black, Colors.white,
+            GuiComponentStuff::ComponentSize(72, 20),
+            GuiComponentStuff::Position(0, 160), testGui->screen
+            );
+            btn->mouseClickedCallBack = StartMenuButtonClick;
+            btn->id = 1006;
             
             testGui->screen->children->add(btn);
         }

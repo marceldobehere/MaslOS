@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include "../../generalStuff.h"
 #include "../../componentRenderer.h"
+#include "../../../../../../customClasses/list.h"
 
 namespace GuiComponentStuff
 {
@@ -20,7 +21,7 @@ namespace GuiComponentStuff
     class BaseComponent
     {
         protected:
-        
+        List<Field>* updateFields;
 
         public:
         BaseComponent* parent;
@@ -33,6 +34,8 @@ namespace GuiComponentStuff
         ComponentRenderer* renderer;
         bool hidden = false;
         int64_t id = 10;
+        
+
 
 
 

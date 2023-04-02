@@ -16,6 +16,7 @@ namespace GuiComponentStuff
         keyHitCallBack = NULL;
         mouseClickedCallBack = NULL;
         componentType = ComponentType::TEXTFIELD;
+        updateFields = new List<Field>(5);
 
         this->textCol = textCol;
         this->bgCol= bgCol;
@@ -103,6 +104,8 @@ namespace GuiComponentStuff
             callBackFunc(this);
         actualTextFieldStuff->Destroy(destroyChildren, callBackFunc);
         _Free(actualTextFieldStuff);
+        updateFields->free();
+        _Free(updateFields);
         RemoveFromStack();
     }
 

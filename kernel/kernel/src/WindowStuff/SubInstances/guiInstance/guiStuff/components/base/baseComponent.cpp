@@ -103,7 +103,6 @@ namespace GuiComponentStuff
         if (componentType == TEXTFIELD)
             ((TextFieldComponent*)this)->Destroy(destroyChildren, callBackFunc);
 
-
         RemoveFromStack();
         return true;
     }
