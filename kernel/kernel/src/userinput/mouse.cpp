@@ -455,6 +455,11 @@ bool activeDragOn = false;
 void HandleClick(bool L, bool R, bool M)
 {
     AddToStack();
+ 
+    activeDragOn = false;
+    for (int i = 0; i < 4; i++)
+        activeDrag[i] = 0;
+
     //activeWindow->renderer->Println("Click");
     if (L || R || M)
     {
@@ -514,9 +519,10 @@ void HandleClick(bool L, bool R, bool M)
             else if (action == WindowActionEnum::MIN_MAX)
             {
                 AddToStack();
-                WindowManager::currentActionWindow->maximize = !WindowManager::currentActionWindow->maximize;
-                activeWindow = WindowManager::currentActionWindow;
-                activeWindow->moveToFront = true;
+
+                osData.windowsToGetActive.add(WindowManager::currentActionWindow);
+                if (activeWindow->resizeable)
+                    WindowManager::currentActionWindow->maximize = !WindowManager::currentActionWindow->maximize;
                 RemoveFromStack();
             }
             RemoveFromStack();
@@ -568,6 +574,10 @@ void HandleClick(bool L, bool R, bool M)
                 }
                 RemoveFromStack();
             }
+            else if (MousePosition.y >= osData.windowPointerThing->virtualScreenBuffer->Height - osData.windowPointerThing->taskbar->Height)
+            {
+                osData.windowsToGetActive.add(NULL);    
+            }
             else if (window != NULL)
             {
                 AddToStack();
@@ -604,7 +614,7 @@ void HandleClick(bool L, bool R, bool M)
             }
             else
             {
-
+                //osData.windowsToGetActive.add(NULL);    
                 //osData.windowPointerThing->UpdateWindowBorder(osData.windows[osData.windows.getCount() - 1]);
 
 
@@ -898,7 +908,7 @@ void ProcessMousePacket(MousePacket packet)
         {
             if (clicks[i])
             {   
-                if (time >= clickTimes[i] + 50)
+                //if (time >= clickTimes[i] + 50)
                     tHolds[i] = true;  
             }
             else

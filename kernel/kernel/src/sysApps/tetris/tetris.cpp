@@ -34,10 +34,10 @@ namespace SysApps
         window->OnPartRenderHelp = (void*)this;
         window->OnPartRender =  (void(*)(void*, Window*))(void*)&OnExternalWindowRender;
 
-        window->moveToFront = true;
         window->oldHidden = true;
         window->hidden = false;
-        activeWindow = window;
+
+        osData.windowsToGetActive.add(window);
 
         lmaoRenderer = window->renderer;
         lmaoRenderer->Clear(Colors.black);

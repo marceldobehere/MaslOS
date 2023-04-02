@@ -391,6 +391,7 @@ void PrepareWindowsTemp(Framebuffer* img)
 
     
     osData.windows = List<Window*>();
+    osData.windowsToGetActive = List<Window*>();
     
     osData.windowPointerThing = (WindowManager::WindowPointerBufferThing*)_Malloc(sizeof(WindowManager::WindowPointerBufferThing), "Alloc WindowPointerBufferThing");
     *osData.windowPointerThing = WindowManager::WindowPointerBufferThing(GlobalRenderer->framebuffer, img, Colors.blue);
@@ -516,7 +517,7 @@ void StartMenuButtonClick(GuiComponentStuff::BaseComponent* comp, GuiComponentSt
 
 
 
-        Window* oldActive = activeWindow;
+        //Window* oldActive = activeWindow;
         Window* mainWindow = (Window*)_Malloc(sizeof(Window), "App Window");
         TerminalInstance* terminal = (TerminalInstance*)_Malloc(sizeof(TerminalInstance), "App Terminal");
         *terminal = TerminalInstance(&guestUser);
@@ -528,14 +529,7 @@ void StartMenuButtonClick(GuiComponentStuff::BaseComponent* comp, GuiComponentSt
         //KeyboardPrintStart(mainWindow);
         //((TerminalInstance*)mainWindow->instance)->KeyboardPrintStart();
 
-        activeWindow = mainWindow;          
-        mainWindow->moveToFront = true;
-        osData.mainTerminalWindow = mainWindow;
-
-        if (oldActive != NULL)
-        {
-            osData.windowPointerThing->UpdateWindowBorder(oldActive);
-        }
+        osData.windowsToGetActive.add(mainWindow);
 
         //((NewTerminalInstance*)terminal->newTermInstance)->Println(BLEHUS_CMD);
         {

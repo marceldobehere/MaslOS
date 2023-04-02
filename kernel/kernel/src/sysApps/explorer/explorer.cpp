@@ -29,10 +29,9 @@ namespace SysApps
         window->OnResizeHelp = (void*)this;
         window->OnResize = (void(*)(void*, Window*))(void*)&OnExternalWindowResize;
 
-        window->moveToFront = true;
         window->oldHidden = true;
         window->hidden = false;
-        activeWindow = window;
+        osData.windowsToGetActive.add(window);
 
         guiInstance = gui;
         lastClickedComp = NULL;

@@ -168,18 +168,14 @@ void HandleKeyboard(uint8_t scancode)
         int64_t count = Taskbar::taskWindowList->getCount();
         int64_t index = Taskbar::taskWindowList->getIndexOf(activeWindow);
         index = (index + count + 1) % count;
-        activeWindow = Taskbar::taskWindowList->elementAt(index);
-        activeWindow->moveToFront = true;
-        activeWindow->hidden = false;
-        activeWindow->moveToFront = true;
-        if (activeWindow == osData.debugTerminalWindow)
-            osData.showDebugterminal = true;
+        Window* w = Taskbar::taskWindowList->elementAt(index);
+        osData.windowsToGetActive.add(w);
 
         return;
     }
     if (lAlt && scancode == 0x41)
     {
-        Window* oldActive = activeWindow;
+        //Window* oldActive = activeWindow;
         Window* mainWindow = (Window*)_Malloc(sizeof(Window), "Main Window");
         TerminalInstance* terminal = (TerminalInstance*)_Malloc(sizeof(TerminalInstance), "Terminal Instance");
         *terminal = TerminalInstance(&guestUser);
@@ -190,14 +186,7 @@ void HandleKeyboard(uint8_t scancode)
         //KeyboardPrintStart(mainWindow);
         ((TerminalInstance*)mainWindow->instance)->KeyboardPrintStart();
 
-        activeWindow = mainWindow;          
-        mainWindow->moveToFront = true;
-        osData.mainTerminalWindow = mainWindow;
-
-        if (oldActive != NULL)
-        {
-            osData.windowPointerThing->UpdateWindowBorder(oldActive);
-        }
+        osData.windowsToGetActive.add(mainWindow);
     }
 
 

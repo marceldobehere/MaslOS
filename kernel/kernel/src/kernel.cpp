@@ -207,7 +207,27 @@ void RenderLoop()
             bgm = osData.drawBackground;
         }
 
-   
+        AddToStack();
+        if (osData.windowsToGetActive.getCount() > 0)
+        {
+            Window* w = osData.windowsToGetActive[0];
+            osData.windowsToGetActive.removeAt(0);
+
+            Window* oldActive = activeWindow;
+            activeWindow = w;          
+            if (w != NULL)
+            {
+                w->moveToFront = true;
+                w->hidden = false;
+                if (w == osData.debugTerminalWindow)
+                    osData.showDebugterminal = true;
+            }
+
+            if (oldActive != NULL)
+                osData.windowPointerThing->UpdateWindowBorder(oldActive);
+        }
+
+        RemoveFromStack();
 
         AddToStack();
         {
@@ -902,7 +922,7 @@ void boot(BootInfo* bootInfo)
 
 
         activeWindow = mainWindow;
-        osData.mainTerminalWindow = mainWindow;
+        //osData.mainTerminalWindow = mainWindow;
     }
 
 

@@ -1363,7 +1363,7 @@ namespace FilesystemInterface
 
             uint64_t diff = ((((uint64_t)buffer ) + totalSize) - ((uint64_t)tBuffer));
             if (diff != 0)
-                osData.mainTerminalWindow->Log("Diff:               {}", to_string(diff), Colors.red);
+                ;//osData.mainTerminalWindow->Log("Diff:               {}", to_string(diff), Colors.red);
             
         }
 
@@ -1511,7 +1511,7 @@ namespace FilesystemInterface
 
             uint64_t diff = ((((uint64_t)buffer) + (totalSize - addrOffset)) - ((uint64_t)tBuffer));
             if (diff != 0)
-                osData.mainTerminalWindow->Log("Diff:               {}", to_string(diff), Colors.red);
+                ;//osData.mainTerminalWindow->Log("Diff:               {}", to_string(diff), Colors.red);
 
 
             _Free(buffer);

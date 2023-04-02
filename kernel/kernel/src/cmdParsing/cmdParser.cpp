@@ -300,7 +300,6 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     if (StrEquals(input, "connect 4") || StrEquals(input, "connect four"))
     {
         {
-            Window* oldActive = activeWindow;
             Window* con4Window = (Window*)_Malloc(sizeof(Window), "Connect 4 Window");
             Connect4Instance* connect4 = (Connect4Instance*)_Malloc(sizeof(Connect4Instance), "Connect 4 Instance");
             *connect4 = Connect4Instance(con4Window);
@@ -310,14 +309,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             connect4->Init();
             
             
-            activeWindow = con4Window;          
-            con4Window->moveToFront = true;
-            osData.mainTerminalWindow = con4Window;
-
-            if (oldActive != NULL)
-            {
-                osData.windowPointerThing->UpdateWindowBorder(oldActive);
-            }
+            osData.windowsToGetActive.add(con4Window);
 
             RemoveFromStack();
             return;

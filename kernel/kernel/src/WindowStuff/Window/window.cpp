@@ -533,7 +533,6 @@ bool CreateWindowWithId(int64_t id)
     if (window != NULL)
         return false;
 
-    Window* _oldActive = activeWindow;
     Window* _mainWindow = (Window*)_Malloc(sizeof(Window), "Window");
     GuiInstance* _gui = (GuiInstance*)_Malloc(sizeof(GuiInstance), "GUI Instance");
     *_gui = GuiInstance(_mainWindow);
@@ -542,14 +541,7 @@ bool CreateWindowWithId(int64_t id)
     osData.windows.add(_mainWindow);
     _gui->Init();
 
-    activeWindow = _mainWindow;          
-    _mainWindow->moveToFront = true;
-    osData.mainTerminalWindow = _mainWindow;
-
-    if (_oldActive != NULL)
-    {
-        osData.windowPointerThing->UpdateWindowBorder(_oldActive);
-    }
+    osData.windowsToGetActive.add(_mainWindow);
 
     return true;
 }

@@ -193,10 +193,11 @@ void Panic(const char* panicMessage, const char* var, bool lock)
                     
                     //GlobalRenderer->Println("BRUH 4.7", Colors.yellow);
 
-                    activeWindow = crashWindow;
-                    osData.mainTerminalWindow = crashWindow;
-                    osData.activeCrashWindow = crashWindow;
-                    crashWindow->moveToFront = true;
+                    // activeWindow = crashWindow;
+                    // //osData.mainTerminalWindow = crashWindow;
+                    // osData.activeCrashWindow = crashWindow;
+                    // crashWindow->moveToFront = true;
+                    osData.windowsToGetActive.add(crashWindow);
                 }
             }
             // it crashes between 4 and 5, probably while trying to allocate memory since it used all the memory
