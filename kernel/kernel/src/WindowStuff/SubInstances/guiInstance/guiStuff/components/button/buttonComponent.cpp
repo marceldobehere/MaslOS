@@ -44,6 +44,9 @@ namespace GuiComponentStuff
 
         mouseClickedCallBack = NULL;
         keyHitCallBack = NULL;
+
+        CheckUpdates();
+        Render(Field(Position(), GetActualComponentSize()));
     }
 
     void ButtonComponent::MouseClicked(MouseClickEventInfo info)
@@ -60,7 +63,7 @@ namespace GuiComponentStuff
             keyHitCallBack(this, info);
     }
 
-    void ButtonComponent::Render(Field field)
+    void ButtonComponent::CheckUpdates()
     {
         AddToStack();
         Window* wind = (Window*)GetWindow();
@@ -119,6 +122,15 @@ namespace GuiComponentStuff
             textComp->fgColor = textColDef;
             rectComp->fillColor = bgColDef;
         }
+
+        actualButtonStuff->CheckUpdates();
+
+        RemoveFromStack();
+    }
+
+    void ButtonComponent::Render(Field field)
+    {
+        AddToStack();
 
         actualButtonStuff->Render(field);
         RemoveFromStack();

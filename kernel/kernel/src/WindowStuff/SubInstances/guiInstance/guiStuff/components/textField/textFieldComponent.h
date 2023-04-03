@@ -44,6 +44,7 @@ namespace GuiComponentStuff
         void MouseClicked(MouseClickEventInfo info);
         void KeyHit(KeyHitEventInfo info);
         void Render(Field field);
+        void CheckUpdates();
         void Destroy(bool destroyChildren, void (*callBackFunc)(BaseComponent* comp));
         ComponentSize GetActualComponentSize();
 

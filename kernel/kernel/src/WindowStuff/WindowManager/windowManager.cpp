@@ -29,6 +29,8 @@ namespace WindowManager
         {
             if (osData.windows[i]->hidden)
                 continue;
+            if (osData.windows[i] == osData.debugTerminalWindow && !osData.showDebugterminal)
+                continue;
             //GlobalRenderer->Println("Check: {}", to_string(i), Colors.yellow);
             Position tl = osData.windows[i]->position;
             Position br = Position(tl.x + osData.windows[i]->size.width, tl.y + osData.windows[i]->size.height);

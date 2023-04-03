@@ -21,9 +21,10 @@ namespace GuiComponentStuff
     class BaseComponent
     {
         protected:
-        List<Field>* updateFields;
+        
 
         public:
+        List<Field>* updateFields;
         BaseComponent* parent;
         ComponentSize size = ComponentSize();
         Position position;
@@ -54,12 +55,14 @@ namespace GuiComponentStuff
         void KeyHit(KeyHitEventInfo info);
 
         void Render(Field field);
+        void CheckUpdates();
         bool Destroy(bool destroyChildren, void (*callBackFunc)(BaseComponent* comp));
 
         bool SetAttribute(int32_t type, uint64_t val);
         uint64_t GetAttribute(int32_t type);
         int GetAttributeSize(int32_t type);
         
+        Field GetFieldWithPos();
 
     };
 

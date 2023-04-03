@@ -11,6 +11,7 @@ namespace GuiComponentStuff
         unsigned int Height;
 
         ComponentFramebuffer(int x, int y);
+        ComponentFramebuffer(int x, int y, uint32_t* pxls);
         void Free();
     };
     

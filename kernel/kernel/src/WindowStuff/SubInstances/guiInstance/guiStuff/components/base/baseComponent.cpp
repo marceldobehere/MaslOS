@@ -43,6 +43,27 @@ namespace GuiComponentStuff
         RemoveFromStack();
     }
 
+    void BaseComponent::CheckUpdates()
+    {
+        if (hidden)
+            return;
+
+        AddToStack();
+        if (componentType == RECT)
+            ((RectangleComponent*)this)->CheckUpdates();
+        if (componentType == SCREEN)
+            ((ScreenComponent*)this)->CheckUpdates();
+        if (componentType == BOX)
+            ((BoxComponent*)this)->CheckUpdates();
+        if (componentType == TEXT)
+            ((TextComponent*)this)->CheckUpdates();
+        if (componentType == BUTTON)
+            ((ButtonComponent*)this)->CheckUpdates();
+        if (componentType == TEXTFIELD)
+            ((TextFieldComponent*)this)->CheckUpdates();
+        RemoveFromStack();
+    }
+
     void BaseComponent::MouseClicked(MouseClickEventInfo info)
     {
         if (componentType == RECT)
@@ -151,6 +172,11 @@ namespace GuiComponentStuff
             return false;
         else
             return !hidden && parent->IsVisible();
+    }
+
+    Field BaseComponent::GetFieldWithPos()
+    {
+        return Field(position, GetActualComponentSize());
     }
 
     // BaseComponent* BaseComponent::GetComponentFromId(uint64_t id)

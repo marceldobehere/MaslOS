@@ -38,26 +38,40 @@ void TaskWindowClose::Do()
         return;
     }
 
-    osData.windows.removeAt(index);
 
-    osData.windowPointerThing->UpdatePointerRect(
-        window->position.x - 1, 
-        window->position.y - 23, 
-        window->position.x + window->size.width, 
-        window->position.y + window->size.height
-        );
+    if (window == osData.debugTerminalWindow)
+    {
+        osData.showDebugterminal = false;
 
-    if (window == activeWindow)
-        activeWindow = NULL;
+        osData.windowPointerThing->UpdatePointerRect(
+            window->position.x - 1, 
+            window->position.y - 23, 
+            window->position.x + window->size.width, 
+            window->position.y + window->size.height
+            );
+    }
+    else
+    {
+        osData.windows.removeAt(index);
 
-    if (window->title != NULL)
-        _TryFree(window->title);
+        osData.windowPointerThing->UpdatePointerRect(
+            window->position.x - 1, 
+            window->position.y - 23, 
+            window->position.x + window->size.width, 
+            window->position.y + window->size.height
+            );
+            
+        if (window == activeWindow)
+            activeWindow = NULL;
 
-    window->Free();
-    _Free(window);
-    window = NULL;
-    
-    
+        if (window->title != NULL)
+            _TryFree(window->title);
+
+        window->Free();
+        _Free(window);
+        window = NULL;
+    }
+
     done = true;
     RemoveFromStack();
 }

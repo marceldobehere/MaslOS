@@ -81,6 +81,12 @@ namespace GuiComponentStuff
             y = 0;
         }
 
+        Position(ComponentSize fixedSize)
+        {
+            x = fixedSize.FixedX;
+            y = fixedSize.FixedY;
+        }
+
         Position operator-(Position other)
         {
             return Position(this->x - other.x, this->y - other.y);
@@ -120,9 +126,19 @@ namespace GuiComponentStuff
             BR = Position();
         }
 
+        Field(Position tl, ComponentSize fixedSize)
+        {
+            TL = tl;
+            BR = tl + Position(fixedSize);
+        }
+
         Field operator- (Position other)
         {
             return Field(TL - other, BR - other);
+        }
+        Field operator+ (Position other)
+        {
+            return Field(TL + other, BR + other);
         }
 
         bool operator==(Field other)

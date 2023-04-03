@@ -8,11 +8,14 @@ namespace GuiComponentStuff
     {
         this->window = window;
         updateFields = new List<Field>(5);
+        finalUpdatedFields = new List<Field>(5);
         size = ComponentSize((int)window->framebuffer->Width, (int)window->framebuffer->Height);
         oldSize = size;
         componentType = SCREEN;
         parent = NULL;
         children = new List<BaseComponent*>(5);
+        childrenFields = new List<Field>(5);
+        childrenHidden = new List<bool>(5);
         renderer = new ComponentRenderer(size);
         backgroundColor = Colors.bgray;
         renderer->bgCol = backgroundColor;
@@ -20,13 +23,20 @@ namespace GuiComponentStuff
 
         tempSelectedComponent = NULL;
         selectedComponent = NULL;
+
+        updateFields->add(Field(Position(), GetActualComponentSize()));
+        CheckUpdates(); 
     }
 
-    void ScreenComponent::Render(Field field)
+    void ScreenComponent::CheckUpdates()
     {
         AddToStack();
+
+
         tempSelectedComponent = NULL;
         ComponentSize tSize = ComponentSize((int)window->framebuffer->Width, (int)window->framebuffer->Height);
+        bool update = false;
+
 
         AddToStack();
         if (oldSize != tSize)
@@ -34,25 +44,122 @@ namespace GuiComponentStuff
             renderer->Resize(tSize);
             size = tSize;
             oldSize = tSize;
+            update = true;
         }
         RemoveFromStack();
 
         AddToStack();
+        if (backgroundColor != renderer->bgCol)
         {
-            Field temp = field - position;
             renderer->bgCol = backgroundColor;
-            renderer->Fill(renderer->bgCol, temp);
+            renderer->Fill(backgroundColor);
+            update = true;
         }
         RemoveFromStack();
 
-        Field bruh = field - position;
+        for (int i = 0; i < children->getCount(); i++)
+            children->elementAt(i)->CheckUpdates();
+        {
+            int cCount = children->getCount();
+            while (childrenFields->getCount() > cCount)
+            {
+                updateFields->add(childrenFields->elementAt(childrenFields->getCount() - 1));
+                childrenFields->removeLast();
+                childrenHidden->removeLast();
+            }
+            while (childrenFields->getCount() < cCount)
+            {
+                childrenFields->add(Field());
+                childrenHidden->add(false);
+            }
+        }
+        {
+            for (int i = 0; i < childrenFields->getCount(); i++)
+            {
+                Field a = childrenFields->elementAt(i);
+                Field b = children->elementAt(i)->GetFieldWithPos();
+                bool a1 = childrenHidden->elementAt(i);
+                bool b1 = children->elementAt(i)->hidden;
+
+                if (a != b || a1 != b1)
+                {
+                    childrenFields->set(i, b);
+                    childrenHidden->set(i, b1);
+                    updateFields->add(a);
+                    updateFields->add(b);
+                }
+            }
+        }
+        {
+            for (int i = 0; i < childrenFields->getCount(); i++)
+            {
+                Field a = childrenFields->elementAt(i);
+                Field b = children->elementAt(i)->GetFieldWithPos();
+
+                if (a != b)
+                {
+                    childrenFields->set(i, b);
+                    updateFields->add(a);
+                    updateFields->add(b);
+                }
+            }
+        }
+        if (update)
+        {
+            updateFields->clear();
+            updateFields->add(Field(Position(), GetActualComponentSize()));
+        }
 
         AddToStack();
-        for (int i = 0; i < children->getCount(); i++)
+        while (updateFields->getCount() > 0)
         {
-            children->elementAt(i)->Render(bruh);
+            Field bruh = updateFields->elementAt(0);
+            updateFields->removeAt(0);
+            finalUpdatedFields->add(bruh);
+            renderer->bgCol = backgroundColor;
+            renderer->Fill(renderer->bgCol, bruh);
+            for (int i = 0; i < children->getCount(); i++)
+                children->elementAt(i)->Render(bruh - children->elementAt(i)->position);
+
         }
         RemoveFromStack();
+
+
+
+        RemoveFromStack();
+    }
+
+    void ScreenComponent::Render(Field field)
+    {
+        AddToStack();
+        // tempSelectedComponent = NULL;
+        // ComponentSize tSize = ComponentSize((int)window->framebuffer->Width, (int)window->framebuffer->Height);
+
+        // AddToStack();
+        // if (oldSize != tSize)
+        // {
+        //     renderer->Resize(tSize);
+        //     size = tSize;
+        //     oldSize = tSize;
+        // }
+        // RemoveFromStack();
+
+        // AddToStack();
+        // {
+        //     Field temp = field - position;
+        //     renderer->bgCol = backgroundColor;
+        //     renderer->Fill(renderer->bgCol, temp);
+        // }
+        // RemoveFromStack();
+
+        // Field bruh = field - position;
+
+        // AddToStack();
+        // for (int i = 0; i < children->getCount(); i++)
+        // {
+        //     children->elementAt(i)->Render(bruh);
+        // }
+        // RemoveFromStack();
 
         RemoveFromStack();
     }
@@ -99,6 +206,12 @@ namespace GuiComponentStuff
         _Free(children);
         updateFields->free();
         _Free(updateFields);
+        finalUpdatedFields->free();
+        _Free(finalUpdatedFields);
+        childrenFields->free();
+        _Free(childrenFields);
+        childrenHidden->free();
+        _Free(childrenHidden);
         RemoveFromStack();
 
         AddToStack();

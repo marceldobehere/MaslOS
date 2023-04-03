@@ -12,6 +12,13 @@ namespace GuiComponentStuff
         Height = y;
     }
 
+    ComponentFramebuffer::ComponentFramebuffer(int x, int y, uint32_t* pxls)
+    {
+        this->pixels = pxls;
+        Width = x;
+        Height = y;
+    }
+
     void ComponentFramebuffer::Free()
     {
         _Free(pixels);
@@ -110,8 +117,17 @@ namespace GuiComponentStuff
         int h = componentFrameBuffer->Height;
         int w = componentFrameBuffer->Width;
 
-        for (int y = field.TL.y; y <= field.BR.y && y < h; y++)
-            for (int x = field.TL.x; x <= field.BR.x && x < w; x++)
+        if (field.TL.x < 0)
+            field.TL.x = 0;
+        if (field.TL.y < 0)
+            field.TL.y = 0;
+        if (field.BR.x >= w)
+            field.BR.x = w - 1;
+        if (field.BR.y >= h)
+            field.BR.y = h - 1;
+
+        for (int y = field.TL.y; y <= field.BR.y; y++)
+            for (int x = field.TL.x; x <= field.BR.x; x++)
                 pxls[x + y * w] = col;
         RemoveFromStack();
     }

@@ -101,6 +101,17 @@ template <typename T> void List<T>::add(T item)
     RemoveFromStack();
 }
 
+template <typename T> void List<T>::set(uint64_t index, T item)
+{
+    AddToStack();
+    int64_t indx = index;
+    if (index > count || indx < 0)
+        return;
+    arr[index] = item;
+    
+    RemoveFromStack();
+}
+
 template <typename T> void List<T>::insertAt(T item, uint64_t index)
 {
     int64_t indx = index;

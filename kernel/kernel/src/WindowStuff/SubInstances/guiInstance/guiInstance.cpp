@@ -22,6 +22,24 @@ void GuiInstance::Init()
     allComponents->add(screen);
     screen->id = 1234;
     window->renderer->Clear(Colors.white);
+    screen->CheckUpdates();
+
+    GuiComponentStuff::ComponentFramebuffer bruhus = GuiComponentStuff::ComponentFramebuffer
+        (
+            window->framebuffer->Width,
+            window->framebuffer->Height,
+            (uint32_t*)window->framebuffer->BaseAddress
+        );
+
+    screen->renderer->Render(
+        screen->position, 
+        GuiComponentStuff::Field(
+            GuiComponentStuff::Position(), 
+            screen->GetActualComponentSize()
+        ), 
+        &bruhus
+    );
+
 }
 
 int GetBaseComponentAttributeSize(GuiInstanceBaseAttributeType type)
@@ -62,11 +80,29 @@ void GuiInstance::Render()
     if (screen == NULL)
         return;
     //window->renderer->Clear(Colors.orange);
-    screen->Render(GuiComponentStuff::Field(GuiComponentStuff::Position(), GuiComponentStuff::Position(window->size.width - 1, window->size.height - 1)));
-    long t = window->size.height * (long)window->size.width;
 
-    for (long i = 0; i < t; i++)
-        ((uint32_t*)window->framebuffer->BaseAddress)[i] = screen->renderer->componentFrameBuffer->pixels[i];
+    screen->CheckUpdates();
+
+    while (screen->finalUpdatedFields->getCount() > 0)
+    {
+        GuiComponentStuff::Field bruh = screen->finalUpdatedFields->elementAt(0);
+        screen->finalUpdatedFields->removeAt(0);
+
+        GuiComponentStuff::ComponentFramebuffer bruhus = GuiComponentStuff::ComponentFramebuffer
+            (
+                window->framebuffer->Width,
+                window->framebuffer->Height,
+                (uint32_t*)window->framebuffer->BaseAddress
+            );
+
+        screen->renderer->Render(screen->position, bruh, &bruhus);
+    }
+    
+    //screen->Render(GuiComponentStuff::Field(GuiComponentStuff::Position(), GuiComponentStuff::Position(window->size.width - 1, window->size.height - 1)));
+    // long t = window->size.height * (long)window->size.width;
+
+    // for (long i = 0; i < t; i++)
+    //     ((uint32_t*)window->framebuffer->BaseAddress)[i] = screen->renderer->componentFrameBuffer->pixels[i];
 }
 
 GuiComponentStuff::BaseComponent* GuiInstance::GetComponentFromId(uint64_t id)
@@ -238,6 +274,8 @@ void GuiInstance::Free()
 
     allComponents->free();
     _Free(allComponents);
+
+
     RemoveFromStack();
 }
 

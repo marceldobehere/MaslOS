@@ -17,6 +17,9 @@ namespace GuiComponentStuff
         oldSize = temp;
         oldFillColor = fillColor;
         updateFields = new List<Field>(5);
+
+        CheckUpdates();
+        Render(Field(Position(), GetActualComponentSize()));
     }
 
     void RectangleComponent::MouseClicked(MouseClickEventInfo info)
@@ -29,23 +32,36 @@ namespace GuiComponentStuff
 
     }
 
-    void RectangleComponent::Render(Field field)
+    void RectangleComponent::CheckUpdates()
     {
         AddToStack();
+        bool update = false;
         ComponentSize temp = GetActualComponentSize();
         if (oldSize != temp)
         {
             renderer->Resize(temp);
             renderer->Fill(fillColor);
             oldSize = temp;
+            update = true;
         }
         if (oldFillColor != fillColor)
         {
             renderer->Fill(fillColor);
             oldFillColor = fillColor;
+            update = true;
         }
 
-        renderer->Render(position, field, parent->renderer->componentFrameBuffer);
+        if (update)
+            parent->updateFields->add(Field(position, temp));
+
+        RemoveFromStack();
+    }
+
+    void RectangleComponent::Render(Field field)
+    {
+        AddToStack();
+        if (!hidden)
+            renderer->Render(position, field, parent->renderer->componentFrameBuffer);
         RemoveFromStack();
     }
 

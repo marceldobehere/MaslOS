@@ -16,12 +16,15 @@ namespace GuiComponentStuff
         public:
         uint32_t backgroundColor = 0;
         List<BaseComponent*>* children;
+        List<Field>* childrenFields;
+        List<bool>* childrenHidden;
 
         //BoxComponent(BaseComponent* parent);
         BoxComponent(BaseComponent* parent, ComponentSize size, uint32_t bgCol);
         void MouseClicked(MouseClickEventInfo info);
         void KeyHit(KeyHitEventInfo info);
         void Render(Field field);
+        void CheckUpdates();
         void Destroy(bool destroyChildren, void (*callBackFunc)(BaseComponent* comp));
         ComponentSize GetActualComponentSize();
 
