@@ -1,6 +1,7 @@
 #include "componentRenderer.h"
 #include "../../../../memory/heap.h"
 #include "../../../../OSDATA/MStack/MStackM.h"
+#include "../../../../rnd/rnd.h"
 
 
 namespace GuiComponentStuff
@@ -92,8 +93,9 @@ namespace GuiComponentStuff
             {
                 uint32_t col = pxls[x + y * w];
                 if (col >> 24 != 0)
-                    pxlsTo[(x + componentPosition.x) + (y + componentPosition.y) * w2] = col;
+                    pxlsTo[(x + componentPosition.x) + (y + componentPosition.y) * w2] = col;// & (0xFFFF0000 | ((uint16_t)RND::lehmer64()));
             }
+
         RemoveFromStack();
         RemoveFromStack();
     }
