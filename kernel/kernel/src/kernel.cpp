@@ -794,6 +794,7 @@ void boot(BootInfo* bootInfo)
     //
     //while(true);
     osData.booting = true;
+    osData.verboseBoot = false;
 
     PrintAll = true;
     KernelInfo kernelInfo = InitializeKernel(bootInfo);

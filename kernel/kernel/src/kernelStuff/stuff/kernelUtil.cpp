@@ -699,10 +699,11 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     r = BasicRenderer(bootInfo->framebuffer, bootInfo->psf1_font);
     GlobalRenderer = &r;
 
-
+    PrepBootScreen();
     PrintMsg("> Initializing Kernel");
     Println();
     PrintMsgStartLayer("BOOT");
+    StepDone(0);
     // PrintMsg("Test 1");
     // PrintMsgStartLayer("TEST");
     // PrintMsg("Test 2");
@@ -733,7 +734,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     gdtDescriptor.Size = sizeof(GDT) - 1;
     gdtDescriptor.Offset = (uint64_t)&DefaultGDT;
     LoadGDT(&gdtDescriptor);
-
+    StepDone(1);
 
     RemoveFromStack();
 
@@ -746,11 +747,13 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     PrepareMemory(bootInfo);
     PrintMsgEndLayer("Prepare Memory");
     RemoveFromStack();
+    StepDone(2);
     
     //while(true);
     
     PrintMsg("> Initializing Heap");
     InitializeHeap((void*)0x0000100000000000, 0x10);
+    StepDone(3);
 
     //GlobalRenderer->Println("BG IMG: {}", to_string((uint64_t)bootInfo->bgImage), Colors.orange);
 
@@ -765,21 +768,25 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     PrintMsg("> Getting Background Image");
     Framebuffer* bgImg = kernelFiles::ConvertImageToFramebuffer(bootInfo->bgImage);
-
+    StepDone(4);
     
     
     PrintMsg("> Preparing Windows (1/2)");
     PrepareWindowsTemp(bgImg);
+    StepDone(5);
 
     
 
     PrintMsg("> Initing RTC");
     RTC::InitRTC();
+    StepDone(6);
     PrintMsg("> Reading RTC");
     RTC::read_rtc();
+    StepDone(7);
 
     PrintMsg("> Updating RTC Time");
     RTC::UpdateTimeIfNeeded();
+    StepDone(8);
 
     PrintMsgStartLayer("RTC Info");
     PrintMsgColSL("TIME: ", Colors.yellow);
@@ -795,6 +802,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     PrintMsg("> Initing PIT");
     PIT::InitPIT();
+    StepDone(9);
     
 
     #define STAT 0x64
@@ -809,19 +817,25 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
             inb(CMD);
         }
     }
+    StepDone(10);
     
     PrintMsg("> Initing PS/2 Mouse");
     InitPS2Mouse(bootInfo->mouseZIP, "default.mbif");
     //mouseImage = kernelFiles::ConvertFileToImage(kernelFiles::ZIP::GetFileFromFileName(bootInfo->mouseZIP, "default.mbif"));
+    StepDone(11);
 
     PrintMsg("> Initing Keyboard State List");
     InitKeyboardListRam();
+    StepDone(12);
 
     PrintMsg("> Initing PS/2 Keyboard");
     InitKeyboard();
+    StepDone(13);
     
     PrintMsg("> Preparing Interrupts");
     PrepareInterrupts();
+    PIT::Inited = true;
+    StepDone(14);
 
 
     PrintMsg("> Clearing Input Buffer (2/2)");
@@ -833,9 +847,11 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
             inb(CMD);
         }
     }
+    StepDone(15);
     
     PrintMsg("> Initing Users");
     initUsers();
+    StepDone(16);
 
 
     PrintMsg("> Creating List for Disk Interfaces");
@@ -843,6 +859,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     osData.windowIconZIP = bootInfo->windowIconsZIP;
     osData.windowButtonZIP = bootInfo->windowButtonZIP;
+    StepDone(17);
 
     //GlobalRenderer->Clear(Colors.black);
     //GlobalRenderer->Println("                                     COUNT OF WINDOW ICONS: {}", to_string(WindowManager::countOfWindowIcons), Colors.yellow);
@@ -851,7 +868,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     PrintMsg("> Loading Window Icons");
     for (int i = 0; i < WindowManager::countOfWindowIcons; i++)
         WindowManager::internalWindowIcons[i] = kernelFiles::ConvertFileToImage(kernelFiles::ZIP::GetFileFromFileName(osData.windowIconZIP, WindowManager::windowIconNames[i]));
-    
+    StepDone(18);
 
     PrintMsg("> Loading Window Button Icons");
     for (int i = 0; i < WindowManager::countOfButtonIcons; i++)
@@ -863,19 +880,23 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
         //osData.debugTerminalWindow->Log("- Width:  {}px", to_string(WindowManager::windowIcons[i]->width), Colors.yellow);
         //osData.debugTerminalWindow->Log("- Height: {}px", to_string(WindowManager::windowIcons[i]->height), Colors.yellow);
     }
+    StepDone(19);
     
 
     PrintMsg("> Preparing Windows (2/2)");
     PrepareWindows(bgImg);
     PrintDebugTerminal();
+    StepDone(20);
     
     PrintMsg("> Initing Taskbar");
     Taskbar::InitTaskbar(bootInfo->MButton, bootInfo->MButtonS);
+    StepDone(23);
 
     //bootInfo->rsdp = (ACPI::RSDP2*)((uint64_t)bootInfo->rsdp + 20); //idk why but this is very important unless ya want the whole os to crash on boot
 
     PrintMsg("> Initing Start Menu");
     InitStartMenuWindow(bootInfo);
+    StepDone(24);
 
     //while (true);
     PrintMsg("> Prepare ACPI");
@@ -883,6 +904,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     PrepareACPI(bootInfo);
     PrintMsgEndLayer("ACPI");
     PrintDebugTerminal();
+    StepDone(25);
 
     
 
@@ -891,6 +913,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     PrintMsg("> Enabling FPU");
     enable_fpu();
+    StepDone(26);
     
     PrintMsg("> Creating OS Ram Disk");
     PrintMsgStartLayer("OS RAM DISK");
@@ -939,9 +962,12 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     }
     RemoveFromStack();
     PrintMsgEndLayer("OS RAM DISK");
+    StepDone(27);
 
     PrintMsgEndLayer("BOOT");
 
+    StepDone(28);
+    PIT::Sleep(200);
     PrintMsgCol("> Inited Kernel!", Colors.bgreen);
     RemoveFromStack();
     return kernelInfo;

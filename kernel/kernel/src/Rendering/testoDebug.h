@@ -3,6 +3,10 @@
 
 extern bool PrintAll;
 
+void PercentDone(int percent);
+void StepDone(int step);
+void PrepBootScreen();
+
 void PrintSpaces();
 void PrintMsgColSL(const char* msg, const char* var, uint32_t col);
 void Println();

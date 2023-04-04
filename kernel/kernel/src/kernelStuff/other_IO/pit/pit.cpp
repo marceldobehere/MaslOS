@@ -19,7 +19,7 @@ namespace PIT
         TicksSinceBoot = 0;
         SetDivisor(400 /*65535*/);
         freq = GetFrequency();
-        Inited = true;
+        //Inited = true;
     }
 
     void SetDivisor(uint16_t divisor)

@@ -23,6 +23,7 @@ struct OSData
 {
     bool exit;
     bool booting;
+    bool verboseBoot;
     KernelInfo* kernelInfo;
     List<Window*> windows;
     List<Window*> windowsToGetActive;
