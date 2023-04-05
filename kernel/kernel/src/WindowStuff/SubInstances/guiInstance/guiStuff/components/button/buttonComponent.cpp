@@ -46,7 +46,7 @@ namespace GuiComponentStuff
         keyHitCallBack = NULL;
 
         CheckUpdates();
-        Render(Field(Position(), GetActualComponentSize()));
+        //Render(Field(Position(), GetActualComponentSize()));
     }
 
     void ButtonComponent::MouseClicked(MouseClickEventInfo info)

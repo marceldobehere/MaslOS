@@ -37,7 +37,7 @@ namespace GuiComponentStuff
         renderer->Fill(backgroundColor);
 
         CheckUpdates();
-        Render(Field(Position(), GetActualComponentSize()));
+        //Render(Field(Position(), GetActualComponentSize()));
     }
 
     void BoxComponent::MouseClicked(MouseClickEventInfo info)
@@ -87,7 +87,7 @@ namespace GuiComponentStuff
             while (childrenFields->getCount() < cCount)
             {
                 childrenFields->add(Field());
-                childrenHidden->add(false);
+                childrenHidden->add(true);
             }
         }
         {

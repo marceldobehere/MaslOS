@@ -42,7 +42,7 @@ namespace GuiComponentStuff
         keyHitCallBack = NULL;
 
         CheckUpdates();
-        Render(Field(Position(), GetActualComponentSize()));
+        //Render(Field(Position(), GetActualComponentSize()));
     }
 
     void TextFieldComponent::MouseClicked(MouseClickEventInfo info)

@@ -19,7 +19,7 @@ namespace GuiComponentStuff
         updateFields = new List<Field>(5);
 
         CheckUpdates();
-        Render(Field(Position(), GetActualComponentSize()));
+        //Render(Field(Position(), GetActualComponentSize()));
     }
 
     void RectangleComponent::MouseClicked(MouseClickEventInfo info)

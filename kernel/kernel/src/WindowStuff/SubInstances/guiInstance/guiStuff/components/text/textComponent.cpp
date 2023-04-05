@@ -32,7 +32,7 @@ namespace GuiComponentStuff
 
 
         CheckUpdates();
-        Render(Field(Position(), GetActualComponentSize()));
+        //Render(Field(Position(), GetActualComponentSize()));
     }
 
     void TextComponent::MouseClicked(MouseClickEventInfo info)

@@ -6,6 +6,7 @@
 #include "../text/textComponent.h"
 #include "../button/buttonComponent.h"
 #include "../textField/textFieldComponent.h"
+#include "../imageRect/imageRectangleComponent.h"
 #include "../../../../../../OSDATA/MStack/MStackM.h"
 #include "../../../guiInstance.h"
 
@@ -40,6 +41,8 @@ namespace GuiComponentStuff
             ((ButtonComponent*)this)->Render(field);
         if (componentType == TEXTFIELD)
             ((TextFieldComponent*)this)->Render(field);
+        if (componentType == IMAGE_RECT)
+            ((ImageRectangleComponent*)this)->Render(field);
         RemoveFromStack();
     }
 
@@ -61,6 +64,8 @@ namespace GuiComponentStuff
             ((ButtonComponent*)this)->CheckUpdates();
         if (componentType == TEXTFIELD)
             ((TextFieldComponent*)this)->CheckUpdates();
+        if (componentType == IMAGE_RECT)
+            ((ImageRectangleComponent*)this)->CheckUpdates();
         RemoveFromStack();
     }
 
@@ -78,6 +83,8 @@ namespace GuiComponentStuff
             ((ButtonComponent*)this)->MouseClicked(info);
         if (componentType == TEXTFIELD)
             ((TextFieldComponent*)this)->MouseClicked(info);
+        if (componentType == IMAGE_RECT)
+            ((ImageRectangleComponent*)this)->MouseClicked(info);
     }
 
     void BaseComponent::KeyHit(KeyHitEventInfo info)
@@ -94,6 +101,8 @@ namespace GuiComponentStuff
             ((ButtonComponent*)this)->KeyHit(info);
         if (componentType == TEXTFIELD)
             ((TextFieldComponent*)this)->KeyHit(info);
+        if (componentType == IMAGE_RECT)
+            ((ImageRectangleComponent*)this)->KeyHit(info);
     }
 
     bool BaseComponent::Destroy(bool destroyChildren, void (*callBackFunc)(BaseComponent* comp))
@@ -123,6 +132,8 @@ namespace GuiComponentStuff
             ((ButtonComponent*)this)->Destroy(destroyChildren, callBackFunc);
         if (componentType == TEXTFIELD)
             ((TextFieldComponent*)this)->Destroy(destroyChildren, callBackFunc);
+        if (componentType == IMAGE_RECT)
+            ((ImageRectangleComponent*)this)->Destroy(destroyChildren, callBackFunc);
 
         RemoveFromStack();
         return true;
@@ -142,6 +153,8 @@ namespace GuiComponentStuff
             return ((ButtonComponent*)this)->GetActualComponentSize();
         if (componentType == TEXTFIELD)
             return ((TextFieldComponent*)this)->GetActualComponentSize();
+        if (componentType == IMAGE_RECT)
+            return ((ImageRectangleComponent*)this)->GetActualComponentSize();
 
         return ComponentSize(0, 0);
     }
@@ -238,6 +251,8 @@ namespace GuiComponentStuff
             return ((ButtonComponent*)this)->SetAttribute(type, val);
         if (componentType == TEXTFIELD)
             return ((TextFieldComponent*)this)->SetAttribute(type, val);
+        if (componentType == IMAGE_RECT)
+            return ((ImageRectangleComponent*)this)->SetAttribute(type, val);
 
         return false;
     }
@@ -256,6 +271,8 @@ namespace GuiComponentStuff
             return ((ButtonComponent*)this)->GetAttribute(type);
         if (componentType == TEXTFIELD)
             return ((TextFieldComponent*)this)->GetAttribute(type);
+        if (componentType == IMAGE_RECT)
+            return ((ImageRectangleComponent*)this)->GetAttribute(type);
 
         return 0;
     }
@@ -274,6 +291,8 @@ namespace GuiComponentStuff
             return ((ButtonComponent*)this)->GetAttributeSize(type);
         if (componentType == TEXTFIELD)
             return ((TextFieldComponent*)this)->GetAttributeSize(type);
+        if (componentType == IMAGE_RECT)
+            return ((ImageRectangleComponent*)this)->GetAttributeSize(type);
 
         return 0;
     }
