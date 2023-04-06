@@ -20,15 +20,24 @@ namespace kernelFiles
         int32_t sizes[4] = {0, 0, 0, 0};
 
         for (int i = 0; i < 4; i++)
-	 	    sizes[i] =  (((uint32_t)data[(i*4)+3]) << 24) |
-                        (((uint32_t)data[(i*4)+2]) << 16) |
-                        (((uint32_t)data[(i*4)+1]) <<  8) |
-                        (((uint32_t)data[(i*4)+0]) <<  0) ;
+	 	    sizes[i] = *((int32_t*)&data[i*4]);
+            //  (((uint32_t)data[(i*4)+3]) << 24) |
+            //             (((uint32_t)data[(i*4)+2]) << 16) |
+            //             (((uint32_t)data[(i*4)+1]) <<  8) |
+            //             (((uint32_t)data[(i*4)+0]) <<  0) ;
 
         image->width = sizes[0];
         image->height = sizes[1];
         image->xOff = sizes[2];
         image->yOff = sizes[3];
+
+        int64_t s2 = image->width * image->height;
+        if (s2 < 0 || s2 >= File->size)
+        {
+            _Free(image);
+            RemoveFromStack();
+            return NULL;
+        }
 
         image->size = *((int64_t*)&data[4*4]);
 

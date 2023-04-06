@@ -1,5 +1,6 @@
 #include "imageRectangleComponent.h"
 #include "../../../../../../OSDATA/MStack/MStackM.h"
+#include "../../../../../../fsStuff/fsStuff.h"
 
 namespace GuiComponentStuff
 {
@@ -9,7 +10,7 @@ namespace GuiComponentStuff
         this->oldPath = StrCopy(path);
         //this->fillColor = fillColor;
         this->size = size;
-        componentType = RECT;
+        componentType = IMAGE_RECT;
         this->parent = parent;
         ComponentSize temp = GetActualComponentSize();
         renderer = new ComponentRenderer(temp);
@@ -20,6 +21,7 @@ namespace GuiComponentStuff
         //oldFillColor = fillColor;
         updateFields = new List<Field>(5);
 
+        image = NULL;
         GetImageFromPath(imagePath);
         RenderImg();
 
@@ -29,12 +31,112 @@ namespace GuiComponentStuff
 
     void ImageRectangleComponent::RenderImg()
     {
+        AddToStack();
         renderer->Fill(Colors.black);
+        if (image == NULL)
+        {
+            RemoveFromStack();
+            return;
+        }
 
+        // RemoveFromStack();
+        // return;
+        //renderer->Fill(Colors.bgreen);
+
+        // GlobalRenderer->Clear(Colors.black);
+        // GlobalRenderer->Println("SIZE 1:");
+        // GlobalRenderer->Println(" W: {}:", to_string(size.FixedX), Colors.white);
+        // GlobalRenderer->Println(" H: {}:", to_string(size.FixedY), Colors.white);
+        // GlobalRenderer->Println("SIZE 2:");
+        // GlobalRenderer->Println(" W: {}:", to_string(image->width), Colors.white);
+        // GlobalRenderer->Println(" H: {}:", to_string(image->height), Colors.white);
+        // while (true);
+
+
+        // if (tSize.FixedX != image->width || 
+        //     tSize.FixedY != image->height)
+        //     return;
+        //renderer->Fill(Colors.yellow);
+        
+
+        // for (int y = 0; y < image->height; y++)
+        // {
+        //     int w = renderer->componentFrameBuffer->Width;
+        //     for (int x = 0; x < image->width; x++)
+        //     {
+        //         uint32_t col = ((uint32_t*)image->imageBuffer)[y * image->width + x];
+        //         renderer->componentFrameBuffer->pixels[y * w + x] = col;
+
+        //     }
+        // }
+
+        // draw scaled
+
+        ComponentSize tSize = GetActualComponentSize();
+
+        int w = tSize.FixedX;
+        int h = tSize.FixedY;
+
+        int w2 = image->width;
+        int h2 = image->height;
+
+        if (w <= 0 || h <= 0 || w2 <= 0 || h2 <= 0)
+        {
+            RemoveFromStack();
+            return;
+        }
+
+
+
+        for (int y = 0; y < h; y++)
+        {
+            for (int x = 0; x < w; x++)
+            {
+                int aX = (x * w2) / w;
+                int aY = (y * h2) / h;
+                uint32_t col = ((uint32_t*)image->imageBuffer)[aY * w2 + aX];
+
+                renderer->componentFrameBuffer->pixels[y * w + x] = col;
+            }
+        }
+
+        RemoveFromStack();
     }
+
     void ImageRectangleComponent::GetImageFromPath(const char* path)
     {
+        AddToStack();
+        if (image != NULL)
+        {
+            _Free(image->imageBuffer);
+            _Free(image);
+        }
+        image = NULL;
 
+        char* buf;
+        int size = 0;
+        if (!FS_STUFF::GetDataFromFullPath(path, &buf, &size))
+        {
+            RemoveFromStack();
+            return;
+        }
+
+        kernelFiles::DefaultFile tempFile;
+        tempFile.fileData = buf;
+        tempFile.size = size;
+        tempFile.filename = "A";
+        tempFile.filenameSize = 1;
+        kernelFiles::ImageFile* img = kernelFiles::ConvertFileToImage(&tempFile);
+        if (img == NULL)
+        {
+            _Free(buf);
+            RemoveFromStack();
+            return;
+        }
+
+        _Free(buf);
+        image = img;
+        RemoveFromStack();
     }
 
     void ImageRectangleComponent::MouseClicked(MouseClickEventInfo info)
@@ -55,17 +157,15 @@ namespace GuiComponentStuff
         if (oldSize != temp)
         {
             renderer->Resize(temp);
-            renderer->Fill(Colors.black);
-            RenderImg();
             oldSize = temp;
+            //renderer->Fill(Colors.black);
+            RenderImg();
             update = true;
         }
         if (!StrEquals(imagePath, oldPath))
         {
             _Free((void*)oldPath);
             oldPath = StrCopy(imagePath);
-            if (image != NULL)
-                _Free(image);
             GetImageFromPath(imagePath);
             RenderImg();
             
@@ -101,6 +201,12 @@ namespace GuiComponentStuff
         _Free(updateFields);
         _Free((void*)imagePath);
         _Free((void*)oldPath);
+        if (image != NULL)
+        {
+            _Free(image->imageBuffer);
+            _Free(image);
+        }
+        image = NULL;
         RemoveFromStack();
     }
 
@@ -148,8 +254,8 @@ namespace GuiComponentStuff
 
     int ImageRectangleComponent::GetAttributeSize(int32_t type)
     {
-        if (type == 10)
-            return 4;
+        // if (type == 10)
+        //     return 4;
 
         return 0;
     }

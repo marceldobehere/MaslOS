@@ -21,6 +21,7 @@ struct BootInfo
 	kernelFiles::ZIPFile* windowButtonZIP;
 	kernelFiles::ZIPFile* windowIconsZIP;
 	kernelFiles::ZIPFile* maabZIP;
+	kernelFiles::ZIPFile* otherZIP;
 	//EFI_MEMORY_DESCRIPTOR* mMap;
 	// uint64_t mMapSize;
 	// uint64_t mMapDescSize;

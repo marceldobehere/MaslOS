@@ -24,6 +24,7 @@ struct MaslOsAssetStruct
 	kernelFiles::ZIPFile* windowIconsZIP;
 
     kernelFiles::ZIPFile* maabZIP;
+    kernelFiles::ZIPFile* otherZIP;
 
     // EFI Mem?
 

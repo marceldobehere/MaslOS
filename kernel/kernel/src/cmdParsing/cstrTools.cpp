@@ -115,6 +115,22 @@ bool StrStartsWith(const char* og, const char* with)
     return true;
 }
 
+bool StrEndsWith(const char* og, const char* with)
+{
+    if (og == NULL || with == NULL)
+        return false;
+    int diff = StrLen(og) - StrLen(with);
+    if (diff < 0)
+        return false;
+    
+    og += diff;
+    for (;*with != 0; og++, with++)
+        if (*og != *with)
+            return false;
+
+    return true;
+}
+
 char* StrCombine(const char* a, const char* b)
 {
     int lenA = StrLen(a);

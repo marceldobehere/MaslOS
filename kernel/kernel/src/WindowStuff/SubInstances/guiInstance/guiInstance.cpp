@@ -2,6 +2,7 @@
 #include "guiStuff/components/box/boxComponent.h"
 #include "guiStuff/components/button/buttonComponent.h"
 #include "guiStuff/components/screenComponent/screenComponent.h"
+#include "guiStuff/components/imageRect/imageRectangleComponent.h"
 #include "guiStuff/components/textField/textFieldComponent.h"
 #include "../../../memory/heap.h"
 #include "../../../cmdParsing/cstrTools.h"
@@ -598,6 +599,19 @@ bool GuiInstance::CreateComponentWithIdAndParent(int64_t id, GuiComponentStuff::
         GuiComponentStuff::RectangleComponent* comp =
         new GuiComponentStuff::RectangleComponent(
             Colors.black,
+            GuiComponentStuff::ComponentSize(50, 50),
+            parentComp 
+        );
+        comp->id = id;
+
+        allComponents->add(comp);
+        return ComponentAddChild(parentId, comp);
+    }
+    if (type == GuiComponentStuff::ComponentType::IMAGE_RECT)
+    {
+        GuiComponentStuff::ImageRectangleComponent* comp =
+        new GuiComponentStuff::ImageRectangleComponent(
+            "",
             GuiComponentStuff::ComponentSize(50, 50),
             parentComp 
         );

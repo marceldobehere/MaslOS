@@ -133,6 +133,8 @@ namespace SysApps
         folderPathsYes.free();
         driveCompsYes.free();
         drivePathsYes.free();
+        fileCompsYes.free();
+        filePathsYes.free();
 
         _Free(this);
         RemoveFromStack();
@@ -144,11 +146,15 @@ namespace SysApps
             _Free((void*)folderPathsYes.elementAt(i)); 
         for (int i = 0; i < drivePathsYes.getCount(); i++)
             _Free((void*)drivePathsYes.elementAt(i)); 
+        for (int i = 0; i < filePathsYes.getCount(); i++)
+            _Free((void*)filePathsYes.elementAt(i));
 
         folderCompsYes.clear();
         folderPathsYes.clear();
         driveCompsYes.clear();
         drivePathsYes.clear();
+        fileCompsYes.clear();
+        filePathsYes.clear();
     }
 
     void Explorer::Reload()
@@ -260,6 +266,11 @@ namespace SysApps
                     btnComp->size.FixedY = 16;
                     btnComp->size.FixedX = StrLen(textComp->text) * 8;
                     
+                    fileCompsYes.add(btnComp);
+                    const char* tBLEH = StrCombine(drive, ":");
+                    filePathsYes.add(StrCombine(tBLEH, dataList[i]));
+                    _Free(tBLEH);
+
                     _Free(tempo);
                     btnComp->position.x = 0;
                     btnComp->position.y = _y;
@@ -347,7 +358,12 @@ namespace SysApps
     }
     void Explorer::OnFileClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
     {
-        //window->renderer->Clear(Colors.blue);
+        int indx = fileCompsYes.getIndexOf(btn);
+        if (indx == -1)
+            return;
+        const char* pathThing = filePathsYes[indx];
+
+        FS_STUFF::OpenFile(pathThing);
     }
 
     void Explorer::OnDriveClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)

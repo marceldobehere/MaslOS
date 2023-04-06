@@ -16,6 +16,7 @@ namespace kernelFiles
     namespace ZIP
     {
         DefaultFile* GetFileFromFileName(ZIPFile* zip, const char* filename);
+		ZIPFile* GetZIPFromDefaultFile(DefaultFile* file);
     }
 }
 

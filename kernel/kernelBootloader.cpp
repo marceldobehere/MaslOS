@@ -434,6 +434,9 @@ extern "C" void _start(void) {
     kernelFiles::ZIPFile zip_4 = getZIP("maab.mbzf");
     assets.maabZIP = &zip_4;
 
+    kernelFiles::ZIPFile zip_5 = getZIP("other.mbzf");
+    assets.otherZIP = &zip_5;
+
     e9_printf("> Assets loaded!");
 
     //done();

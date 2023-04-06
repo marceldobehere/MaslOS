@@ -225,6 +225,7 @@ void EditPartitionSetting(PartitionInterface::PartitionInfo* part, const char* p
 
 #include "../sysApps/explorer/explorer.h"
 #include "../sysApps/tetris/tetris.h"
+#include "../sysApps/imgTest/imgTest.h"
 
 void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 {
@@ -435,6 +436,30 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     {
         if (data->len == 2)
             terminal->tasks.add(NewBFTask(data->data[1], window));
+        else
+            LogInvalidArgumentCount(1, data->len-1, window);
+        
+        _Free(data);
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(data->data[0], "img"))
+    {
+        if (data->len == 2)
+            new SysApps::ImageTest(data->data[1]);
+        else
+            LogInvalidArgumentCount(1, data->len-1, window);
+        
+        _Free(data);
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(data->data[0], "run") || StrEquals(data->data[0], "opn") || StrEquals(data->data[0], "open"))
+    {
+        if (data->len == 2)
+            FS_STUFF::OpenFile(data->data[1]);
         else
             LogInvalidArgumentCount(1, data->len-1, window);
         

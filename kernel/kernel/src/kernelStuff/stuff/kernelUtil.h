@@ -61,6 +61,7 @@ struct KernelInfo
 #include "../../customClasses/list.h"
 
 #include "../kernelFiles/kernelFiles.h"
+#include "../kernelFiles/ZIPStruct.h"
 
 #include "../other_IO/acpi/acpi.h"
 #include "../other_IO/pci/pci.h"

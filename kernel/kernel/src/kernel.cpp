@@ -412,7 +412,7 @@ void RenderLoop()
                         }
                     }
                 }
-                if (window->instance != NULL && !window->hidden && (activeWindow == window || frame % 5 == (i%8)))
+                if (window->instance != NULL && !window->hidden && (activeWindow == window || frame % 5 == (i%3)))
                 {
                     if (window->instance->instanceType == InstanceType::Terminal)
                     {
@@ -1193,6 +1193,7 @@ void bootTest(Framebuffer fb, ACPI::RSDP2* rsdp, PSF1_FONT* psf1_font, MaslOsAss
     tempBootInfo.MButtonS = assets->MButtonS;
     tempBootInfo.bgImage = assets->bgImage;
     tempBootInfo.maabZIP = assets->maabZIP;
+    tempBootInfo.otherZIP = assets->otherZIP;
 
     tempBootInfo.mouseZIP = assets->mouseZIP;
     tempBootInfo.windowButtonZIP = assets->windowButtonZIP;

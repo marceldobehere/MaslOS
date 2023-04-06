@@ -7,6 +7,7 @@
 #include "../cmdParsing/cstrTools.h"
 #include "../OSDATA/osdata.h"
 
+#include "../sysApps/imgTest/imgTest.h"
 
 namespace FS_STUFF
 {
@@ -136,6 +137,27 @@ namespace FS_STUFF
         return name;
     }
 
+    FilesystemInterface::FileInfo* GetFileInfoFromFullPath(const char* path)
+    {
+        FilesystemInterface::GenericFilesystemInterface* fsInterface = FS_STUFF::GetFsInterfaceFromFullPath(path);
+        if (fsInterface == NULL)
+            return NULL;
+        
+        char* relPath = FS_STUFF::GetFilePathFromFullPath(path);
+        if (relPath == NULL)
+            return NULL;
+
+        if (!fsInterface->FileExists(relPath))
+        {
+            _Free(relPath);
+            return NULL;
+        }
+
+        FilesystemInterface::FileInfo* inf = fsInterface->GetFileInfo(relPath);
+
+        _Free(relPath);
+        return inf;       
+    }
 
     FilesystemInterface::GenericFilesystemInterface* GetFsInterfaceFromFullPath(const char* path)
     {
@@ -189,6 +211,57 @@ namespace FS_STUFF
     }
     
 
+
+    bool GetDataFromFullPath(const char* path, char** resBuffer, int* resBufferLen)
+    {
+        FilesystemInterface::GenericFilesystemInterface* fsInterface = FS_STUFF::GetFsInterfaceFromFullPath(path);
+        if (fsInterface == NULL)
+            return false;
+        
+        char* relPath = FS_STUFF::GetFilePathFromFullPath(path);
+        if (relPath == NULL)
+            return false;
+
+        if (!fsInterface->FileExists(relPath))
+        {
+            _Free(relPath);
+            return false;
+        }
+
+        char* buf = NULL;
+        fsInterface->ReadFile(relPath, (void**)(&buf));
+
+        if (buf == NULL)
+        {
+            _Free(relPath);
+            return false;
+        }
+
+        int fSize = fsInterface->GetFileInfo(relPath)->sizeInBytes;
+
+        *resBuffer = buf;
+        *resBufferLen = fSize;
+
+        _Free(relPath);
+        return true;        
+    }
+
+
     
+
+    bool OpenFile(const char* path)
+    {
+        if (path == NULL)
+            return false;
+
+        if (StrEndsWith(path, ".mbif"))
+        {
+            new SysApps::ImageTest(path);
+            return true;
+        }
+
+        return false;
+    }
+
 }
 

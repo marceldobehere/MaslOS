@@ -948,6 +948,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
         FilesystemInterface::GenericFilesystemInterface* fsInterface = (FilesystemInterface::GenericFilesystemInterface*)new FilesystemInterface::MrafsFilesystemInterface(partInterface, partInterface->partitionList[2]);
         fsInterface->InitAndSaveFSTable();
 
+        PrintMsgStartLayer("MAAB");
         for (int i = 0; i < bootInfo->maabZIP->fileCount; i++)
         {
             PrintMsgColSL("FILE: \"{}\"", bootInfo->maabZIP->files[i].filename, Colors.yellow);
@@ -955,6 +956,38 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
             fsInterface->CreateFile(bootInfo->maabZIP->files[i].filename, bootInfo->maabZIP->files[i].size);
             fsInterface->WriteFile(bootInfo->maabZIP->files[i].filename, bootInfo->maabZIP->files[i].size, bootInfo->maabZIP->files[i].fileData);
         }
+        PrintMsgEndLayer("MAAB");
+
+
+        PrintMsgStartLayer("OTHER");
+        const char* tempNames[] = {"images", "maab"};
+        const char* tempNames2[] = {"images/", "maab/"};
+        if (bootInfo->otherZIP->fileCount != 2)
+            Panic("OTHER MBZF DOES NOT HAVE 2 FILES!!!", true);
+        for (int i = 0; i < 2; i++)
+        {
+            PrintMsgColSL("ZIP FILE: \"{}\"", bootInfo->otherZIP->files[i].filename, Colors.yellow);
+            PrintMsgCol(" ({} bytes)", to_string(bootInfo->otherZIP->files[i].size), Colors.bgreen);
+                bootInfo->otherZIP->files[i];
+            //kernelFiles::ZIP::GetFileFromFileName()
+            kernelFiles::ZIPFile* zip = kernelFiles::ZIP::GetZIPFromDefaultFile(&bootInfo->otherZIP->files[i]);
+            fsInterface->CreateFolder(tempNames[i]);
+            PrintMsgStartLayer(tempNames[i]);
+            for (int x = 0; x < zip->fileCount; x++)
+            {
+                const char* tempPath = StrCombine(tempNames2[i], zip->files[x].filename);
+                PrintMsgColSL("FILE: \"{}\"", tempPath, Colors.yellow);
+                PrintMsgCol(" ({} bytes)", to_string(zip->files[x].size), Colors.bgreen);
+                fsInterface->CreateFile(tempPath, zip->files[x].size);
+                fsInterface->WriteFile(tempPath, zip->files[x].size, zip->files[x].fileData);
+                _Free((void*)tempPath);
+            }
+            PrintMsgEndLayer(tempNames[i]);
+            //const char* tempPath = StrCombine("other", bootInfo->otherZIP->files[i].filename);
+            //fsInterface->CreateFile(bootInfo->otherZIP->files[i].filename, bootInfo->otherZIP->files[i].size);
+            //fsInterface->WriteFile(bootInfo->otherZIP->files[i].filename, bootInfo->otherZIP->files[i].size, bootInfo->otherZIP->files[i].fileData);
+        }
+        PrintMsgEndLayer("OTHER");
         fsInterface->SaveFSTable();
 
         //while (true);
