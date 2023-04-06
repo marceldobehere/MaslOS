@@ -33,6 +33,8 @@ namespace SysApps
 
         guiInstance = gui;
 
+        guiInstance->screen->backgroundColor = Colors.white;
+
         guiInstance->CreateComponentWithId(1010, GuiComponentStuff::ComponentType::IMAGE_RECT);
         GuiComponentStuff::ImageRectangleComponent* imgComp = (GuiComponentStuff::ImageRectangleComponent*)guiInstance->GetComponentFromId(1010);
 
