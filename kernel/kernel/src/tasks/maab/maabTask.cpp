@@ -9,6 +9,7 @@
 #include "../sleep/taskSleep.h"
 #include "../../WindowStuff/SubInstances/guiInstance/guiInstance.h"
 #include "../../WindowStuff/SubInstances/guiInstance/guiStuff/components/text/textComponent.h"
+#include "../../WindowStuff/SubInstances/guiInstance/guiStuff/components/imageRect/imageRectangleComponent.h"
 #include "../../userinput/mouse.h"
 #include "../../userinput/keyboard.h"
 #include "../../rnd/rnd.h"
@@ -922,6 +923,24 @@ void TaskMAAB::Do()
 
 									_TryFree((void*)oldThing);
 								}
+								else if (bruhus->componentType == GuiComponentStuff::ComponentType::IMAGE_RECT && attrType == 10)
+								{
+									GuiComponentStuff::ImageRectangleComponent* bleh = ((GuiComponentStuff::ImageRectangleComponent*)bruhus);
+
+									if (val >= memLen)
+									{
+										programEnded = true;
+										errCode = 3;
+										errMsg = "STRING IS OUT OF BOUNDS!";
+										return;
+									}
+
+									const char* newThing = StrCopy((const char*)(mem + val));
+									const char* oldThing = bleh->imagePath;
+									bleh->imagePath = newThing;
+
+									_TryFree((void*)oldThing);
+								}
 								else
 									gui->SetSpecificComponentAttribute(compId, attrType, val);
 							}
@@ -965,6 +984,18 @@ void TaskMAAB::Do()
 									uint64_t nAddr = (uint64_t)memHandler->MallocMem(len + 1);
 									for (int i = 0; i < len; i++)
 										mem[nAddr + i] = bleh->text[i];
+									mem[nAddr + len] = 0;
+
+									*((uint64_t*)(mem + to)) = (uint64_t)nAddr;
+								}
+								else if (bruhus->componentType == GuiComponentStuff::ComponentType::IMAGE_RECT && attrType == 10)
+								{
+									GuiComponentStuff::ImageRectangleComponent* bleh = ((GuiComponentStuff::ImageRectangleComponent*)bruhus);
+
+									int len = StrLen(bleh->imagePath);
+									uint64_t nAddr = (uint64_t)memHandler->MallocMem(len + 1);
+									for (int i = 0; i < len; i++)
+										mem[nAddr + i] = bleh->imagePath[i];
 									mem[nAddr + len] = 0;
 
 									*((uint64_t*)(mem + to)) = (uint64_t)nAddr;

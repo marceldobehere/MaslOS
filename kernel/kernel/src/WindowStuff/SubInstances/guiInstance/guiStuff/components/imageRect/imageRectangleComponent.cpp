@@ -231,11 +231,12 @@ namespace GuiComponentStuff
 
     bool ImageRectangleComponent::SetAttribute(int32_t type, uint64_t val)
     {
-        // if (type == 10)
-        // {
-        //     fillColor = *((uint32_t*)&val);
-        //     return true;
-        // }
+        if (type == 10)
+        {
+            _Free(imagePath);
+            imagePath = StrCopy((const char*)val);
+            return true;
+        }
 
         return false;
     }
@@ -246,16 +247,24 @@ namespace GuiComponentStuff
         for (int i = 0; i < 8; i++)
             temp[i] = 0;
 
-        // if (type == 10)
-        //     *((uint32_t*)temp) = fillColor;
+        if (type == 10)
+            *((uint64_t*)temp) = (uint64_t)imagePath;
+        if (type == 20 && image != NULL)
+            *((uint32_t*)temp) = image->width;
+        if (type == 21 && image != NULL)
+            *((uint32_t*)temp) = image->height;
 
         return *((uint64_t*)temp);
     }
 
     int ImageRectangleComponent::GetAttributeSize(int32_t type)
     {
-        // if (type == 10)
-        //     return 4;
+        if (type == 10)
+            return 8;
+        if (type == 20)
+            return 4;
+        if (type == 21)
+            return 4;
 
         return 0;
     }

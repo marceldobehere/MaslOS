@@ -8,7 +8,9 @@ namespace GuiComponentStuff
 {
     enum class GuiInstanceImageRectComponentAttributeType : int32_t
     {
-        FILL_COLOR = 10
+        IMAGE_PATH = 10,
+        IMAGE_SIZE_X = 20,
+        IMAGE_SIZE_Y = 21
     };
 
     class ImageRectangleComponent : public BaseComponent
