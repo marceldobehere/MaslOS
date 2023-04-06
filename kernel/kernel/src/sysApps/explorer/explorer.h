@@ -9,7 +9,7 @@ namespace SysApps
 {
     class Explorer
     {
-        private:
+        public:
         Window* window;
         GuiInstance* guiInstance;
         GuiComponentStuff::BaseComponent* lastClickedComp;
@@ -28,8 +28,12 @@ namespace SysApps
 
 
         public:
+
+        void* OnFileClickHelp;
+        void (*OnFileClickCallback)(void* bruh, const char* path);
+
         Explorer();
-        void Explorer::UpdateSizes();
+        void UpdateSizes();
         const char* GetPath();
         void SetPath(const char* path);
         void Reload();

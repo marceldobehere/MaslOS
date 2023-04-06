@@ -9,6 +9,7 @@
 #include "taskMgrTask/taskMgrTask.h"
 #include "test/testTask.h"
 #include "debugViewTask/debugViewTask.h"
+#include "simpleData/taskSimpleData.h"
 
 
 bool Task::GetDone()
@@ -50,6 +51,8 @@ const char* TaskTypeToString(TaskType type)
         return "TESTO";
     if (type == TaskType::DEBUG_VIEWER)
         return "DEBUG RAM VIEWER";
+    if (type == TaskType::SIMPLE_DATA)
+        return "SIMPLE DATA TASK";
 
     return "UNKNOWN!";
 }
@@ -122,6 +125,12 @@ void DoTask(Task* task)
         {
             TaskDebugViewer* dbg = (TaskDebugViewer*)task;
             dbg->Do();
+            break;
+        }
+        case TaskType::SIMPLE_DATA:
+        {
+            TaskSimpleData* data = (TaskSimpleData*)task;
+            data->Do();
             break;
         }
     }
@@ -197,6 +206,13 @@ void FreeTask(Task* task)
             TaskDebugViewer* dbg = (TaskDebugViewer*)task;
             dbg->Free();
             _Free((void*)dbg);
+            break;
+        }
+        case TaskType::SIMPLE_DATA:
+        {
+            TaskSimpleData* data = (TaskSimpleData*)task;
+            data->Free();
+            _Free((void*)data);
             break;
         }
     }  

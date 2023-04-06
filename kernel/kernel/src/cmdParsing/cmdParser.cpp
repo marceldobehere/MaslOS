@@ -225,6 +225,7 @@ void EditPartitionSetting(PartitionInterface::PartitionInfo* part, const char* p
 
 #include "../sysApps/explorer/explorer.h"
 #include "../sysApps/tetris/tetris.h"
+#include "../sysApps/notepad/notepad.h"
 #include "../sysApps/imgTest/imgTest.h"
 
 void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
@@ -263,6 +264,13 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     if (StrEquals(input, "explorer"))
     {
         new SysApps::Explorer();
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(input, "notepad"))
+    {
+        new SysApps::Notepad();
         RemoveFromStack();
         return;
     }

@@ -601,7 +601,7 @@ void HandleClick(bool L, bool R, bool M)
                     {
                         GuiInstance* gui = (GuiInstance*)window->instance;
                         // if (gui->screen != NULL && gui->screen->selectedComponent != NULL)
-                        if (gui->screen != NULL)
+                        if (gui->screen != NULL && gui->waitTask == NULL)
                         {
                             Position p = window->GetMousePosRelativeToWindow();
                             

@@ -11,6 +11,8 @@ namespace SysApps
     Explorer::Explorer()
     {
         path = StrCopy("");
+        OnFileClickCallback = NULL;
+        OnFileClickHelp = NULL;
 
         //window =
 
@@ -363,7 +365,10 @@ namespace SysApps
             return;
         const char* pathThing = filePathsYes[indx];
 
-        FS_STUFF::OpenFile(pathThing);
+        if (OnFileClickCallback != NULL)
+            OnFileClickCallback(OnFileClickHelp, pathThing);
+        else
+            FS_STUFF::OpenFile(pathThing);
     }
 
     void Explorer::OnDriveClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)

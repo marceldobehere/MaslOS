@@ -9,6 +9,10 @@
 
 GuiInstance::GuiInstance(Window* window)
 {
+    waitTask = NULL;
+    waitingForTask = false;
+    OnWaitTaskDoneCallback = NULL;
+    OnWaitTaskDoneHelp = NULL;
     this->window = window;
     instanceType = InstanceType::GUI;
 }
@@ -80,6 +84,45 @@ void GuiInstance::Render()
 {
     if (screen == NULL)
         return;
+
+    if (waitTask != NULL)
+    {
+        if (waitTask->GetDone())
+        {
+            if (OnWaitTaskDoneCallback != NULL)
+                OnWaitTaskDoneCallback(OnWaitTaskDoneHelp, waitTask);
+
+            FreeTask(waitTask);
+            waitTask = NULL;
+
+
+            GuiComponentStuff::ComponentFramebuffer bruhus = GuiComponentStuff::ComponentFramebuffer
+            (
+                window->framebuffer->Width,
+                window->framebuffer->Height,
+                (uint32_t*)window->framebuffer->BaseAddress
+            );
+
+            screen->renderer->Render(
+                screen->position, 
+                GuiComponentStuff::Field(
+                    GuiComponentStuff::Position(), 
+                    screen->GetActualComponentSize()
+                ), 
+                &bruhus
+            );
+        }
+        else
+        {
+            if (waitingForTask)
+                return;
+            waitingForTask = true;
+            window->renderer->ClearDotted(Colors.black);
+            return;
+        }
+    }
+    else
+        waitingForTask = false;
     //window->renderer->Clear(Colors.orange);
 
     screen->CheckUpdates();

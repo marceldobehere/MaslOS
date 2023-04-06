@@ -39,6 +39,11 @@ class GuiInstance : public DefaultInstance
     GuiComponentStuff::ScreenComponent* screen;
     List<GuiComponentStuff::BaseComponent*>* allComponents;
     
+    Task* waitTask;
+    bool waitingForTask;
+    void* OnWaitTaskDoneHelp;
+    void (*OnWaitTaskDoneCallback)(void* bruh, Task* tsk);
+
     GuiInstance(Window* window);
     void Free();
     void Init();
