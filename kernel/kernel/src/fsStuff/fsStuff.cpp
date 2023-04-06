@@ -6,6 +6,7 @@
 #include "../kernelStuff/stuff/cstr.h"
 #include "../cmdParsing/cstrTools.h"
 #include "../OSDATA/osdata.h"
+#include "../tasks/enterHandler/taskEnterHandler.h"
 
 #include "../sysApps/imgTest/imgTest.h"
 
@@ -259,9 +260,48 @@ namespace FS_STUFF
             new SysApps::ImageTest(path);
             return true;
         }
+        if (StrEndsWith(path, ".maab"))
+        {
+            const char* t = StrCombine("maab \"", path);
+            const char* t2= StrCombine(t, "\"");
+            _Free(t);
+            RunTerminalCommand(t2, "MAAB TEST", false, false);
+            _Free(t2);
+            return true;
+        }
 
         return false;
     }
 
+
+
+    void RunTerminalCommand(const char* terminalCommand, const char* terminalWindowTitle, bool hideTerminalWindow, bool autoCloseTerminalWindow)
+    {
+        Window* mainWindow = (Window*)_Malloc(sizeof(Window), "App Window");
+        TerminalInstance* terminal = (TerminalInstance*)_Malloc(sizeof(TerminalInstance), "App Terminal");
+        *terminal = TerminalInstance(&guestUser);
+        *(mainWindow) = Window((DefaultInstance*)terminal, Size(500, 500), Position(50, 50), terminalWindowTitle, true, true, true);
+        mainWindow->hidden = hideTerminalWindow;
+        mainWindow->oldHidden = !hideTerminalWindow;
+        
+        osData.windows.add(mainWindow);
+        terminal->SetWindow(mainWindow);
+        terminal->closeWindowAfterTask = autoCloseTerminalWindow;
+        ((TerminalInstance*)mainWindow->instance)->Cls();
+        //KeyboardPrintStart(mainWindow);
+        //((TerminalInstance*)mainWindow->instance)->KeyboardPrintStart();
+        if (!hideTerminalWindow)
+            osData.windowsToGetActive.add(mainWindow);
+
+        //((NewTerminalInstance*)terminal->newTermInstance)->Println(BLEHUS_CMD);
+        {
+            int i = 0;
+            for (; terminalCommand[i] != 0; i++)
+                terminal->terminalInput[i] = terminalCommand[i];
+            terminal->terminalInput[i] = 0;
+            terminal->userlen = i;
+        }
+        terminal->tasks.add(NewEnterTask(terminal));
+    }
 }
 

@@ -38,7 +38,7 @@ Window::Window(DefaultInstance* instance, Size size, Position position, const ch
     this->selectedTitleColor = Colors.white;
     this->defaultTitleBackgroundColor = 0xff555555;
     allowKeyboardDrawing = true;
-    this->title = title;
+    this->title = StrCopy(title);
     moveToFront = false;
     this->showBorder = showBorder;
     this->showTitleBar = showTitleBar;
@@ -151,6 +151,7 @@ void Window::Free()
     _Free(backbuffer);
     _Free(renderer);
     _Free(brenderer);
+    _Free(title);
 
 
     RemoveFromStack();
@@ -637,7 +638,7 @@ bool SetWindowAttribute(int64_t id, WindowAttributeType type, uint64_t val)
     if (type == WindowAttributeType::TITLE_TEXT)
     {
         const char* nT = StrCopy(*((const char**)&val));
-        _TryFree((void*)window->title);
+        _Free((void*)window->title);
         window->title = nT;
         
         return true;

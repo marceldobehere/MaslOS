@@ -654,7 +654,7 @@ void TaskMAAB::Do()
 							const char* oldThing = tWin->title;
 							tWin->title = newThing;
 
-							_TryFree((void*)oldThing);
+							_Free((void*)oldThing);
 						}
 
 					}

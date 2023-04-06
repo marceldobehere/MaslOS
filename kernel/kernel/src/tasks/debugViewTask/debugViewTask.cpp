@@ -7,22 +7,29 @@
 #include "../../OSDATA/osStats.h"
 
 
-TaskDebugViewer::TaskDebugViewer(Window* window)
+TaskDebugViewer::TaskDebugViewer(Window* window, char* coolBuf, uint64_t coolBufLen)
 {
     this->window = window;
+    this->coolBuf = coolBuf;
+    this->coolBufLen = coolBufLen;
     waitForInput = false;
     lastL = 0;
     lastB = false;
     showAddr = true;
     done = false;
     currentAddr = (int64_t)RAM_START_ADDR;
+    if (coolBuf != NULL)
+        currentAddr = (uint64_t)0;
     scrollY = 0;
     type = TaskType::DEBUG_VIEWER;
     callCount = 0;
 
     oldTitle = window->title;
     exit = false;
-    window->title = "Debug RAM Viewer";
+    if (coolBuf == NULL)
+        window->title = "Debug RAM Viewer";
+    else
+        window->title = "Debug File Viewer";
     osData.windowPointerThing->UpdateWindowBorder(window);
     nextTime = PIT::TimeSinceBootMS();
 
@@ -46,14 +53,6 @@ void TaskDebugViewer::Do()
         RemoveFromStack();
         return;
     }
-
-    // if (++callCount < callsPerFrame)
-    // {
-    //     RemoveFromStack();
-    //     return;        
-    // }
-    // totalCount++;
-    // callCount = 0;
 
     if (waitForInput)
     {
@@ -136,7 +135,7 @@ void TaskDebugViewer::Do()
     }
     if (KeyboardScancodeState[0x12] && window==activeWindow)
         showAddr = true;
-    if (KeyboardScancodeState[0x20])
+    if (KeyboardScancodeState[0x20] && window==activeWindow)
         showAddr = false;
 
     if (KeyboardScancodeState[0x10] && window==activeWindow)
@@ -186,16 +185,25 @@ void TaskDebugViewer::Do()
     // window->renderer->Print("........");
     // window->renderer->Println();
 
-    
+    char* coolBufEnd = NULL;
+
+    if (coolBuf != NULL)
+        coolBufEnd = coolBuf + coolBufLen;
+
 
     for (int y = 0; y < yCount; y++)
     {
         uint8_t* tempArr = (uint8_t*)startAddr;
+        if (coolBuf != NULL)
+            tempArr = (uint64_t)startAddr + (uint8_t*)coolBuf;
+
         if (showAddr)
             window->renderer->Print("{} ", ConvertHexToString(startAddr), Colors.bgray);
         for (int x = 0; x < xCount; x++)
         {
-            uint8_t val = tempArr[x];
+            uint8_t val = 0;
+            if (coolBufEnd == NULL || (char*)tempArr + x < coolBufEnd)
+                val = tempArr[x];
             char testo[4];
             testo[2] = ' ';
             testo[3] = 0;
@@ -216,7 +224,9 @@ void TaskDebugViewer::Do()
         window->renderer->Print("   ");
         for (int x = 0; x < xCount; x++)
         {
-            char chr = tempArr[x];
+            char chr = '?';
+            if (coolBufEnd == NULL || (char*)tempArr + x < coolBufEnd)
+                chr = tempArr[x];
             if (chr < 20 || chr > 126)
                 chr = '.';
             char testo[2];
@@ -240,13 +250,31 @@ void TaskDebugViewer::Do()
 
 void TaskDebugViewer::Free()
 {
-    // free((void*)code);
-    // free((void*)mem);
+    if (window->title != oldTitle)
+    {
+        window->title = oldTitle;
+        done = true;
+        window->icon = oldIcon;
+        window->renderer->Clear(Colors.black);
+        osData.windowPointerThing->UpdateWindowBorder(window);
+        ((NewTerminalInstance*)(((TerminalInstance*)window->instance)->newTermInstance))->Reload();
+        RemoveFromStack();
+        return;
+    }
+    if (coolBuf != NULL)
+        _Free(coolBuf);
+}
+
+TaskDebugViewer* NewDebugViewerTask(Window* window, char* coolBuf, uint64_t coolBufLen)
+{
+    TaskDebugViewer* task = (TaskDebugViewer*)_Malloc(sizeof(TaskDebugViewer));
+    *task = TaskDebugViewer(window, coolBuf, coolBufLen);
+    return task;
 }
 
 TaskDebugViewer* NewDebugViewerTask(Window* window)
 {
     TaskDebugViewer* task = (TaskDebugViewer*)_Malloc(sizeof(TaskDebugViewer));
-    *task = TaskDebugViewer(window);
+    *task = TaskDebugViewer(window, NULL, 0);
     return task;
 }

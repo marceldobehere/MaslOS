@@ -467,6 +467,26 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         RemoveFromStack();
         return;
     }
+
+    if (StrEquals(data->data[0], "dbg") || StrEquals(data->data[0], "debug") || StrEquals(data->data[0], "hex"))
+    {
+        if (data->len == 2)
+        {
+            //  FS_STUFF::OpenFile(data->data[1]);
+            char* buf = NULL;
+            int len = 0;
+            if (FS_STUFF::GetDataFromFullPath(data->data[1], &buf, &len))
+                terminal->tasks.add(NewDebugViewerTask(window, buf, len));
+            else
+                LogError("File not found!", window);
+        }
+        else
+            LogInvalidArgumentCount(1, data->len-1, window);
+        
+        _Free(data);
+        RemoveFromStack();
+        return;
+    }
     
 
     if (StrEquals(data->data[0], "sleep"))

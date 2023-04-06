@@ -197,8 +197,17 @@ void TaskTaskManager::Do()
 
 void TaskTaskManager::Free()
 {
-    // free((void*)code);
-    // free((void*)mem);
+    if (window->title != oldTitle)
+    {
+        window->title = oldTitle;
+        done = true;
+        window->icon = oldIcon;
+        window->renderer->Clear(Colors.black);
+        osData.windowPointerThing->UpdateWindowBorder(window);
+        ((NewTerminalInstance*)(((TerminalInstance*)window->instance)->newTermInstance))->Reload();
+        RemoveFromStack();
+        return;
+    }
 }
 
 TaskTaskManager* NewTaskManagerTask(Window* window)

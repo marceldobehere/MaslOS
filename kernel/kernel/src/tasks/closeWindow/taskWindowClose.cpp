@@ -64,8 +64,8 @@ void TaskWindowClose::Do()
         if (window == activeWindow)
             activeWindow = NULL;
 
-        if (window->title != NULL)
-            _TryFree(window->title);
+        // if (window->title != NULL)
+        //     _TryFree(window->title);
 
         window->Free();
         _Free(window);

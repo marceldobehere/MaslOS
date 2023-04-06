@@ -482,6 +482,7 @@ void StartMenuButtonClick(GuiComponentStuff::BaseComponent* comp, GuiComponentSt
         const char* BLEHUS_TITLE = "App Terminal Window";
         const char* BLEHUS_CMD   = "echo \"Unknown App lol\"";
         bool BLEHUS_CLOSE = true;
+        bool BLEHUS_HIDE = false;
 
         if (comp->id == 1001)
         {
@@ -500,6 +501,7 @@ void StartMenuButtonClick(GuiComponentStuff::BaseComponent* comp, GuiComponentSt
         {
             BLEHUS_TITLE = "Alert Window";
             BLEHUS_CMD   = "maab \"bruh:alert.maab\"";
+            BLEHUS_HIDE = true;
         }
 
         if (comp->id == 1004)
@@ -519,6 +521,7 @@ void StartMenuButtonClick(GuiComponentStuff::BaseComponent* comp, GuiComponentSt
         {
             BLEHUS_TITLE = "Explorer";
             BLEHUS_CMD   = "explorer";
+            BLEHUS_HIDE = true;
         }
 
 
@@ -528,14 +531,17 @@ void StartMenuButtonClick(GuiComponentStuff::BaseComponent* comp, GuiComponentSt
         TerminalInstance* terminal = (TerminalInstance*)_Malloc(sizeof(TerminalInstance), "App Terminal");
         *terminal = TerminalInstance(&guestUser);
         *(mainWindow) = Window((DefaultInstance*)terminal, Size(500, 500), Position(50, 50), BLEHUS_TITLE, true, true, true);
+        mainWindow->hidden = BLEHUS_HIDE;
+        mainWindow->oldHidden = !BLEHUS_HIDE;
+        
         osData.windows.add(mainWindow);
         terminal->SetWindow(mainWindow);
         terminal->closeWindowAfterTask = BLEHUS_CLOSE;
         ((TerminalInstance*)mainWindow->instance)->Cls();
         //KeyboardPrintStart(mainWindow);
         //((TerminalInstance*)mainWindow->instance)->KeyboardPrintStart();
-
-        osData.windowsToGetActive.add(mainWindow);
+        if (!BLEHUS_HIDE)
+            osData.windowsToGetActive.add(mainWindow);
 
         //((NewTerminalInstance*)terminal->newTermInstance)->Println(BLEHUS_CMD);
         {

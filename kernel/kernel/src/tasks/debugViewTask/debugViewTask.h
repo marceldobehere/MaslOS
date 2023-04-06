@@ -21,12 +21,16 @@ class TaskDebugViewer : public Task
         bool lastB = false;
         int64_t currentAddr;
 
+        char* coolBuf = NULL;
+        uint64_t coolBufLen = 0;
+
     public:
         bool exit = false;
-        TaskDebugViewer(Window* window);
+        TaskDebugViewer(Window* window, char* coolBuf, uint64_t coolBufLen);
         void Do();
         void Free();
 
 };
 
+TaskDebugViewer* NewDebugViewerTask(Window* window, char* coolBuf, uint64_t coolBufLen);
 TaskDebugViewer* NewDebugViewerTask(Window* window);

@@ -17,6 +17,8 @@ namespace FS_STUFF
     FilesystemInterface::FileInfo* GetFileInfoFromFullPath(const char* path);
 
     bool OpenFile(const char* path);
+    void RunTerminalCommand(const char* terminalCommand, const char* terminalWindowTitle, bool hideTerminalWindow, bool autoCloseTerminalWindow);
+
 
 /*
 Println(window, "Avaiable Drives:", Colors.bgreen);
