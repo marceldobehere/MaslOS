@@ -519,9 +519,9 @@ void HandleClick(bool L, bool R, bool M)
             else if (action == WindowActionEnum::MIN_MAX)
             {
                 AddToStack();
-
+                
                 osData.windowsToGetActive.add(WindowManager::currentActionWindow);
-                if (activeWindow->resizeable)
+                if (WindowManager::currentActionWindow->resizeable)
                     WindowManager::currentActionWindow->maximize = !WindowManager::currentActionWindow->maximize;
                 RemoveFromStack();
             }
