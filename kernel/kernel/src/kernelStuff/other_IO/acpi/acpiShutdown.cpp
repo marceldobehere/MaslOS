@@ -320,9 +320,9 @@ int InitAcpiShutdownThing(void *RSDT)
         PrintMsgCol("DSDT: {}", ConvertHexToString((uint64_t)FACP->Dsdt), Colors.yellow);
 
         // search the \_S5 package in the DSDT
-        char *S5Addr = (char *)FACP->Dsdt + 36; // skip header
+        char *S5Addr = (char *)(uint64_t)FACP->Dsdt + 36; // skip header
         
-        int dsdtLength = *((int32_t*)FACP->Dsdt + 1) - 36;
+        int dsdtLength = *((int32_t*)(uint64_t)FACP->Dsdt + 1) - 36;
         
 
         while (0 < dsdtLength--)
@@ -354,8 +354,8 @@ int InitAcpiShutdownThing(void *RSDT)
                 ACPI_ENABLE = FACP->AcpiEnable; // either & oder (uint32_t*)
                 ACPI_DISABLE = FACP->AcpiDisable;
 
-                PM1a_CNT = (uint32_t*)FACP->PM1aControlBlock;
-                PM1b_CNT = (uint32_t*)FACP->PM1bControlBlock;
+                PM1a_CNT = (uint32_t*)(uint64_t)FACP->PM1aControlBlock;
+                PM1b_CNT = (uint32_t*)(uint64_t)FACP->PM1bControlBlock;
 
                 PM1_CNT_LEN = FACP->PM1ControlLength;
 
@@ -483,5 +483,5 @@ void PowerOffAcpi()
     if (PM1b_CNT != 0)
         outw((unsigned int)(uint64_t)PM1b_CNT, SLP_TYPb | SLP_EN);
 
-    GlobalRenderer->Println("acpi poweroff failed.\n", Colors.bred);
+    GlobalRenderer->Println("ACPI Shutdown failed!\n", Colors.bred);
 }

@@ -17,6 +17,7 @@
 
 extern "C" void BruhusSafus()
 {
+
     //GlobalRenderer->Clear(Colors.green);
     //PIT::Sleep(500);
     //GlobalRenderer->Clear(Colors.red);
@@ -37,6 +38,8 @@ extern "C" void BruhusSafus()
 
     GlobalRenderer->Clear(Colors.black);
     GlobalRenderer->Println("The ACPI shutdown failed!", Colors.yellow);
+
+    GlobalRenderer->Println();
     GlobalRenderer->Println("Please shut down the computer manually.", Colors.white);
 
     while (true)

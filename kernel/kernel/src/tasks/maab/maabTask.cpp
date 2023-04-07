@@ -14,6 +14,8 @@
 #include "../../userinput/keyboard.h"
 #include "../../rnd/rnd.h"
 
+
+
 TaskMAAB::TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInstance* term)
 {
 	this->window = window;

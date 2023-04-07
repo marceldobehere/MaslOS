@@ -124,7 +124,7 @@ namespace GuiComponentStuff
         kernelFiles::DefaultFile tempFile;
         tempFile.fileData = buf;
         tempFile.size = size;
-        tempFile.filename = "A";
+        tempFile.filename = (char*)"A";
         tempFile.filenameSize = 1;
         kernelFiles::ImageFile* img = kernelFiles::ConvertFileToImage(&tempFile);
         if (img == NULL)

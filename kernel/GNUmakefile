@@ -55,7 +55,7 @@ override CFLAGS +=       \
     -MMD                 \
     -I.
     
-CFLAGS2 = -ffreestanding -fshort-wchar -mno-red-zone -fno-omit-frame-pointer -fno-exceptions -fpermissive
+CFLAGS2 = -ffreestanding -fshort-wchar -mno-red-zone -fno-omit-frame-pointer -fno-exceptions -fpermissive -Wno-pmf-conversions
 #-ffreestanding -fshort-wchar -mno-red-zone -fno-omit-frame-pointer -fno-exceptions -fcommon
 
 # Internal linker flags that should not be changed by the user.
