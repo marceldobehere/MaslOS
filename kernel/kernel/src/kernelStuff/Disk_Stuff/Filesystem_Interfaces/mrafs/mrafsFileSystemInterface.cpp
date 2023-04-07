@@ -1073,6 +1073,8 @@ namespace FilesystemInterface
 
         if (byteCount == info->sizeInBytes)
         {
+            if (byteCount == 0)
+                return FSCommandResult.SUCCESS;
             const char* res = partitionInterface->WritePartition(partitionInfo, info->locationInBytes, byteCount, buffer);
             if (res != PartitionInterface::CommandResult.SUCCESS)
                 return res;

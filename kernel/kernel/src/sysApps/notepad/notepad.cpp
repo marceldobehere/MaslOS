@@ -5,13 +5,14 @@
 #include "../../fsStuff/fsStuff.h"
 #include "../../rnd/rnd.h"
 #include "../openFileExplorer/openFileExplorer.h"
+#include "../saveFileExplorer/saveFileExplorer.h"
 
 
 namespace SysApps
 {
     Notepad::Notepad()
     {
-        path = NULL;//StrCopy("");
+        lastSavePath = NULL;//StrCopy("");
         btnTaskState = NotePadButtonTaskState::None;
 
         //window =
@@ -66,6 +67,18 @@ namespace SysApps
         saveBtn->size.FixedY = 20;
         saveBtn->OnMouseClickHelp = (void*)this;
         saveBtn->OnMouseClickedCallBack = (void(*)(void*, GuiComponentStuff::BaseComponent*, GuiComponentStuff::MouseClickEventInfo))(void*)&OnSaveClick;
+
+        guiInstance->CreateComponentWithId(1022, GuiComponentStuff::ComponentType::BUTTON);
+        saveAsBtn = (GuiComponentStuff::ButtonComponent*)guiInstance->GetComponentFromId(1022);
+        saveAsBtn->position.x = 104;
+        saveAsBtn->position.y = 0;
+        _Free(saveAsBtn->textComp->text);
+        saveAsBtn->textComp->text = StrCopy("Save As");
+        saveAsBtn->size.FixedX = 64;
+        saveAsBtn->size.FixedY = 20;
+        saveAsBtn->OnMouseClickHelp = (void*)this;
+        saveAsBtn->OnMouseClickedCallBack = (void(*)(void*, GuiComponentStuff::BaseComponent*, GuiComponentStuff::MouseClickEventInfo))(void*)&OnSaveAsClick;
+
 
         // guiInstance->CreateComponentWithId(1021, GuiComponentStuff::ComponentType::TEXTFIELD);
         // pathComp = (GuiComponentStuff::TextFieldComponent*)guiInstance->GetComponentFromId(1021);
@@ -135,25 +148,19 @@ namespace SysApps
     void Notepad::Free()
     {
         AddToStack();
-        if (path != NULL)
-            _Free(path);
+        if (lastSavePath != NULL)
+        {
+            _Free(lastSavePath);
+            lastSavePath = NULL;
+        }
         
-        // folderCompsYes.free();
-        // folderPathsYes.free();
-        // driveCompsYes.free();
-        // drivePathsYes.free();
-        // fileCompsYes.free();
-        // filePathsYes.free();
 
         _Free(this);
         RemoveFromStack();
     }
 
     void Notepad::OnLoadClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
-    {
-        if (path != NULL)
-            _Free(path);
-        
+    {        
         OpenFileExplorer* exp = new OpenFileExplorer();
         
         guiInstance->OnWaitTaskDoneHelp = (void*)this;
@@ -165,13 +172,82 @@ namespace SysApps
 
     void Notepad::OnSaveClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
     {
-        if (path == NULL)
+        if (lastSavePath == NULL)
         {
-            // GET PATH WITH SAVE FILE DIALOGUE
+            SaveFileExplorer* exp = new SaveFileExplorer();
+            
+            guiInstance->OnWaitTaskDoneHelp = (void*)this;
+            guiInstance->OnWaitTaskDoneCallback = (void(*)(void*, Task*))(void*)&OnTaskDone;
+            guiInstance->waitTask = exp->dataTask;
+
+            btnTaskState = NotePadButtonTaskState::Save;
         }
         else
         {
+            SaveInto(StrCopy(lastSavePath));
+        }
+    }
 
+    void Notepad::OnSaveAsClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
+    {
+        SaveFileExplorer* exp = new SaveFileExplorer();
+        
+        guiInstance->OnWaitTaskDoneHelp = (void*)this;
+        guiInstance->OnWaitTaskDoneCallback = (void(*)(void*, Task*))(void*)&OnTaskDone;
+        guiInstance->waitTask = exp->dataTask;
+
+        btnTaskState = NotePadButtonTaskState::Save;
+    }
+
+    void Notepad::SaveInto(const char* path)
+    {
+        if (path == NULL)
+            return;
+
+        if (lastSavePath != NULL)
+        {
+            _Free(lastSavePath);
+            lastSavePath = NULL;
+        }
+        lastSavePath = StrCopy(path);
+
+        FS_STUFF::WriteFileToFullPath(path, (char*)textComp->textComp->text, StrLen(textComp->textComp->text), false);
+    }
+
+    void Notepad::LoadFrom(const char* path)
+    {
+        if (lastSavePath != NULL)
+        {
+            _Free(lastSavePath);
+            lastSavePath = NULL;
+        }
+        lastSavePath = StrCopy(path);
+        //const char* fData = StrCopy(path);
+
+        // LOAD
+
+        char* fData = NULL;
+        int fDataLen = 0;
+
+        if (FS_STUFF::LoadFileFromFullPath(path, &fData, &fDataLen))
+        {
+            char* nData = (char*)_Malloc(fDataLen + 1);
+            nData[fDataLen] = 0;
+            _memcpy(fData, nData, fDataLen);
+            _Free(fData);
+
+            _Free(textComp->textComp->text);
+            textComp->textComp->text = (const char*)nData;
+        }
+        else
+        {
+            // _Free(textComp->textComp->text);
+            // textComp->textComp->text = StrCopy("");
+            if (lastSavePath != NULL)
+            {
+                _Free(lastSavePath);
+                lastSavePath = NULL;
+            }
         }
     }
     
@@ -186,35 +262,34 @@ namespace SysApps
             if (tsk->data != NULL)
             {
                 const char* path = (const char*)tsk->data;
-                //const char* fData = StrCopy(path);
 
-                // LOAD
-
-                char* fData = NULL;
-                int fDataLen = 0;
-
-                if (FS_STUFF::GetDataFromFullPath(path, &fData, &fDataLen))
-                {
-                    char* nData = (char*)_Malloc(fDataLen + 1);
-                    nData[fDataLen] = 0;
-                    _memcpy(fData, nData, fDataLen);
-                    _Free(fData);
-
-                    _Free(textComp->textComp->text);
-                    textComp->textComp->text = (const char*)nData;
-                }
-                else
-                {
-                    _Free(textComp->textComp->text);
-                    textComp->textComp->text = StrCopy("");
-                }
+                LoadFrom(path);
 
                 _Free(path);
             }
             else
             {
-                _Free(textComp->textComp->text);
-                textComp->textComp->text = StrCopy("");
+                // _Free(textComp->textComp->text);
+                // textComp->textComp->text = StrCopy("");
+                if (lastSavePath != NULL)
+                {
+                    _Free(lastSavePath);
+                    lastSavePath = NULL;
+                }
+            }
+
+            return;
+        }
+        else if (state == NotePadButtonTaskState::Save)
+        {
+            TaskSimpleData* tsk = (TaskSimpleData*)task;
+            if (tsk->data != NULL)
+            {
+                const char* path = (const char*)tsk->data;
+
+                SaveInto(path);
+
+                _Free(path);
             }
 
             return;

@@ -129,7 +129,7 @@ namespace DiskInterface
             return false;
         AddToStack();
         uint32_t tempSectorCount = ((((address + count) + 511) / 512) - (address / 512));
-        uint8_t* buffer2 = (uint8_t*)_Malloc(512, "Malloc for Read Buffer");
+        uint8_t* buffer2 = (uint8_t*)_Malloc(512, "Malloc for Write Buffer");
         //window->Log("Writing Bytes...");
         
         if (tempSectorCount == 1)
@@ -164,6 +164,10 @@ namespace DiskInterface
             uint64_t newCount = count;
             uint64_t addrOffset = 0;
             {
+                // GlobalRenderer->Clear(Colors.dgray);
+                // while (true);
+
+
                 //uint8_t* buffer2 = (uint8_t*)malloc(512, "Malloc for Read Buffer (1/2)");
                 _memset(buffer2, 0, 512);
                 //window->Log("Writing to Sector: {}", to_string((address / 512)), Colors.yellow);
@@ -204,7 +208,7 @@ namespace DiskInterface
                 //uint8_t* buffer2 = (uint8_t*)malloc(512, "Malloc for Read Buffer (1/2)");
                 _memset(buffer2, 0, 512);
                 //window->Log("Writing to Sector: {}", to_string((address + count - 1) / 512), Colors.yellow);
-                if (!Read(((address + count - 1) / 512), 1, buffer2))
+                if (!Read(((address + count) / 512), 1, buffer2))
                 {
                     _Free(buffer2);
                     RemoveFromStack();
@@ -216,18 +220,35 @@ namespace DiskInterface
                 newCount -= specialCount;
                 //newAddr = address + specialCount;
 
-                // window->Log("Address:        {}", to_string(address), Colors.yellow);
-                // window->Log("Count:          {}", to_string(count), Colors.yellow);
-                // window->Log("New Address:    {}", to_string(newAddr), Colors.yellow);
-                // window->Log("New Count:      {}", to_string(newCount), Colors.yellow);
+                // GlobalRenderer->Clear(Colors.black);
+
+                // GlobalRenderer->Println("Address:        {}", to_string(address), Colors.yellow);
+                // GlobalRenderer->Println("Count:          {}", to_string(count), Colors.yellow);
+                // GlobalRenderer->Println("New Address:    {}", to_string(newAddr), Colors.yellow);
+                // GlobalRenderer->Println("New Count:      {}", to_string(newCount), Colors.yellow);
                 // //window->Log("Offset:         {}", to_string(offset), Colors.yellow);
-                // window->Log("Address Offset: {}", to_string(addrOffset), Colors.yellow);
-                // window->Log("Special Count:  {}", to_string(specialCount), Colors.yellow);
+                // GlobalRenderer->Println("Address Offset: {}", to_string(addrOffset), Colors.yellow);
+                // GlobalRenderer->Println("Special Count:  {}", to_string(specialCount), Colors.yellow);
 
-                for (uint64_t i = 0; i < specialCount; i++)
-                    buffer2[i] = ((uint8_t*)buffer)[i + addrOffset];
+                uint64_t blehus = (count - specialCount);
+                //GlobalRenderer->Println("blehus:  {}", to_string(blehus), Colors.yellow);
 
-                if (!Write(((address + count - 1) / 512), 1, buffer2))
+                // GlobalRenderer->Println("BUFF (1):");
+                // for (int i = 0; i < 512; i++)
+                //     GlobalRenderer->Print("{} ", to_string((int)buffer2[i]), Colors.yellow);
+                // GlobalRenderer->Println("");
+
+                for (int64_t i = 0; i < specialCount; i++)
+                    buffer2[i] = ((uint8_t*)buffer)[i + blehus];
+
+                // GlobalRenderer->Println("BUFF (2):");
+                // for (int i = 0; i < 512; i++)
+                //     GlobalRenderer->Print("{} ", to_string((int)buffer2[i]), Colors.yellow);
+                // GlobalRenderer->Println("");
+
+                //while (true);
+
+                if (!Write(((address + count) / 512), 1, buffer2))
                 {
                     _Free(buffer2);
                     RemoveFromStack();

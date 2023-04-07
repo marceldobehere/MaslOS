@@ -27,7 +27,8 @@ namespace SysApps
         // GuiComponentStuff::ButtonComponent* goUpBtn;
     
         GuiComponentStuff::ButtonComponent* loadBtn;   
-        GuiComponentStuff::ButtonComponent* saveBtn;    
+        GuiComponentStuff::ButtonComponent* saveBtn;
+        GuiComponentStuff::ButtonComponent* saveAsBtn;
         GuiComponentStuff::TextFieldComponent* textComp;
 
 
@@ -38,7 +39,7 @@ namespace SysApps
         // List<void*> fileCompsYes = List<void*>(4);
         // List<const char*> filePathsYes = List<const char*>(4);
         
-        const char* path;
+        const char* lastSavePath;
         int ScrollY;
 
 
@@ -54,9 +55,12 @@ namespace SysApps
         void OnExternalWindowResize(Window* window);
 
         void OnSaveClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info);
+        void OnSaveAsClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info);
         void OnLoadClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info);
 
         void OnTaskDone(Task* task);
+        void SaveInto(const char* path);
+        void LoadFrom(const char* path);
 
         // void OnFolderClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info);
         // void OnFileClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info);

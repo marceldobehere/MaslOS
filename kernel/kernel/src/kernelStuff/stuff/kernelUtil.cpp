@@ -476,7 +476,7 @@ void enable_fpu()
 
 void StartMenuButtonClick(GuiComponentStuff::BaseComponent* comp, GuiComponentStuff::MouseClickEventInfo info)
 {
-    if (comp->id >= 1001 && comp->id <= 1006)
+    if (comp->id >= 1001 && comp->id <= 1007)
     {
         // PONG
         const char* BLEHUS_TITLE = "App Terminal Window";
@@ -521,6 +521,13 @@ void StartMenuButtonClick(GuiComponentStuff::BaseComponent* comp, GuiComponentSt
         {
             BLEHUS_TITLE = "Explorer";
             BLEHUS_CMD   = "explorer";
+            BLEHUS_HIDE = true;
+        }
+
+        if (comp->id == 1007)
+        {
+            BLEHUS_TITLE = "Notepad";
+            BLEHUS_CMD   = "notepad";
             BLEHUS_HIDE = true;
         }
 
@@ -670,6 +677,19 @@ void InitStartMenuWindow(BootInfo* bootInfo)
             );
             btn->mouseClickedCallBack = StartMenuButtonClick;
             btn->id = 1006;
+            
+            testGui->screen->children->add(btn);
+        }
+
+        {
+            GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("Notepad", 
+            Colors.bgray, Colors.yellow, Colors.black, 
+            Colors.black, Colors.black, Colors.white,
+            GuiComponentStuff::ComponentSize(64, 20),
+            GuiComponentStuff::Position(0, 180), testGui->screen
+            );
+            btn->mouseClickedCallBack = StartMenuButtonClick;
+            btn->id = 1007;
             
             testGui->screen->children->add(btn);
         }
@@ -992,6 +1012,14 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
             //const char* tempPath = StrCombine("other", bootInfo->otherZIP->files[i].filename);
             //fsInterface->CreateFile(bootInfo->otherZIP->files[i].filename, bootInfo->otherZIP->files[i].size);
             //fsInterface->WriteFile(bootInfo->otherZIP->files[i].filename, bootInfo->otherZIP->files[i].size, bootInfo->otherZIP->files[i].fileData);
+        }
+        {
+            fsInterface->CreateFolder("other");
+            {
+                fsInterface->CreateFile("other/hi.txt", 14);
+                fsInterface->WriteFile("other/hi.txt", 14, (void*)"Hello, world!");
+                fsInterface->WriteFile("other/hi.txt", 16, (void*)"Hello, world! 2");
+            }
         }
         PrintMsgEndLayer("OTHER");
         fsInterface->SaveFSTable();

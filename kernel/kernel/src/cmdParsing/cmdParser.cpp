@@ -483,7 +483,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             //  FS_STUFF::OpenFile(data->data[1]);
             char* buf = NULL;
             int len = 0;
-            if (FS_STUFF::GetDataFromFullPath(data->data[1], &buf, &len))
+            if (FS_STUFF::LoadFileFromFullPath(data->data[1], &buf, &len))
                 terminal->tasks.add(NewDebugViewerTask(window, buf, len));
             else
                 LogError("File not found!", window);
