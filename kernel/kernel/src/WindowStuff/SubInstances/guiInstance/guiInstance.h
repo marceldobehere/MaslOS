@@ -41,6 +41,7 @@ class GuiInstance : public DefaultInstance
     
     Task* waitTask;
     bool waitingForTask;
+    bool oldResizeable;
     void* OnWaitTaskDoneHelp;
     void (*OnWaitTaskDoneCallback)(void* bruh, Task* tsk);
 

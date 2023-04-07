@@ -14,6 +14,7 @@ GuiInstance::GuiInstance(Window* window)
     OnWaitTaskDoneCallback = NULL;
     OnWaitTaskDoneHelp = NULL;
     this->window = window;
+    oldResizeable = false;
     instanceType = InstanceType::GUI;
 }
 
@@ -111,6 +112,7 @@ void GuiInstance::Render()
                 ), 
                 &bruhus
             );
+            window->resizeable = oldResizeable;
         }
         else
         {
@@ -118,6 +120,8 @@ void GuiInstance::Render()
                 return;
             waitingForTask = true;
             window->renderer->ClearDotted(Colors.black);
+            oldResizeable = window->resizeable;
+            window->resizeable = false;
             return;
         }
     }
