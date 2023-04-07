@@ -476,7 +476,7 @@ void enable_fpu()
 
 void StartMenuButtonClick(GuiComponentStuff::BaseComponent* comp, GuiComponentStuff::MouseClickEventInfo info)
 {
-    if (comp->id >= 1001 && comp->id <= 1007)
+    if (true)//(comp->id >= 1001 && comp->id <= 1007)
     {
         // PONG
         const char* BLEHUS_TITLE = "App Terminal Window";
@@ -531,6 +531,13 @@ void StartMenuButtonClick(GuiComponentStuff::BaseComponent* comp, GuiComponentSt
             BLEHUS_HIDE = true;
         }
 
+        if (comp->id == 1008)
+        {
+            BLEHUS_TITLE = "Image Viewer";
+            BLEHUS_CMD   = "img";
+            BLEHUS_HIDE = true;
+        }
+
 
 
         //Window* oldActive = activeWindow;
@@ -571,7 +578,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
     GuiComponentStuff::RectangleComponent* testRect;
 
     int sW = 200;
-    int sH = 250;
+    int sH = 300;
 
     {
         Window* window = (Window*)_Malloc(sizeof(Window), "GUI Window");
@@ -670,10 +677,10 @@ void InitStartMenuWindow(BootInfo* bootInfo)
 
         {
             GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("Explorer", 
-            Colors.bgray, Colors.yellow, Colors.black, 
+            Colors.bgreen, Colors.yellow, Colors.black, 
             Colors.black, Colors.black, Colors.white,
             GuiComponentStuff::ComponentSize(72, 20),
-            GuiComponentStuff::Position(0, 160), testGui->screen
+            GuiComponentStuff::Position(0, 180), testGui->screen
             );
             btn->mouseClickedCallBack = StartMenuButtonClick;
             btn->id = 1006;
@@ -683,13 +690,27 @@ void InitStartMenuWindow(BootInfo* bootInfo)
 
         {
             GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("Notepad", 
-            Colors.bgray, Colors.yellow, Colors.black, 
+            Colors.bgreen, Colors.yellow, Colors.black, 
             Colors.black, Colors.black, Colors.white,
             GuiComponentStuff::ComponentSize(64, 20),
-            GuiComponentStuff::Position(0, 180), testGui->screen
+            GuiComponentStuff::Position(0, 200), testGui->screen
             );
             btn->mouseClickedCallBack = StartMenuButtonClick;
             btn->id = 1007;
+            
+            testGui->screen->children->add(btn);
+        }
+
+
+        {
+            GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("Image Viewer", 
+            Colors.bgreen, Colors.yellow, Colors.black, 
+            Colors.black, Colors.black, Colors.white,
+            GuiComponentStuff::ComponentSize(104, 20),
+            GuiComponentStuff::Position(0, 220), testGui->screen
+            );
+            btn->mouseClickedCallBack = StartMenuButtonClick;
+            btn->id = 1008;
             
             testGui->screen->children->add(btn);
         }

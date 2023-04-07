@@ -305,7 +305,7 @@ namespace FS_STUFF
 
         if (StrEndsWith(path, ".mbif"))
         {
-            new SysApps::ImageTest(path);
+            new SysApps::ImageViewer(path);
             return true;
         }
         if (StrEndsWith(path, ".txt"))

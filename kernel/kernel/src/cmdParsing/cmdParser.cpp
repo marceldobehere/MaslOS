@@ -275,6 +275,13 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         return;
     }
 
+    if (StrEquals(input, "img"))
+    {
+        new SysApps::ImageViewer("");
+        RemoveFromStack();
+        return;
+    }
+
     if (StrEquals(input, "tetris") || StrEquals(input, "tetr"))
     {
         new SysApps::Tetris();
@@ -455,7 +462,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     if (StrEquals(data->data[0], "img"))
     {
         if (data->len == 2)
-            new SysApps::ImageTest(data->data[1]);
+            new SysApps::ImageViewer(data->data[1]);
         else
             LogInvalidArgumentCount(1, data->len-1, window);
         

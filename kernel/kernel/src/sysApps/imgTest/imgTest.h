@@ -8,17 +8,24 @@
 
 namespace SysApps
 {
-    class ImageTest
+
+    class ImageViewer
     {
         private:
         Window* window;
         GuiInstance* guiInstance;
         GuiComponentStuff::ImageRectangleComponent* testImg1;
+        GuiComponentStuff::ButtonComponent* openBtn;
 
         public:
-        ImageTest(const char* path);
+        ImageViewer(const char* path);
 
         void OnExternalWindowClose(Window* window);
+        void OnExternalWindowResize(Window* window);
+
+        void OnOpenClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info);
+        void OnTaskDone(Task* task);
+
 
         void Free();
     };

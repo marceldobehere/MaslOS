@@ -113,6 +113,12 @@ namespace GuiComponentStuff
         }
         image = NULL;
 
+        if (path == NULL || !StrEndsWith(path, ".mbif"))
+        {
+            RemoveFromStack();
+            return;
+        }
+
         char* buf;
         int size = 0;
         if (!FS_STUFF::LoadFileFromFullPath(path, &buf, &size))
