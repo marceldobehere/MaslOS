@@ -28,7 +28,8 @@ Here are the [Terminal Commands](https://github.com/marceldobehere/MaslOS/wiki/T
   - Mandelbrot renderer
   - Explorer
   - Image Viewer
-  - RAM Hex Viewer
+  - RAM/File Hex Viewer
+  - Notepad (Really Basic but works)
 * Audio
   - (In planning) Audio Device Driver of some sorts
 * Keyboard
@@ -111,6 +112,7 @@ Go into the MaslOS Folder and run the `RUN.sh` file
 ![The Desktop with some windows open](/images/desktop.PNG "The Desktop with some windows open")
 ![Experimental Raytracer Demo](/images/raycaster%20demo.png "An experimental Raytracer Demo")
 ![Explorer Gif](/images/explorer%20yes.gif "Explorer Gif")
+![Notepad Gif](/images/notepad%20yes.gif "Notepad Gif")
 ![Image Viewer](/images/image-component.PNG "Image Viewer")
 ![Pong running on real hardware](/images/pongus.jpg "Pong running on real hardware")
 ![MAAB Interpreter](/images/maab.png "MAAB Interpreter running with the windows interpreter next to it")
