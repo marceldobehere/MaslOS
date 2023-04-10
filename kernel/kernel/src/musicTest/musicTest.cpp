@@ -53,6 +53,7 @@ namespace Music
             if (n.isNote)
             {
                 n.isNote = false;
+                currentCount = -1;
                 currentNotes->add(n.note);
             }
 
@@ -68,12 +69,12 @@ namespace Music
         // Set Div if needed
         if (currentNotes->getCount() > 0 || toPlay->getCount() > 0)
         {
-            if (PIT::Divisor == PIT::NonMusicDiv)
+            if (PIT::Divisor != PIT::MusicDiv)
                 PIT::SetDivisor(PIT::MusicDiv);
         }
         else
         {
-            if (PIT::Divisor == PIT::MusicDiv)
+            if (PIT::Divisor != PIT::NonMusicDiv)
                 PIT::SetDivisor(PIT::NonMusicDiv);
         }
 
@@ -105,13 +106,22 @@ namespace Music
 			bool playBeep = false;
 			currentIndex %= currentNotes->getCount();
 			if (currentCount == -1)
-				currentCount = (currentNotes->getCount() - currentIndex) * 2;
+            {
+                int a = currentNotes->elementAt(currentIndex).freqLen;
+                int last = currentNotes->elementAt(currentNotes->getCount() - 1).freqLen;
+                if (a == 0)
+                    a = 1;
+                if (last == 0)
+                    last == 1;
+                currentCount = (last + last / 2) / a;
+            }
+			//currentCount = (currentNotes->getCount() - currentIndex) * 2;
             for (int i = 0; i < currentNotes->getCount(); i++)
             {
                 Note t = currentNotes->elementAt(i);
 				t.duration -= timeYes;
 
-				
+                //if (currentIndex == i)
 				t.tTime += timeYes * 2;
 				
 				if (t.tTime >= t.freqLen)
@@ -129,7 +139,18 @@ namespace Music
 					if (currentCount < 1)
 					{
 						currentIndex++;
+                        currentIndex %= currentNotes->getCount();
+
 						currentCount = -1;
+                        {
+                            int a = currentNotes->elementAt(currentIndex).freqLen;
+                            int last = currentNotes->elementAt(currentNotes->getCount() - 1).freqLen;
+                            if (a == 0)
+                                a = 1;
+                            if (last == 0)
+                                last == 1;
+                            currentCount = last / a;
+                        }
 					}
                 }
 				

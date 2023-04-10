@@ -1856,6 +1856,17 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
         else
             LogError("Wanted FPS of {} is out of range!", val, window);
     }
+    else if (StrEquals(name, "mdiv"))
+    {
+        int mDiv = to_int(val);
+        if (mDiv > 10 && mDiv < 300)
+        {
+            PIT::MusicDiv = mDiv;
+            Println(window, "Music Div set to {}.", val);
+        }
+        else
+            LogError("Wanted Music Div of {} is out of range!", val, window);
+    }
     else if (StrEquals(name, "username"))
     {
         (*user)->userName = StrCopy(val);

@@ -35,8 +35,8 @@ namespace Music
     Note::Note()
     {
         //AddToStack();
-        note = 0;
-        freqLen = 0;
+        note = 1;
+        freqLen = 1;
         duration = 0;
         tTime = 0;
         //RemoveFromStack();
@@ -196,7 +196,7 @@ namespace Music
     {
         if (midi >= 0 && midi <= 102)
             return lookupTable[midi];
-        return 0;
+        return 1;
     }
 }
 

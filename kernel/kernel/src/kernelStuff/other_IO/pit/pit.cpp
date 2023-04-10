@@ -12,6 +12,9 @@ namespace PIT
 
     uint16_t Divisor = 65535;
 
+    uint16_t MusicDiv = 40;
+    uint16_t NonMusicDiv = 400;
+
     bool Inited = false;
 
     uint64_t freq = GetFrequency();
