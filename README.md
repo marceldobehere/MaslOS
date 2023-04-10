@@ -31,6 +31,7 @@ Here are the [Terminal Commands](https://github.com/marceldobehere/MaslOS/wiki/T
   - RAM/File Hex Viewer
   - Notepad (Really Basic but works)
 * Audio
+  - PC Speaker (You can technically play midi music but still majorly WIP)
   - (In planning) Audio Device Driver of some sorts
 * Keyboard
   - PS/2 Keyboard support
