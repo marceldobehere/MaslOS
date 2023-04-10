@@ -9,7 +9,7 @@ namespace PIT
     static const uint64_t BaseFrequency = 1193182;
     extern bool Inited;
     extern int FreqAdder;
-    const uint16_t MusicDiv = 20;
+    const uint16_t MusicDiv = 40;
     const uint16_t NonMusicDiv = 400;
 
 

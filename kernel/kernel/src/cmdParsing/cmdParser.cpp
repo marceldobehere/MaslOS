@@ -284,7 +284,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         return;
     }
 
-    if (StrEquals(input, "music"))
+    if (StrEquals(input, "music test"))
     {
         for (int i = 60; i < 103; i++)
         {
@@ -296,9 +296,19 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         return;
     }
 
-    if (StrEquals(input, "rick"))
+    if (StrEquals(input, "music clear"))
     {
-        Music::addRick();
+        Music::listInUse = true;
+        Music::toPlay->clear();
+        Music::listInUse = false;
+
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(input, "music mario"))
+    {
+        Music::addMario();
 
         RemoveFromStack();
         return;

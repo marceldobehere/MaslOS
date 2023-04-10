@@ -27,8 +27,8 @@ namespace PIT
 
     void SetDivisor(uint16_t divisor)
     {
-        if (divisor < 20)
-            divisor = 20;
+        if (divisor < 5)
+            divisor = 5;
 
         if (Inited)
         {

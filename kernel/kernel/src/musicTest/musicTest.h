@@ -8,6 +8,7 @@ namespace Music
     extern List<NoteCommand>* toPlay;
     extern List<Note>* currentNotes;
     extern int currentIndex;
+    extern int currentCount;
     void init();
     extern bool listInUse;
     void addCmd(NoteCommand note);
@@ -16,6 +17,6 @@ namespace Music
 
     int getNoteDurFromMidiNote(int midi);
 
-    void addRick();
+    void addMario();
 
 }
