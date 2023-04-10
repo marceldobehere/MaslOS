@@ -3,6 +3,7 @@
 #include "../../OSDATA/osStats.h" 
 #include "../../Rendering/VirtualRenderer.h"
 //#include "../../userinput/mouse.h"
+#include "../../musicTest/musicTest.h"
 
 namespace WindowManager
 {
@@ -884,7 +885,7 @@ if (window != NULL)
         AddToStack();
         //osData.debugTerminalWindow->Log("             : ################", Colors.black);
         osData.debugTerminalWindow->renderer->CursorPosition.x = 0;
-        osData.debugTerminalWindow->renderer->CursorPosition.y -= 16 * 12;
+        osData.debugTerminalWindow->renderer->CursorPosition.y -= 16 * 14;
 
         AddToStack();
         osData.debugTerminalWindow->renderer->Clear(
@@ -1017,6 +1018,27 @@ if (window != NULL)
             Colors.black);
         osData.debugTerminalWindow->Log("MSTACK MAX: {}", to_string(MStackData::BenchmarkStackPointerSave), Colors.yellow);
         RemoveFromStack();
+
+        AddToStack();
+        osData.debugTerminalWindow->renderer->Clear(
+            osData.debugTerminalWindow->renderer->CursorPosition.x,
+            osData.debugTerminalWindow->renderer->CursorPosition.y,
+            osData.debugTerminalWindow->renderer->CursorPosition.x + 240,
+            osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
+            Colors.black);
+        osData.debugTerminalWindow->Log("MUSIC COUNT: {}", to_string(Music::toPlay->getCount()), Colors.yellow);
+        RemoveFromStack();
+
+        AddToStack();
+        osData.debugTerminalWindow->renderer->Clear(
+            osData.debugTerminalWindow->renderer->CursorPosition.x,
+            osData.debugTerminalWindow->renderer->CursorPosition.y,
+            osData.debugTerminalWindow->renderer->CursorPosition.x + 240,
+            osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
+            Colors.black);
+        osData.debugTerminalWindow->Log("PIT DIV: {}", to_string(PIT::Divisor), Colors.yellow);
+        RemoveFromStack();
+
 
         RemoveFromStack();
 

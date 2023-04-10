@@ -734,6 +734,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
 
 BasicRenderer r = *((BasicRenderer*)NULL);
 
+#include "../../musicTest/musicTest.h"
 
 
 
@@ -796,6 +797,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     RemoveFromStack();
     StepDone(2);
     
+
     //while(true);
     
     PrintMsg("> Initializing Heap");
@@ -804,7 +806,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     //GlobalRenderer->Println("BG IMG: {}", to_string((uint64_t)bootInfo->bgImage), Colors.orange);
 
-
+    Music::init();
     
 
     //uint8_t* bleh = (uint8_t*) malloc(sizeof(Framebuffer), "Converting Image to Framebuffer");;

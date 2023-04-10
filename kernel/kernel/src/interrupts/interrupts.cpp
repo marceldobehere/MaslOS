@@ -240,11 +240,19 @@ __attribute__((interrupt)) void MouseInt_handler(interrupt_frame* frame)
     RemoveFromStack();
 }
 
+bool speakA = false;
+
+#include "../musicTest/musicTest.h"
+
 __attribute__((interrupt)) void PITInt_handler(interrupt_frame* frame)
 { 
     AddToStack();
     PIT::Tick();
     PIC_EndMaster();
+    Music::play(PIT::FreqAdder);
+
+    // TestSetSpeakerPosition(speakA);
+    // speakA = !speakA;
     RemoveFromStack();
 }
 
@@ -396,11 +404,11 @@ void RemapPIC(uint8_t _a1, uint8_t _a2)
 
 void PIC_EndMaster()
 {
-    AddToStack();
+    //AddToStack();
     io_wait();
     outb(PIC1_COMMAND, PIC_EOI);
     io_wait();
-    RemoveFromStack();
+    //RemoveFromStack();
 }
 
 

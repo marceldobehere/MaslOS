@@ -228,6 +228,8 @@ void EditPartitionSetting(PartitionInterface::PartitionInfo* part, const char* p
 #include "../sysApps/notepad/notepad.h"
 #include "../sysApps/imgTest/imgTest.h"
 
+#include "../musicTest/musicTest.h"
+
 void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 {
     AddToStack();
@@ -278,6 +280,26 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     if (StrEquals(input, "img"))
     {
         new SysApps::ImageViewer("");
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(input, "music"))
+    {
+        for (int i = 60; i < 103; i++)
+        {
+            Music::addCmd(Music::NoteCommand(i, 100, true));
+            Music::addCmd(Music::NoteCommand(100));
+        }
+
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(input, "rick"))
+    {
+        Music::addRick();
+
         RemoveFromStack();
         return;
     }
@@ -726,13 +748,12 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     }
 
     if (StrEquals(data->data[0], "beep"))
-    {
-        int onDur = to_int(data->data[1]);
-        int offDur = to_int(data->data[2]);
-        int totDur = to_int(data->data[3]);
-        
+    {        
         if (data->len == 4)
         {
+            int onDur = to_int(data->data[1]);
+            int offDur = to_int(data->data[2]);
+            int totDur = to_int(data->data[3]);
             int size = to_int(data->data[3]);
             terminal->tasks.add(NewBeepTask(onDur, offDur, totDur));
             Println(window, "Playing beep...");

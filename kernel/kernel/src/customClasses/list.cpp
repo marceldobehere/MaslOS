@@ -92,24 +92,24 @@ template <typename T> int64_t List<T>::getIndexOf(T item)
 
 template <typename T> void List<T>::add(T item)
 {
-    AddToStack();
+    //AddToStack();
     if (count >= cap)
         expandArr();
 
     arr[count] = item;
     count++;
-    RemoveFromStack();
+    //RemoveFromStack();
 }
 
 template <typename T> void List<T>::set(uint64_t index, T item)
 {
-    AddToStack();
+    //AddToStack();
     int64_t indx = index;
     if (index > count || indx < 0)
         return;
     arr[index] = item;
     
-    RemoveFromStack();
+    //RemoveFromStack();
 }
 
 template <typename T> void List<T>::insertAt(T item, uint64_t index)

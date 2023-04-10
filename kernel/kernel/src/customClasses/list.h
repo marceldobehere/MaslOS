@@ -120,8 +120,13 @@ template class List<DiskInterface::GenericDiskInterface*>;
 template class Array<GuiComponentStuff::Field>;
 template class List<GuiComponentStuff::Field>;
 
+#include "../musicTest/musicStruct.h"
 
+template class Array<Music::Note>;
+template class List<Music::Note>;
 
+template class Array<Music::NoteCommand>;
+template class List<Music::NoteCommand>;
 
 
 
