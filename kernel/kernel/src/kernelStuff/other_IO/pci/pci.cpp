@@ -71,6 +71,8 @@ namespace PCI
 
         uint64_t functionAddress = deviceAddress + offset;
 
+        if (functionAddress == 0x0000000000000000) {RemoveFromStack(); return;}
+
         //GlobalPageTableManager.MapMemory((void*)functionAddress, (void*)functionAddress);
         
         PCIDeviceHeader* pciDeviceHeader  = (PCIDeviceHeader*)functionAddress;

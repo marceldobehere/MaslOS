@@ -302,6 +302,10 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         Music::toPlay->clear();
         Music::listInUse = false;
 
+        Music::rawAudioInUse = true;
+        Music::currentRawAudio->clear();
+        Music::rawAudioInUse = false;
+
         RemoveFromStack();
         return;
     }

@@ -7,6 +7,10 @@ namespace Music
 {
     List<NoteCommand>* toPlay = NULL;
     List<Note>* currentNotes  = NULL;
+    List<uint8_t>* currentRawAudio = NULL;
+    bool rawAudioInUse = false;
+    int currentRawAudioIndex = 0;
+    int rawAudioDiv = 60;
     int currentIndex = 0;
 	int currentCount = -1;
 
@@ -19,6 +23,9 @@ namespace Music
     {
         toPlay = new List<NoteCommand>(10);
         currentNotes = new List<Note>(10);
+        currentRawAudio = new List<uint8_t>(10);
+        currentRawAudioIndex = 0;
+        rawAudioInUse = false;
         currentIndex = 0;
 		currentCount = 0;
         listInUse = false;
@@ -43,7 +50,43 @@ namespace Music
         if (toPlay == NULL || paused)
             return;
 
+
         AddToStack();
+        if (!rawAudioInUse && currentRawAudio->getCount() > 0)
+        {
+            if (PIT::Divisor != rawAudioDiv)
+                PIT::SetDivisor(rawAudioDiv);
+
+            int indx1 = currentRawAudioIndex >> 3;
+            int indx2 = currentRawAudioIndex & 0b111;
+
+            uint8_t val = currentRawAudio->elementAt(indx1);
+            uint8_t yes = (val >> (7 - indx2)) & 1;
+            bool beep = yes == 1;
+			if (beep != currentState)
+			{
+				currentState = beep;
+				TestSetSpeakerPosition(currentState);
+			}
+
+            currentRawAudioIndex++;
+            if (currentRawAudioIndex >= 20000)
+            {
+                currentRawAudioIndex = 0;
+                currentRawAudio->removeFirst(20000 / 8);
+            }
+            if (currentRawAudioIndex >> 3 >= currentRawAudio->getCount())
+            {
+                currentRawAudio->clear();
+                currentRawAudioIndex = 0;
+            }
+
+            RemoveFromStack();
+            return;
+        }
+        currentRawAudioIndex = 0;
+
+        
         // Add Note if needed
         testo:
         if (!listInUse && toPlay->getCount() > 0) 

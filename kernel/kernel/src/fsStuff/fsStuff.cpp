@@ -10,6 +10,7 @@
 
 #include "../sysApps/imgTest/imgTest.h"
 #include "../sysApps/notepad/notepad.h"
+#include "../musicTest/musicTest.h"
 
 namespace FS_STUFF
 {
@@ -323,7 +324,25 @@ namespace FS_STUFF
             _Free(t2);
             return true;
         }
-
+        if (StrEndsWith(path, ".mbaf"))
+        {
+            int totalLen = 0;
+            char* buf = NULL;
+            LoadFileFromFullPath(path, &buf, &totalLen);
+            if (buf != NULL && totalLen > 8)
+            {
+                Music::rawAudioInUse = true;
+                int bitRate = ((int*)buf)[1];
+                int div = PIT::BaseFrequency / bitRate;
+                Music::rawAudioDiv = div;
+                Music::currentRawAudio->clear();
+                for (long offset = 8; offset < totalLen; offset++)
+                    Music::currentRawAudio->add(buf[offset]);
+                Music::rawAudioInUse = false;
+                return true;
+            }
+            return false;
+        }
         return false;
     }
 

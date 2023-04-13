@@ -180,6 +180,27 @@ template <typename T> void List<T>::removeFirst()
     RemoveFromStack();
 }
 
+template <typename T> void List<T>::removeFirst(int amt)
+{
+    AddToStack();
+    if (count == 0 || amt <= 0)
+    {
+        RemoveFromStack();
+        return;
+    }
+
+    if (amt > count)
+        amt = count;
+    
+    for (uint64_t i = amt; i < count; i++)
+    {
+        arr[i - amt] = arr[i];
+    }
+    count -= amt;
+
+    RemoveFromStack();
+}
+
 template <typename T> void List<T>::removeLast()
 {
     AddToStack();
