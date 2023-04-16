@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include "kbScancodeTranslation.h"
 #include "../OSDATA/userdata.h"
 #include "../WindowStuff/Window/window.h"
 #include "../WindowStuff/SubInstances/terminalInstance/terminalInstance.h"

@@ -6,7 +6,7 @@ TerminalInstance::TerminalInstance(OSUser* user)
 {
     this->currentUser = user;
     //this->window = window;
-    mode = commandMode::none;
+    mode = commandMode::mode_none;
     instanceType = InstanceType::Terminal;
     userlen = 0;
     takeInput = false;
@@ -69,7 +69,7 @@ void TerminalInstance::HandleEnter()
     }
     else
     {
-        mode = commandMode::none;
+        mode = commandMode::mode_none;
     }
     printUser = true;
     RemoveFromStack();

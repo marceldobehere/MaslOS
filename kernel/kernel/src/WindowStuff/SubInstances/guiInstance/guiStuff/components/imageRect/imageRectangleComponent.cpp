@@ -121,7 +121,7 @@ namespace GuiComponentStuff
 
         char* buf;
         int size = 0;
-        if (!FS_STUFF::LoadFileFromFullPath(path, &buf, &size))
+        if (!FS_STUFF::ReadFileFromFullPath(path, &buf, &size))
         {
             RemoveFromStack();
             return;

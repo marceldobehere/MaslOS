@@ -9,7 +9,7 @@
 
 enum commandMode
 {
-    none,
+    mode_none,
     enterPassword,
     enterText
 };

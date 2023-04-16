@@ -215,7 +215,7 @@ namespace FS_STUFF
     
 
 
-    bool LoadFileFromFullPath(const char* path, char** resBuffer, int* resBufferLen)
+    bool ReadFileFromFullPath(const char* path, char** resBuffer, int* resBufferLen)
     {
         FilesystemInterface::GenericFilesystemInterface* fsInterface = FS_STUFF::GetFsInterfaceFromFullPath(path);
         if (fsInterface == NULL)
@@ -328,7 +328,7 @@ namespace FS_STUFF
         {
             int totalLen = 0;
             char* buf = NULL;
-            LoadFileFromFullPath(path, &buf, &totalLen);
+            ReadFileFromFullPath(path, &buf, &totalLen);
             if (buf != NULL && totalLen > 8)
             {
                 Music::rawAudioInUse = true;

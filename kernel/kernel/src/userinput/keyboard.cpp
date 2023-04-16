@@ -1,7 +1,7 @@
 #include "keyboard.h"
 
 #include <stdint.h>
-#include "kbScancodeTranslation.h"
+
 #include "../Rendering/BasicRenderer.h"
 #include "../cmdParsing/cmdParser.h"
 #include "../Rendering/Cols.h"
@@ -220,7 +220,7 @@ void HandleKeyboard(uint8_t scancode)
         //     if (activeWindow != NULL)
         //         activeWindow->position.x--;
         // }
-        else
+        else if (lAlt)
         {
             if (activeWindow != NULL)
             {
@@ -249,7 +249,7 @@ void HandleKeyboard(uint8_t scancode)
                             return;
                         }
         }
-        else
+        else if (lAlt)
         {
             if (activeWindow != NULL)
             {
@@ -279,7 +279,7 @@ void HandleKeyboard(uint8_t scancode)
                             return;
                         }
         }
-        else
+        else if (lAlt)
         {
             if (activeWindow != NULL)
             {
@@ -303,7 +303,7 @@ void HandleKeyboard(uint8_t scancode)
                             return;
                         }
         }
-        else
+        else if (lAlt)
         {
             if (activeWindow != NULL)
             {
@@ -546,7 +546,7 @@ void HandleKeyboard(uint8_t scancode)
                 {
                     if ((activeWindow->allowKeyboardDrawing && !instance->GetBusy()))
                     {
-                        if (instance->mode == commandMode::none)
+                        if (instance->mode == commandMode::mode_none)
                             ((NewTerminalInstance*)instance->newTermInstance)->Print(ascii);
                         else if (instance->mode == commandMode::enterText)
                             ((NewTerminalInstance*)instance->newTermInstance)->Print(ascii);

@@ -229,7 +229,7 @@ namespace SysApps
         char* fData = NULL;
         int fDataLen = 0;
 
-        if (FS_STUFF::LoadFileFromFullPath(path, &fData, &fDataLen))
+        if (FS_STUFF::ReadFileFromFullPath(path, &fData, &fDataLen))
         {
             char* nData = (char*)_Malloc(fDataLen + 1);
             nData[fDataLen] = 0;

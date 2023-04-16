@@ -174,6 +174,12 @@ MPoint MousePosition;
 
 // }
 
+void SetMousePosition(MPoint point)
+{
+    IMousePosition = point;
+    MousePosition = point;
+}
+
 void DrawMousePointer()
 {
     //DrawMousePointer1();

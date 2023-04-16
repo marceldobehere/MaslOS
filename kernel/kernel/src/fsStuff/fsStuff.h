@@ -12,7 +12,7 @@ namespace FS_STUFF
     char* GetFilePathFromFullPath(const char* path);
     char* GetFolderPathFromFullPath(const char* path);
 
-    bool LoadFileFromFullPath(const char* path, char** resBuffer, int* resBufferLen);
+    bool ReadFileFromFullPath(const char* path, char** resBuffer, int* resBufferLen);
     bool WriteFileToFullPath(const char* path, char* buffer, int bufferLen, bool createIfNotExists);
 
     FilesystemInterface::GenericFilesystemInterface* GetFsInterfaceFromFullPath(const char* path);

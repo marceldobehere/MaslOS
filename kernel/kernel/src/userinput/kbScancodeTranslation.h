@@ -65,6 +65,9 @@ namespace QWERTYKeyboard
     #define LeftShift   0x2A
     #define RightShift  0x36
     #define Enter       0x1C
+    #define Escape       0x01
+    #define Control    0x1D
+    #define Tab          0x0F
     #define Backspace   0x0E
     #define ARR_UP      0x48 
     #define ARR_DOWN    0x50
@@ -73,17 +76,7 @@ namespace QWERTYKeyboard
     #define LeftAlt   0x38
     
 
-    char Translate(uint8_t scancode, bool uppercase)
-    { 
-        if (scancode >= 58) return 0;
-
-
-
-        if (uppercase) 
-            return ShiftASCIITable[scancode];
-
-        return ASCIITable[scancode];
-    }
+    char Translate(uint8_t scancode, bool uppercase);
 
 
  

@@ -227,6 +227,7 @@ void EditPartitionSetting(PartitionInterface::PartitionInfo* part, const char* p
 #include "../sysApps/tetris/tetris.h"
 #include "../sysApps/notepad/notepad.h"
 #include "../sysApps/imgTest/imgTest.h"
+#include "../tasks/doomTask/taskDoom.h"
 
 #include "../musicTest/musicTest.h"
 
@@ -280,6 +281,13 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     if (StrEquals(input, "img"))
     {
         new SysApps::ImageViewer("");
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(input, "doom"))
+    {
+        terminal->tasks.add(NewDoomTask(window));
         RemoveFromStack();
         return;
     }
@@ -417,7 +425,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 
     if (StrEquals(data->data[0], "login") && terminal->mode == commandMode::enterPassword)
     {
-        terminal->mode = commandMode::none;
+        terminal->mode = commandMode::mode_none;
         StringArrData* data2 = SplitLine(input);
         if (data->len == 2)
         {
@@ -435,7 +443,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 
     if (StrEquals(data->data[0], "set") && terminal->mode == commandMode::enterPassword)
     {
-        terminal->mode = commandMode::none;
+        terminal->mode = commandMode::mode_none;
         StringArrData* data2 = SplitLine(input);
         if (data->len == 2 || data->len == 3)
         {
@@ -526,7 +534,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             //  FS_STUFF::OpenFile(data->data[1]);
             char* buf = NULL;
             int len = 0;
-            if (FS_STUFF::LoadFileFromFullPath(data->data[1], &buf, &len))
+            if (FS_STUFF::ReadFileFromFullPath(data->data[1], &buf, &len))
                 terminal->tasks.add(NewDebugViewerTask(window, buf, len));
             else
                 LogError("File not found!", window);
@@ -1737,7 +1745,7 @@ void login(const char* name, const char* pass, OSUser** user, Window* window)
 
     TerminalInstance* terminal = (TerminalInstance*)window->instance;
 
-    terminal->mode = commandMode::none;
+    terminal->mode = commandMode::mode_none;
 
     OSUser* usr = getUser(name);
     if (usr == 0)

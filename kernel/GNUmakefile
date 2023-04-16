@@ -56,6 +56,8 @@ override CFLAGS +=       \
     -I.
     
 CFLAGS2 = -ffreestanding -fshort-wchar -mno-red-zone -fno-omit-frame-pointer -fno-exceptions -fpermissive -Wno-pmf-conversions
+CFLAGS3 = -ffreestanding -fshort-wchar -mno-red-zone -fno-omit-frame-pointer -fno-exceptions 
+
 #-ffreestanding -fshort-wchar -mno-red-zone -fno-omit-frame-pointer -fno-exceptions -fcommon
 
 # Internal linker flags that should not be changed by the user.
@@ -77,12 +79,15 @@ override NASMFLAGS += \
     -f elf64
 
 # Use find to glob all *.c, *.S, and *.asm files in the directory and extract the object names.
-override CFILES := $(shell find . -type f -name '*.c')
-override CPPFILES := $(shell find . -type f -name '*.cpp')
-override ASFILES := $(shell find . -type f -name '*.S')
+
+
+override CFILES    := $(shell find . -type f -name '*.c')
+override CPPFILES  := $(shell find . -type f -name '*.cpp')
+override ASFILES   := $(shell find . -type f -name '*.S')
 override NASMFILES := $(shell find . -type f -name '*.asm')
-override OBJ := $(CFILES:.c=.o) $(CPPFILES:.cpp=.o) $(ASFILES:.S=.o) $(NASMFILES:.asm=_asm.o)
-override HEADER_DEPS := $(CFILES:.c=.d) $(CFILES:.cpp=.d) $(ASFILES:.S=.d)
+
+override OBJ         := $(CFILES:.c=.o) $(CPPFILES:.cpp=.o) $(ASFILES:.S=.o) $(NASMFILES:.asm=_asm.o)
+override HEADER_DEPS := $(CFILES:.c=.d) $(CPPFILES:.cpp=.d) $(ASFILES:.S=.d)
 
 # Default target.
 .PHONY: all
@@ -143,6 +148,10 @@ kernel/src/WindowStuff/WindowManager/%.o: kernel/src/WindowStuff/WindowManager/%
 # Compilation rules for *.cpp files.
 %.o: %.cpp
 	$(CC) $(CFLAGS2) -c $^ -o $@
+	
+	# Compilation rules for *.cpp files.
+%.o: %.c
+	$(CC) $(CFLAGS3) -c $^ -o $@
 
 
 
