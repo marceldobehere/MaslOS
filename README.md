@@ -30,6 +30,7 @@ Here are the [Terminal Commands](https://github.com/marceldobehere/MaslOS/wiki/T
   - Image Viewer
   - RAM/File Hex Viewer
   - Notepad (Really Basic but works)
+  - DOOM (Port from [here](https://github.com/Daivuk/PureDOOM). Mostly works though you can only run 1 instance of DOOM at the same time and relaunching is currently broken lol)
 * Audio
   + PC Speaker 
     - "MIDI" Playback (WIP but exists)
@@ -112,6 +113,7 @@ Go into the MaslOS Folder and run the `RUN.sh` file
 ## Screenshots
 
 ![The MaslOS Splashscreen](/images/boot.PNG "The MaslOS Splashscreen")
+![Doom Port](/images/doom.png "DOOM 2 running on MaslOS")
 ![The Desktop with some windows open](/images/desktop.PNG "The Desktop with some windows open")
 ![Experimental Raytracer Demo](/images/raycaster%20demo.png "An experimental Raytracer Demo")
 ![Explorer Gif](/images/explorer%20yes.gif "Explorer Gif")
