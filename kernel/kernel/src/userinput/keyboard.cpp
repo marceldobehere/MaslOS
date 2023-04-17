@@ -126,7 +126,8 @@ void HandleKeyboard(uint8_t scancode)
     }
     else
     {
-        if (KeyboardScancodeState[scancode] && scancode != Backspace && 
+        if (KeyboardScancodeState[scancode] && 
+            scancode != Backspace && 
             scancode != ARR_DOWN &&
             scancode != ARR_LEFT &&
             scancode != ARR_UP &&

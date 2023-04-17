@@ -53,3 +53,4 @@ extern uint32_t mouseColFront, mouseColBack;
 extern MPoint MousePosition;
 
 extern bool MouseClickState[3];
+extern bool ShowMouseCursor;

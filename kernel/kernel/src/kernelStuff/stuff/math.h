@@ -11,6 +11,9 @@ struct MPoint
 {
     int x;
     int y;
+
+    MPoint(int x, int y);
+    MPoint();
 };
 
 // inline int min(int a, int b);

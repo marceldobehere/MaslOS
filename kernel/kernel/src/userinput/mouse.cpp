@@ -99,6 +99,7 @@ List<MousePacket> mousePackets;
 
 MPoint IMousePosition;
 MPoint MousePosition;
+bool ShowMouseCursor = true;
 
 // void SaveIntoBuffer(MPoint point, Framebuffer* framebuffer)
 // {
@@ -293,7 +294,8 @@ void DrawMousePointer2(PointerFramebuffer* framebuffer, MPoint mousePos)
 {
     //SaveIntoBuffer(IMousePosition, framebuffer);
     //DrawMouseBuffer(IMousePosition, framebuffer);
-    DrawMousePointerNew(mousePos, framebuffer);
+    if (ShowMouseCursor)
+        DrawMousePointerNew(mousePos, framebuffer);
     MousePosition = IMousePosition;
 }
 

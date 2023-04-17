@@ -149,7 +149,7 @@ kernel/src/WindowStuff/WindowManager/%.o: kernel/src/WindowStuff/WindowManager/%
 %.o: %.cpp
 	$(CC) $(CFLAGS2) -c $^ -o $@
 	
-	# Compilation rules for *.cpp files.
+# Compilation rules for *.cpp files.
 %.o: %.c
 	$(CC) $(CFLAGS3) -c $^ -o $@
 

@@ -8,13 +8,22 @@ extern "C"
 
 #include "../../kernelStuff/other_IO/pit/pit.h"
 #include "../../Rendering/Cols.h"
+#include "../../userinput/kbScancodeTranslation.h"
+#include "../../userinput/mouse.h"
+#include "../../fsStuff/fsStuff.h"
+#include "../../cmdParsing/cstrTools.h"
+#include "../../OSDATA/MStack/MStackM.h"
+
+List<void*>* openMallocs = NULL;
 
 // doom 2 wad https://archive.org/details/Doom-2
 
 void doomExit(int code)
 {
     doomRunning = false;
+    doomInit = false;
     currentDoom->End();
+    //currentDoom = NULL;
 }
 
 void doomPrint(const char* str)
@@ -24,20 +33,26 @@ void doomPrint(const char* str)
 
 void* doomMalloc(int size)
 {
-    void* bruh = _Malloc(size);
+    void* bruh = _Malloc(size, "DOOM MALLOC");
+    openMallocs->add(bruh);
     return bruh;
 }
 
 void doomFree(void* ptr)
 {
-    return _Free(ptr);
+    int indx = openMallocs->getIndexOf(ptr);
+    if (indx != -1)
+    {
+        openMallocs->removeAt(indx);
+        _Free(ptr);
+    }
 }
 
 void doomGetTime(int* s, int* u)
 {
     int t = PIT::TimeSinceBootMicroS();
     *s = t / 1000000;
-    *u = t;
+    *u = t % 1000000;
 }
 
 char* doomGetEnv(const char* var)
@@ -45,7 +60,7 @@ char* doomGetEnv(const char* var)
     return "bruh:doom";
 }
 
-#include "../../fsStuff/fsStuff.h"
+
 
 struct BruhFile
 {
@@ -56,7 +71,7 @@ struct BruhFile
     const char* path;
 };
 
-#include "../../cmdParsing/cstrTools.h"
+
 
 void* doomOpen(const char* path, const char* mode)
 {
@@ -83,6 +98,10 @@ void* doomOpen(const char* path, const char* mode)
     bruhFile->bufferLen = resBufferLen;
     bruhFile->pos = 0;
     bruhFile->path = StrCopy(path);
+    openMallocs->add((void*)bruhFile);
+    openMallocs->add((void*)bruhFile->buffer);
+    openMallocs->add((void*)bruhFile->path);
+
 
     //PIT::Sleep(1000);
     return bruhFile;
@@ -93,9 +112,9 @@ void doomClose(void* handle)
     if (handle == NULL)
         return;
     BruhFile* bruhFile = (BruhFile*)handle;
-    _Free(bruhFile->buffer);
-    _Free(bruhFile->path);
-    _Free(bruhFile);
+    doomFree((void*)bruhFile->buffer);
+    doomFree((void*)bruhFile->path);
+    doomFree((void*)bruhFile);
 }
 
 int doomRead(void* handle, void* buffer, int size)
@@ -169,6 +188,7 @@ int doomEof(void *handle)
     return bruhFile->pos >= bruhFile->bufferLen ? 1 : 0;
 }
 
+
 void DoDoomInit()
 {
     doom_print_fn print_fn = doomPrint;
@@ -193,11 +213,20 @@ void DoDoomInit()
     doom_set_gettime(gettime_fn);
     doom_set_exit(exit_fn);
     doom_set_getenv(getenv_fn);
+
+    AddToStack();
+    doom_set_default_int("key_up", DOOM_KEY_W);
+    doom_set_default_int("key_down", DOOM_KEY_S);
+    doom_set_default_int("key_strafeleft", DOOM_KEY_A);
+    doom_set_default_int("key_straferight", DOOM_KEY_D);
+    doom_set_default_int("key_use", DOOM_KEY_E);
+    doom_set_default_int("mouse_move", 0); // Mouse will not move forward
+    RemoveFromStack();
 }
 
 
 
-#include "../../OSDATA/MStack/MStackM.h"
+
 
 #define DOOM_WIDTH 320
 #define DOOM_HEIGHT 200
@@ -205,7 +234,9 @@ bool doomRunning = false;
 bool doomInit = false;
 TaskDoom* currentDoom = NULL;
 uint64_t lastTime = 0;
-//#define DOOM_SCALE 2
+
+
+int DOOM_SCALE = 2;
 
 bool doomKeyboardTemp[256];
 bool doomMouseTemp[3];
@@ -213,6 +244,10 @@ MPoint tempDoomMousePos;
 
 TaskDoom::TaskDoom(Window* window)
 {
+    if (openMallocs == NULL)
+    {
+        openMallocs = new List<void*>(5);
+    }
     if (doomRunning)
     {
         done = true;
@@ -233,28 +268,28 @@ TaskDoom::TaskDoom(Window* window)
     for (int i = 0; i < 3; i++)
         doomMouseTemp[i] = false;
 
-    tempDoomMousePos = MousePosition;
+
+    tempDoomMousePos = MPoint(DOOM_WIDTH * DOOM_SCALE / 2 + window->position.x, DOOM_HEIGHT * DOOM_SCALE / 2 + window->position.y);
+    SetMousePosition(tempDoomMousePos);
 
     AddToStack();
     //openFIles = new List<void*>(5);
     done = false;
     type = TaskType::DOOM;
     this->window = window;
+    oldTitle = window->title;
+    oldResize = window->resizeable;
+    window->title = StrCopy("DOOM");
+    window->resizeable = false;
+    window->allowKeyboardDrawing = false;
+    ((TerminalInstance*)window->instance)->takeInput = false;
     //startTime = PIT::TimeSinceBootMS();
     //endTime = startTime + ms;
-    window->newSize.width = DOOM_WIDTH;
-    window->newSize.height = DOOM_HEIGHT;
+    window->newSize.width = DOOM_WIDTH * DOOM_SCALE;
+    window->newSize.height = DOOM_HEIGHT * DOOM_SCALE;
     lastTime = PIT::TimeSinceBootMS();
 
     
-    AddToStack();
-    doom_set_default_int("key_up", DOOM_KEY_W);
-    doom_set_default_int("key_down", DOOM_KEY_S);
-    doom_set_default_int("key_strafeleft", DOOM_KEY_A);
-    doom_set_default_int("key_straferight", DOOM_KEY_D);
-    doom_set_default_int("key_use", DOOM_KEY_E);
-    doom_set_default_int("mouse_move", 0); // Mouse will not move forward
-    RemoveFromStack();
 
     AddToStack();
     doom_set_resolution(DOOM_WIDTH, DOOM_HEIGHT);
@@ -268,35 +303,48 @@ TaskDoom::TaskDoom(Window* window)
 }
 void TaskDoom::End()
 {
-    done = true;
+    //GlobalRenderer->Clear(Colors.black);
+    //GlobalRenderer->Println("DONE 1: {}", to_string(this->done), Colors.bred);
+    //GlobalRenderer->Println("AAA 1: {}", to_string(doomRunning), Colors.bred);
+    this->done = true;
+    //GlobalRenderer->Println("DONE 2: {}", to_string(done), Colors.bred);
+    //GlobalRenderer->Println("AAA 2: {}", to_string(doomRunning), Colors.bred);
+    //GlobalRenderer->Println("THIS: {}", ConvertHexToString((uint64_t)this), Colors.yellow);
+    //while (true);
 }
 
-#include "../../userinput/kbScancodeTranslation.h"
-#include "../../userinput/mouse.h"
+
 
 
 
 void TaskDoom::Do()
 {
-    if (done)
+    if (this->done || !doomRunning)
+    {
+        this->done = true;
+        return;
+    }
+    ShowMouseCursor = activeWindow != window;
+    if (window == NULL || activeWindow != window)
         return;
     if (window == NULL ||
-        window->size.width != DOOM_WIDTH ||
-        window->size.height != DOOM_HEIGHT)
+        window->size.width != DOOM_WIDTH * DOOM_SCALE ||
+        window->size.height != DOOM_HEIGHT * DOOM_SCALE)
     {
-        if (window->newSize.width != DOOM_WIDTH ||
-            window->newSize.height != DOOM_HEIGHT)
-        {
-            window->newSize.width = DOOM_WIDTH;
-            window->newSize.height = DOOM_HEIGHT;
-        }
+        window->newSize.width = DOOM_WIDTH * DOOM_SCALE;
+        window->newSize.height = DOOM_HEIGHT * DOOM_SCALE;
+        return;
+    }
+    if (KeyboardScancodeState[Escape] && KeyboardScancodeState[Control])
+    {
+        activeWindow = NULL;
         return;
     }
 
     uint64_t time = PIT::TimeSinceBootMS();
-    if (time < lastTime + 15)
+    if (time < lastTime + 5)
     {
-        return;
+        //return;
     }
     lastTime = time;
 
@@ -306,6 +354,7 @@ void TaskDoom::Do()
     //doom_button_t
 
     //doom_key_t t;
+    AddToStack();
     for (int i = 0; i < 256; i++)
     {
         if (doomKeyboardTemp[i] != KeyboardScancodeState[i])
@@ -331,7 +380,10 @@ void TaskDoom::Do()
                 doom_button_up(button);
         }
     }
+    RemoveFromStack();
 
+    AddToStack();
+    tempDoomMousePos = MPoint(DOOM_WIDTH * DOOM_SCALE / 2 + window->position.x, DOOM_HEIGHT * DOOM_SCALE / 2 + window->position.y);
     if (tempDoomMousePos.x != MousePosition.x || 
         tempDoomMousePos.y != MousePosition.y)
     {
@@ -340,19 +392,27 @@ void TaskDoom::Do()
         SetMousePosition(tempDoomMousePos);
         doom_mouse_move(xDiff, yDiff);
     }
+    RemoveFromStack();
     
 
+    AddToStack();
     doom_update();
+    RemoveFromStack();
+
+
+    AddToStack();
     uint32_t* toBuff = (uint32_t*)window->framebuffer->BaseAddress;
     int toWidth = window->framebuffer->Width;
     int toHeight = window->framebuffer->Height;
     uint32_t* fromBuff = (uint32_t*)doom_get_framebuffer(4 /* RGBA */);
     
-    for (int y = 0; y < DOOM_HEIGHT; y++)
+    for (int y = 0; y < DOOM_HEIGHT * DOOM_SCALE; y++)
     {
-        for (int x = 0; x < DOOM_WIDTH; x++)
+        for (int x = 0; x < DOOM_WIDTH * DOOM_SCALE; x++)
         {
-            int indexFrom = y * DOOM_WIDTH + x;
+            int tX = x / DOOM_SCALE;
+            int tY = y / DOOM_SCALE;
+            int indexFrom = tY * DOOM_WIDTH + tX;
             int indexTo = y * toWidth + x;
 
             int fromCol = fromBuff[indexFrom]; // RGBA
@@ -369,10 +429,37 @@ void TaskDoom::Do()
         }
     }
     RemoveFromStack();
+
+    RemoveFromStack();
 }
 void TaskDoom::Free()
 {
+    ShowMouseCursor = true;
+    currentDoom = NULL;
+    //window->renderer->Clear(Colors.black);
+    if (window->instance != NULL && 
+        window->instance->instanceType == InstanceType::Terminal)
+    {
+        TerminalInstance* term = (TerminalInstance*)window->instance;
+        NewTerminalInstance* newTerm = (NewTerminalInstance*)term->newTermInstance;
+        newTerm->Reload();
+        //term->Cls();
+    }
+    _Free(window->title);
+    window->title = oldTitle;
+    window->position.x--;
+    window->resizeable = oldResize;
 
+    window->allowKeyboardDrawing = true;
+    ((TerminalInstance*)window->instance)->takeInput = true;
+
+    while (openMallocs->getCount() > 0)
+    {
+        void* data = openMallocs->elementAt(0);
+        _Free(data);
+        
+        openMallocs->removeFirst();
+    }
 }
 
 TaskDoom* NewDoomTask(Window* window)
