@@ -18,6 +18,7 @@ namespace Music
     void addCmd(NoteCommand note);
     void play(int timeYes);
     extern bool paused;
+    extern int volume;
 
     int getNoteDurFromMidiNote(int midi);
 

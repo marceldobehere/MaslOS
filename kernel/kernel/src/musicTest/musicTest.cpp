@@ -18,6 +18,7 @@ namespace Music
     //int64_t tempTime = 0; // MICRO S
     bool currentState = false;
     bool paused;
+    int volume = 50; 
     
     void init()
     {
@@ -167,11 +168,15 @@ namespace Music
                 //if (currentIndex == i)
 				t.tTime += timeYes * 2;
 				
-				if (t.tTime >= t.freqLen)
+				if (t.tTime >= t.freqLen &&
+                    t.tTime <= t.freqLen + (t.freqLen * volume) / 100)
                 {
                     //t.tTime -= t.freqLen;
 					if (currentIndex == i)
-						playBeep = true;
+                    {
+                        playBeep = true;
+
+                    }
                 }
 				if (t.tTime >= t.freqLen * 2)
                 {

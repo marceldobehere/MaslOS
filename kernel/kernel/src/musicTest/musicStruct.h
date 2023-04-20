@@ -10,6 +10,7 @@ namespace Music
         int32_t freqLen;
         int32_t duration; // MICRO S
         int32_t tTime;
+        //bool played;
         //bool space;
 
         bool operator== (Note other);

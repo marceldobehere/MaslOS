@@ -1879,6 +1879,17 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
         else
             LogError("Wanted Music Div of {} is out of range!", val, window);
     }
+    else if (StrEquals(name, "mvol"))
+    {
+        int mVol = to_int(val);
+        if (mVol >= 0 && mVol <= 100)
+        {
+            Music::volume = mVol;
+            Println(window, "Music Volume set to {}.", val);
+        }
+        else
+            LogError("Wanted Music Volume of {} is out of range!", val, window);
+    }
     else if (StrEquals(name, "username"))
     {
         (*user)->userName = StrCopy(val);
