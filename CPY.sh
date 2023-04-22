@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cp barebones.iso /media/sf_maab_2/barebones.iso
+cp MaslOS.iso /media/sf_maab_2/barebones.iso
