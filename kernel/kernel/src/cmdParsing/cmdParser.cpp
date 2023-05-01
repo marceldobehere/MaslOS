@@ -264,29 +264,29 @@ BuiltinCommand BuiltinCommandFromStr(char* i)
 
 void HelpCommand(Window* window)
 {
-        const char* helpMessage =
-"help                    get this message\n"
-"exit                    exit terminal\n"
-"clear                   clears the terminal screen\n"
-"benchmark reset         resets the bench mark\n"
-"malloc                  mallocs memory 20G\n"
-"music test              test music\n"
-"music clear             clear music\n"
-"music mario             play mario music\n"
-"shutdown                turn off operating system\n"
-"explorer                open explorer\n"
-"notepad                 open notepad\n"
-"img                     open image viewer\n"
-"doom                    open doom game\n"
-"tetris                  open tetris game\n"
-"connect [four | 4]      open connect four game\n"
-"taskmgr                 open task manager\n"
-"dbg | debug viewer      open debug viewer\n"
-"heapCheck               ...\n"
-"crash                   ...\n"
-"crash2                  ...\n";
-        Print(window, helpMessage);
-        RemoveFromStack();
+    const char* helpMessage =
+        "Help Commands:\n"
+        " - help                    get this message\n"
+        " - exit                    exit terminal\n"
+        " - clear                   clears the terminal screen\n"
+        " - benchmark reset         resets the bench mark\n"
+        " - malloc                  mallocs memory 20G\n"
+        " - music test              test music\n"
+        " - music clear             clear music\n"
+        " - music mario             play mario music\n"
+        " - shutdown                turn off operating system\n"
+        " - explorer                open explorer\n"
+        " - notepad                 open notepad\n"
+        " - img                     open image viewer\n"
+        " - doom                    open doom game\n"
+        " - tetris                  open tetris game\n"
+        " - connect [four | 4]      open connect four game\n"
+        " - taskmgr                 open task manager\n"
+        " - dbg | debug viewer      open debug viewer\n"
+        " - heapCheck               ...\n"
+        " - crash                   ...\n"
+        " - crash2                  ...\n";
+    Print(window, helpMessage);
 }
 
 void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
@@ -305,6 +305,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     switch (command) {
         case Command_Help: {
             HelpCommand(window);
+            RemoveFromStack();
             return;
         }
         case Command_Clear: {
@@ -366,7 +367,6 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         }
         case Command_MusicMario: {
             Music::addMario();
-
             RemoveFromStack();
             return;
         }
