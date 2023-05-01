@@ -16,6 +16,31 @@ struct ParsedColData
     uint32_t col;
 };
 
+enum BuiltinCommand {
+    Command_Help,
+    Command_Clear,
+    Command_BenchMarkReset,
+    Command_Malloc,
+    Command_Explorer,
+    Command_NotePad,
+    Command_Image,
+    Command_Doom,
+    Command_MusicTest,
+    Command_MusicClear,
+    Command_MusicMario,
+    Command_Tetris,
+    Command_HeapCheck,
+    Command_ShutDown,
+    Command_Exit,
+    Command_ConnectFour,
+    Command_TaskManager,
+    Command_DebugViewer,
+    Command_Crash,
+    Command_Crash2,
+    Command_Invalid,
+};
+BuiltinCommand BuiltinCommandFromStr(char* i);
+
 StringArrData* SplitLine(const char* input);
 
 void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window);
@@ -33,5 +58,7 @@ void LogInvalidArgumentCount(int expected, int found, Window* window);
 void SetCmd(const char* name, const char* val, OSUser** user, Window* window);
 
 void GetCmd(const char* name, OSUser* user, Window* window);
+
+void HelpCommand(Window* window);
 
 ParsedColData ParseColor(const char* col);
