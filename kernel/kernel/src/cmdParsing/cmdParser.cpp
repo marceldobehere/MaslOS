@@ -231,6 +231,64 @@ void EditPartitionSetting(PartitionInterface::PartitionInfo* part, const char* p
 
 #include "../musicTest/musicTest.h"
 
+
+
+BuiltinCommand BuiltinCommandFromStr(char* i)
+{
+  if (StrEquals(i, "help")) return Command_Help;
+  else if (StrEquals(i, "cls")) return Command_Clear;
+  else if (StrEquals(i, "clear")) return Command_Clear;
+  else if (StrEquals(i, "benchmark reset")) return Command_BenchMarkReset;
+  else if (StrEquals(i, "bench res")) return Command_BenchMarkReset;
+  else if (StrEquals(i, "malloc")) return Command_Malloc;
+  else if (StrEquals(i, "explorer")) return Command_Explorer;
+  else if (StrEquals(i, "notepad")) return Command_NotePad;
+  else if (StrEquals(i, "img")) return Command_Image;
+  else if (StrEquals(i, "doom")) return Command_Doom;
+  else if (StrEquals(i, "music test")) return Command_MusicTest;
+  else if (StrEquals(i, "music clear")) return Command_MusicClear;
+  else if (StrEquals(i, "music mario")) return Command_MusicMario;
+  else if (StrEquals(i, "tetris")) return Command_Tetris;
+  else if (StrEquals(i, "heap check")) return Command_HeapCheck;
+  else if (StrEquals(i, "shutdown")) return Command_ShutDown;
+  else if (StrEquals(i, "exit")) return Command_Exit;
+  else if (StrEquals(i, "connect 4")) return Command_ConnectFour;
+  else if (StrEquals(i, "connect four")) return Command_ConnectFour;
+  else if (StrEquals(i, "taskmgr")) return Command_TaskManager;
+  else if (StrEquals(i, "dbg")) return Command_DebugViewer;
+  else if (StrEquals(i, "debug viewer")) return Command_DebugViewer;
+  else if (StrEquals(i, "crash")) return Command_Crash;
+  else if (StrEquals(i, "crash 2")) return Command_Crash2;
+  else return Command_Invalid;
+}
+
+void HelpCommand(Window* window)
+{
+        const char* helpMessage =
+"help                    get this message\n"
+"exit                    exit terminal\n"
+"clear                   clears the terminal screen\n"
+"benchmark reset         resets the bench mark\n"
+"malloc                  mallocs memory 20G\n"
+"music test              test music\n"
+"music clear             clear music\n"
+"music mario             play mario music\n"
+"shutdown                turn off operating system\n"
+"explorer                open explorer\n"
+"notepad                 open notepad\n"
+"img                     open image viewer\n"
+"doom                    open doom game\n"
+"tetris                  open tetris game\n"
+"connect [four | 4]      open connect four game\n"
+"taskmgr                 open task manager\n"
+"dbg | debug viewer      open debug viewer\n"
+"heapCheck               ...\n"
+"crash                   ...\n"
+"crash2                  ...\n";
+        Print(window, helpMessage);
+        RemoveFromStack();
+}
+
 void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 {
     AddToStack();
@@ -242,184 +300,152 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     }
 
     TerminalInstance* terminal = (TerminalInstance*)window->instance;
+    BuiltinCommand command = BuiltinCommandFromStr(input);
 
-    //Println("This is test out!");
-    if (StrEquals(input, "cls"))
-    {
-        ((TerminalInstance*)window->instance)->Cls();
-        RemoveFromStack();
-        return;
-    }
-    if (StrEquals(input, "benchmark reset") || StrEquals(input, "bench res"))
-    {
-        MStackData::BenchmarkStackPointerSave = 0;
-        RemoveFromStack();
-        return;
-    }
-
-    if (StrEquals(input, "malloc"))
-    {
-        _Malloc(0x5000, "Test malloc command");
-        RemoveFromStack();
-        return;
-    }
-
-    if (StrEquals(input, "explorer"))
-    {
-        new SysApps::Explorer();
-        RemoveFromStack();
-        return;
-    }
-
-    if (StrEquals(input, "notepad"))
-    {
-        new SysApps::Notepad();
-        RemoveFromStack();
-        return;
-    }
-
-    if (StrEquals(input, "img"))
-    {
-        new SysApps::ImageViewer("");
-        RemoveFromStack();
-        return;
-    }
-
-    if (StrEquals(input, "doom"))
-    {
-        terminal->tasks.add(NewDoomTask(window));
-        RemoveFromStack();
-        return;
-    }
-
-    if (StrEquals(input, "music test"))
-    {
-        for (int i = 60; i < 103; i++)
-        {
-            Music::addCmd(Music::NoteCommand(i, 100, true));
-            Music::addCmd(Music::NoteCommand(100));
+    switch (command) {
+        case Command_Help: {
+            HelpCommand(window);
+            return;
         }
-
-        RemoveFromStack();
-        return;
-    }
-
-    if (StrEquals(input, "music clear"))
-    {
-        Music::listInUse = true;
-        Music::toPlay->clear();
-        Music::listInUse = false;
-
-        Music::rawAudioInUse = true;
-        Music::currentRawAudio->clear();
-        Music::rawAudioInUse = false;
-
-        RemoveFromStack();
-        return;
-    }
-
-    if (StrEquals(input, "music mario"))
-    {
-        Music::addMario();
-
-        RemoveFromStack();
-        return;
-    }
-
-    if (StrEquals(input, "tetris") || StrEquals(input, "tetr"))
-    {
-        new SysApps::Tetris();
-        RemoveFromStack();
-        return;
-    }
-
-    if (StrEquals(input, "heap check"))
-    {
-        HeapCheck(true);
-        osData.windowPointerThing->Clear(true);
-        osData.windowPointerThing->RenderWindows();
-        RemoveFromStack();
-        return;
-    }
-
-    if (StrEquals(input, "shutdown"))
-    {
-        Println(window, "Shutting down...");
-        osData.exit = true;
-        RemoveFromStack();
-        return;
-    }
-
-    if (StrEquals(input, "exit"))
-    {
-        osData.osTasks.add(NewWindowCloseTask(window));
-        RemoveFromStack();
-        return;
-    }
-
-    if (StrEquals(input, "connect 4") || StrEquals(input, "connect four"))
-    {
-        {
-            Window* con4Window = (Window*)_Malloc(sizeof(Window), "Connect 4 Window");
-            Connect4Instance* connect4 = (Connect4Instance*)_Malloc(sizeof(Connect4Instance), "Connect 4 Instance");
-            *connect4 = Connect4Instance(con4Window);
-            *(con4Window) = Window((DefaultInstance*)connect4, Size(200, 200), Position(10, 40), "Connect 4", true, true, true);
-            osData.windows.add(con4Window);
-            
-            connect4->Init();
-            
-            
-            osData.windowsToGetActive.add(con4Window);
+        case Command_Clear: {
+            ((TerminalInstance*)window->instance)->Cls();
+            RemoveFromStack();
+            return;
+        }
+        case Command_BenchMarkReset: {
+            MStackData::BenchmarkStackPointerSave = 0;
+            RemoveFromStack();
+            return;
+        }
+        case Command_Malloc: {
+            _Malloc(0x5000, "Test malloc command");
+            RemoveFromStack();
+            return;
+        }
+        case Command_Explorer: {
+            new SysApps::Explorer();
+            RemoveFromStack();
+            return;
+        }
+        case Command_NotePad: {
+            new SysApps::Notepad();
+            RemoveFromStack();
+            return;
+        }
+        case Command_Image: {
+            new SysApps::ImageViewer("");
+            RemoveFromStack();
+            return;
+        }
+        case Command_Doom: {
+            terminal->tasks.add(NewDoomTask(window));
+            RemoveFromStack();
+            return;
+        }
+        case Command_MusicTest: {
+            for (int i = 60; i < 103; i++)
+            {
+                Music::addCmd(Music::NoteCommand(i, 100, true));
+                Music::addCmd(Music::NoteCommand(100));
+            }
 
             RemoveFromStack();
             return;
         }
-        RemoveFromStack();
-        return;
-    }
+        case Command_MusicClear: {
+            Music::listInUse = true;
+            Music::toPlay->clear();
+            Music::listInUse = false;
 
-    if (StrEquals(input, "taskmgr") || StrEquals(input, "task manager"))
-    {
-        terminal->tasks.add(NewTaskManagerTask(window));
-        RemoveFromStack();
-        return;
-    }
+            Music::rawAudioInUse = true;
+            Music::currentRawAudio->clear();
+            Music::rawAudioInUse = false;
 
-    if (StrEquals(input, "dbg") || StrEquals(input, "debug viewer"))
-    {
-        terminal->tasks.add(NewDebugViewerTask(window));
-        RemoveFromStack();
-        return;
-    }
+            RemoveFromStack();
+            return;
+        }
+        case Command_MusicMario: {
+            Music::addMario();
 
+            RemoveFromStack();
+            return;
+        }
+        case Command_Tetris: {
+            new SysApps::Tetris();
+            RemoveFromStack();
+            return;
+        }
+        case Command_HeapCheck: {
+            HeapCheck(true);
+            osData.windowPointerThing->Clear(true);
+            osData.windowPointerThing->RenderWindows();
+            RemoveFromStack();
+            return;
+        }
+        case Command_ShutDown: {
+            Println(window, "Shutting down...");
+            osData.exit = true;
+            RemoveFromStack();
+            return;
+        }
+        case Command_Exit: {
+            osData.osTasks.add(NewWindowCloseTask(window));
+            RemoveFromStack();
+            return;
+        }
+        case Command_ConnectFour: {
+            {
+                Window* con4Window = (Window*)_Malloc(sizeof(Window), "Connect 4 Window");
+                Connect4Instance* connect4 = (Connect4Instance*)_Malloc(sizeof(Connect4Instance), "Connect 4 Instance");
+                *connect4 = Connect4Instance(con4Window);
+                *(con4Window) = Window((DefaultInstance*)connect4, Size(200, 200), Position(10, 40), "Connect 4", true, true, true);
+                osData.windows.add(con4Window);
 
-    if (StrEquals(input, "crash"))
-    {
-        Println(window, "Crashing...");
-        
+                connect4->Init();
+
+                osData.windowsToGetActive.add(con4Window);
+
+                RemoveFromStack();
+                return;
+            }
+            RemoveFromStack();
+            return;
+        }
+        case Command_TaskManager: {
+            terminal->tasks.add(NewTaskManagerTask(window));
+            RemoveFromStack();
+            return;
+        }
+        case Command_DebugViewer: {
+            terminal->tasks.add(NewDebugViewerTask(window));
+            RemoveFromStack();
+            return;
+        }
+        case Command_Crash: {
+            Println(window, "Crashing...");
+
             // int Ax = 0;
             // int Ay = 0;
 
             // int Az = Ax/Ay;
-        
-        asm("int $0x01");
-        RemoveFromStack();
-        return;
-    }
-    if (StrEquals(input, "crash 2"))
-    {
-        Println(window, "Crashing 2...");
-        
+
+            asm("int $0x01");
+            RemoveFromStack();
+            return;
+        }
+        case Command_Crash2: {
+            Println(window, "Crashing 2...");
+
             // int Ax = 0;
             // int Ay = 0;
 
             // int Az = Ax/Ay;
-        osData.NO_INTERRUPTS = true;
-        asm("int $0x0D");
-        RemoveFromStack();
-        return;
+            osData.NO_INTERRUPTS = true;
+            asm("int $0x0D");
+            RemoveFromStack();
+            return;
+        }
     }
-    //return;
 
     StringArrData* data = SplitLine(oldInput);
 
