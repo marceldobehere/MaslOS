@@ -26,6 +26,7 @@ enum BuiltinCommand {
     Command_Image,
     Command_Doom,
     Command_MusicTest,
+    Command_SbTest,
     Command_MusicClear,
     Command_MusicMario,
     Command_Tetris,

@@ -114,6 +114,62 @@ void PageFrameAllocator::FreePage(void* address)
     usedMemory -= 4096;
 }
 
+
+void* PageFrameAllocator::RequestPages(int count)
+{
+    reqCount += count;
+    int tCount = count;
+    for (; pageBitmapIndex < PageBitMap.Size * 8; pageBitmapIndex++)
+    {
+        if (PageBitMap[pageBitmapIndex])
+        {
+            tCount = count;
+            continue;
+        }
+        {
+            tCount--;
+            if (tCount == 0)
+            {
+                LockPages((void*)((pageBitmapIndex - (count - 1)) * 4096), count);
+                return(void*)((pageBitmapIndex - (count - 1)) * 4096);
+            }
+        }
+    }
+    
+    tCount = count;
+    for (pageBitmapIndex = 0; pageBitmapIndex < PageBitMap.Size * 8; pageBitmapIndex++)
+    {
+        if (PageBitMap[pageBitmapIndex])
+        {
+            tCount = count;
+            continue;
+        }
+        {
+            tCount--;
+            if (tCount == 0)
+            {
+                LockPages((void*)((pageBitmapIndex - (count - 1)) * 4096), count);
+                return(void*)((pageBitmapIndex - (count - 1)) * 4096);
+            }
+        }
+    }
+
+    GlobalRenderer->Println("ERROR: NO MORE RAM AVAIABLE!", Colors.red);
+    GlobalRenderer->Println("REQ COUNT: {}", to_string(reqCount), Colors.red);
+    GlobalRenderer->Println("FREE MEM: {}", to_string(freeMemory), Colors.yellow);
+    GlobalRenderer->Println("USED MEM: {}", to_string(usedMemory), Colors.yellow);
+    GlobalRenderer->Println("RES MEM: {}", to_string(reservedMemory), Colors.yellow);
+    
+    
+    Panic("No more RAM avaiable! (Count: {})", to_string(reqCount), true);
+}
+
+void PageFrameAllocator::FreePages(void* address, int count)
+{
+    for (int i = 0; i < count; i++)
+        FreePage((void*)((uint64_t)address + (i * 4096)));
+}
+
 void PageFrameAllocator::LockPage(void* address)
 {
     uint64_t index = (uint64_t)address / 4096;

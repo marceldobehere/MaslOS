@@ -285,7 +285,7 @@ namespace PCI {
 
     const int _MultimediaControllerSubclassCount = 5;
     const SubclassEntry _MultimediaControllerSubclasses[] {
-        {0x0, "Multimedia Video Controller", 0, 0},
+        {0x0, "Multimedia Video Controller", 0, 0}, 
         {0x1, "Multimedia Audio Controller", 0, 0},
         {0x2, "Computer Telephony Device", 0, 0},
         {0x3, "Audio Device", 0, 0},

@@ -2,6 +2,7 @@
 #include "../../../paging/PageTableManager.h"
 #include "../../../OSDATA/osdata.h"
 #include "../ahci/ahci.h"
+#include "../ac97/ac97.h"
 
 namespace PCI
 {
@@ -43,7 +44,7 @@ namespace PCI
         RemoveFromStack();
     }
 
-    void EnumerateDevice(uint64_t busAddress, uint64_t device)
+    void EnumerateDevice(uint64_t busAddress, uint64_t device) // Slot
     {
         AddToStack();
         uint64_t offset = device << 15;
@@ -81,7 +82,7 @@ namespace PCI
         if (pciDeviceHeader ->Device_ID == 0xFFFF) {RemoveFromStack(); return;}
 
         BasicRenderer* renderer = osData.debugTerminalWindow->renderer;
-
+        renderer->Print(" - ");
 
         {
             const char* vendorName = GetVendorName(pciDeviceHeader->Vendor_ID);
@@ -170,6 +171,24 @@ namespace PCI
                 }
                 break;
             }
+            case 0x04: // AC97 CLASS
+            {
+                switch (pciDeviceHeader->SubClass)
+                {
+                    case 0x01: // AC97 SUBCLASS
+                    {
+                        new AC97::AC97Driver(pciDeviceHeader);
+                        break;
+                    }
+
+                    // case 0x03: // MAYBE AC97 SUBCLASS FOR TESTING IG
+                    // {
+                    //     new AC97::AC97Driver(pciDeviceHeader);
+                    //     break;
+                    // }
+                }
+                break;
+            }
         }
 
 
@@ -179,4 +198,76 @@ namespace PCI
         RemoveFromStack();
     }
 
+
+
+
+    IOAddress get_address(PCIDeviceHeader* hdr, uint8_t field)
+    {
+        uint64_t addr = (uint64_t)hdr;
+        return get_address(addr, field);
+    }
+
+    IOAddress get_address(uint64_t addr, uint8_t field)
+    {
+        IOAddress address;
+        address.attrs.field = field;
+        address.attrs.function = (addr >> 12) & 0b111; // 3 bit
+        address.attrs.slot = (addr >> 15) & 0b11111; // 5 bit
+        address.attrs.bus = (addr >> 20) & 0b11111111; // 8 bit
+        return address;
+    }
+
+	uint8_t read_byte(uint64_t address, uint8_t field) {
+		outl(PCI_ADDRESS_PORT, get_address(address, field).value);
+		return inb(PCI_DATA_PORT + (field & 3));
+	}
+
+	uint16_t read_word(uint64_t address, uint8_t field){
+		outl(PCI_ADDRESS_PORT, get_address(address, field).value);
+		return inw(PCI_DATA_PORT + (field & 2));
+	}
+
+	uint32_t read_dword(uint64_t address, uint8_t field) {
+	    outl(PCI_ADDRESS_PORT, get_address(address, field).value);
+		return inl(PCI_DATA_PORT);
+	}
+
+	void write_byte(uint64_t address, uint8_t field, uint8_t value) {
+		outl(PCI_ADDRESS_PORT, get_address(address, field).value);
+		outb(PCI_DATA_PORT + (field & 3), value);
+	}
+
+	void write_word(uint64_t address, uint8_t field, uint16_t value) {
+		outl(PCI_ADDRESS_PORT, get_address(address, field).value);
+		outw(PCI_DATA_PORT + (field & 2), value);
+	}
+
+	void write_dword(uint64_t address, uint8_t field, uint32_t value) {
+		outl(PCI_ADDRESS_PORT, get_address(address, field).value);
+		outl(PCI_DATA_PORT, value);
+	}
+
+	void enable_interrupt(uint64_t address) {
+		Command comm = {.value = read_word(address, PCI_COMMAND)};
+		comm.attrs.interrupt_disable = false;
+		write_word(address, PCI_COMMAND, comm.value);
+	}
+
+	void disable_interrupt(uint64_t address) {
+		Command comm = {.value = read_word(address, PCI_COMMAND)};
+		comm.attrs.interrupt_disable = true;
+		write_word(address, PCI_COMMAND, comm.value);
+	}
+
+	void enable_bus_mastering(uint64_t address) {
+		Command comm = {.value = read_word(address, PCI_COMMAND)};
+		comm.attrs.bus_master = true;
+		write_word(address, PCI_COMMAND, comm.value);
+	}
+
+	void disable_bus_mastering(uint64_t address) {
+		Command comm = {.value = read_word(address, PCI_COMMAND)};
+		comm.attrs.bus_master = false;
+		write_word(address, PCI_COMMAND, comm.value);
+	}
 }

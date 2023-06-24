@@ -19,6 +19,8 @@
 #undef LIST_INCLUDE_TASK
 #undef LIST_INCLUDE_GENERIC_DISK_INTERFACE
 
+#include "../kernelStuff/other_IO/ac97/ac97.h"
+
 struct OSData
 {
     bool exit;
@@ -57,6 +59,7 @@ struct OSData
     uint8_t port64Val;
 
     uint32_t wantedFps = 60;
+    AC97::AC97Driver* ac97Driver = NULL;
 
 };
 

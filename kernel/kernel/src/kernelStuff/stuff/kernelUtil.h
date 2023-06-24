@@ -72,6 +72,8 @@ struct KernelInfo
 #include "../../WindowStuff/SubInstances/debugTerminalInstance/debugTerminalInstance.h"
 #include "../../WindowStuff/SubInstances/newTerminalInstance/newTerminalInstance.h"
 
+//#include "../other_IO/sb16/sb16.h"
+
 void PrepareACPI(BootInfo* bootInfo);
 
 //extern KernelInfo kernelInfo;

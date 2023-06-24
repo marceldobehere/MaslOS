@@ -36,8 +36,8 @@ class PageFrameAllocator{
     uint64_t GetReservedRAM();
 
     uint64_t pageBitmapIndex = (uint64_t)0;
-    void* RequestPage();
 
+    void* RequestPage();
     void FreePage(void* address);
 
     void LockPage(void* address);
@@ -47,6 +47,9 @@ class PageFrameAllocator{
     void LockPages(void* address, uint64_t pageCount);
 
     void ReadEFIMemoryMap(void* start, uint64_t size);
+
+    void* RequestPages(int count);
+    void FreePages(void* address, int count);
       
 };
 

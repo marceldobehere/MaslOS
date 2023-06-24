@@ -163,7 +163,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
 
     osData.preCrashWindow = activeWindow;
 
-    if (osData.maxNonFatalCrashCount-- > 0 && !lock && !osData.booting && !osData.tempCrash)
+    if (!lock && osData.maxNonFatalCrashCount-- > 0 && !osData.booting && !osData.tempCrash)
     {
         //GlobalRenderer->Println("BRUH 1", Colors.yellow);
         if (osData.tempCrash)
@@ -252,7 +252,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         GlobalRenderer->Println();
 
         osData.crashCount++;
-        if (osData.crashCount <= 2)
+        if (osData.crashCount <= 2 && !osData.booting)
         {
             osData.debugTerminalWindow->position.x = GlobalRenderer->framebuffer->Width - 500;
             osData.debugTerminalWindow->position.y = 23;

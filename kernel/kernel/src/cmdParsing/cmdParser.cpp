@@ -230,6 +230,8 @@ void EditPartitionSetting(PartitionInterface::PartitionInfo* part, const char* p
 #include "../tasks/doomTask/taskDoom.h"
 
 #include "../musicTest/musicTest.h"
+//#include "../kernelStuff/other_IO/sb16/sb16.h"
+#include "../musicTest/sbTest.h"
 
 
 
@@ -246,6 +248,7 @@ BuiltinCommand BuiltinCommandFromStr(char* i)
   else if (StrEquals(i, "img")) return Command_Image;
   else if (StrEquals(i, "doom")) return Command_Doom;
   else if (StrEquals(i, "music test")) return Command_MusicTest;
+  else if (StrEquals(i, "sb test")) return Command_SbTest;
   else if (StrEquals(i, "music clear")) return Command_MusicClear;
   else if (StrEquals(i, "music mario")) return Command_MusicMario;
   else if (StrEquals(i, "tetris")) return Command_Tetris;
@@ -272,6 +275,7 @@ void HelpCommand(Window* window)
         " - benchmark reset         resets the bench mark\n"
         " - malloc                  mallocs memory 20G\n"
         " - music test              test music\n"
+        " - sb test              test sb16\n"
         " - music clear             clear music\n"
         " - music mario             play mario music\n"
         " - shutdown                turn off operating system\n"
@@ -348,6 +352,63 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             {
                 Music::addCmd(Music::NoteCommand(i, 100, true));
                 Music::addCmd(Music::NoteCommand(100));
+            }
+
+            RemoveFromStack();
+            return;
+        }
+        case Command_SbTest: {
+            if (osData.ac97Driver != NULL)
+            {
+                AddToStack();
+                int amt = 0x4000;
+                int step = 0x200;
+                int hz = 200;
+                uint16_t* testBuff = (uint16_t*)_Malloc(amt*2);
+                Println(window, "Malloc Test Array: {}", ConvertHexToString((uint64_t)testBuff));
+                for (int i = 0; i + step <= amt; i += step)
+                {
+                    AddToStack();
+                    MusicBit16Test::FillArray(testBuff, i, step, hz);
+                    //Println(window, "HZ: {}", to_string(hz));
+                    hz += 200;
+                    RemoveFromStack();
+                }
+                RemoveFromStack();
+                
+                AddToStack();
+                Println(window, "Fill Test Array");
+                uint64_t tCount = 0;
+                tCount = osData.ac97Driver->writeBuffer(0, (uint8_t*)testBuff, amt*2);
+                RemoveFromStack();
+
+                AddToStack();
+                Println(window, "Wrote {} bytes", to_string(tCount));
+                RemoveFromStack();
+
+                AddToStack();
+                _Free(testBuff);
+                //terminal->tasks.add(NewDebugViewerTask(window, (uint8_t*)testBuff, amt*2));
+                RemoveFromStack();
+
+                AddToStack();
+                Println(window, "Freed Test Array");
+                RemoveFromStack();
+                
+                
+                // uint64_t tArr2 = (uint64_t)GlobalAllocator->RequestPage();
+                // Println(window, "ARR2: {}", ConvertHexToString(tArr2));
+                
+                // SB16Test::TestMusicArr = (uint16_t*)tArr2;
+                // SB16Test::FillArray();
+
+                // uint64_t tArr = (uint64_t)SB16Test::TestMusicArr;
+                // Println(window, "ARR1: {}", ConvertHexToString(tArr));
+                // SB16::SB16SetBuff((uint32_t)tArr, SB16Test::TestMusicArrLen * 2);
+            }
+            else
+            {
+                Println(window, "No AC97 Driver :(");
             }
 
             RemoveFromStack();

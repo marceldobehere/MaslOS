@@ -814,7 +814,7 @@ void boot(BootInfo* bootInfo)
     //
     //while(true);
     osData.booting = true;
-    osData.verboseBoot = false;
+    osData.verboseBoot = true;
 
     PrintAll = true;
     KernelInfo kernelInfo = InitializeKernel(bootInfo);
@@ -1116,8 +1116,8 @@ void boot(BootInfo* bootInfo)
 
     debugTerminalWindow->Log("Kernel Initialised Successfully!");
 
-    for (int i = 0; i < 10; i++)
-        debugTerminalWindow->Log("<STAT>");
+    for (int i = 0; i < 15; i++)
+        debugTerminalWindow->Log("");
     //debugTerminalWindow->renderer->CursorPosition.y = 16 * 16;
 
     ((TerminalInstance*)mainWindow->instance)->Cls();

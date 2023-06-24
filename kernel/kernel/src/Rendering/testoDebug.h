@@ -4,6 +4,7 @@
 extern bool PrintAll;
 
 void PercentDone(int percent);
+void StepDone();
 void StepDone(int step);
 void PrepBootScreen();
 

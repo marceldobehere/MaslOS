@@ -363,6 +363,7 @@ extern "C" void _start(void) {
     }
     startRAMAddr = freeMemStart;
     
+    //done();
 
 
     if (module_request.response == NULL) {
