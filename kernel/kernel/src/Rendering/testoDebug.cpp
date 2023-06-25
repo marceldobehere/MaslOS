@@ -144,7 +144,7 @@ void Println()
 {
     PrintedSpace = false;
 
-    Serial::Write("\r\n");
+    Serial::Writeln();
     if (!PrintAll || !osData.verboseBoot)
         return;
     PrintMsgColSL("\n\r", "", GlobalRenderer->color);

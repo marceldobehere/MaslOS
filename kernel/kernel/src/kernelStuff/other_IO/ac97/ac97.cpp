@@ -78,16 +78,23 @@ namespace AC97
 
         const int wantedSampleRate = 10000;
 
-        set_sample_rate(wantedSampleRate);
-        PrintMsg("> Set Sample Rate to {}", to_string(wantedSampleRate));
+        PrintMsg("> Setting Sample Rate to {}", to_string(wantedSampleRate));
+        int tries = 10;
+        while (tries-- > 0)
+        {
+            set_sample_rate(wantedSampleRate);
+            if (m_sample_rate == wantedSampleRate)
+                break;
+            PIT::Sleep(10);
+        }
         PrintMsg("> Card Sample Rate: {}", to_string((int)m_sample_rate));
-
-
-        reset_output();
-        PrintMsg("> Reset Output");
 
         if (m_sample_rate != wantedSampleRate)
             Panic("AC97: Failed to set sample rate! GOT: {}", to_string((int)m_sample_rate), true);
+        
+        reset_output();
+        PrintMsg("> Reset Output");
+        
         PrintMsgEndLayer("AC97Driver");
     }
 
@@ -131,7 +138,7 @@ namespace AC97
 
     void AC97Driver::set_sample_rate(uint32_t sample_rate) {
         outw(m_mixer_address + MixerRegisters::SAMPLE_RATE, sample_rate);
-        io_wait(50);
+        io_wait(500);
         m_sample_rate = inw(m_mixer_address + MixerRegisters::SAMPLE_RATE);
     }
 

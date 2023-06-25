@@ -61,6 +61,22 @@ namespace Serial
         outb(PORT, chr);
     }
 
+    void Writeln()
+    {
+        Write("\r\n");
+    }
+
+    void Writeln(const char* str)
+    {
+        Write(str);
+        Writeln();
+    }
+    void Writeln(const char *chrs, const char *var, bool allowEscape)
+    {
+        Write(chrs, var, allowEscape);
+        Writeln();
+    }
+
     void Write(const char* str)
     {
         if (!SerialWorks || str == 0)

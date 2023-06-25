@@ -4,6 +4,7 @@
 #include "../OSDATA/osdata.h"
 #include "../OSDATA/MStack/MStackM.h"
 #include "../WindowStuff/SubInstances/customInstance/customInstance.h"
+#include "../kernelStuff/other_IO/serial/serial.h"
 
 void PrintRegisterDump(BasicRenderer* renderer)
 {
@@ -53,6 +54,50 @@ void PrintRegisterDump(BasicRenderer* renderer)
 	renderer->Print("0x");
 	renderer->Print(ConvertHexToString(Register));
     renderer->Println();
+
+    Serial::Writeln();
+    Serial::Writeln("Register dump: ");
+    Serial::Writeln();
+    Serial::Write("rax: ");
+    asm volatile("mov %%rax, %0" : "=r"(Register));
+    Serial::Write("0x");
+    Serial::Write(ConvertHexToString(Register));
+    Serial::Write("  ");
+    Serial::Write("rcx: ");
+    asm volatile("mov %%rcx, %0" : "=r"(Register));
+    Serial::Write("0x");
+    Serial::Write(ConvertHexToString(Register));
+    Serial::Write("  ");
+    Serial::Write("rdx: ");
+    asm volatile("mov %%rdx, %0" : "=r"(Register));
+    Serial::Write("0x");
+    Serial::Write(ConvertHexToString(Register));
+    Serial::Write("  ");
+    Serial::Write("rbx: ");
+    asm volatile("mov %%rbx, %0" : "=r"(Register));
+    Serial::Write("0x");
+    Serial::Write(ConvertHexToString(Register));    
+    Serial::Writeln();
+    Serial::Write("rsp: ");
+    asm volatile("mov %%rsp, %0" : "=r"(Register));
+    Serial::Write("0x");
+    Serial::Write(ConvertHexToString(Register));
+    Serial::Write("  ");
+    Serial::Write("rbp: ");
+    asm volatile("mov %%rbp, %0" : "=r"(Register));
+    Serial::Write("0x");
+    Serial::Write(ConvertHexToString(Register));
+    Serial::Write("  ");
+    Serial::Write("rsi: ");
+    asm volatile("mov %%rsi, %0" : "=r"(Register));
+    Serial::Write("0x");
+    Serial::Write(ConvertHexToString(Register));
+    Serial::Write("  ");
+    Serial::Write("rdi: ");
+    asm volatile("mov %%rdi, %0" : "=r"(Register));
+    Serial::Write("0x");
+    Serial::Write(ConvertHexToString(Register));
+    Serial::Writeln();
 }
 
 int kernelPanicCount = 0;
@@ -243,13 +288,20 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         GlobalRenderer->Println();
         GlobalRenderer->Println();
         GlobalRenderer->Println("KERNEL PANIC AAAAAAAAAAAAAAAAAAAAAAAAAAA", Colors.white);
+        Serial::Writeln();
+        Serial::Writeln();
+        Serial::Writeln();
+        Serial::Writeln("KERNEL PANIC AAAAAAAAAAAAAAAAAAAAAAAAAAA");
         for (int i = 0; i < kernelPanicCount; i++)
             GlobalRenderer->Println();
         GlobalRenderer->Print(panicMessage, var, Colors.white);
+        Serial::Write(panicMessage, var, true);
         GlobalRenderer->Println("  (MNFCC: {})",  to_string(osData.maxNonFatalCrashCount), Colors.white);
+        Serial::Writeln("  (MNFCC: {})",  to_string(osData.maxNonFatalCrashCount), true);
 
         GlobalRenderer->Println();
         GlobalRenderer->Println();
+        Serial::Writeln();
 
         osData.crashCount++;
         if (osData.crashCount <= 2 && !osData.booting)
@@ -258,15 +310,19 @@ void Panic(const char* panicMessage, const char* var, bool lock)
             osData.debugTerminalWindow->position.y = 23;
             osData.debugTerminalWindow->parentFrameBuffer = GlobalRenderer->framebuffer;
             osData.debugTerminalWindow->Render(osData.debugTerminalWindow->framebuffer, GlobalRenderer->framebuffer, osData.debugTerminalWindow->position, osData.debugTerminalWindow->size, osData.debugTerminalWindow);
+            Serial::Writeln("<INSERT DEBUG TERMINAL DATA HERE>");
         }
         else
         {
             GlobalRenderer->Println("(BTW the rendering of the debug terminal is causing issues so no debug terminal)");
             GlobalRenderer->Println();
+            Serial::Writeln("(BTW the rendering of the debug terminal is causing issues so no debug terminal)");
 
             PrintMStackTrace(MStackData::stackArr, MStackData::stackPointer);
             GlobalRenderer->Println();
             GlobalRenderer->Println();
+            Serial::Writeln();
+            Serial::Writeln();
             PrintRegisterDump(GlobalRenderer);
 
             while(true)
@@ -276,9 +332,14 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         PrintMStackTrace(MStackData::stackArr, MStackData::stackPointer);
         GlobalRenderer->Println();
         GlobalRenderer->Println();
+        Serial::Writeln();
+        Serial::Writeln();
         PrintRegisterDump(GlobalRenderer);
         
         //if (lock)
+
+        Serial::Writeln();
+        Serial::Writeln("<HALTING OS>");
         while(true)
             asm("hlt");
     }
