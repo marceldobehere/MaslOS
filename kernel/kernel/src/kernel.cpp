@@ -104,7 +104,7 @@ void TestKeyHandler(GuiComponentStuff::BaseComponent* btn, GuiComponentStuff::Ke
 
 
 
-
+#include "./kernelStuff/other_IO/serial/serial.h"
 
 
 void RenderLoop()
@@ -154,6 +154,24 @@ void RenderLoop()
         freeCount = 0;
         mallocCount = 0;
         osStats.frameStartTime = PIT::TimeSinceBootMicroS();
+
+
+        if (Serial::CanRead())
+        {
+            char c = Serial::Read();
+            if (c == '\r')
+            {
+                Serial::Write("\r\n");
+            }
+            else if (c == '\b')
+            {
+                Serial::Write("\b \b");
+            }
+            else
+            {
+                Serial::Write(c);
+            }
+        }
 
         if (!osData.startMenuWindow->hidden && activeWindow != osData.startMenuWindow)
         {

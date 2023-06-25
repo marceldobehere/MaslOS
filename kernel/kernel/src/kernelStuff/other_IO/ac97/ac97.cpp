@@ -1,5 +1,6 @@
 #include "ac97.h"
 #include "../../../OSDATA/osdata.h"
+#include "../../../Rendering/testoDebug.h"
 
 // https://github.com/byteduck/duckOS/blob/master/kernel/device/AC97Device.cpp
 
@@ -8,18 +9,28 @@ namespace AC97
     AC97Driver::AC97Driver(PCI::PCIDeviceHeader* pciBaseAddress)
     {
         PCIBaseAddress = pciBaseAddress;
+        PrintMsgStartLayer("AC97Driver");
+
+        PrintMsg("> AC97 Driver Init");
         osData.debugTerminalWindow->Log("YOOO AC97 YES");
 
 
         uint64_t address = (uint64_t)PCIBaseAddress;
+        PrintMsgCol("> PCI Address: {}", ConvertHexToString(address), Colors.yellow);
+        Println();
         //IRQHandler(PCI::read_byte(address, PCI_INTERRUPT_LINE)),
         //uint8_t irqId = PCI::read_byte(address, PCI_INTERRUPT_LINE);
         //Panic("AC97 IRQ: {}", to_string(irqId), true);
         
         // m_address = address;
         m_mixer_address = PCI::read_word(address, PCI_BAR0) & ~1;
+        PrintMsgCol("> Mixer Address: {}", ConvertHexToString(m_mixer_address), Colors.yellow);
         m_bus_address = PCI::read_word(address, PCI_BAR1) & ~1;
-        m_output_channel = m_bus_address + BusRegisters::NABM_PCM_OUT,
+        PrintMsgCol("> Bus Address: {}", ConvertHexToString(m_bus_address), Colors.yellow);
+        m_output_channel = m_bus_address + BusRegisters::NABM_PCM_OUT;
+        PrintMsgCol("> Output Channel: {}", ConvertHexToString(m_output_channel), Colors.yellow);
+        Println();
+
         //m_output_buffer_region = MM.alloc_dma_region(0x1000 * AC97_OUTPUT_BUFFER_PAGES);
         //m_output_buffer_descriptor_region = MM.alloc_dma_region(sizeof(BufferDescriptor) * AC97_NUM_BUFFER_DESCRIPTORS);
 
@@ -27,8 +38,13 @@ namespace AC97
         //m_output_buffer_descriptor_region = (uint8_t*)_Malloc(sizeof(BufferDescriptor) * AC97_NUM_BUFFER_DESCRIPTORS);
 
         m_output_buffer_region = (uint8_t*)GlobalAllocator->RequestPages(AC97_OUTPUT_BUFFER_PAGES);
+        GlobalPageTableManager.MapMemories((void*)m_output_buffer_region, (void*)m_output_buffer_region, AC97_OUTPUT_BUFFER_PAGES, true);
+        PrintMsgCol("> Output Buffer Region: {}", ConvertHexToString((uint64_t)m_output_buffer_region), Colors.yellow);
         //Panic("BRUH {}", ConvertHexToString((uint64_t)m_output_buffer_region), true);
         m_output_buffer_descriptor_region = (uint8_t*)GlobalAllocator->RequestPages(1);//(uint8_t*)_Malloc(sizeof(BufferDescriptor) * AC97_NUM_BUFFER_DESCRIPTORS);
+        GlobalPageTableManager.MapMemories((void*)m_output_buffer_descriptor_region, (void*)m_output_buffer_descriptor_region, 1, true);
+        PrintMsgCol("> Output Buffer Descriptor Region: {}", ConvertHexToString((uint64_t)m_output_buffer_descriptor_region), Colors.yellow);
+        Println();
 
         m_output_buffer_descriptors = (BufferDescriptor*) m_output_buffer_descriptor_region;
 
@@ -36,27 +52,43 @@ namespace AC97
 
         //Enable bus mastering and interrupts
         PCI::enable_interrupt(address);
+        PrintMsg("> Enabled PCI Interrupts");
         PCI::enable_bus_mastering(address);
+        PrintMsg("> Enabled PCI Bus Mastering");
+        Println();
 
         //Initialize the card with cold reset of bus and mixer, enable interrupts
         auto control = inb(m_bus_address + BusRegisters::GLOBAL_CONTROL);
         control |= GlobalControl::COLD_RESET | GlobalControl::INTERRUPT_ENABLE;
         outb(m_bus_address + BusRegisters::GLOBAL_CONTROL, control);
         write_mixer(RESET, 1);
+        PrintMsg("> Initialized Card");
+        Println();
 
         //TODO: Verify version?
 
         //Set master volume and reset pcm out channel
         write_mixer(MASTER_VOLUME, 0);
+        PrintMsg("> Set Master Volume");
         write_mixer(PCM_VOLUME, 0);
+        PrintMsg("> Set PCM Volume");
+        reset_output();
+        
+
 
         const int wantedSampleRate = 10000;
 
         set_sample_rate(wantedSampleRate);
-        reset_output();
+        PrintMsg("> Set Sample Rate to {}", to_string(wantedSampleRate));
+        PrintMsg("> Card Sample Rate: {}", to_string((int)m_sample_rate));
 
-        //if (m_sample_rate != wantedSampleRate)
-        //    Panic("AC97: Failed to set sample rate! GOT: {}", to_string((int)m_sample_rate), true);
+
+        reset_output();
+        PrintMsg("> Reset Output");
+
+        if (m_sample_rate != wantedSampleRate)
+            Panic("AC97: Failed to set sample rate! GOT: {}", to_string((int)m_sample_rate), true);
+        PrintMsgEndLayer("AC97Driver");
     }
 
 
@@ -107,31 +139,31 @@ namespace AC97
     uint64_t AC97Driver::writeBuffer(uint64_t offset, uint8_t* buffer, uint64_t count)
     {
 
-        handle_irq();
+        //handle_irq();
         //Write buffer by buffer
         uint64_t n_written = 0;
         while(count > 0) 
         {
             //Wait until we have a free buffer to write to
-            // do 
-            // {
-            //     //Read the status, current index, and last valid index
-            //     //TaskManager::ScopedCritical critical;
-            //     auto status_byte = inw(m_output_channel + ChannelRegisters::STATUS);
-            //     BufferStatus status = {.value = status_byte};
-            //     auto current_index = inb(m_output_channel + ChannelRegisters::CURRENT_INDEX);
-            //     auto last_valid_index = inb(m_output_channel + ChannelRegisters::LAST_VALID_INDEX);
-            //     auto num_buffers_left = last_valid_index >= current_index ? last_valid_index - current_index : AC97_NUM_BUFFER_DESCRIPTORS - (current_index - last_valid_index);
-            //     if(!status.is_halted)
-            //         num_buffers_left++;
-            //     if(num_buffers_left < AC97_NUM_BUFFER_DESCRIPTORS)
-            //         break;
-            //     //critical.exit();
-            //     m_blocker = false;
-            //     //TaskManager::current_thread()->block(m_blocker);
-            //     // if(m_blocker.was_interrupted())
-            //     //     return 0;
-            // } while(m_output_dma_enabled);
+            do 
+            {
+                //Read the status, current index, and last valid index
+                //TaskManager::ScopedCritical critical;
+                auto status_byte = inw(m_output_channel + ChannelRegisters::STATUS);
+                BufferStatus status = {.value = status_byte};
+                auto current_index = inb(m_output_channel + ChannelRegisters::CURRENT_INDEX);
+                auto last_valid_index = inb(m_output_channel + ChannelRegisters::LAST_VALID_INDEX);
+                auto num_buffers_left = last_valid_index >= current_index ? last_valid_index - current_index : AC97_NUM_BUFFER_DESCRIPTORS - (current_index - last_valid_index);
+                if(!status.is_halted)
+                    num_buffers_left++;
+                if(num_buffers_left < AC97_NUM_BUFFER_DESCRIPTORS)
+                    break;
+                //critical.exit();
+                m_blocker = false;
+                //TaskManager::current_thread()->block(m_blocker);
+                // if(m_blocker.was_interrupted())
+                //     return 0;
+            } while(m_output_dma_enabled);
 
             //If the output DMA is not currently enabled, reset the PCM channel to be sure
             if(!m_output_dma_enabled)

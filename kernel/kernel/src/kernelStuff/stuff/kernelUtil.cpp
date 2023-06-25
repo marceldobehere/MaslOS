@@ -740,7 +740,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
 BasicRenderer r = *((BasicRenderer*)NULL);
 
 #include "../../musicTest/musicTest.h"
-
+#include "../other_IO/serial/serial.h"
 
 
 KernelInfo InitializeKernel(BootInfo* bootInfo)
@@ -779,6 +779,10 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     //while (true);
 
     //osData.realMainWindow->framebuffer = r.framebuffer;
+
+    PrintMsg("> Initing Serial Interface");
+    Serial::Init();
+    StepDone();
 
     AddToStack();
 
@@ -857,8 +861,6 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     PrintMsg("> Initing PIT");
     PIT::InitPIT();
     StepDone();
-
-    
 
     #define STAT 0x64
     #define CMD 0x60

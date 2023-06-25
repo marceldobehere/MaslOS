@@ -94,6 +94,14 @@ void PageTableManager::MapMemory(void* virtualMemory, void* physicalMemory, bool
     return;
 }
 
+void PageTableManager::MapMemories(void* virtualMemory, void* physicalMemory, int c, bool allowCache)
+{
+    for (int i = 0; i < c; i++)
+    {
+        MapMemory((void*)((uint64_t)virtualMemory + (i * 0x1000)), (void*)((uint64_t)physicalMemory + (i * 0x1000)), allowCache);
+    }
+}
+
 
 void PageTableManager::MapFramebufferMemory(void* virtualMemory, void* physicalMemory)
 {

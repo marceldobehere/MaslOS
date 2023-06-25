@@ -137,7 +137,7 @@ void BasicRenderer::printStr(const char *chrs, const char *var, bool allowEscape
             else if (chrs[index + 1] == '}')
             {
                 index++;
-                putChar('{', CursorPosition.x, CursorPosition.y);
+                putChar('}', CursorPosition.x, CursorPosition.y);
                 CursorPosition.x += 8;
             }
             else if (chrs[index + 1] == 'C')

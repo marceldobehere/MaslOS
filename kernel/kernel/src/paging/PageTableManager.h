@@ -13,6 +13,7 @@ class PageTableManager
     PageTableManager(PageTable* PML4Address);
 
     void MapMemory(void* virtualMemory, void* physicalMemory, bool allowCache);
+    void MapMemories(void* virtualMemory, void* physicalMemory, int c, bool allowCache);
     void MapFramebufferMemory(void* virtualMemory, void* physicalMemory);
 
 };

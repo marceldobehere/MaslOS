@@ -5,6 +5,7 @@
 #include "../cmdParsing/cstrTools.h"
 #include "../memory/heap.h"
 #include "../OSDATA/osdata.h"
+#include "../kernelStuff/other_IO/serial/serial.h"
 
 bool PrintAll = true;
 int PrintLayer = 0;
@@ -96,11 +97,16 @@ void StepDone(int step)
 
 void PrintSpaces()
 {
-    GlobalRenderer->CursorPosition.x += PrintLayer * 8;
     // for (int i = 0; i < PrintLayer; i++)
     //     GlobalRenderer->Print("  ");
-    
-    PrintedSpace = true;
+
+    PrintedSpace = true;    
+    for (int i = 0; i < PrintLayer; i++)
+        Serial::Write("  ");
+
+    if (!PrintAll || !osData.verboseBoot)
+        return;
+    GlobalRenderer->CursorPosition.x += PrintLayer * 8;
 }
 
 void ScrollUp(int amt)
@@ -123,11 +129,12 @@ void ScrollUp(int amt)
 
 void PrintMsgColSL(const char* msg, const char* var, uint32_t col)
 {
-    if (!PrintAll || !osData.verboseBoot)
-        return;
     if (!PrintedSpace)
         PrintSpaces();
+    Serial::Write(msg, var, true);
 
+    if (!PrintAll || !osData.verboseBoot)
+        return;
     GlobalRenderer->Print(msg, var, col);
     while (GlobalRenderer->CursorPosition.y > GlobalRenderer->framebuffer->Height - 32)
         ScrollUp(16);
@@ -135,8 +142,12 @@ void PrintMsgColSL(const char* msg, const char* var, uint32_t col)
 
 void Println()
 {
-    PrintMsgColSL("\n\r", "", GlobalRenderer->color);
     PrintedSpace = false;
+
+    Serial::Write("\r\n");
+    if (!PrintAll || !osData.verboseBoot)
+        return;
+    PrintMsgColSL("\n\r", "", GlobalRenderer->color);
 }
 
 void PrintMsgCol(const char* msg, const char* var, uint32_t col)
