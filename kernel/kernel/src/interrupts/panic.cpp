@@ -181,6 +181,240 @@ void CreateWindowWithBenchmarkData()
     RemoveFromStack();
 }
 
+#include "../memory/heap.h"
+
+void LockOsStuffLoop(Window* termWindow)
+{
+    AddToStack();
+
+    AddToStack();
+    {
+        uint64_t tS = PIT::TimeSinceBootMicroS();
+        if (osData.osTasks.getCount() > 0)
+        {
+            uint64_t tS2 = PIT::TimeSinceBootMicroS();
+            Task* task = osData.osTasks[0];
+            AddToStack();
+            DoTask(task);
+            RemoveFromStack();
+            task->tempTime += PIT::TimeSinceBootMicroS() - tS2;
+            if (task->GetDone())
+            {
+                osData.osTasks.removeFirst();
+                FreeTask(task);
+            }
+        }
+        //totOsTaskTemp += PIT::TimeSinceBootMicroS() - tS;
+    }
+    RemoveFromStack();
+
+    AddToStack();
+    {
+        for (int i = 0; i < osData.windows.getCount(); i++)
+        {     
+            i = osData.windows.getCount();
+            Window* window = termWindow; // only do terminal window
+            if (window->instance == NULL)
+                continue;
+            if (window->hidden && !osData.bgTaskRun)
+                continue;
+            if (window->instance->instanceType != InstanceType::Terminal)
+                continue;
+
+            TerminalInstance* terminal = (TerminalInstance*)window->instance;
+
+            if (terminal->tasks.getCount() > 0)
+            {
+                uint64_t tS2 = PIT::TimeSinceBootMicroS();
+                Task* task = terminal->tasks[0];
+                AddToStack();
+                DoTask(task);
+                RemoveFromStack();
+                task->tempTime += PIT::TimeSinceBootMicroS() - tS2;
+                if (task->GetDone())
+                {
+                    terminal->tasks.removeFirst();
+                    FreeTask(task);
+                    //GlobalRenderer->Println("TASK DONE");
+                    terminal->PrintUserIfNeeded();
+                }
+            }
+        }
+    }
+    RemoveFromStack();
+
+    RemoveFromStack();
+}
+
+#include "../tasks/maab/maabTask.h"
+#include "../tasks/bfTask/bfTask.h"
+#include "../kernelStuff/other_IO/acpi/acpiShutdown.h"
+
+void LockLoop()
+{
+    AddToStack();
+    Serial::Writeln();
+    osData.NO_INTERRUPTS = true;
+    Serial::Writeln("<HALTED OS>");
+    Serial::Writeln();
+    if (backupHeapFailed)
+    {
+        Serial::Writeln("The Backup heap failed and therefore the OS cannot continue.");
+        Serial::Writeln("(DePaST cannot launch without memory working)");
+        Serial::Writeln("Please restart the computer.");
+        Serial::Writeln();
+        while (true)
+        {
+            asm("hlt");
+        }
+    }
+
+    Serial::Writeln("MaslOS Debug Panic Serial Terminal (DePaST)");
+    Serial::Writeln();
+
+
+    Serial::Writeln("> Initing...");
+    Serial::Writeln("> Creating Debug Terminal Instance...");
+    Window* mainWindow;
+    OSUser* mainUser = &adminUser;
+    TerminalInstance* oldTerm;
+    NewTerminalInstance* newTerm;
+    {
+        mainWindow = (Window*)_Malloc(sizeof(Window), "Main window");
+        TerminalInstance* terminal = (TerminalInstance*)_Malloc(sizeof(TerminalInstance), "Terminal Instance for main window");
+        *terminal = TerminalInstance(mainUser);
+        oldTerm = terminal;
+
+        Serial::Writeln("> Setting Terminal to redirect to Serial...");
+        newTerm = ((NewTerminalInstance*)terminal->newTermInstance); 
+        newTerm->redirectToSerial = true;
+        // NewTerminalInstance* terminal = (NewTerminalInstance*)malloc(sizeof(NewTerminalInstance), "New Terminal Instance for main window");
+        // *terminal = NewTerminalInstance(&adminUser, mainWindow);
+
+        Serial::Writeln("> Creating Debug Window...");
+        *(mainWindow) = Window((DefaultInstance*)terminal, Size(1, 1), Position(0, 0), "Main Window", true, true, true);
+        osData.windows.add(mainWindow);
+        Serial::Writeln("> Init Done!");
+        terminal->SetWindow(mainWindow);
+        terminal->Cls();
+
+        activeWindow = mainWindow;
+        //osData.mainTerminalWindow = mainWindow;
+    }
+
+
+    Serial::Writeln();
+
+    const int maxInputLen = 500;
+    char input[maxInputLen + 1];
+    char lastInput[maxInputLen + 1];
+    int inputLen = 0;
+    for (int i = 0; i < maxInputLen + 1; i++)
+    {
+        input[i] = 0;
+        lastInput[i] = input[i];
+    }
+    
+    Serial::Writeln();
+    Serial::Write("> ");
+
+    while (true)
+    {
+        LockOsStuffLoop(mainWindow);
+        if (Serial::CanRead())
+        {
+            char c = Serial::Read();
+
+            bool keyHandled = false;
+            {
+                TaskMAAB* maab = NULL;
+                for (int i = 0; i < oldTerm->tasks.getCount(); i++)
+                {
+                    if (oldTerm->tasks[i]->GetType() == TaskType::MAAB)
+                    {
+                        maab = (TaskMAAB*)oldTerm->tasks[i];
+                        break;
+                    }
+                }
+
+                if (maab != NULL && maab->waitInput && !maab->gotInput)
+                {
+                    keyHandled = true;
+                    if (c == '\r')
+                    {
+                        maab->gotInput = true;
+                    }
+                    else
+                    {
+                        if (c == '\n' || maab->memUserInputLen >= 490)
+                        {
+                            maab->gotInput = true;
+                        }
+                        else if (c == '\b')
+                        {
+                            if (maab->memUserInputLen > 0)
+                            {
+                                maab->memUserInput[--maab->memUserInputLen] = 0;
+                                newTerm->DeleteLastCharInLine();
+                            }
+                        }
+                        else
+                        {
+                            maab->memUserInput[maab->memUserInputLen++] = c;
+                            newTerm->Print(c);
+                        }
+                    }
+                }
+            }
+
+            if (keyHandled)
+            {
+
+            }
+            else if (c == '\r')
+            {
+                Serial::Writeln();
+                //Serial::Writeln("<TEST>");
+                newTerm->Clear();
+                
+                if (inputLen > 0)
+                {
+                    input[inputLen] = 0;    
+                    ParseCommand(input, lastInput, &mainUser, mainWindow);
+                }
+
+                inputLen = 0;
+                for (int i = 0; i < maxInputLen + 1; i++)
+                {
+                    lastInput[i] = input[i];
+                    input[i] = 0;
+                }
+                
+                Serial::Writeln();
+                Serial::Write("> ");
+            }
+            else if (c == '\b')
+            {
+                if (inputLen > 0)
+                {
+                    Serial::Write("\b \b");
+                    input[--inputLen] = 0;
+                }
+            }
+            else
+            {
+                if (inputLen < maxInputLen)
+                {
+                    input[inputLen++] = c;
+                    Serial::Write(c);
+                }
+            }
+        }
+    }
+    PowerOffAcpi();
+
+    RemoveFromStack();
+}
 
 
 
@@ -325,8 +559,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
             Serial::Writeln();
             PrintRegisterDump(GlobalRenderer);
 
-            while(true)
-                asm("hlt");
+            LockLoop();
         }
         
         PrintMStackTrace(MStackData::stackArr, MStackData::stackPointer);
@@ -338,10 +571,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         
         //if (lock)
 
-        Serial::Writeln();
-        Serial::Writeln("<HALTING OS>");
-        while(true)
-            asm("hlt");
+        LockLoop();
     }
 
     osData.tempCrash = false;   

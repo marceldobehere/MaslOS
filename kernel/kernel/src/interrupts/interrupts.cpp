@@ -15,6 +15,8 @@
 
 #include "../kernel.h"
 
+
+
 extern "C" void BruhusSafus()
 {
 
@@ -44,6 +46,11 @@ extern "C" void BruhusSafus()
 
     while (true)
         asm("hlt");
+}
+
+void DoSafe()
+{
+    BruhusSafus();
 }
 
 //void** search(void** addr, void* value) __attribute__((noinline));

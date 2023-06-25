@@ -5,6 +5,7 @@
 #include "../kernelStuff/memory/memory.h"
 #include "../kernelStuff/stuff/cstr.h"
 #include "../interrupts/panic.h"
+#include "../memory/heap.h"
 
 PageFrameAllocator* GlobalAllocator;
 
@@ -94,7 +95,7 @@ void* PageFrameAllocator::RequestPage()
     GlobalRenderer->Println("USED MEM: {}", to_string(usedMemory), Colors.yellow);
     GlobalRenderer->Println("RES MEM: {}", to_string(reservedMemory), Colors.yellow);
     
-    
+    SwitchToBackupHeap();
     Panic("No more RAM avaiable! (Count: {})", to_string(reqCount), true);
 
 
@@ -160,7 +161,7 @@ void* PageFrameAllocator::RequestPages(int count)
     GlobalRenderer->Println("USED MEM: {}", to_string(usedMemory), Colors.yellow);
     GlobalRenderer->Println("RES MEM: {}", to_string(reservedMemory), Colors.yellow);
     
-    
+    SwitchToBackupHeap();
     Panic("No more RAM avaiable! (Count: {})", to_string(reqCount), true);
 }
 

@@ -1,6 +1,7 @@
 #include "newTerminalInstance.h"
 #include "../../../memory/heap.h"
 #include "../../../OSDATA/MStack/MStackM.h"
+#include "../../../kernelStuff/other_IO/serial/serial.h"
 
 void ClearListList(List<List<ConsoleChar>*>* list)
 {
@@ -18,6 +19,9 @@ void ClearListList(List<List<ConsoleChar>*>* list)
 List<ConsoleChar>* NewTerminalInstance::AddNewLine()
 {
     AddToStack();
+    if (redirectToSerial)
+        Serial::Writeln();
+
     List<ConsoleChar>* list = (List<ConsoleChar>*)_Malloc(sizeof(List<ConsoleChar>), "New List of console chars");
     *list = List<ConsoleChar>(2);
     textData.add(list);
@@ -80,31 +84,44 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
             {
                 index++;
                 currList->add(ConsoleChar('\\', fg, bg));
+                if (redirectToSerial)
+                    Serial::Write('\\');
             }
             else if (chrs[index + 1] == '%')
             {
                 index++;
                 currList->add(ConsoleChar('%', fg, bg));
+                if (redirectToSerial)
+                    Serial::Write('%');
             }
             else if (chrs[index + 1] == '{')
             {
                 index++;
                 currList->add(ConsoleChar('{', fg, bg));
+                if (redirectToSerial)
+                    Serial::Write('{');
             }
             else if (chrs[index + 1] == '}')
             {
                 index++;
                 currList->add(ConsoleChar('}', fg, bg));
+                if (redirectToSerial)
+                    Serial::Write('}');
             }
             else if (chrs[index + 1] == 'F') // foreground color
             {
                 index++;
                 if (chrs[index + 1] == 0 || chrs[index + 2] == 0 || chrs[index + 3] == 0 || chrs[index + 4] == 0 || chrs[index + 5] == 0 || chrs[index + 6] == 0)
+                {
                     currList->add(ConsoleChar('?', fg, bg));
+                    if (redirectToSerial)
+                        Serial::Write('?');
+                }
                 else
                 {
                     index++;
                     fg = ConvertStringToHex(&chrs[index]);
+                    // ignore switching col in serial 
                     index += 5;
                 }
             }
@@ -112,19 +129,32 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
             {
                 index++;
                 if (chrs[index + 1] == 0 || chrs[index + 2] == 0 || chrs[index + 3] == 0 || chrs[index + 4] == 0 || chrs[index + 5] == 0 || chrs[index + 6] == 0)
+                {
                     currList->add(ConsoleChar('?', fg, bg));
+                    if (redirectToSerial)
+                        Serial::Write('?');
+                }
                 else
                 {
                     index++;
                     bg = ConvertStringToHex(&chrs[index]);
+                    // ignore switching col in serial 
                     index += 5;
                 }
             }
             else
+            {
                 currList->add(ConsoleChar(chrs[index], fg, bg));
+                if (redirectToSerial)
+                    Serial::Write(chrs[index]);
+            }
         }
         else
+        {
             currList->add(ConsoleChar(chrs[index], fg, bg));
+            if (redirectToSerial)
+                Serial::Write(chrs[index]);
+        }
         
         //currList->add(ConsoleChar(str[i], fg, bg));
     }
@@ -181,27 +211,39 @@ void NewTerminalInstance::WriteVarStringIntoList(const char* chrs, dispVar vars[
             {
                 index++;
                 currList->add(ConsoleChar('\\', fg, bg));
+                if (redirectToSerial)
+                    Serial::Write('\\');
             }
             else if (chrs[index + 1] == '%')
             {
                 index++;
                 currList->add(ConsoleChar('%', fg, bg));
+                if (redirectToSerial)
+                    Serial::Write('%');
             }
             else if (chrs[index + 1] == '{')
             {
                 index++;
                 currList->add(ConsoleChar('{', fg, bg));
+                if (redirectToSerial)
+                    Serial::Write('{');
             }
             else if (chrs[index + 1] == '}')
             {
                 index++;
                 currList->add(ConsoleChar('}', fg, bg));
+                if (redirectToSerial)
+                    Serial::Write('}');
             }
             else if (chrs[index + 1] == 'F') // foreground color
             {
                 index++;
                 if (chrs[index + 1] == 0 || chrs[index + 2] == 0 || chrs[index + 3] == 0 || chrs[index + 4] == 0 || chrs[index + 5] == 0 || chrs[index + 6] == 0)
+                {
                     currList->add(ConsoleChar('?', fg, bg));
+                    if (redirectToSerial)
+                        Serial::Write('?');
+                }
                 else
                 {
                     index++;
@@ -213,7 +255,11 @@ void NewTerminalInstance::WriteVarStringIntoList(const char* chrs, dispVar vars[
             {
                 index++;
                 if (chrs[index + 1] == 0 || chrs[index + 2] == 0 || chrs[index + 3] == 0 || chrs[index + 4] == 0 || chrs[index + 5] == 0 || chrs[index + 6] == 0)
+                {
                     currList->add(ConsoleChar('?', fg, bg));
+                    if (redirectToSerial)
+                        Serial::Write('?');
+                }
                 else
                 {
                     index++;
@@ -222,11 +268,17 @@ void NewTerminalInstance::WriteVarStringIntoList(const char* chrs, dispVar vars[
                 }
             }
             else
+            {
                 currList->add(ConsoleChar(chrs[index], fg, bg));
+                if (redirectToSerial)
+                    Serial::Write(chrs[index]);
+            }
         }
         else
         {
             currList->add(ConsoleChar(chrs[index], fg, bg));
+            if (redirectToSerial)
+                Serial::Write(chrs[index]);
         }
         
         //currList->add(ConsoleChar(str[i], fg, bg));
@@ -261,6 +313,7 @@ void ReInitCharArrWithSize(ConsoleChar** charArr, int sizeX, int sizeY, uint32_t
 NewTerminalInstance::NewTerminalInstance()
 {
     AddToStack();
+    redirectToSerial = false;
     //textData = List<List<ConsoleChar>*>(4);
     instanceType = InstanceType::NewTerminal;
     RenderCalled = true;

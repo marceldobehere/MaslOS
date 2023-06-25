@@ -145,22 +145,17 @@ bool mallocToCache = false;
 
 void* RAM_START_ADDR;
 
-void InitializeHeap(void* heapAddress, size_t pageCount)
+void* backupHeapStart = NULL;
+static const size_t backupHeapPageCount = 4000; // ~16MB
+bool usingBackupHeap = false;
+bool backupHeapFailed = false;
+
+
+void SubInitHeap(void* heapAddress, size_t pageCount)
 {
     AddToStack();
     RAM_START_ADDR = heapAddress;
-    void* pos = heapAddress;
-
     activeMemFlagVal = 0;
-
-    for (size_t i = 0; i < pageCount; i++)
-    {
-        //uint64_t addr = (uint64_t)GlobalAllocator->RequestPage();
-        //GlobalRenderer->Println("Requesting Page: {}", ConvertHexToString(addr), Colors.yellow);
-        //GlobalPageTableManager.MapMemory(pos, (void*)addr);
-        GlobalPageTableManager.MapMemory(pos, GlobalAllocator->RequestPage(), true);
-        pos = (void*)((size_t)pos + 0x1000);
-    }
 
     size_t heapLength = pageCount * 0x1000;
 
@@ -191,6 +186,61 @@ void InitializeHeap(void* heapAddress, size_t pageCount)
     }
     mallocToCache = false;
     lastUpdateTime = 0;
+
+
+    RemoveFromStack();
+}
+
+void InitBackup(void* heapAddress, size_t pageCount)
+{
+    AddToStack();   
+    backupHeapStart = heapAddress;
+    usingBackupHeap = false;
+    backupHeapFailed = false;
+
+    void* pos = heapAddress;
+    for (size_t i = 0; i < pageCount; i++)
+    {
+        GlobalPageTableManager.MapMemory(pos, GlobalAllocator->RequestPage(), true);
+        pos = (void*)((size_t)pos + 0x1000);
+    }
+
+    RemoveFromStack();
+}
+
+void SwitchToBackupHeap()
+{
+    if (usingBackupHeap)
+    {
+        backupHeapFailed = true;
+        Panic("Already using backup heap!", true);
+    }
+    usingBackupHeap = true;
+
+    RAM_START_ADDR = backupHeapStart;
+    SubInitHeap(backupHeapStart, backupHeapPageCount);
+}
+
+void InitializeHeap(void* heapAddress, size_t pageCount)
+{
+    AddToStack();
+    RAM_START_ADDR = heapAddress;
+    
+    uint64_t backupAddr = (uint64_t)heapAddress;
+    backupAddr -= 0x1000 * backupHeapPageCount;
+    InitBackup((void*)backupAddr, backupHeapPageCount);
+    
+    void* pos = heapAddress;
+    for (size_t i = 0; i < pageCount; i++)
+    {
+        //uint64_t addr = (uint64_t)GlobalAllocator->RequestPage();
+        //GlobalRenderer->Println("Requesting Page: {}", ConvertHexToString(addr), Colors.yellow);
+        //GlobalPageTableManager.MapMemory(pos, (void*)addr);
+        GlobalPageTableManager.MapMemory(pos, GlobalAllocator->RequestPage(), true);
+        pos = (void*)((size_t)pos + 0x1000);
+    }
+
+    SubInitHeap(heapAddress, pageCount);
 
     RemoveFromStack();
 }
@@ -565,6 +615,13 @@ void* _malloc(size_t size, const char* text)
 bool ExpandHeap(size_t length)
 {
     AddToStack();
+    if (usingBackupHeap)
+    {
+        backupHeapFailed = true;
+        Panic("Trying to expand heap while using backup heap!", true);
+    }
+
+
     if (length % 0x1000)
     {
         length -= (length % 0x1000);
@@ -584,7 +641,10 @@ bool ExpandHeap(size_t length)
     {
         void* tempAddr = GlobalAllocator->RequestPage();
         if (tempAddr == NULL)
+        {
+            SwitchToBackupHeap();
             Panic("NO MORE RAM!!!!!!!", true);
+        }
         
         GlobalPageTableManager.MapMemory(tHeapEnd, tempAddr, true);
         tHeapEnd = (void*)((size_t)tHeapEnd + 0x1000);

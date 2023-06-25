@@ -130,8 +130,10 @@ namespace AC97
     {
         //Send reset command and wait for it to be cleared
         outb(m_output_channel + ChannelRegisters::CONTROL, ControlFlags::RESET_REGISTERS);
-        while(inb(m_output_channel + ChannelRegisters::CONTROL) & ControlFlags::RESET_REGISTERS)
-            io_wait(50);
+        io_wait();
+        int timeOut = 500;
+        while((timeOut-- > 0) && inb(m_output_channel + ChannelRegisters::CONTROL) & ControlFlags::RESET_REGISTERS)
+            io_wait(500);
         m_output_dma_enabled = false;
         m_current_buffer_descriptor = 0;
     }

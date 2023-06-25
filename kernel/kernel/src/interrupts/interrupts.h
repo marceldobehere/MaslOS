@@ -75,3 +75,4 @@ void RemapPIC(uint8_t _a1, uint8_t _a2);
 void PIC_EndMaster();
 void PIC_EndSlave();
 void TestSetSpeakerPosition(bool in);
+void DoSafe();

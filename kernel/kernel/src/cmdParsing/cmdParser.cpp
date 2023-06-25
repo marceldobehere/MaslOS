@@ -262,20 +262,22 @@ BuiltinCommand BuiltinCommandFromStr(char* i)
   else if (StrEquals(i, "debug viewer")) return Command_DebugViewer;
   else if (StrEquals(i, "crash")) return Command_Crash;
   else if (StrEquals(i, "crash 2")) return Command_Crash2;
+  else if (StrEquals(i, "crash 3")) return Command_Crash3;
+  else if (StrEquals(i, "renderloop")) return Command_RenderLoop;
   else return Command_Invalid;
 }
 
 void HelpCommand(Window* window)
 {
     const char* helpMessage =
-        "Help Commands:\n"
+        "Help Commands: (More Details are in the MaslOS Wiki)\n"
         " - help                    get this message\n"
         " - exit                    exit terminal\n"
         " - clear                   clears the terminal screen\n"
         " - benchmark reset         resets the bench mark\n"
         " - malloc                  mallocs memory 20G\n"
         " - music test              test music\n"
-        " - sb test              test sb16\n"
+        " - sb test                 test ac97\n"
         " - music clear             clear music\n"
         " - music mario             play mario music\n"
         " - shutdown                turn off operating system\n"
@@ -289,7 +291,8 @@ void HelpCommand(Window* window)
         " - dbg | debug viewer      open debug viewer\n"
         " - heapCheck               ...\n"
         " - crash                   ...\n"
-        " - crash2                  ...\n";
+        " - crash 2                 ...\n"
+        " - crash 3                 ...\n";
     Print(window, helpMessage);
 }
 
@@ -503,6 +506,19 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             // int Az = Ax/Ay;
             osData.NO_INTERRUPTS = true;
             asm("int $0x0D");
+            RemoveFromStack();
+            return;
+        }
+        case Command_Crash3: {
+            Println(window, "Crashing 3...");
+
+            Panic("DEBUG KERNEL PANIC", true);
+            RemoveFromStack();
+            return;
+        }
+        case Command_RenderLoop: {
+            Println(window, "Re-Entering Render Loop...");
+            DoSafe();
             RemoveFromStack();
             return;
         }

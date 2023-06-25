@@ -38,6 +38,8 @@ enum BuiltinCommand {
     Command_DebugViewer,
     Command_Crash,
     Command_Crash2,
+    Command_Crash3,
+    Command_RenderLoop,
     Command_Invalid,
 };
 BuiltinCommand BuiltinCommandFromStr(char* i);

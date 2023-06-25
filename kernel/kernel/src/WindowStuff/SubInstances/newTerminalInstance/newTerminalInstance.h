@@ -11,6 +11,7 @@
 class NewTerminalInstance : public DefaultInstance
 {
     private:
+        
         Window* window;
         bool printUser;
         void WriteStringIntoList(const char* str, const char* var);
@@ -20,6 +21,7 @@ class NewTerminalInstance : public DefaultInstance
 
     public:
     // OSUser* currentUser;
+    bool redirectToSerial;
     int32_t scrollX, scrollY, oldScrollX, oldScrollY, oldHeight, oldWidth;
     uint32_t backgroundColor;
     uint32_t foregroundColor;
