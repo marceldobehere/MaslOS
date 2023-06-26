@@ -255,6 +255,12 @@ void LockLoop()
     AddToStack();
     Serial::Writeln();
     osData.NO_INTERRUPTS = true;
+    // doing it here bc goto
+    Window* mainWindow;
+    OSUser* mainUser = &adminUser;
+    TerminalInstance* oldTerm;
+    NewTerminalInstance* newTerm;
+
     Serial::Writeln("<HALTED OS>");
     Serial::Writeln();
     if (backupHeapFailed)
@@ -263,10 +269,7 @@ void LockLoop()
         Serial::Writeln("(DePaST cannot launch without memory working)");
         Serial::Writeln("Please restart the computer.");
         Serial::Writeln();
-        while (true)
-        {
-            asm("hlt");
-        }
+        goto endLockLoop;
     }
 
     Serial::Writeln("MaslOS Debug Panic Serial Terminal (DePaST)");
@@ -275,10 +278,6 @@ void LockLoop()
 
     Serial::Writeln("> Initing...");
     Serial::Writeln("> Creating Debug Terminal Instance...");
-    Window* mainWindow;
-    OSUser* mainUser = &adminUser;
-    TerminalInstance* oldTerm;
-    NewTerminalInstance* newTerm;
     {
         mainWindow = (Window*)_Malloc(sizeof(Window), "Main window");
         TerminalInstance* terminal = (TerminalInstance*)_Malloc(sizeof(TerminalInstance), "Terminal Instance for main window");
@@ -305,113 +304,117 @@ void LockLoop()
 
     Serial::Writeln();
 
-    const int maxInputLen = 500;
-    char input[maxInputLen + 1];
-    char lastInput[maxInputLen + 1];
-    int inputLen = 0;
-    for (int i = 0; i < maxInputLen + 1; i++)
     {
-        input[i] = 0;
-        lastInput[i] = input[i];
-    }
-    
-    Serial::Writeln();
-    Serial::Write("> ");
-
-    osData.exit = false;
-    while (!osData.exit)
-    {
-        LockOsStuffLoop(mainWindow);
-        if (Serial::CanRead())
+        const int maxInputLen = 500;
+        char input[maxInputLen + 1];
+        char lastInput[maxInputLen + 1];
+        int inputLen = 0;
+        for (int i = 0; i < maxInputLen + 1; i++)
         {
-            char c = Serial::Read();
+            input[i] = 0;
+            lastInput[i] = input[i];
+        }
+        
+        Serial::Writeln();
+        Serial::Write("> ");
 
-            bool keyHandled = false;
+        osData.exit = false;
+        while (!osData.exit)
+        {
+            LockOsStuffLoop(mainWindow);
+            if (Serial::CanRead())
             {
-                TaskMAAB* maab = NULL;
-                for (int i = 0; i < oldTerm->tasks.getCount(); i++)
-                {
-                    if (oldTerm->tasks[i]->GetType() == TaskType::MAAB)
-                    {
-                        maab = (TaskMAAB*)oldTerm->tasks[i];
-                        break;
-                    }
-                }
+                char c = Serial::Read();
 
-                if (maab != NULL && maab->waitInput && !maab->gotInput)
+                bool keyHandled = false;
                 {
-                    keyHandled = true;
-                    if (c == '\r')
+                    TaskMAAB* maab = NULL;
+                    for (int i = 0; i < oldTerm->tasks.getCount(); i++)
                     {
-                        maab->gotInput = true;
+                        if (oldTerm->tasks[i]->GetType() == TaskType::MAAB)
+                        {
+                            maab = (TaskMAAB*)oldTerm->tasks[i];
+                            break;
+                        }
                     }
-                    else
+
+                    if (maab != NULL && maab->waitInput && !maab->gotInput)
                     {
-                        if (c == '\n' || maab->memUserInputLen >= 490)
+                        keyHandled = true;
+                        if (c == '\r')
                         {
                             maab->gotInput = true;
                         }
-                        else if (c == '\b')
-                        {
-                            if (maab->memUserInputLen > 0)
-                            {
-                                maab->memUserInput[--maab->memUserInputLen] = 0;
-                                newTerm->DeleteLastCharInLine();
-                            }
-                        }
                         else
                         {
-                            maab->memUserInput[maab->memUserInputLen++] = c;
-                            newTerm->Print(c);
+                            if (c == '\n' || maab->memUserInputLen >= 490)
+                            {
+                                maab->gotInput = true;
+                            }
+                            else if (c == '\b')
+                            {
+                                if (maab->memUserInputLen > 0)
+                                {
+                                    maab->memUserInput[--maab->memUserInputLen] = 0;
+                                    newTerm->DeleteLastCharInLine();
+                                }
+                            }
+                            else
+                            {
+                                maab->memUserInput[maab->memUserInputLen++] = c;
+                                newTerm->Print(c);
+                            }
                         }
                     }
                 }
-            }
 
-            if (keyHandled)
-            {
+                if (keyHandled)
+                {
 
-            }
-            else if (c == '\r')
-            {
-                Serial::Writeln();
-                //Serial::Writeln("<TEST>");
-                newTerm->Clear();
-                
-                if (inputLen > 0)
-                {
-                    input[inputLen] = 0;    
-                    ParseCommand(input, lastInput, &mainUser, mainWindow);
                 }
+                else if (c == '\r')
+                {
+                    Serial::Writeln();
+                    //Serial::Writeln("<TEST>");
+                    newTerm->Clear();
+                    
+                    if (inputLen > 0)
+                    {
+                        input[inputLen] = 0;    
+                        ParseCommand(input, lastInput, &mainUser, mainWindow);
+                    }
 
-                inputLen = 0;
-                for (int i = 0; i < maxInputLen + 1; i++)
-                {
-                    lastInput[i] = input[i];
-                    input[i] = 0;
+                    inputLen = 0;
+                    for (int i = 0; i < maxInputLen + 1; i++)
+                    {
+                        lastInput[i] = input[i];
+                        input[i] = 0;
+                    }
+                    
+                    Serial::Writeln();
+                    Serial::Write("> ");
                 }
-                
-                Serial::Writeln();
-                Serial::Write("> ");
-            }
-            else if (c == '\b')
-            {
-                if (inputLen > 0)
+                else if (c == '\b')
                 {
-                    Serial::Write("\b \b");
-                    input[--inputLen] = 0;
+                    if (inputLen > 0)
+                    {
+                        Serial::Write("\b \b");
+                        input[--inputLen] = 0;
+                    }
                 }
-            }
-            else
-            {
-                if (inputLen < maxInputLen)
+                else
                 {
-                    input[inputLen++] = c;
-                    Serial::Write(c);
+                    if (inputLen < maxInputLen)
+                    {
+                        input[inputLen++] = c;
+                        Serial::Write(c);
+                    }
                 }
             }
         }
     }
+
+endLockLoop:
     PowerOffAcpi();
 
     GlobalRenderer->Clear(Colors.black);
