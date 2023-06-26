@@ -318,7 +318,8 @@ void LockLoop()
     Serial::Writeln();
     Serial::Write("> ");
 
-    while (true)
+    osData.exit = false;
+    while (!osData.exit)
     {
         LockOsStuffLoop(mainWindow);
         if (Serial::CanRead())
@@ -412,6 +413,19 @@ void LockLoop()
         }
     }
     PowerOffAcpi();
+
+    GlobalRenderer->Clear(Colors.black);
+    Serial::Writeln();
+    GlobalRenderer->Println("The ACPI shutdown failed!", Colors.yellow);
+    Serial::Writeln("The ACPI shutdown failed!");
+
+    GlobalRenderer->Println();
+    Serial::Writeln();
+    GlobalRenderer->Println("Please shut down the computer manually.", Colors.white);
+    Serial::Writeln("Please shut down the computer manually.");
+
+    while (true)
+        asm("hlt");
 
     RemoveFromStack();
 }
