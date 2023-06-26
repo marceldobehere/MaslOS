@@ -11,8 +11,10 @@ namespace Serial
     bool CanWrite();
     void Write(char chr); 
     void Write(const char* str);
+    void Write(const char *chrs, const char *var);
     void Write(const char *chrs, const char *var, bool allowEscape);
     void Writeln();
     void Writeln(const char* str);
+    void Writeln(const char *chrs, const char *var);
     void Writeln(const char *chrs, const char *var, bool allowEscape);
 }

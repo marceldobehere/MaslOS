@@ -4,10 +4,17 @@
 #include "../connect4Instance/connect4Instance.h"
 #include "../guiInstance/guiInstance.h"
 #include "../../../memory/heap.h"
+#include "../../../audio/audio.h"
 
 
 void DefaultInstance::DefaultFree()
 {
+    if (audioSource != NULL)
+    {
+        Audio::BasicAudioSource* source = (Audio::BasicAudioSource*)audioSource;
+        source->Free();
+        source = NULL;
+    }
     switch (this->instanceType)
     {
         case InstanceType::Default:

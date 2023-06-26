@@ -52,6 +52,18 @@ namespace Music
     void play2()
     {
         AddToStack();
+
+        if (osData.ac97Driver != NULL)
+        {
+            if (osData.ac97Driver->needManualRestart)
+            {
+                //osData.ac97Driver->CheckMusic();
+                osData.ac97Driver->needManualRestart = osData.ac97Driver->CheckMusic();
+                
+                // if (!osData.ac97Driver->needManualRestart)
+                //     Panic("bruh", true);
+            }
+        }
         // if (osData.ac97Driver != NULL && (PIT::TicksSinceBoot % 44) == 0)
         // {
         //     //AddToStack();

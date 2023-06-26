@@ -3,5 +3,5 @@
 
 namespace MusicBit16Test
 {
-    void FillArray(uint16_t* buf, int start, int len, int freq);
+    void FillArray(uint16_t* buf, int start, int len, int freq, int sampleRate);
 }

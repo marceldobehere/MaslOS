@@ -367,39 +367,73 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             if (osData.ac97Driver != NULL)
             {
                 AddToStack();
-                int amt = 48000;
-                int step = 0x1000;
-                int hz = 200;
-                uint16_t* testBuff = (uint16_t*)_Malloc(amt*2);
-                Println(window, "Malloc Test Array: {}", ConvertHexToString((uint64_t)testBuff));
-                for (int i = 0; i + step <= amt; i += step)
+                DefaultInstance* instance = window->instance;
+                if (instance != NULL && osData.audioDestinations.getCount() > 0)
                 {
-                    AddToStack();
-                    MusicBit16Test::FillArray(testBuff, i, step, hz);
-                    //Println(window, "HZ: {}", to_string(hz));
-                    hz += 10;
-                    RemoveFromStack();
+                    int sampleCount = 96000;
+                    int sampleRate = 12000;
+                    if (instance->audioSource == NULL)
+                    {
+                        Println(window, "> Creating Audiosource");
+                        instance->audioSource = (void*)new Audio::BasicAudioSource(
+                            Audio::AudioBuffer::Create16BitMonoBuffer(sampleRate, sampleCount)
+                        );
+                        Println(window, "> Linking Audiosource to AC97");
+                        ((Audio::BasicAudioSource*)instance->audioSource)->ConnectTo(osData.audioDestinations.elementAt(0));
+                    }
+                    Audio::BasicAudioSource* src = (Audio::BasicAudioSource*)instance->audioSource;
+
+                    if (!src->readyToSend)
+                    {
+                        Println(window, "> Filling Data");
+                        uint16_t* arr = (uint16_t*)src->buffer->data;
+                        MusicBit16Test::FillArray(arr, 0, sampleCount, 400, sampleRate);
+                        src->buffer->sampleCount = sampleCount;
+                        src->samplesSent = 0;
+                        src->readyToSend = true;
+                        Println(window, "> Ready To send");
+                    }
+                    else
+                    {
+                        Print(window, "> Still sending Data. ({}", to_string(src->samplesSent));
+                        Println(window, " of {} samples)", to_string(src->buffer->sampleCount));
+                    }
                 }
-                RemoveFromStack();
+
+
+                // int amt = 48000;
+                // int step = 0x1000;
+                // int hz = 200;
+                // uint16_t* testBuff = (uint16_t*)_Malloc(amt*2);
+                // Println(window, "Malloc Test Array: {}", ConvertHexToString((uint64_t)testBuff));
+                // for (int i = 0; i + step <= amt; i += step)
+                // {
+                //     AddToStack();
+                //     MusicBit16Test::FillArray(testBuff, i, step, hz);
+                //     //Println(window, "HZ: {}", to_string(hz));
+                //     hz += 10;
+                //     RemoveFromStack();
+                // }
+                // RemoveFromStack();
                 
-                AddToStack();
-                Println(window, "Fill Test Array");
-                uint64_t tCount = 0;
-                tCount = osData.ac97Driver->writeBuffer(0, (uint8_t*)testBuff, amt*2);
-                RemoveFromStack();
+                // AddToStack();
+                // Println(window, "Fill Test Array");
+                // uint64_t tCount = 0;
+                // tCount = osData.ac97Driver->writeBuffer(0, (uint8_t*)testBuff, amt*2);
+                // RemoveFromStack();
 
-                AddToStack();
-                Println(window, "Wrote {} bytes", to_string(tCount));
-                RemoveFromStack();
+                // AddToStack();
+                // Println(window, "Wrote {} bytes", to_string(tCount));
+                // RemoveFromStack();
 
-                AddToStack();
-                _Free(testBuff);
-                //terminal->tasks.add(NewDebugViewerTask(window, (uint8_t*)testBuff, amt*2));
-                RemoveFromStack();
+                // AddToStack();
+                // _Free(testBuff);
+                // //terminal->tasks.add(NewDebugViewerTask(window, (uint8_t*)testBuff, amt*2));
+                // RemoveFromStack();
 
-                AddToStack();
-                Println(window, "Freed Test Array");
-                RemoveFromStack();
+                // AddToStack();
+                // Println(window, "Freed Test Array");
+                // RemoveFromStack();
                 
                 
                 // uint64_t tArr2 = (uint64_t)GlobalAllocator->RequestPage();

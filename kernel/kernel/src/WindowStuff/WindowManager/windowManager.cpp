@@ -1046,7 +1046,10 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.x + 240,
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
-        osData.debugTerminalWindow->Log("PIT DIV: {}", to_string(PIT::Divisor), Colors.yellow);
+        if (osData.ac97Driver != NULL)
+            osData.debugTerminalWindow->Log("AC97 OFF: {}", to_string(osData.ac97Driver->needManualRestart), Colors.yellow);
+        else
+            osData.debugTerminalWindow->Log("<NO AC97>", Colors.yellow);
         RemoveFromStack();
 
 

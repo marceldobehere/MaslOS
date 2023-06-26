@@ -3,6 +3,7 @@
 #include "../pci/pci.h"
 #include "../../IO/IO.h"
 #include "../../../interrupts/interrupts.h"
+#include "../../../audio/audio.h"
 
 namespace AC97
 {
@@ -77,8 +78,10 @@ namespace AC97
             };
             uint16_t value;
         };
-
-
+        static const int DEF_SAMPLE_COUNT = 4096;
+        Audio::BasicAudioDestination* audioDestination;
+        //bool lastDone;
+        bool needManualRestart;
         AC97Driver (PCI::PCIDeviceHeader* pciBaseAddress);
         //~AC97Driver();
 
@@ -89,10 +92,11 @@ namespace AC97
 
         void reset_output();
         void set_sample_rate(uint32_t sample_rate);
-        void handle_irq();
+        bool handle_irq();
         uint64_t writeBuffer(uint64_t offset, uint8_t* buffer, uint64_t count);
 
         void HandleIRQ(interrupt_frame* frame);
+        bool CheckMusic();
 
         PCI::PCIDeviceHeader* PCIBaseAddress;     
 

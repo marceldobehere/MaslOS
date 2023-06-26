@@ -71,6 +71,10 @@ namespace Serial
         Write(str);
         Writeln();
     }
+    void Writeln(const char *chrs, const char *var)
+    {
+        Writeln(chrs, var, true);
+    }
     void Writeln(const char *chrs, const char *var, bool allowEscape)
     {
         Write(chrs, var, allowEscape);
@@ -86,6 +90,11 @@ namespace Serial
             Write(*str);
             str++;
         }
+    }
+
+    void Write(const char *chrs, const char *var)
+    {
+        Write(chrs, var, true);
     }
 
     void Write(const char *chrs, const char *var, bool allowEscape)

@@ -952,6 +952,9 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     PrintMsg("> Creating List for Disk Interfaces");
     osData.diskInterfaces = List<DiskInterface::GenericDiskInterface*>();
 
+    PrintMsg("> Creating List for Audio Destinations");
+    osData.audioDestinations = List<Audio::BasicAudioDestination*>();
+
     osData.windowIconZIP = bootInfo->windowIconsZIP;
     osData.windowButtonZIP = bootInfo->windowButtonZIP;
     StepDone();

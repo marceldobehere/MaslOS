@@ -2,6 +2,7 @@
 #include "../../../OSDATA/osdata.h"
 #include "../../../Rendering/testoDebug.h"
 #include "../../../musicTest/sbTest.h"
+#include "../../../kernelStuff/other_IO/serial/serial.h"
 
 
 // https://github.com/byteduck/duckOS/blob/master/kernel/device/AC97Device.cpp
@@ -11,38 +12,106 @@ namespace AC97
     void AC97Driver::HandleIRQ(interrupt_frame* frame)
     {
         //Panic("OO YES", true);
+        //Serial::Writeln("<AC97 IRQ>");
+        // if (!handle_irq())
+        // {
+        //     //Serial::Writeln("</NVM>");
+        //     //return;
+        // }
         handle_irq();
 
-        if (osData.ac97Driver != NULL)
+        needManualRestart = CheckMusic();    
+         
+
+        // if (osData.ac97Driver != NULL)
+        // {
+        //     //AddToStack();
+        //     int amt = 1000;
+        //     int step = 1;
+        //     int hz = ((PIT::TimeSinceBootMS() / 10) % 100) * 2 + 200;
+        //     //hz = 200;
+        //     // frequency gets doubled bc we are sending mono
+        //     uint16_t* testBuff = (uint16_t*)_Malloc(amt*2);
+
+        //     MusicBit16Test::FillArray(testBuff, 0, amt, hz);            
+        
+        //     //AddToStack();
+        //     uint64_t tCount = 0;
+        //     tCount = osData.ac97Driver->writeBuffer(0, (uint8_t*)testBuff, amt*2);
+        //     //RemoveFromStack();
+        //     //Serial::Writeln("X> Wrote {} bytes", to_string(tCount));
+
+
+        //     //AddToStack();
+        //     _Free(testBuff);
+        //     //RemoveFromStack();
+        // }
+
+        //Serial::Writeln("</AC97 IRQ: {}>", to_string(needManualRestart));  
+    }
+
+    bool AC97Driver::CheckMusic()
+    {
+        //return true;
+        int c = audioDestination->RequestBuffers();
+        if (c > 0)
         {
-            //AddToStack();
-            int amt = 1000;
-            int step = 1;
-            int hz = ((PIT::TimeSinceBootMS() / 10) % 100) * 2 + 200;
-            //hz = 200;
-            uint16_t* testBuff = (uint16_t*)_Malloc(amt*2);
+            if (osData.ac97Driver != NULL)
+            {
+                uint64_t tCount = 0;
+                //Serial::Writeln("> Writing {} bytes", to_string(audioDestination->buffer->byteCount));
+                tCount = osData.ac97Driver->writeBuffer(0, 
+                (uint8_t*)(audioDestination->buffer->data), 
+                audioDestination->buffer->byteCount);
+ 
+                if (tCount != audioDestination->buffer->byteCount)
+                {
+                    Panic("AC97Driver::HandleIRQ: tCount != audioDestination->buffer->byteCount", true);
+                }
 
-            MusicBit16Test::FillArray(testBuff, 0, amt, hz);            
-            // for (int i = 0; i + step <= amt; i += step)
-            // {
-            //     //AddToStack();
-            //     MusicBit16Test::FillArray(testBuff, i, step, hz);
-            //     //Println(window, "HZ: {}", to_string(hz));
-            //     //hz += 10;
-            //     //RemoveFromStack();
-            // }
-            //RemoveFromStack();
-            
-            //AddToStack();
-            uint64_t tCount = 0;
-            tCount = osData.ac97Driver->writeBuffer(0, (uint8_t*)testBuff, amt*2);
-            //RemoveFromStack();
-
-
-            //AddToStack();
-            _Free(testBuff);
-            //RemoveFromStack();
+                audioDestination->buffer->ClearBuffer();
+                audioDestination->buffer->sampleCount = audioDestination->buffer->totalSampleCount;
+                //lastDone = tDone;
+                //Panic("bruh: {}", to_string(c), true);
+                //return true;
+                return false;
+            }
         }
+
+        return true;
+
+        // if (audioDestination != NULL)
+        // {
+        //     bool tDone = audioDestination->AllBuffersDone();
+        //     if (tDone)
+        //     {
+        //         if (!lastDone && 
+        //             osData.ac97Driver != NULL)
+        //         {
+        //             // Do Stuff
+        //             uint64_t tCount = 0;
+        //             tCount = osData.ac97Driver->writeBuffer(0, 
+        //             (uint8_t*)(audioDestination->buffer->data), 
+        //             audioDestination->buffer->byteCount);
+
+        //             if (tCount != audioDestination->buffer->byteCount)
+        //             {
+        //                 Panic("AC97Driver::HandleIRQ: tCount != audioDestination->buffer->byteCount", true);
+        //             }
+
+        //             audioDestination->buffer->ClearBuffer();
+        //             audioDestination->buffer->sampleCount = audioDestination->buffer->totalSampleCount;
+        //             lastDone = tDone;
+        //             return false;
+        //         }
+        //     }
+        //     else
+        //     {
+        //         audioDestination->RequestBuffers();
+        //     }
+        //     lastDone = tDone;
+        //     return true;
+        // }
     }
 
     AC97Driver::AC97Driver(PCI::PCIDeviceHeader* pciBaseAddress)
@@ -140,9 +209,18 @@ namespace AC97
         reset_output();
         PrintMsg("> Reset Output");
         
+        audioDestination = new Audio::BasicAudioDestination(
+            //Audio::AudioBuffer::Create16Bit48KHzStereoBuffer(DEF_SAMPLE_COUNT)
+            Audio::AudioBuffer::Create16Bit48KHzStereoBuffer(DEF_SAMPLE_COUNT)
+        );
+        audioDestination->buffer->sampleCount = audioDestination->buffer->totalSampleCount;
+        //lastDone = true;
+        needManualRestart = true;
+
         if (osData.ac97Driver == NULL)
         {
             osData.ac97Driver = this;
+            osData.audioDestinations.add(audioDestination);
             PrintMsg("> Set as main AC97 Driver");
         }
 
@@ -150,7 +228,7 @@ namespace AC97
     }
 
 
-    void AC97Driver::handle_irq() 
+    bool AC97Driver::handle_irq() 
     {
         //Read the status
         auto status_byte = inw(m_output_channel + ChannelRegisters::STATUS);
@@ -161,7 +239,7 @@ namespace AC97
 
         //If we're not done, don't do anything
         if(!status.completion_interrupt_status)
-            return;
+            return false;
 
 
         //osData.debugTerminalWindow->newPosition.x--;
@@ -178,6 +256,7 @@ namespace AC97
             reset_output();
         }
         m_blocker = true;
+        return true;
     }
 
     void AC97Driver::reset_output() 

@@ -1,4 +1,5 @@
 #pragma once
+#include <stddef.h>
 
 enum InstanceType
 {
@@ -19,5 +20,6 @@ class DefaultInstance
 
     public:
         InstanceType instanceType = InstanceType::Default;
+        void* audioSource = NULL;
         void DefaultFree();
 };

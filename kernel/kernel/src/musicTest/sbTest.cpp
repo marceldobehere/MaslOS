@@ -3,11 +3,11 @@
 
 namespace MusicBit16Test
 {
-    void FillArray(uint16_t* buf, int start, int len, int freq)
+    void FillArray(uint16_t* buf, int start, int len, int freq, int sampleRate)
     {
         // sample rate is 48000 Hz
 
-        int maxQ = 48000 / freq;
+        int maxQ = sampleRate / freq;
         int halfQ = maxQ / 2;
 
         for (int i = start; i < start + len; i++)
