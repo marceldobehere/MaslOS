@@ -263,6 +263,7 @@ BuiltinCommand BuiltinCommandFromStr(char* i)
   else if (StrEquals(i, "crash")) return Command_Crash;
   else if (StrEquals(i, "crash 2")) return Command_Crash2;
   else if (StrEquals(i, "crash 3")) return Command_Crash3;
+  else if (StrEquals(i, "crash 4")) return Command_Crash4;
   else if (StrEquals(i, "renderloop")) return Command_RenderLoop;
   else return Command_Invalid;
 }
@@ -290,9 +291,11 @@ void HelpCommand(Window* window)
         " - taskmgr                 open task manager\n"
         " - dbg | debug viewer      open debug viewer\n"
         " - heapCheck               ...\n"
-        " - crash                   ...\n"
-        " - crash 2                 ...\n"
-        " - crash 3                 ...\n";
+        " - crash                   Causes a trivial kernel panic\n"
+        " - crash 2                 Causes a trivial but blocking kernel panic\n"
+        " - crash 3                 Causes a kernel panic\n"
+        " - crash 4                 Causes a memory corruption and crashes\n"
+        ;
     Print(window, helpMessage);
 }
 
@@ -519,6 +522,21 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         case Command_RenderLoop: {
             Println(window, "Re-Entering Render Loop...");
             DoSafe();
+            RemoveFromStack();
+            return;
+        }
+        case Command_Crash4: {
+            Println(window, "Crashing 4...");
+
+            void* testo = _Malloc(10);
+            char* bruhus = (char*) testo;
+            for (int i = -100; i < 100; i++)
+                bruhus[i] = ((i * 7 + 1234) % 255);
+        
+            // Should crash
+            //_Free(testo);
+            _Malloc(10);
+
             RemoveFromStack();
             return;
         }

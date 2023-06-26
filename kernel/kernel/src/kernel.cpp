@@ -664,7 +664,9 @@ void RenderLoop()
 
 
                 msgWindow = (Window*)_Malloc(sizeof(Window), "Crash Window");
-                Size size = Size(64*8, 16*10);
+                Size size = Size(64*8, 10*16);
+                // if (usingBackupHeap)
+                //     size = Size(40*8, 8*16);
                 Position pos = Position(((GlobalRenderer->framebuffer->Width - size.width) / 2), ((GlobalRenderer->framebuffer->Height) / 5));
                 
                 if (msgWindow != NULL)

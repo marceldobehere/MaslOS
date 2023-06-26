@@ -27,6 +27,7 @@ struct HeapSegHdr
 extern bool backupHeapFailed;
 extern bool usingBackupHeap;
 void SwitchToBackupHeap();
+void TrySwitchToBackupHeap();
 
 void InitializeHeap(void* heapAddress, size_t pageCount);
 

@@ -961,12 +961,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     StepDone();
 
     //while (true);
-    PrintMsg("> Prepare ACPI");
-    PrintMsgStartLayer("ACPI");
-    PrepareACPI(bootInfo);
-    PrintMsgEndLayer("ACPI");
-    PrintDebugTerminal();
-    StepDone();
+
 
     
 
@@ -1063,6 +1058,13 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
         fsInterface->SaveFSTable();
 
         //while (true);
+
+        PrintMsg("> Prepare ACPI");
+        PrintMsgStartLayer("ACPI");
+        PrepareACPI(bootInfo);
+        PrintMsgEndLayer("ACPI");
+        PrintDebugTerminal();
+        StepDone();
 
     }
     RemoveFromStack();

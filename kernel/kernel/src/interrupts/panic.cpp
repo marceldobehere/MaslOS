@@ -279,8 +279,8 @@ void LockLoop()
     Serial::Writeln("> Initing...");
     Serial::Writeln("> Creating Debug Terminal Instance...");
     {
-        mainWindow = (Window*)_Malloc(sizeof(Window), "Main window");
-        TerminalInstance* terminal = (TerminalInstance*)_Malloc(sizeof(TerminalInstance), "Terminal Instance for main window");
+        mainWindow = (Window*)_Malloc(sizeof(Window), "DePaST Window");
+        TerminalInstance* terminal = (TerminalInstance*)_Malloc(sizeof(TerminalInstance), "Terminal Instance for DePaST Window");
         *terminal = TerminalInstance(mainUser);
         oldTerm = terminal;
 
@@ -291,7 +291,7 @@ void LockLoop()
         // *terminal = NewTerminalInstance(&adminUser, mainWindow);
 
         Serial::Writeln("> Creating Debug Window...");
-        *(mainWindow) = Window((DefaultInstance*)terminal, Size(1, 1), Position(0, 0), "Main Window", true, true, true);
+        *(mainWindow) = Window((DefaultInstance*)terminal, Size(10*8, 2*16), Position(50, 50), "DePaST Window", true, true, true);
         osData.windows.add(mainWindow);
         Serial::Writeln("> Init Done!");
         terminal->SetWindow(mainWindow);
@@ -415,8 +415,20 @@ void LockLoop()
     }
 
 endLockLoop:
-    PowerOffAcpi();
+    
+    Serial::Writeln();
+    Serial::Writeln();
+    while (Serial::CanRead())
+        Serial::Read();
+    Serial::Writeln("Press any key to try to shutdown the computer.");
+    while (true)
+        if (Serial::CanRead())
+            break;
+    Serial::Writeln();
 
+    Serial::Writeln();
+    Serial::Writeln("Shutting down...");
+    PowerOffAcpi();
     GlobalRenderer->Clear(Colors.black);
     Serial::Writeln();
     GlobalRenderer->Println("The ACPI shutdown failed!", Colors.yellow);
@@ -522,8 +534,8 @@ void Panic(const char* panicMessage, const char* var, bool lock)
                 //GlobalRenderer->Println("BRUH 5.5", Colors.yellow);
 
 
-
-                CreateWindowWithBenchmarkData();
+                if (!usingBackupHeap)
+                    CreateWindowWithBenchmarkData();
             }
             //GlobalRenderer->Println("BRUH 6", Colors.yellow);
 

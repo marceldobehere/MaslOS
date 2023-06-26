@@ -146,7 +146,7 @@ bool mallocToCache = false;
 void* RAM_START_ADDR;
 
 void* backupHeapStart = NULL;
-static const size_t backupHeapPageCount = 4000; // ~16MB
+static const size_t backupHeapPageCount = 8000; // ~32MB
 bool usingBackupHeap = false;
 bool backupHeapFailed = false;
 
@@ -206,6 +206,13 @@ void InitBackup(void* heapAddress, size_t pageCount)
     }
 
     RemoveFromStack();
+}
+
+void TrySwitchToBackupHeap()
+{
+    SwitchToBackupHeap();
+    // if (!usingBackupHeap)
+    //     SwitchToBackupHeap();
 }
 
 void SwitchToBackupHeap()
@@ -366,8 +373,8 @@ bool HeapCheck(bool wait)
     if (foundError)
     {
         GlobalRenderer->Println("> Heap has Errors!", Colors.bred);
-        while (true)
-            ;
+        TrySwitchToBackupHeap();
+        Panic("HEAP CHECK HAS ERRORS!", true);
         
         RemoveFromStack();
         return false;
@@ -438,6 +445,7 @@ void* _Xmalloc(size_t size, const char* text, const char* func, const char* file
 
         if (current->magicNum != HeapMagicNum)
         {
+            TrySwitchToBackupHeap();
             Panic("Trying to access invalid HeapSegment Header!", true);
             RemoveFromStack();
             return NULL;
@@ -575,6 +583,7 @@ void _Xfree(void* address, const char* func, const char* file, int line)
     }
     else
     {
+        TrySwitchToBackupHeap();
         Panic("Tried to free invalid Segment!", true);
         RemoveFromStack();
         return;
@@ -721,7 +730,11 @@ bool ExpandHeap(size_t length)
     // newSegment->magicNum = HeapMagicNum;
 
     if (newSegment == NULL)
+    {
+        TrySwitchToBackupHeap();
         Panic("NEW SEGMENT IS NULL!", true);
+    }
+
 
     // newSegment->next = NULL;
     // newSegment->text = "<FREE>";

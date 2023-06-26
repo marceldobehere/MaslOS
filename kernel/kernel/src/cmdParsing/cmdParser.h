@@ -39,6 +39,7 @@ enum BuiltinCommand {
     Command_Crash,
     Command_Crash2,
     Command_Crash3,
+    Command_Crash4,
     Command_RenderLoop,
     Command_Invalid,
 };
