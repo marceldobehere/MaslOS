@@ -39,7 +39,8 @@ Here are the [Terminal Commands](https://github.com/marceldobehere/MaslOS/wiki/T
   + PC Speaker 
     - "MIDI" Playback (WIP but exists)
     - 1 bit raw audio playback (WIP but works)
-  - (In planning) Audio Device Driver of some sorts
+  - AC97 Driver (WIP)
+  - Sound System and API (WIP)
 * Keyboard
   - PS/2 Keyboard support
 * Mouse
@@ -62,12 +63,15 @@ Here are the [Terminal Commands](https://github.com/marceldobehere/MaslOS/wiki/T
   - AHCI
   - ACPI
   - PCI
+  - RS232
+  - AC97
 * Other Features
   - Stack Trace
   + Crash handling
     - Crash Window showing non fatal kernel panic / crash
     - Advanced Fatal General Protection Fault Handler and recoverer
     - Emergency Kernel Panic
+    - DePaST (Debug Panic Serial Terminal)
   - 2 Crash Commands!
   - BF Interpreter
   - [MAAB Interpreter](https://github.com/marceldobehere/MAAL-Marcels-Amazing-Assembly-Language)
