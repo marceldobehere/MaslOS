@@ -214,6 +214,8 @@ namespace PCI
         address.attrs.function = (addr >> 12) & 0b111; // 3 bit
         address.attrs.slot = (addr >> 15) & 0b11111; // 5 bit
         address.attrs.bus = (addr >> 20) & 0b11111111; // 8 bit
+        address.attrs.enable = true;
+        //0x80000000 
         return address;
     }
 

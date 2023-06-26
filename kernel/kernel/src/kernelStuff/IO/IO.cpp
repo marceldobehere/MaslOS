@@ -1,6 +1,6 @@
 #include "IO.h"
 
-#define DEF_IO_WAIT 100
+#define DEF_IO_WAIT 0
 
 void _outb(uint16_t port, uint8_t value)
 {

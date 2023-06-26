@@ -344,6 +344,13 @@ void PrepareInterrupts()
     for (int i = 0; i < (0x1000 / sizeof(IDTDescEntry)); i++)
         SetIDTGate((void*)GenericInt_handler, i, IDT_TA_InterruptGate, 0x08);
 
+    for (int i = 0; i < 256; i++)
+    {
+        IRQHandlerCallbackHelpers[i] = NULL;
+        IRQHandlerCallbackFuncs[i] = NULL;
+    }
+
+    // Main Stuff
     SetIDTGate((void*)PageFault_handler, 0xE, IDT_TA_InterruptGate, 0x08);
     SetIDTGate((void*)DoubleFault_handler, 0x8, IDT_TA_InterruptGate, 0x08);
     SetIDTGate((void*)GPFault_handler, 0xD, IDT_TA_InterruptGate, 0x08);
@@ -351,12 +358,14 @@ void PrepareInterrupts()
     SetIDTGate((void*)MouseInt_handler, 0x2C, IDT_TA_InterruptGate, 0x08);
     SetIDTGate((void*)PITInt_handler, 0x20, IDT_TA_InterruptGate, 0x08);
     
+    // Main Exceptions
     SetIDTGate((void*)GenMathFault_handler, 0x0, IDT_TA_InterruptGate, 0x08); // Divide by 0
     SetIDTGate((void*)Debug_handler, 0x1, IDT_TA_InterruptGate, 0x08); // Debug
     SetIDTGate((void*)Breakpoint_handler, 0x3, IDT_TA_InterruptGate, 0x08); // Breakpoint
     SetIDTGate((void*)GenFloatFault_handler, 0x10, IDT_TA_InterruptGate, 0x08); // x87 Float error
     SetIDTGate((void*)GenFloatFault_handler, 0x13, IDT_TA_InterruptGate, 0x08); // SIMD Float error
 
+    // Other Exceptions
     SetIDTGate((void*)GenFault_handler, 0x2, IDT_TA_InterruptGate, 0x08); // Non Maskable interrupt
     SetIDTGate((void*)GenFault_handler, 0x4, IDT_TA_InterruptGate, 0x08); // Overflow
     SetIDTGate((void*)GenFault_handler, 0x5, IDT_TA_InterruptGate, 0x08); // Bound Range Exceeded
@@ -373,17 +382,41 @@ void PrepareInterrupts()
     SetIDTGate((void*)VMMCommunicationFault_handler, 0x1D, IDT_TA_InterruptGate, 0x08); // VMM Communication Exception
     SetIDTGate((void*)SecurityException_handler, 0x1E, IDT_TA_InterruptGate, 0x08); // Security Exception
 
+    // Unhandled IRQs
+    //SetIDTGate((void*)IRQ0_handler, 0x20, IDT_TA_InterruptGate, 0x08); // IRQ0 Handled
+    //SetIDTGate((void*)IRQ1_handler, 0x21, IDT_TA_InterruptGate, 0x08); // IRQ1 Handled
+    SetIDTGate((void*)IRQ2_handler, 0x22, IDT_TA_InterruptGate, 0x08); // IRQ2
+    SetIDTGate((void*)IRQ3_handler, 0x23, IDT_TA_InterruptGate, 0x08); // IRQ3
+    SetIDTGate((void*)IRQ4_handler, 0x24, IDT_TA_InterruptGate, 0x08); // IRQ4
+    SetIDTGate((void*)IRQ5_handler, 0x25, IDT_TA_InterruptGate, 0x08); // IRQ5
+    SetIDTGate((void*)IRQ6_handler, 0x26, IDT_TA_InterruptGate, 0x08); // IRQ6
+    SetIDTGate((void*)IRQ7_handler, 0x27, IDT_TA_InterruptGate, 0x08); // IRQ7
+    SetIDTGate((void*)IRQ8_handler, 0x28, IDT_TA_InterruptGate, 0x08); // IRQ8
+    SetIDTGate((void*)IRQ9_handler, 0x29, IDT_TA_InterruptGate, 0x08); // IRQ9
+    SetIDTGate((void*)IRQ10_handler, 0x2A, IDT_TA_InterruptGate, 0x08); // IRQ10
+    SetIDTGate((void*)IRQ11_handler, 0x2B, IDT_TA_InterruptGate, 0x08); // IRQ11
+    //SetIDTGate((void*)IRQ12_handler, 0x2C, IDT_TA_InterruptGate, 0x08); // IRQ12 Handled
+    //SetIDTGate((void*)IRQ13_handler, 0x2D, IDT_TA_InterruptGate, 0x08); // IRQ13 Handled
+    SetIDTGate((void*)IRQ14_handler, 0x2E, IDT_TA_InterruptGate, 0x08); // IRQ14
+    SetIDTGate((void*)IRQ15_handler, 0x2F, IDT_TA_InterruptGate, 0x08); // IRQ15
+
+
     io_wait();    
     __asm__ volatile ("lidt %0" : : "m" (idtr));
     io_wait();    
     //asm ("int $0x1");
 
     AddToStack();
+    // RemapPIC(
+    //     0b11111000, //0b11111000, 
+    //     0b11101111 //0b11101111
+    // );
     RemapPIC(
-        0b11111000, //0b11111000, 
-        0b11101111 //0b11101111
+        0, //0b11111000, 
+        0 //0b11101111
     );
-    
+
+
     io_wait();    
     __asm__ volatile ("sti");
     RemoveFromStack();

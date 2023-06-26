@@ -2,6 +2,7 @@
 #include "../interrupts/interrupts.h"
 #include "../OSDATA/MStack/MStackM.h"
 #include "../rnd/rnd.h"
+#include "sbTest.h"
 
 namespace Music
 {
@@ -46,8 +47,49 @@ namespace Music
         //RemoveFromStack();
     }
 
+    
+
+    void play2()
+    {
+        AddToStack();
+        // if (osData.ac97Driver != NULL && (PIT::TicksSinceBoot % 44) == 0)
+        // {
+        //     //AddToStack();
+        //     int amt = 8000;
+        //     int step = 1;
+        //     int hz = ((PIT::TimeSinceBootMS() / 10) % 100) * 4 + 200;
+        //     //hz = 400;
+        //     uint16_t* testBuff = (uint16_t*)_Malloc(amt*2);
+
+        //     MusicBit16Test::FillArray(testBuff, 0, amt, hz);            
+        //     // for (int i = 0; i + step <= amt; i += step)
+        //     // {
+        //     //     //AddToStack();
+        //     //     MusicBit16Test::FillArray(testBuff, i, step, hz);
+        //     //     //Println(window, "HZ: {}", to_string(hz));
+        //     //     //hz += 10;
+        //     //     //RemoveFromStack();
+        //     // }
+        //     //RemoveFromStack();
+            
+        //     //AddToStack();
+        //     uint64_t tCount = 0;
+        //     tCount = osData.ac97Driver->writeBuffer(0, (uint8_t*)testBuff, amt*2);
+        //     //RemoveFromStack();
+
+
+        //     //AddToStack();
+        //     _Free(testBuff);
+        //     //RemoveFromStack();
+        // }
+        RemoveFromStack();
+    }
+
+
     void play(int timeYes)
     {
+        play2();
+
         if (toPlay == NULL || paused)
             return;
 

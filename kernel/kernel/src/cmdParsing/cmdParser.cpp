@@ -367,8 +367,8 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             if (osData.ac97Driver != NULL)
             {
                 AddToStack();
-                int amt = 0x4000;
-                int step = 0x200;
+                int amt = 48000;
+                int step = 0x1000;
                 int hz = 200;
                 uint16_t* testBuff = (uint16_t*)_Malloc(amt*2);
                 Println(window, "Malloc Test Array: {}", ConvertHexToString((uint64_t)testBuff));
@@ -377,7 +377,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                     AddToStack();
                     MusicBit16Test::FillArray(testBuff, i, step, hz);
                     //Println(window, "HZ: {}", to_string(hz));
-                    hz += 200;
+                    hz += 10;
                     RemoveFromStack();
                 }
                 RemoveFromStack();

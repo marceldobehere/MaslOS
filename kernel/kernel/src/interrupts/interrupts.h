@@ -70,6 +70,29 @@ __attribute__((interrupt)) void SecurityException_handler(interrupt_frame* frame
 
 __attribute__((interrupt)) void InvalidOpCode_handler(interrupt_frame* frame);//, uint64_t error);
 
+// IRQ 0 (PIT) is Handled
+// IRQ 1 (Keyboard) is Handled
+__attribute__((interrupt)) void IRQ2_handler(interrupt_frame* frame); //COM2
+__attribute__((interrupt)) void IRQ3_handler(interrupt_frame* frame); //COM2
+__attribute__((interrupt)) void IRQ4_handler(interrupt_frame* frame); //COM1
+__attribute__((interrupt)) void IRQ5_handler(interrupt_frame* frame); //LPT2
+__attribute__((interrupt)) void IRQ6_handler(interrupt_frame* frame); //Floppy
+__attribute__((interrupt)) void IRQ7_handler(interrupt_frame* frame); //LPT1
+__attribute__((interrupt)) void IRQ8_handler(interrupt_frame* frame); //CMOS
+__attribute__((interrupt)) void IRQ9_handler(interrupt_frame* frame); //Free
+__attribute__((interrupt)) void IRQ10_handler(interrupt_frame* frame); //Free
+__attribute__((interrupt)) void IRQ11_handler(interrupt_frame* frame); //Free
+// IRQ 12 (Mouse) is Handled
+// IRQ 13 (FPU) is Handled
+__attribute__((interrupt)) void IRQ14_handler(interrupt_frame* frame); //Primary ATA
+__attribute__((interrupt)) void IRQ15_handler(interrupt_frame* frame); //Secondary ATA
+
+void IRQGenericDriverHandler(int irq, interrupt_frame* frame);
+
+extern void* IRQHandlerCallbackHelpers[256];
+extern void* IRQHandlerCallbackFuncs[256];
+
+//extern void (*IRQHandlerCallbacks[256]) (interrupt_frame*);
 
 void RemapPIC(uint8_t _a1, uint8_t _a2);
 void PIC_EndMaster();

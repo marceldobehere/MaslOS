@@ -104,9 +104,9 @@ void PrintSpaces()
     for (int i = 0; i < PrintLayer; i++)
         Serial::Write("  ");
 
+    GlobalRenderer->CursorPosition.x += PrintLayer * 16;
     if (!PrintAll || !osData.verboseBoot)
         return;
-    GlobalRenderer->CursorPosition.x += PrintLayer * 8;
 }
 
 void ScrollUp(int amt)
@@ -142,12 +142,8 @@ void PrintMsgColSL(const char* msg, const char* var, uint32_t col)
 
 void Println()
 {
-    PrintedSpace = false;
-
-    Serial::Writeln();
-    if (!PrintAll || !osData.verboseBoot)
-        return;
     PrintMsgColSL("\n\r", "", GlobalRenderer->color);
+    PrintedSpace = false;
 }
 
 void PrintMsgCol(const char* msg, const char* var, uint32_t col)

@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include "../pci/pci.h"
 #include "../../IO/IO.h"
+#include "../../../interrupts/interrupts.h"
 
 namespace AC97
 {
@@ -83,12 +84,15 @@ namespace AC97
 
         inline void write_mixer(MixerRegisters reg, uint16_t val) const {
             outw(m_mixer_address + reg, val);
+            io_wait(1000);
         }
 
         void reset_output();
         void set_sample_rate(uint32_t sample_rate);
         void handle_irq();
         uint64_t writeBuffer(uint64_t offset, uint8_t* buffer, uint64_t count);
+
+        void HandleIRQ(interrupt_frame* frame);
 
         PCI::PCIDeviceHeader* PCIBaseAddress;     
 
@@ -101,5 +105,6 @@ namespace AC97
         bool m_output_dma_enabled = false;
         bool m_blocker; //BooleanBlocker
         uint32_t m_sample_rate;   
+        uint8_t irqId = 0;
     };
 }
