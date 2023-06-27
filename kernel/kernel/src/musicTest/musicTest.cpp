@@ -47,7 +47,10 @@ namespace Music
         //RemoveFromStack();
     }
 
-    
+    void resetTest()
+    {
+        osData.ac97Driver->needManualRestart = osData.ac97Driver->CheckMusic();
+    }
 
     void play2()
     {
@@ -58,7 +61,7 @@ namespace Music
             if (osData.ac97Driver->needManualRestart)
             {
                 //osData.ac97Driver->CheckMusic();
-                osData.ac97Driver->needManualRestart = osData.ac97Driver->CheckMusic();
+                resetTest();
                 
                 // if (!osData.ac97Driver->needManualRestart)
                 //     Panic("bruh", true);

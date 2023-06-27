@@ -249,6 +249,7 @@ BuiltinCommand BuiltinCommandFromStr(char* i)
   else if (StrEquals(i, "doom")) return Command_Doom;
   else if (StrEquals(i, "music test")) return Command_MusicTest;
   else if (StrEquals(i, "sb test")) return Command_SbTest;
+  else if (StrEquals(i, "sb reset")) return Command_SbReset;
   else if (StrEquals(i, "music clear")) return Command_MusicClear;
   else if (StrEquals(i, "music mario")) return Command_MusicMario;
   else if (StrEquals(i, "tetris")) return Command_Tetris;
@@ -360,6 +361,13 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                 Music::addCmd(Music::NoteCommand(100));
             }
 
+            RemoveFromStack();
+            return;
+        }
+        case Command_SbReset: 
+        {
+            Println(window, "> Resetting AC97 thingy");
+            Music::resetTest();
             RemoveFromStack();
             return;
         }
