@@ -351,7 +351,7 @@ void LockLoop()
                             {
                                 maab->gotInput = true;
                             }
-                            else if (c == '\b')
+                            else if (c == '\b' || c == 127)
                             {
                                 if (maab->memUserInputLen > 0)
                                 {
@@ -394,7 +394,7 @@ void LockLoop()
                     Serial::Writeln();
                     Serial::Write("> ");
                 }
-                else if (c == '\b')
+                else if (c == '\b' || c == 127)
                 {
                     if (inputLen > 0)
                     {
