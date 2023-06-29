@@ -1,11 +1,13 @@
 #include "serial.h"
 #include "../../../OSDATA/osdata.h"
 
+
 namespace Serial
 {
     int SerialPort = 0x3f8;          // COM1
     uint64_t pciCard = 0;
     bool SerialWorks = false;
+    uint16_t pciIoBase = 0;
 
     bool Init()
     {
@@ -13,31 +15,77 @@ namespace Serial
 
         if (pciCard != 0)
         {
-            PCI::enable_interrupt(pciCard);
-            PCI::enable_bus_mastering(pciCard);
+            osData.debugTerminalWindow->Log("Serial PCI CARD AT: 0x{}", ConvertHexToString(pciCard), Colors.yellow);
+            uint64_t bar0 = ((PCI::PCIHeader0*)pciCard)->BAR0;
+            osData.debugTerminalWindow->Log("Serial PCI CARD BAR0: {}", ConvertHexToString(bar0), Colors.yellow);
+            uint32_t ret = PCI::read_word(pciCard, PCI_BAR0);
+            osData.debugTerminalWindow->Log("Serial PCI CARD BAR0 (2): {}", ConvertHexToString(ret), Colors.yellow);
+            pciIoBase = bar0;// & (~0x3);
+            pciIoBase += 0xC0;
+            osData.debugTerminalWindow->Log("Serial PCI CARD IO BASE: {}", to_string(pciIoBase), Colors.bgreen);
+            // PCI::enable_interrupt(pciCard);
+            // PCI::enable_bus_mastering(pciCard);
         }
+        
+        if (pciCard == 0)
+        {
+            // Disable all interrupts
+            Soutb(1, 0x00);
+            // Enable DLAB (set baud rate divisor)
+            Soutb(3, 0x80);
+            // Set divisor to 3 (lo byte) 38400 baud
+            Soutb(0, 0x03);
+            //                  (hi byte)
+            Soutb(1, 0x00);
+            // 8 bits, no parity, one stop bit
+            Soutb(3, 0x03);
+            // Enable FIFO, clear them, with 14-byte threshold
+            Soutb(2, 0xC7);
+            // IRQs enabled, RTS/DSR set
+            Soutb(4, 0x0B);
+            
+        }
+        else
+        {
+            Soutb(3, 0x03);   // Enable IER
+            Soutb(1, 0x80);    // Disable all interrupts
+            Soutb(3, 0x80);    // Enable DLAB (set baud rate divisor)
+            Soutb(0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
+            Soutb(1, 0x00);    //                  (hi byte)
+            outb(4, 0x80);    // half duplex ig
+            Soutb(3, 0x03);    // 8 bits, no parity, one stop bit
+            Soutb(1, 0x00);    // Disable all interrupts
+            Soutb(2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
+            //Soutb(2, 0);    // No FIFO
+            //Soutb(4, 0x0B);    // IRQs enabled, RTS/DSR set
+            Soutb(4, 0x08);    // OUT yes
 
-        Soutb(1, 0x00);    // Disable all interrupts
-        Soutb(3, 0x80);    // Enable DLAB (set baud rate divisor)
-        Soutb(0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
-        Soutb(1, 0x00);    //                  (hi byte)
-        Soutb(3, 0x03);    // 8 bits, no parity, one stop bit
-        Soutb(2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
-        Soutb(4, 0x0B);    // IRQs enabled, RTS/DSR set
+        }
+        
         Soutb(4, 0x1E);    // Set in loopback mode, test the serial chip
         Soutb(0, 0xAE);    // Test serial chip (send byte 0xAE and check if serial returns same byte)
-        
+
         // Check if serial is faulty (i.e: not same byte as sent)
         if(Sinb(0) != 0xAE)
         {
+            if (pciCard != 0)
+                osData.debugTerminalWindow->Log("Serial PCI NO WORK :(!");
             RemoveFromStack();
             SerialWorks = false;
             return false;
         }
+        else
+        {
+            if (pciCard != 0)
+                osData.debugTerminalWindow->Log("Serial PCI WORKS! :)");
+        }
         
         // If serial is not faulty set it in normal operation mode
         // (not-loopback with IRQs enabled and OUT#1 and OUT#2 bits enabled)
-        Soutb(4, 0x0F);
+        if (pciCard == 0)
+            Soutb(4, 0x0F);
+        else
+            Soutb(4, 0x8F);    // OUT yes
         RemoveFromStack();
         SerialWorks = true;
         return true;
@@ -185,7 +233,8 @@ namespace Serial
         if (pciCard == 0)
             outb(SerialPort + port, value);
         else
-            PCI::write_byte(pciCard, port, value);
+            //PCI::write_byte(pciCard, port, value);
+            outb(pciIoBase + port, value);
     }
 
     uint8_t Sinb(uint16_t port)
@@ -193,6 +242,7 @@ namespace Serial
         if (pciCard == 0)
             return inb(SerialPort + port);
         else
-            return PCI::read_byte(pciCard, port);
+            //return PCI::read_byte(pciCard, port);
+            return inb(pciIoBase + port);
     }
 }

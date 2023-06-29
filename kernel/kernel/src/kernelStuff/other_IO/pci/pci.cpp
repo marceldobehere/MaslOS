@@ -197,6 +197,7 @@ namespace PCI
                     case 0x00: // AC97 SUBCLASS
                     {
                         Serial::pciCard = (uint64_t)pciDeviceHeader;
+                        //Serial::SerialPort= 0x2F8;
                         if (Serial::Init())
                         {
                             //Panic("SERIAL CARD YES", true);

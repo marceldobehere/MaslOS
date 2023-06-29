@@ -232,7 +232,7 @@ void EditPartitionSetting(PartitionInterface::PartitionInfo* part, const char* p
 #include "../musicTest/musicTest.h"
 //#include "../kernelStuff/other_IO/sb16/sb16.h"
 #include "../musicTest/sbTest.h"
-
+#include "../kernelStuff/other_IO/serial/serial.h"
 
 
 BuiltinCommand BuiltinCommandFromStr(char* i)
@@ -646,6 +646,95 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     {
         if (data->len == 2)
             Println(window, data->data[1]);
+        else
+            LogInvalidArgumentCount(1, data->len-1, window);
+        
+        _Free(data);
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(data->data[0], "io"))
+    {
+        // io [outb, outw, outl] port value (4)
+        // io [inb, inw, inl] port (3)
+        // io pci [outb, outw, outl] addr field value (6)
+        // io pci [inb, inw, inl] addr field (5)
+        
+        if (data->len == 4) // io [outb, outw, outl] port value (4)
+        {
+            if (StrEquals(data->data[1], "outb"))
+            {
+                //Print(window, "OUTB: {}, ", to_string((uint16_t)to_int(data->data[2])), Colors.yellow);
+                //Println(window, "{}", to_string((uint8_t)to_int(data->data[3])), Colors.yellow);
+                outb((uint16_t)to_int(data->data[2]), (uint8_t)to_int(data->data[3]));
+            }
+            else if (StrEquals(data->data[1], "outw"))
+                outw((uint16_t)to_int(data->data[2]), (uint16_t)to_int(data->data[3]));
+            else if (StrEquals(data->data[1], "outl"))
+                outl((uint16_t)to_int(data->data[2]), (uint32_t)to_int(data->data[3]));
+            else
+                LogError("Invalid IO Command!", window);
+        }
+        else if (data->len == 3) // io [inb, inw, inl] port (3)
+        {
+            if (StrEquals(data->data[1], "inb"))
+                Println(window, "INB: {}", to_string(inb((uint16_t)to_int(data->data[2]))), Colors.yellow);
+            else if (StrEquals(data->data[1], "inw"))
+                Println(window, "INW: {}", to_string(inw((uint16_t)to_int(data->data[2]))), Colors.yellow);
+            else if (StrEquals(data->data[1], "inl"))
+                Println(window, "INL: {}", to_string((uint64_t)inl((uint16_t)to_int(data->data[2]))), Colors.yellow);
+            else
+                LogError("Invalid IO Command!", window);
+        }
+        else if (data->len == 6) // io pci [outb, outw, outl] addr field value (6)
+        {
+            if (StrEquals(data->data[2], "outb"))
+                PCI::write_byte((uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[5]));
+            else if (StrEquals(data->data[2], "outw"))
+                PCI::write_word((uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[4]), (uint16_t)to_int(data->data[5]));
+            else if (StrEquals(data->data[2], "outl"))
+                PCI::write_dword((uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[4]), (uint32_t)to_int(data->data[5]));
+            else
+                LogError("Invalid IO Command!", window);
+        }
+        else if (data->len == 5) // io pci [inb, inw, inl] addr field (5)
+        {
+            if (StrEquals(data->data[2], "inb"))
+                Println(window, "INB: {}", to_string(PCI::read_byte((uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[4]))), Colors.yellow);
+            else if (StrEquals(data->data[2], "inw"))
+                Println(window, "INW: {}", to_string(PCI::read_word((uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[4]))), Colors.yellow);
+            else if (StrEquals(data->data[2], "inl"))
+                Println(window, "INL: {}", to_string((uint64_t)PCI::read_dword((uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[4]))), Colors.yellow);
+            else
+                LogError("Invalid IO Command!", window);
+        }
+        else
+            LogError("Invalid IO Command!", window);
+        
+        _Free(data);
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(data->data[0], "serial"))
+    {
+        if (data->len == 2)
+        {
+            if (StrEquals(data->data[1], "init"))
+                Println(window, "Init: {}", to_string(Serial::Init()), Colors.yellow);
+            else if (StrEquals(data->data[1], "read"))
+                Println(window, "Read: {}", to_string(Serial::Read()), Colors.yellow);
+            else
+                LogError("Invalid Serial Command!", window);
+        }
+        else if (data->len == 3)
+        {
+            if (StrEquals(data->data[1], "write"))
+                Serial::Write(data->data[2]);
+            else
+                LogError("Invalid Serial Command!", window);
+        }
         else
             LogInvalidArgumentCount(1, data->len-1, window);
         
