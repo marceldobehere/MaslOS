@@ -19,8 +19,9 @@ namespace AC97
         //     //return;
         // }
         handle_irq();
+        doCheck = true;
 
-        needManualRestart = CheckMusic();    
+        //needManualRestart = CheckMusic();    
          
 
         // if (osData.ac97Driver != NULL)
@@ -216,6 +217,7 @@ namespace AC97
         audioDestination->buffer->sampleCount = audioDestination->buffer->totalSampleCount;
         //lastDone = true;
         needManualRestart = true;
+        doCheck = true;
 
         if (osData.ac97Driver == NULL)
         {

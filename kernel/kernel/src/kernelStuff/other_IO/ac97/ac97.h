@@ -82,6 +82,7 @@ namespace AC97
         Audio::BasicAudioDestination* audioDestination;
         //bool lastDone;
         bool needManualRestart;
+        bool doCheck;
         AC97Driver (PCI::PCIDeviceHeader* pciBaseAddress);
         //~AC97Driver();
 

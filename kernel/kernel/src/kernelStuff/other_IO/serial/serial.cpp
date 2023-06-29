@@ -1,26 +1,34 @@
 #include "serial.h"
 #include "../../../OSDATA/osdata.h"
 
-#define PORT 0x3f8          // COM1
-
 namespace Serial
 {
+    int SerialPort = 0x3f8;          // COM1
+    uint64_t pciCard = 0;
     bool SerialWorks = false;
+
     bool Init()
     {
         AddToStack();
-        outb(PORT + 1, 0x00);    // Disable all interrupts
-        outb(PORT + 3, 0x80);    // Enable DLAB (set baud rate divisor)
-        outb(PORT + 0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
-        outb(PORT + 1, 0x00);    //                  (hi byte)
-        outb(PORT + 3, 0x03);    // 8 bits, no parity, one stop bit
-        outb(PORT + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
-        outb(PORT + 4, 0x0B);    // IRQs enabled, RTS/DSR set
-        outb(PORT + 4, 0x1E);    // Set in loopback mode, test the serial chip
-        outb(PORT + 0, 0xAE);    // Test serial chip (send byte 0xAE and check if serial returns same byte)
+
+        if (pciCard != 0)
+        {
+            PCI::enable_interrupt(pciCard);
+            PCI::enable_bus_mastering(pciCard);
+        }
+
+        Soutb(1, 0x00);    // Disable all interrupts
+        Soutb(3, 0x80);    // Enable DLAB (set baud rate divisor)
+        Soutb(0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
+        Soutb(1, 0x00);    //                  (hi byte)
+        Soutb(3, 0x03);    // 8 bits, no parity, one stop bit
+        Soutb(2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
+        Soutb(4, 0x0B);    // IRQs enabled, RTS/DSR set
+        Soutb(4, 0x1E);    // Set in loopback mode, test the serial chip
+        Soutb(0, 0xAE);    // Test serial chip (send byte 0xAE and check if serial returns same byte)
         
         // Check if serial is faulty (i.e: not same byte as sent)
-        if(inb(PORT + 0) != 0xAE)
+        if(Sinb(0) != 0xAE)
         {
             RemoveFromStack();
             SerialWorks = false;
@@ -29,7 +37,7 @@ namespace Serial
         
         // If serial is not faulty set it in normal operation mode
         // (not-loopback with IRQs enabled and OUT#1 and OUT#2 bits enabled)
-        outb(PORT + 4, 0x0F);
+        Soutb(4, 0x0F);
         RemoveFromStack();
         SerialWorks = true;
         return true;
@@ -37,7 +45,7 @@ namespace Serial
 
     bool CanRead()
     {
-        return SerialWorks && (inb(PORT + 5) & 1);
+        return SerialWorks && (Sinb(5) & 1);
     }
 
     char Read()
@@ -45,12 +53,12 @@ namespace Serial
         if (!SerialWorks)
             return 0;
         while (CanRead() == 0);
-        return inb(PORT);
+        return Sinb(0);
     }
 
     bool CanWrite()
     {
-        return SerialWorks && (inb(PORT + 5) & 0x20);
+        return SerialWorks && (Sinb(5) & 0x20);
     }
 
     void Write(char chr)
@@ -58,7 +66,7 @@ namespace Serial
         if (!SerialWorks)
             return;
         while (CanWrite() == 0);
-        outb(PORT, chr);
+        Soutb(0, chr);
     }
 
     void Writeln()
@@ -170,5 +178,21 @@ namespace Serial
 
             index++;
         }
+    }
+
+    void Soutb(uint16_t port, uint8_t value)
+    {
+        if (pciCard == 0)
+            outb(SerialPort + port, value);
+        else
+            PCI::write_byte(pciCard, port, value);
+    }
+
+    uint8_t Sinb(uint16_t port)
+    {
+        if (pciCard == 0)
+            return inb(SerialPort + port);
+        else
+            return PCI::read_byte(pciCard, port);
     }
 }

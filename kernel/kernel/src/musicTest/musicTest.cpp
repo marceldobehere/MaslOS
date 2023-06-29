@@ -58,7 +58,12 @@ namespace Music
 
         if (osData.ac97Driver != NULL)
         {
-            if (osData.ac97Driver->needManualRestart)
+            if (osData.ac97Driver->doCheck)
+            {
+                osData.ac97Driver->doCheck = false;
+                resetTest();
+            }
+            else if (osData.ac97Driver->needManualRestart)
             {
                 //osData.ac97Driver->CheckMusic();
                 resetTest();

@@ -3,6 +3,7 @@
 #include "../../../OSDATA/osdata.h"
 #include "../ahci/ahci.h"
 #include "../ac97/ac97.h"
+#include "../serial/serial.h"
 
 namespace PCI
 {
@@ -186,6 +187,30 @@ namespace PCI
                     //     new AC97::AC97Driver(pciDeviceHeader);
                     //     break;
                     // }
+                }
+                break;
+            }
+            case 0x07: // Serial PCI Card
+            {
+                switch (pciDeviceHeader->SubClass)
+                {
+                    case 0x00: // AC97 SUBCLASS
+                    {
+                        Serial::pciCard = (uint64_t)pciDeviceHeader;
+                        if (Serial::Init())
+                        {
+                            //Panic("SERIAL CARD YES", true);
+                        }
+                        else
+                        {
+                            // Serial::SerialWorks = true;
+                            // Serial::Soutb(4, 0x0F);
+                            // Serial::Writeln("TEST");
+                            Serial::pciCard = 0;
+                        }
+                        
+                        break;
+                    }
                 }
                 break;
             }

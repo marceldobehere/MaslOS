@@ -838,6 +838,7 @@ void boot(BootInfo* bootInfo)
 
     PrintAll = true;
     KernelInfo kernelInfo = InitializeKernel(bootInfo);
+    Serial::Writeln("> Kernel Initialized");
     PageTableManager* pageTableManager = kernelInfo.pageTableManager;
     //AddToStack();
     osData.osTasks = List<Task*>(4);
