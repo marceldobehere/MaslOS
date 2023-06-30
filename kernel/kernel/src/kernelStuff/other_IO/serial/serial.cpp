@@ -17,11 +17,17 @@ namespace Serial
         {
             osData.debugTerminalWindow->Log("Serial PCI CARD AT: 0x{}", ConvertHexToString(pciCard), Colors.yellow);
             uint64_t bar0 = ((PCI::PCIHeader0*)pciCard)->BAR0;
+            uint64_t bar2 = ((PCI::PCIHeader0*)pciCard)->BAR2;
             osData.debugTerminalWindow->Log("Serial PCI CARD BAR0: {}", ConvertHexToString(bar0), Colors.yellow);
+            //osData.debugTerminalWindow->Log("Serial PCI CARD BAR2: {}", ConvertHexToString(bar2), Colors.yellow);
             uint32_t ret = PCI::read_word(pciCard, PCI_BAR0);
-            osData.debugTerminalWindow->Log("Serial PCI CARD BAR0 (2): {}", ConvertHexToString(ret), Colors.yellow);
+            //osData.debugTerminalWindow->Log("Serial PCI CARD BAR0 (2): {}", ConvertHexToString(ret), Colors.yellow);
+            ret = PCI::read_word(pciCard, PCI_BAR2);
+            //osData.debugTerminalWindow->Log("Serial PCI CARD BAR2 (2): {}", ConvertHexToString(ret), Colors.yellow);
             pciIoBase = bar0;// & (~0x3);
+            //pciIoBase = bar2;// & (~0x3);
             pciIoBase += 0xC0;
+            //pciIoBase += 0x08;
             osData.debugTerminalWindow->Log("Serial PCI CARD IO BASE: {}", to_string(pciIoBase), Colors.bgreen);
             // PCI::enable_interrupt(pciCard);
             // PCI::enable_bus_mastering(pciCard);
@@ -47,18 +53,33 @@ namespace Serial
         }
         else
         {
-            Soutb(3, 0x03);   // Enable IER
-            Soutb(1, 0x80);    // Disable all interrupts
-            Soutb(3, 0x80);    // Enable DLAB (set baud rate divisor)
-            Soutb(0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
-            Soutb(1, 0x00);    //                  (hi byte)
-            outb(4, 0x80);    // half duplex ig
-            Soutb(3, 0x03);    // 8 bits, no parity, one stop bit
-            Soutb(1, 0x00);    // Disable all interrupts
-            Soutb(2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
-            //Soutb(2, 0);    // No FIFO
-            //Soutb(4, 0x0B);    // IRQs enabled, RTS/DSR set
-            Soutb(4, 0x08);    // OUT yes
+            // Soutb(3, 0x03);   // Set word size
+            // Soutb(1, 0x80);    // Reset
+            // Soutb(3, 0x80);    // Enable DLAB (set baud rate divisor)
+            // Soutb(0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
+            // Soutb(1, 0x00);    //                  (hi byte)
+            // Soutb(4, 0x80);    // half duplex ig
+            // Soutb(3, 0x03);    // 8 bits, no parity, one stop bit
+            // Soutb(1, 0x00);    // Disable all interrupts
+            // //Soutb(2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
+            // Soutb(2, 0x00);    // No FIFO
+            // //Soutb(4, 0x0B);    // IRQs enabled, RTS/DSR set
+            // Soutb(4, 0x08);    // OUT yes
+
+            // Disable all interrupts
+            Soutb(1, 0x00);
+            // Enable DLAB (set baud rate divisor)
+            Soutb(3, 0x80);
+            // Set divisor to 3 (lo byte) 38400 baud
+            Soutb(0, 0x03);
+            //                  (hi byte)
+            Soutb(1, 0x00);
+            // 8 bits, no parity, one stop bit
+            Soutb(3, 0x03);
+            // Enable FIFO, clear them, with 14-byte threshold
+            Soutb(2, 0xC7);
+            // IRQs enabled, RTS/DSR set
+            Soutb(4, 0x0B);
 
         }
         
