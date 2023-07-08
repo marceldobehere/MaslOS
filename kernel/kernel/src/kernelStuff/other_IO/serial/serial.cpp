@@ -4,7 +4,7 @@
 
 namespace Serial
 {
-    int SerialPort = 0x3f8;          // COM1
+    int SerialPort = 0x3F8;          // COM1
     uint64_t pciCard = 0;
     bool SerialWorks = false;
     uint16_t pciIoBase = 0;
@@ -20,71 +20,103 @@ namespace Serial
             uint64_t bar2 = ((PCI::PCIHeader0*)pciCard)->BAR2;
             osData.debugTerminalWindow->Log("Serial PCI CARD BAR0: {}", ConvertHexToString(bar0), Colors.yellow);
             //osData.debugTerminalWindow->Log("Serial PCI CARD BAR2: {}", ConvertHexToString(bar2), Colors.yellow);
-            uint32_t ret = PCI::read_word(pciCard, PCI_BAR0);
+            //uint32_t ret = PCI::read_word(pciCard, PCI_BAR0);
             //osData.debugTerminalWindow->Log("Serial PCI CARD BAR0 (2): {}", ConvertHexToString(ret), Colors.yellow);
-            ret = PCI::read_word(pciCard, PCI_BAR2);
+            //ret = PCI::read_word(pciCard, PCI_BAR2);
             //osData.debugTerminalWindow->Log("Serial PCI CARD BAR2 (2): {}", ConvertHexToString(ret), Colors.yellow);
             pciIoBase = bar0;// & (~0x3);
             //pciIoBase = bar2;// & (~0x3);
             pciIoBase += 0xC0;
             //pciIoBase += 0x08;
             osData.debugTerminalWindow->Log("Serial PCI CARD IO BASE: {}", to_string(pciIoBase), Colors.bgreen);
-            // PCI::enable_interrupt(pciCard);
-            // PCI::enable_bus_mastering(pciCard);
+            PCI::enable_interrupt(pciCard);
+            PCI::enable_bus_mastering(pciCard);
+
+            // Soutb(1, 0x80);
+            // io_wait(100);
         }
         
-        if (pciCard == 0)
-        {
-            // Disable all interrupts
-            Soutb(1, 0x00);
-            // Enable DLAB (set baud rate divisor)
-            Soutb(3, 0x80);
-            // Set divisor to 3 (lo byte) 38400 baud
-            Soutb(0, 0x03);
-            //                  (hi byte)
-            Soutb(1, 0x00);
-            // 8 bits, no parity, one stop bit
-            Soutb(3, 0x03);
-            // Enable FIFO, clear them, with 14-byte threshold
-            Soutb(2, 0xC7);
-            // IRQs enabled, RTS/DSR set
-            Soutb(4, 0x0B);
+        // if (pciCard == 0)
+        // {
+        //     // Disable all interrupts
+        //     Soutb(1, 0x00);
+        //     // Enable DLAB (set baud rate divisor)
+        //     Soutb(3, 0x80);
+        //     // Set divisor to 3 (lo byte) 38400 baud
+        //     Soutb(0, 0x03);
+        //     //                  (hi byte)
+        //     Soutb(1, 0x00);
+        //     // 8 bits, no parity, one stop bit
+        //     Soutb(3, 0x03);
+        //     // Enable FIFO, clear them, with 14-byte threshold
+        //     Soutb(2, 0xC7);
+        //     // IRQs enabled, RTS/DSR set
+        //     Soutb(4, 0x0B);
             
-        }
-        else
-        {
-            // Soutb(3, 0x03);   // Set word size
-            // Soutb(1, 0x80);    // Reset
-            // Soutb(3, 0x80);    // Enable DLAB (set baud rate divisor)
-            // Soutb(0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
-            // Soutb(1, 0x00);    //                  (hi byte)
-            // Soutb(4, 0x80);    // half duplex ig
-            // Soutb(3, 0x03);    // 8 bits, no parity, one stop bit
-            // Soutb(1, 0x00);    // Disable all interrupts
-            // //Soutb(2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
-            // Soutb(2, 0x00);    // No FIFO
-            // //Soutb(4, 0x0B);    // IRQs enabled, RTS/DSR set
-            // Soutb(4, 0x08);    // OUT yes
+        // }
+        // else
+        // {
+        //     // Soutb(3, 0x03);   // Set word size
+        //     // Soutb(1, 0x80);    // Reset
+        //     // Soutb(3, 0x80);    // Enable DLAB (set baud rate divisor)
+        //     // Soutb(0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
+        //     // Soutb(1, 0x00);    //                  (hi byte)
+        //     // Soutb(4, 0x80);    // half duplex ig
+        //     // Soutb(3, 0x03);    // 8 bits, no parity, one stop bit
+        //     // Soutb(1, 0x00);    // Disable all interrupts
+        //     // //Soutb(2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
+        //     // Soutb(2, 0x00);    // No FIFO
+        //     // //Soutb(4, 0x0B);    // IRQs enabled, RTS/DSR set
+        //     // Soutb(4, 0x08);    // OUT yes
 
+        //     // Disable all interrupts
+        //     Soutb(1, 0x00);
+        //     // Enable DLAB (set baud rate divisor)
+        //     Soutb(3, 0x80);
+        //     // Set divisor to 3 (lo byte) 38400 baud
+        //     Soutb(0, 0x03);
+        //     //                  (hi byte)
+        //     Soutb(1, 0x00);
+        //     // 8 bits, no parity, one stop bit
+        //     Soutb(3, 0x03);
+        //     // Enable FIFO, clear them, with 14-byte threshold
+        //     Soutb(2, 0xC7);
+        //     // IRQs enabled, RTS/DSR set
+        //     Soutb(4, 0x0B);
+
+        // }
+
+        {
             // Disable all interrupts
             Soutb(1, 0x00);
+            io_wait(100);
+
             // Enable DLAB (set baud rate divisor)
             Soutb(3, 0x80);
+            io_wait(100);
+
             // Set divisor to 3 (lo byte) 38400 baud
             Soutb(0, 0x03);
             //                  (hi byte)
             Soutb(1, 0x00);
+            io_wait(100);
+
             // 8 bits, no parity, one stop bit
             Soutb(3, 0x03);
+            io_wait(100);
             // Enable FIFO, clear them, with 14-byte threshold
             Soutb(2, 0xC7);
+            io_wait(100);
             // IRQs enabled, RTS/DSR set
             Soutb(4, 0x0B);
-
+            io_wait(100);
         }
+        
         
         Soutb(4, 0x1E);    // Set in loopback mode, test the serial chip
+        io_wait(100);
         Soutb(0, 0xAE);    // Test serial chip (send byte 0xAE and check if serial returns same byte)
+        io_wait(100);
 
         // Check if serial is faulty (i.e: not same byte as sent)
         if(Sinb(0) != 0xAE)
@@ -103,10 +135,13 @@ namespace Serial
         
         // If serial is not faulty set it in normal operation mode
         // (not-loopback with IRQs enabled and OUT#1 and OUT#2 bits enabled)
-        if (pciCard == 0)
-            Soutb(4, 0x0F);
-        else
-            Soutb(4, 0x8F);    // OUT yes
+        // if (pciCard == 0)
+        //     Soutb(4, 0x0F);
+        // else
+        //     Soutb(4, 0x03);    // OUT yes
+
+        io_wait(100);
+        Soutb(4, 0x0F);
         RemoveFromStack();
         SerialWorks = true;
         return true;
@@ -134,7 +169,7 @@ namespace Serial
     {
         if (!SerialWorks)
             return;
-        while (CanWrite() == 0);
+        while (!CanWrite());
         Soutb(0, chr);
     }
 
