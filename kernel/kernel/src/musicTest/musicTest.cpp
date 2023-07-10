@@ -58,7 +58,8 @@ namespace Music
 
         if (osData.ac97Driver != NULL)
         {
-            if (osData.ac97Driver->doCheck)
+            uint64_t currTime = PIT::TimeSinceBootMS();
+            if (osData.ac97Driver->doCheck || osData.ac97Driver->lastCheckTime + 500 < currTime)
             {
                 osData.ac97Driver->doCheck = false;
                 resetTest();

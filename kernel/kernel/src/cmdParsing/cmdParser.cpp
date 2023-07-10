@@ -389,8 +389,8 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                 DefaultInstance* instance = window->instance;
                 if (instance != NULL && osData.audioDestinations.getCount() > 0)
                 {
-                    int sampleCount = 96000;
-                    int sampleRate = 12000;
+                    int sampleRate = 44100;
+                    int sampleCount = sampleRate * 10;
                     if (instance->audioSource == NULL)
                     {
                         Println(window, "> Creating Audiosource");
@@ -406,7 +406,11 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                     {
                         Println(window, "> Filling Data");
                         uint16_t* arr = (uint16_t*)src->buffer->data;
-                        MusicBit16Test::FillArray(arr, 0, sampleCount, 400, sampleRate);
+                        int dif = 40;
+                        for (int i = 0; i < dif; i++)
+                        {
+                            MusicBit16Test::FillArray(arr, (i * sampleCount)/dif, sampleCount/dif, ((1000*(i+1)) / dif), sampleRate);
+                        }
                         src->buffer->sampleCount = sampleCount;
                         src->samplesSent = 0;
                         src->readyToSend = true;

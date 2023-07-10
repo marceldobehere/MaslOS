@@ -5,6 +5,7 @@
 #include "../../fsStuff/fsStuff.h"
 #include "../../rnd/rnd.h"
 #include "../openFileExplorer/openFileExplorer.h"
+#include "../../kernelStuff/other_IO/serial/serial.h"
 
 
 namespace SysApps
@@ -225,12 +226,18 @@ namespace SysApps
         int sampleRate = *((uint32_t*)(musicFileData + 24));
         int bitsPerSample = *((uint16_t*)(musicFileData + 34));
 
+        // Serial::Writeln("Channels: {}", to_string(channels));
+        // Serial::Writeln("SampleRate: {}", to_string(sampleRate));
+        // Serial::Writeln("BitsPerSample: {}", to_string(bitsPerSample));
+
+
         if (osData.ac97Driver != NULL)
         {
             AddToStack();
             if (osData.audioDestinations.getCount() > 0)
             {
-                int sampleCount = sampleRate / 2;
+                int sampleCount = sampleRate;
+                //Serial::Writeln("SampleCount: {}", to_string(sampleCount));
                 if (musicSource == NULL)
                 {
                     //Println(window, "> Creating Audiosource");
@@ -333,15 +340,28 @@ namespace SysApps
                 //Panic("bruh", true);
                 //int sampleCount = 11025;
                 //int sampleRate = 44100;
+
+
                 int sampleCount = musicSource->buffer->totalSampleCount;
                 int bytesPerSample = musicSource->buffer->bitsPerSample / 8;
-                int bytesToRead = sampleCount * bytesPerSample;
+                int channelCount = musicSource->buffer->channelCount;
+                int bytesToRead = sampleCount * bytesPerSample * channelCount;
                 int fileLeft = musicFileLen - musicFilePos;
                 if (fileLeft < bytesToRead)
                 {
                     bytesToRead = fileLeft;
                 }
-                musicFilePos += bytesToRead;
+
+                // Serial::Writeln("READING");
+                // Serial::Writeln("Sample Count: {}", to_string(sampleCount));
+                // Serial::Writeln("Bytes Per Sample: {}", to_string(bytesPerSample));
+                // Serial::Writeln("Bytes To Read (1): {}", to_string(sampleCount * bytesPerSample * channelCount));
+                // Serial::Writeln("File Left: {}", to_string(fileLeft));
+                // Serial::Writeln("Bytes To Read (2): {}", to_string(bytesToRead));
+                // Serial::Writeln("File Pos: {}", to_string(musicFilePos));
+                // //Serial::Writeln("File Len: {}", to_string(musicFileLen));
+                // Serial::Writeln();
+
 
                 if (bytesToRead == 0)
                 {
@@ -353,7 +373,7 @@ namespace SysApps
                 }
                 else
                 {
-                    int samplesToRead = bytesToRead / bytesPerSample;
+                    int samplesToRead = (bytesToRead / bytesPerSample) / channelCount;
                     _memcpy(musicFileData + musicFilePos, musicSource->buffer->data, bytesToRead);
 
                     // uint16_t* arr = (uint16_t*)musicSource->buffer->data;
@@ -362,6 +382,8 @@ namespace SysApps
                     musicSource->samplesSent = 0;
                     musicSource->readyToSend = true;
                 }
+
+                musicFilePos += bytesToRead;
             }
         }
     }
@@ -381,6 +403,9 @@ namespace SysApps
             timeText->text = StrAppend("S: ", to_string(musicSource->samplesSent), false);
             timeText->text = StrAppend(timeText->text, " / ", true);
             timeText->text = StrAppend(timeText->text, to_string(musicSource->buffer->sampleCount), true);
+            timeText->text = StrAppend(timeText->text, " (", true);
+            timeText->text = StrAppend(timeText->text, to_string(musicSource->buffer->totalSampleCount), true);
+            timeText->text = StrAppend(timeText->text, ")", true);
         }
     }
 

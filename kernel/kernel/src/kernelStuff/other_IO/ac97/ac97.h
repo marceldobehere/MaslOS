@@ -103,6 +103,7 @@ namespace AC97
 
         void HandleIRQ(interrupt_frame* frame);
         bool CheckMusic();
+        uint64_t lastCheckTime = 0;
 
         PCI::PCIDeviceHeader* PCIBaseAddress;     
 

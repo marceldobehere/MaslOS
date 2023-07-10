@@ -11,6 +11,7 @@ namespace AC97
 {
     void AC97Driver::HandleIRQ(interrupt_frame* frame)
     {
+        lastCheckTime = PIT::TimeSinceBootMS();
         //Panic("OO YES", true);
         //Serial::Writeln("<AC97 IRQ>");
         // if (!handle_irq())
@@ -21,8 +22,8 @@ namespace AC97
         
         
         handle_irq();
-        DoQuickCheck();
         doCheck = true;
+        //Serial::Writeln("</AC97 IRQ>");
         
         
 
@@ -67,6 +68,15 @@ namespace AC97
         QuickCheck = true;
 
 
+        if (!dataReady)
+        {
+            int c = audioDestination->RequestBuffers();
+            if (c > 0)
+            {
+                dataReady = true;
+            }
+        }
+
         if (dataReady && 
             osData.ac97Driver != NULL)
         {
@@ -88,9 +98,20 @@ namespace AC97
             //Panic("bruh: {}", to_string(c), true);
             //Serial::Write("NICE");
 
+            //Serial::Writeln("<WROTE LE MUSIC>");
             QuickCheck = false;
             return true;
         }
+
+        if (!dataReady)
+        {
+            int c = audioDestination->RequestBuffers();
+            if (c > 0)
+            {
+                dataReady = true;
+            }
+        }
+
 
         QuickCheck = false;
         return false;
@@ -98,9 +119,12 @@ namespace AC97
 
     bool AC97Driver::CheckMusic()
     {
+        Serial::Writeln("<AC97 CheckMusic>");
         if (dataReady)
         {
-            return false;
+            bool ret =!handle_irq(); 
+            Serial::Writeln("</AC97 CheckMusic: {}>", to_string(ret));
+            return ret;
         }
         //return true;
 
@@ -109,11 +133,12 @@ namespace AC97
         if (c > 0)
         {
             dataReady = true;
+            Serial::Writeln("</AC97 CheckMusic: {}>", to_string(false));
             return false;
         }
 
         
-
+        Serial::Writeln("</AC97 CheckMusic: {}>", to_string(true));
         return true;
 
         // if (audioDestination != NULL)
@@ -247,8 +272,9 @@ namespace AC97
         PrintMsg("> Reset Output");
         dataReady = false;
         QuickCheck = false;
+        lastCheckTime = PIT::TimeSinceBootMS();
 
-        DEF_SAMPLE_COUNT = m_sample_rate / 16;//47;
+        DEF_SAMPLE_COUNT = m_sample_rate / 47;
         
         audioDestination = new Audio::BasicAudioDestination(
             //Audio::AudioBuffer::Create16Bit48KHzStereoBuffer(DEF_SAMPLE_COUNT)
@@ -279,9 +305,6 @@ namespace AC97
         if(status.fifo_error)
             Panic("AC97 GOT FIFO ERROR!");//KLog::err("AC97", "Encountered FIFO error!");
 
-        //If we're not done, don't do anything
-        if(!status.completion_interrupt_status)
-            return false;
 
 
         //osData.debugTerminalWindow->newPosition.x--;
@@ -292,13 +315,44 @@ namespace AC97
         status.fifo_error = true;
         outw(m_output_channel + ChannelRegisters::STATUS, status.value);
 
+        // DoQuickCheck();
+        // return true;
+
+
+
         auto current_index = inb(m_output_channel + ChannelRegisters::CURRENT_INDEX);
         auto last_valid_index = inb(m_output_channel + ChannelRegisters::LAST_VALID_INDEX);
-        if(last_valid_index == current_index) {
-            reset_output();
+        
+        int offset = 4;
+        int beginIndex = (last_valid_index + AC97_NUM_BUFFER_DESCRIPTORS - offset) % AC97_NUM_BUFFER_DESCRIPTORS;
+        int endIndex = (last_valid_index + 2) % AC97_NUM_BUFFER_DESCRIPTORS;
+
+        if (endIndex >= beginIndex)
+        {
+            if (current_index >= beginIndex && current_index <= endIndex)
+            {
+                return DoQuickCheck();
+            }
         }
+        else
+        {
+            if (current_index >= beginIndex || current_index <= endIndex)
+            {
+                return DoQuickCheck();
+            }
+        }
+
+        //If we're not done, don't do anything
+        if(!status.completion_interrupt_status)
+            return false;
+        
+        // if(current_index >= ((last_valid_index + AC97_NUM_BUFFER_DESCRIPTORS - 4) % AC97_NUM_BUFFER_DESCRIPTORS)) {
+        //     //reset_output();
+        //     DoQuickCheck();
+        // }
         m_blocker = true;
-        return true;
+
+        return false;
     }
 
     void AC97Driver::reset_output() 
