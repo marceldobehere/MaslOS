@@ -227,6 +227,7 @@ void EditPartitionSetting(PartitionInterface::PartitionInfo* part, const char* p
 #include "../sysApps/tetris/tetris.h"
 #include "../sysApps/notepad/notepad.h"
 #include "../sysApps/imgTest/imgTest.h"
+#include "../sysApps/musicPlayer/musicPlayer.h"
 #include "../tasks/doomTask/taskDoom.h"
 
 #include "../musicTest/musicTest.h"
@@ -246,6 +247,7 @@ BuiltinCommand BuiltinCommandFromStr(char* i)
   else if (StrEquals(i, "explorer")) return Command_Explorer;
   else if (StrEquals(i, "notepad")) return Command_NotePad;
   else if (StrEquals(i, "img")) return Command_Image;
+  else if (StrEquals(i, "music")) return Command_MusicPlayer;
   else if (StrEquals(i, "doom")) return Command_Doom;
   else if (StrEquals(i, "music test")) return Command_MusicTest;
   else if (StrEquals(i, "sb test")) return Command_SbTest;
@@ -349,6 +351,11 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             RemoveFromStack();
             return;
         }
+        case Command_MusicPlayer: {
+            new SysApps::MusicPlayer("");
+            RemoveFromStack();
+            return;
+        }
         case Command_Doom: {
             terminal->tasks.add(NewDoomTask(window));
             RemoveFromStack();
@@ -368,6 +375,10 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         {
             Println(window, "> Resetting AC97 thingy");
             Music::resetTest();
+            if (osData.ac97Driver != NULL)
+            {
+                osData.ac97Driver->DoQuickCheck();
+            }
             RemoveFromStack();
             return;
         }
@@ -759,6 +770,18 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     {
         if (data->len == 2)
             new SysApps::ImageViewer(data->data[1]);
+        else
+            LogInvalidArgumentCount(1, data->len-1, window);
+        
+        _Free(data);
+        RemoveFromStack();
+        return;
+    }
+
+    if (StrEquals(data->data[0], "music"))
+    {
+        if (data->len == 2)
+            new SysApps::MusicPlayer(data->data[1]);
         else
             LogInvalidArgumentCount(1, data->len-1, window);
         

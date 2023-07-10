@@ -29,6 +29,27 @@ bool StrEquals(const char* a, const char* b)
     return true;
 }
 
+bool StrEquals(const char* a, const char* b, int len)
+{
+    AddToStack();
+    if (a == NULL || b == NULL)
+    {
+        RemoveFromStack();
+        return false;
+    }
+
+    for (int index = 0; index < len; index++)
+    {
+        if (a[index] != b[index])
+        {
+            RemoveFromStack();
+            return false;
+        }
+    }
+    RemoveFromStack();
+    return true;
+}
+
 char* StrCopy(const char* og)
 {
     AddToStack();
@@ -40,6 +61,30 @@ char* StrCopy(const char* og)
     for (int i = 0; og[i] != 0; i++)
         newStr[i] = og[i];
     newStr[size] = 0;
+    RemoveFromStack();
+    return newStr;
+}
+
+char* StrAppend(const char* a, const char* b, bool freeA)
+{
+    AddToStack();
+    int sizeA = 0;
+    for (int i = 0; a[i] != 0; i++)
+        sizeA++;
+    int sizeB = 0;
+    for (int i = 0; b[i] != 0; i++)
+        sizeB++;
+
+    char* newStr = (char*)_Malloc(sizeA + sizeB + 1, "strappend");
+
+    for (int i = 0; i < sizeA; i++)
+        newStr[i] = a[i];
+    for (int i = 0; i < sizeB; i++)
+        newStr[i + sizeA] = b[i];
+    newStr[sizeA + sizeB] = 0;
+
+    if (freeA)
+        _Free((void*)a);
     RemoveFromStack();
     return newStr;
 }

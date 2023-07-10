@@ -2,8 +2,10 @@
 #include <stdint.h>
 
 bool StrEquals(const char* a, const char* b);
+bool StrEquals(const char* a, const char* b, int len);
 
 char* StrCopy(const char* og);
+char* StrAppend(const char* a, const char* b, bool freeA);
 
 char* StrSubstr(const char* og, int index, int len);
 

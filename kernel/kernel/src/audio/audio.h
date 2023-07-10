@@ -47,9 +47,12 @@ namespace Audio
     class BasicAudioSource
     {
         public:
+        List<void*>* destinations;
         AudioBuffer* buffer;
         int samplesSent;
         bool readyToSend;
+        void* OnFinishHelp;
+        void (*OnFinish)(void* bruh, BasicAudioDestination* dest);
 
         BasicAudioSource(AudioBuffer* buffer);
         void ConnectTo(BasicAudioDestination* dest);

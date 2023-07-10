@@ -885,7 +885,7 @@ if (window != NULL)
         AddToStack();
         //osData.debugTerminalWindow->Log("             : ################", Colors.black);
         osData.debugTerminalWindow->renderer->CursorPosition.x = 0;
-        osData.debugTerminalWindow->renderer->CursorPosition.y -= 16 * 15;
+        osData.debugTerminalWindow->renderer->CursorPosition.y -= 16 * 17;
 
         AddToStack();
         osData.debugTerminalWindow->renderer->Clear(
@@ -1048,6 +1048,32 @@ if (window != NULL)
             Colors.black);
         if (osData.ac97Driver != NULL)
             osData.debugTerminalWindow->Log("AC97 OFF: {}", to_string(osData.ac97Driver->needManualRestart), Colors.yellow);
+        else
+            osData.debugTerminalWindow->Log("<NO AC97>", Colors.yellow);
+        RemoveFromStack();
+
+        AddToStack();
+        osData.debugTerminalWindow->renderer->Clear(
+            osData.debugTerminalWindow->renderer->CursorPosition.x,
+            osData.debugTerminalWindow->renderer->CursorPosition.y,
+            osData.debugTerminalWindow->renderer->CursorPosition.x + 240,
+            osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
+            Colors.black);
+        if (osData.ac97Driver != NULL)
+            osData.debugTerminalWindow->Log("AC97 DO CHECK: {}", to_string(osData.ac97Driver->doCheck), Colors.yellow);
+        else
+            osData.debugTerminalWindow->Log("<NO AC97>", Colors.yellow);
+        RemoveFromStack();
+
+        AddToStack();
+        osData.debugTerminalWindow->renderer->Clear(
+            osData.debugTerminalWindow->renderer->CursorPosition.x,
+            osData.debugTerminalWindow->renderer->CursorPosition.y,
+            osData.debugTerminalWindow->renderer->CursorPosition.x + 240,
+            osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
+            Colors.black);
+        if (osData.ac97Driver != NULL)
+            osData.debugTerminalWindow->Log("AC97 DATA RDY: {}", to_string(osData.ac97Driver->dataReady), Colors.yellow);
         else
             osData.debugTerminalWindow->Log("<NO AC97>", Colors.yellow);
         RemoveFromStack();

@@ -18,8 +18,13 @@ namespace AC97
         //     //Serial::Writeln("</NVM>");
         //     //return;
         // }
+        
+        
         handle_irq();
+        DoQuickCheck();
         doCheck = true;
+        
+        
 
         //needManualRestart = CheckMusic();    
          
@@ -51,33 +56,63 @@ namespace AC97
         //Serial::Writeln("</AC97 IRQ: {}>", to_string(needManualRestart));  
     }
 
+    bool AC97Driver::DoQuickCheck()
+    {
+        if (QuickCheck)
+        {
+            return false;
+        }
+
+
+        QuickCheck = true;
+
+
+        if (dataReady && 
+            osData.ac97Driver != NULL)
+        {
+            dataReady = false;
+            uint64_t tCount = 0;
+            //Serial::Writeln("> Writing {} bytes", to_string(audioDestination->buffer->byteCount));
+            tCount = osData.ac97Driver->writeBuffer(0, 
+            (uint8_t*)(audioDestination->buffer->data), 
+            audioDestination->buffer->byteCount);
+
+            if (tCount != audioDestination->buffer->byteCount)
+            {
+                Panic("AC97Driver::HandleIRQ: tCount != audioDestination->buffer->byteCount", true);
+            }
+
+            audioDestination->buffer->ClearBuffer();
+            audioDestination->buffer->sampleCount = audioDestination->buffer->totalSampleCount;
+            //lastDone = tDone;
+            //Panic("bruh: {}", to_string(c), true);
+            //Serial::Write("NICE");
+
+            QuickCheck = false;
+            return true;
+        }
+
+        QuickCheck = false;
+        return false;
+    }
+
     bool AC97Driver::CheckMusic()
     {
+        if (dataReady)
+        {
+            return false;
+        }
         //return true;
+
+
         int c = audioDestination->RequestBuffers();
         if (c > 0)
         {
-            if (osData.ac97Driver != NULL)
-            {
-                uint64_t tCount = 0;
-                //Serial::Writeln("> Writing {} bytes", to_string(audioDestination->buffer->byteCount));
-                tCount = osData.ac97Driver->writeBuffer(0, 
-                (uint8_t*)(audioDestination->buffer->data), 
-                audioDestination->buffer->byteCount);
- 
-                if (tCount != audioDestination->buffer->byteCount)
-                {
-                    Panic("AC97Driver::HandleIRQ: tCount != audioDestination->buffer->byteCount", true);
-                }
-
-                audioDestination->buffer->ClearBuffer();
-                audioDestination->buffer->sampleCount = audioDestination->buffer->totalSampleCount;
-                //lastDone = tDone;
-                //Panic("bruh: {}", to_string(c), true);
-                //return true;
-                return false;
-            }
+            dataReady = true;
+            return false;
         }
+
+        
 
         return true;
 
@@ -160,6 +195,7 @@ namespace AC97
         _memset(m_output_buffer_descriptor_region, 0, sizeof(BufferDescriptor) * AC97_NUM_BUFFER_DESCRIPTORS);
         PrintMsgCol("> Output Buffer Descriptor Region: {}", ConvertHexToString((uint64_t)m_output_buffer_descriptor_region), Colors.yellow);
         Println();
+        writeBufferCount = 0;
 
         m_output_buffer_descriptors = (BufferDescriptor*) m_output_buffer_descriptor_region;
 
@@ -209,6 +245,10 @@ namespace AC97
         
         reset_output();
         PrintMsg("> Reset Output");
+        dataReady = false;
+        QuickCheck = false;
+
+        DEF_SAMPLE_COUNT = m_sample_rate / 16;//47;
         
         audioDestination = new Audio::BasicAudioDestination(
             //Audio::AudioBuffer::Create16Bit48KHzStereoBuffer(DEF_SAMPLE_COUNT)
@@ -269,11 +309,12 @@ namespace AC97
         do
         {
             outb(m_output_channel + ChannelRegisters::CONTROL, ControlFlags::RESET_REGISTERS);
-            io_wait(100);
+            io_wait(10);
         } while((timeOut-- > 0) && inb(m_output_channel + ChannelRegisters::CONTROL) & ControlFlags::RESET_REGISTERS);
 
         m_output_dma_enabled = false;
         m_current_buffer_descriptor = 0;
+        writeBufferCount = 0;
     }
 
     void AC97Driver::set_sample_rate(uint32_t sample_rate) {

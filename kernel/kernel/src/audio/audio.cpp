@@ -113,18 +113,18 @@ namespace Audio
             return 0;
         
         long sR1 = sampleRate;
-        if (sR1 == 0)
-            return 0;
         long sR2 = other->sampleRate;
+        if (sR1 == 0 || sR2 == 0)
+            return 0;
 
         //float sR3 = sR1 / (float)sR2; // x Samples of other to 1 sample of this
         long asC2 = ((sC2 * sR1) / sR2); // amount of samples of other to mix into this
         //Panic("YO {}", to_string(sC2 * sR1), true);
         long commonSC = min(sC1, asC2); // amount of samples to mix
         if (commonSC <= 0)
-            return 0;
+            return sC2;
         
-        long osC2 = ((commonSC * sR2) / sR1); // amount of samples of this to mix into other
+        long osC2 = ((commonSC * sR2 + (sR1 / 2)) / sR1); // amount of samples of this to mix into other
 
 
         int cC1 = channelCount;
@@ -228,7 +228,13 @@ namespace Audio
         {
             from->readyToSend = false;
             from->samplesSent = 0;
-            from->buffer->ClearBuffer(); //maybe remove later?
+            from->buffer->sampleCount = 0;
+            // from->buffer->ClearBuffer(); //maybe remove later?
+
+            if (from->OnFinish != NULL)
+            {
+                from->OnFinish(from->OnFinishHelp, this);
+            }
 
             // Serial::Writeln();
             // Serial::Writeln("FROM SAMPLES SENT: {}", to_string(from->samplesSent));
@@ -284,9 +290,12 @@ namespace Audio
 
     BasicAudioSource::BasicAudioSource(AudioBuffer* buffer)
     {
+        this->destinations = new List<void*>();
         this->buffer = buffer;
         this->readyToSend = false;
         this->samplesSent = 0;
+        OnFinish = NULL;
+        OnFinishHelp = NULL;
     }
     void BasicAudioSource::ConnectTo(BasicAudioDestination* dest)
     {
@@ -309,6 +318,18 @@ namespace Audio
     }
     void BasicAudioSource::Free()
     {
+        if (destinations != NULL)
+        {
+            for (int i = 0; i < destinations->getCount(); i++)
+            {
+                BasicAudioDestination* dest = (BasicAudioDestination*)destinations->elementAt(i);
+                if (dest != NULL)
+                    DisconnectFrom(dest);
+            }
+            destinations->free();
+            _Free(destinations);
+        }
+        destinations = NULL;
         if (buffer != NULL)
             buffer->Free();
         buffer = NULL;

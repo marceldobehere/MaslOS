@@ -78,22 +78,27 @@ namespace AC97
             };
             uint16_t value;
         };
-        static const int DEF_SAMPLE_COUNT = 4096;
+        int DEF_SAMPLE_COUNT = 4096;
         Audio::BasicAudioDestination* audioDestination;
         //bool lastDone;
         bool needManualRestart;
         bool doCheck;
+        bool dataReady;
         AC97Driver (PCI::PCIDeviceHeader* pciBaseAddress);
+
+        bool QuickCheck = false;
+        bool DoQuickCheck();
         //~AC97Driver();
 
         inline void write_mixer(MixerRegisters reg, uint16_t val) const {
             outw(m_mixer_address + reg, val);
-            io_wait(1000);
+            io_wait(10);
         }
 
         void reset_output();
         void set_sample_rate(uint32_t sample_rate);
         bool handle_irq();
+        uint64_t writeBufferCount;
         uint64_t writeBuffer(uint64_t offset, uint8_t* buffer, uint64_t count);
 
         void HandleIRQ(interrupt_frame* frame);

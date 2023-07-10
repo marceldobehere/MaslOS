@@ -24,6 +24,7 @@ enum BuiltinCommand {
     Command_Explorer,
     Command_NotePad,
     Command_Image,
+    Command_MusicPlayer,
     Command_Doom,
     Command_MusicTest,
     Command_SbTest,
