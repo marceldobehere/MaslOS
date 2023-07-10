@@ -576,7 +576,7 @@ void _Xfree(void* address, const char* func, const char* file, int line)
         }
         else
         {
-            Panic("Tried to free already free Segment!", true);
+            Panic("Tried to free already free Segment!");
             RemoveFromStack();
             return;
         }

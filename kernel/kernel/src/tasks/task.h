@@ -14,7 +14,9 @@ enum TaskType
     TESTO,
     DEBUG_VIEWER,
     SIMPLE_DATA,
-    DOOM
+    DOOM,
+    READ_FILE,
+    WRITE_FILE,
 };
 
 const char* TaskTypeToString(TaskType type);

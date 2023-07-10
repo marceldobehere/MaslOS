@@ -40,6 +40,7 @@ class GuiInstance : public DefaultInstance
     List<GuiComponentStuff::BaseComponent*>* allComponents;
     
     Task* waitTask;
+    Task* waitTask2;
     bool waitingForTask;
     bool oldResizeable;
     void* OnWaitTaskDoneHelp;

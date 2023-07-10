@@ -15,6 +15,7 @@ Window::Window(DefaultInstance* instance, Size size, Position position, const ch
     OnResizeHelp = NULL;
     OnPartRenderHelp = NULL;
     RenderWhenHidden = false;
+    closeable = true;
     this->instance = instance;
     this->position = position;
     this->size = size;
@@ -115,7 +116,8 @@ WindowActionEnum Window::GetCurrentAction()
     int64_t x = position.x + size.width;
     int64_t y = position.y - 22;
 
-    if (MousePosition.x >= x - 20 && MousePosition.x <= x && MousePosition.y >= y && MousePosition.y <= y + 20)
+    if (MousePosition.x >= x - 20 && MousePosition.x <= x && MousePosition.y >= y && MousePosition.y <= y + 20
+        && closeable)
         return WindowActionEnum::CLOSE;
     x -= 20;
 

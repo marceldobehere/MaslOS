@@ -95,6 +95,7 @@ class Window
     // uint32_t cpuUsagePercent;
     bool showTitleBar, showBorder, moveable, hidden, resizeable;
     bool oldHidden;
+    bool closeable;
     
     bool moveToFront;
     const char* title;

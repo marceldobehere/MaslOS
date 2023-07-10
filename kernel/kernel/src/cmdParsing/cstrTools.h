@@ -6,6 +6,8 @@ bool StrEquals(const char* a, const char* b, int len);
 
 char* StrCopy(const char* og);
 char* StrAppend(const char* a, const char* b, bool freeA);
+char* StrPadLeft(const char* a, char pad, int totalLen, bool freeA);
+char* StrPadRight(const char* a, char pad, int totalLen, bool freeA);
 
 char* StrSubstr(const char* og, int index, int len);
 

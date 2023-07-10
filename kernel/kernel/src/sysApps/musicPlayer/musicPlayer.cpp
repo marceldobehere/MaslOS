@@ -6,6 +6,7 @@
 #include "../../rnd/rnd.h"
 #include "../openFileExplorer/openFileExplorer.h"
 #include "../../kernelStuff/other_IO/serial/serial.h"
+#include "../../tasks/readFile/taskReadFile.h"
 
 
 namespace SysApps
@@ -147,8 +148,12 @@ namespace SysApps
 
     void MusicPlayer::LoadFile(const char* path)
     {
-        if (FS_STUFF::GetFileInfoFromFullPath(path) == NULL)
+        if (path == NULL)
+            return;
+        
+        if (!FS_STUFF::FileExists(path))
         {
+            Serial::Writeln("FILE DOES NOT EXIST");
             return;
         }
 
@@ -158,6 +163,21 @@ namespace SysApps
         pathText->text = StrCopy(path);
         paused = true;
         musicFilePos = 0;
+        musicFileData = NULL;
+        musicFileLen = NULL;
+        _Free(timeText->text);
+        timeText->text = StrCopy("00:00 / 00:00");
+
+        Serial::Writeln("Creating task!");
+        guiInstance->OnWaitTaskDoneHelp = (void*)this;
+        guiInstance->OnWaitTaskDoneCallback = (void(*)(void*, Task*))(void*)&OnTaskDone;
+        guiInstance->waitTask2 = FS_STUFF::ReadFileTask(path);
+    }
+
+    void MusicPlayer::LoadFileBuff(void* _tsk)
+    {
+        TaskReadFile* tsk = (TaskReadFile*)_tsk;
+
 
         if (musicSource != NULL)
         {
@@ -171,11 +191,20 @@ namespace SysApps
             musicFileData = NULL;
         }
 
-        if (!FS_STUFF::ReadFileFromFullPath(path, &musicFileData, &musicFileLen))
+        // if (!FS_STUFF::ReadFileFromFullPath(path, &musicFileData, &musicFileLen))
+        // {
+        //     musicFileData = NULL;
+        //     return;
+        // }
+        musicFileData = tsk->data;
+
+        if (musicFileData == NULL)
         {
-            musicFileData = NULL;
+            musicFileLen = 0;
             return;
         }
+
+        musicFileLen = tsk->dataLen;
 
         if (musicFileLen < 100)
         {
@@ -236,7 +265,7 @@ namespace SysApps
             AddToStack();
             if (osData.audioDestinations.getCount() > 0)
             {
-                int sampleCount = sampleRate;
+                int sampleCount = sampleRate / 2;
                 //Serial::Writeln("SampleCount: {}", to_string(sampleCount));
                 if (musicSource == NULL)
                 {
@@ -300,15 +329,30 @@ namespace SysApps
 
     void MusicPlayer::OnTaskDone(Task* task)
     {
-        TaskSimpleData* tsk = (TaskSimpleData*)task;
-        if (tsk->data != NULL)
+        Serial::Writeln("TASK DONE!");
+        if (task->GetType() == TaskType::SIMPLE_DATA)
         {
-            const char* path = (const char*)tsk->data;
+            TaskSimpleData* tsk = (TaskSimpleData*)task;
+            if (tsk->data != NULL)
+            {
+                const char* path = (const char*)tsk->data;
 
-            LoadFile(path);
+                Serial::Writeln("Opening file: {}", path);
+                LoadFile(path);
 
-            _Free(path);
+                _Free(path);
+            }
         }
+        else if (task->GetType() == TaskType::READ_FILE)
+        {
+            TaskReadFile* tsk = (TaskReadFile*)task;
+            if (tsk->data != NULL)
+            {
+                Serial::Writeln("Loading file...");
+                LoadFileBuff((void*)tsk);
+            }
+        }
+
     }
 
     void MusicPlayer::OnExternalWindowClose(Window* window)
@@ -329,7 +373,7 @@ namespace SysApps
     void MusicPlayer::HandleMusic()
     {
         // Check if need to load more sound
-        if (musicSource != NULL &&
+        if (musicSource != NULL && musicFileData != NULL &&
             !paused)
         {
            
@@ -397,15 +441,29 @@ namespace SysApps
     {
         HandleMusic();
 
-        if (musicSource != NULL)
+        if (musicSource != NULL && musicFileData != NULL)
         {
+            int64_t byteDivisor = (musicSource->buffer->bitsPerSample / 8) * musicSource->buffer->channelCount * musicSource->buffer->sampleRate;
+            int64_t musicFilePosSec = musicFilePos / byteDivisor;
+            int64_t musicFileLenSec = musicFileLen / byteDivisor;
+
+            int startSec = musicFilePosSec % 60;
+            int startMin = (musicFilePosSec / 60); // % 60;
+
+            int endSec = musicFileLenSec % 60;
+            int endMin = (musicFileLenSec / 60); // % 60;
+
             _Free(timeText->text);
-            timeText->text = StrAppend("S: ", to_string(musicSource->samplesSent), false);
+            timeText->text = StrCopy("");
+            timeText->text = StrAppend(timeText->text, StrPadLeft(to_string(startMin), '0', 2, false), true);
+            timeText->text = StrAppend(timeText->text, ":", true);
+            timeText->text = StrAppend(timeText->text, StrPadLeft(to_string(startSec), '0', 2, false), true);
+            
             timeText->text = StrAppend(timeText->text, " / ", true);
-            timeText->text = StrAppend(timeText->text, to_string(musicSource->buffer->sampleCount), true);
-            timeText->text = StrAppend(timeText->text, " (", true);
-            timeText->text = StrAppend(timeText->text, to_string(musicSource->buffer->totalSampleCount), true);
-            timeText->text = StrAppend(timeText->text, ")", true);
+            
+            timeText->text = StrAppend(timeText->text, StrPadLeft(to_string(endMin), '0', 2, false), true);
+            timeText->text = StrAppend(timeText->text, ":", true);
+            timeText->text = StrAppend(timeText->text, StrPadLeft(to_string(endSec), '0', 2, false), true);
         }
     }
 
@@ -413,19 +471,25 @@ namespace SysApps
     {
         AddToStack();
 
-        //drivePathsYes.free();
+        AddToStack();
         _Free(musicPath);
+        RemoveFromStack();
 
+        AddToStack();
         if (musicSource != NULL)
         {
             musicSource->Free();
+            musicSource = NULL;
         }
+        RemoveFromStack();
 
+        AddToStack();
         if (musicFileData != NULL)
         {
             _Free(musicFileData);
             musicFileData = NULL;
         }
+        RemoveFromStack();
 
         _Free(this);
         RemoveFromStack();

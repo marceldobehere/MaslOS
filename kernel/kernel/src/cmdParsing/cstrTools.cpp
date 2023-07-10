@@ -89,6 +89,58 @@ char* StrAppend(const char* a, const char* b, bool freeA)
     return newStr;
 }
 
+char* StrPadLeft(const char* a, char pad, int totalLen, bool freeA)
+{
+    AddToStack();
+    int size = StrLen(a);
+    if (size >= totalLen)
+    {
+        if (freeA)
+            _Free((void*)a);
+
+        RemoveFromStack();
+        return StrCopy(a);
+    }
+
+    char* newStr = (char*)_Malloc(totalLen + 1, "strpadleft");
+    for (int i = 0; i < totalLen - size; i++)
+        newStr[i] = pad;
+    for (int i = 0; i < size; i++)
+        newStr[i + totalLen - size] = a[i];
+    newStr[totalLen] = 0;
+
+    if (freeA)
+        _Free((void*)a);
+    RemoveFromStack();
+    return newStr;
+}
+
+char* StrPadRight(const char* a, char pad, int totalLen, bool freeA)
+{
+    AddToStack();
+    int size = StrLen(a);
+    if (size >= totalLen)
+    {
+        if (freeA)
+            _Free((void*)a);
+
+        RemoveFromStack();
+        return StrCopy(a);
+    }
+
+    char* newStr = (char*)_Malloc(totalLen + 1, "strpadright");
+    for (int i = 0; i < size; i++)
+        newStr[i] = a[i];
+    for (int i = 0; i < totalLen - size; i++)
+        newStr[i + size] = pad;
+    newStr[totalLen] = 0;
+
+    if (freeA)
+        _Free((void*)a);
+    RemoveFromStack();
+    return newStr;
+}
+
 char* StrSubstr(const char* og, int index, int len)
 {
     AddToStack();

@@ -11,6 +11,8 @@
 #include "debugViewTask/debugViewTask.h"
 #include "simpleData/taskSimpleData.h"
 #include "doomTask/taskDoom.h"
+#include "readFile/taskReadFile.h"
+#include "writeFile/taskWriteFile.h"
 
 
 bool Task::GetDone()
@@ -56,6 +58,10 @@ const char* TaskTypeToString(TaskType type)
         return "SIMPLE DATA TASK";
     if (type == TaskType::DOOM)
         return "DOOM TASK";
+    if (type == TaskType::READ_FILE)
+        return "READ FILE TASK";
+    if (type == TaskType::WRITE_FILE)
+        return "WRITE FILE TASK";
 
     return "UNKNOWN!";
 }
@@ -140,6 +146,18 @@ void DoTask(Task* task)
         {
             TaskDoom* doom = (TaskDoom*)task;
             doom->Do();
+            break;
+        }
+        case TaskType::READ_FILE:
+        {
+            TaskReadFile* read = (TaskReadFile*)task;
+            read->Do();
+            break;
+        }
+        case TaskType::WRITE_FILE:
+        {
+            TaskWriteFile* write = (TaskWriteFile*)task;
+            write->Do();
             break;
         }
 
@@ -230,6 +248,20 @@ void FreeTask(Task* task)
             TaskDoom* doom = (TaskDoom*)task;
             doom->Free();
             _Free((void*)doom);
+            break;
+        }
+        case TaskType::READ_FILE:
+        {
+            TaskReadFile* read = (TaskReadFile*)task;
+            read->Free();
+            _Free((void*)read);
+            break;
+        }
+        case TaskType::WRITE_FILE:
+        {
+            TaskWriteFile* write = (TaskWriteFile*)task;
+            write->Free();
+            _Free((void*)write);
             break;
         }
     }  

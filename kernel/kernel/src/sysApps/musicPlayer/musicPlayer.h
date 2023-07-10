@@ -44,6 +44,7 @@ namespace SysApps
         void OnOpenClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info);
         void OnPlayClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info);
         void OnTaskDone(Task* task);
+        void LoadFileBuff(void* tsk);
         void LoadFile(const char* path);
 
 

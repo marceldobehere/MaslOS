@@ -6,10 +6,12 @@
 #include "guiStuff/components/textField/textFieldComponent.h"
 #include "../../../memory/heap.h"
 #include "../../../cmdParsing/cstrTools.h"
+#include "../../../kernelStuff/other_IO/serial/serial.h"
 
 GuiInstance::GuiInstance(Window* window)
 {
     waitTask = NULL;
+    waitTask2 = NULL;
     waitingForTask = false;
     OnWaitTaskDoneCallback = NULL;
     OnWaitTaskDoneHelp = NULL;
@@ -86,8 +88,16 @@ void GuiInstance::Render()
     if (screen == NULL)
         return;
 
+    if (waitTask == NULL && !waitingForTask && waitTask2 != NULL)
+    {
+        Serial::Writeln("Switching to Task2");
+        waitTask = waitTask2;
+        waitTask2 = NULL;
+    }
+
     if (waitTask != NULL)
     {
+        DoTask(waitTask);
         if (waitTask->GetDone())
         {
             if (OnWaitTaskDoneCallback != NULL)
@@ -113,6 +123,7 @@ void GuiInstance::Render()
                 &bruhus
             );
             window->resizeable = oldResizeable;
+            window->closeable = true;
         }
         else
         {
@@ -120,6 +131,7 @@ void GuiInstance::Render()
                 return;
             waitingForTask = true;
             window->renderer->ClearDotted(Colors.black);
+            window->closeable = false;
             oldResizeable = window->resizeable;
             window->resizeable = false;
             return;

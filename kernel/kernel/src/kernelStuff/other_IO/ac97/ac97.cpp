@@ -119,11 +119,11 @@ namespace AC97
 
     bool AC97Driver::CheckMusic()
     {
-        Serial::Writeln("<AC97 CheckMusic>");
+        //Serial::Writeln("<AC97 CheckMusic>");
         if (dataReady)
         {
             bool ret =!handle_irq(); 
-            Serial::Writeln("</AC97 CheckMusic: {}>", to_string(ret));
+            //Serial::Writeln("</AC97 CheckMusic: {}>", to_string(ret));
             return ret;
         }
         //return true;
@@ -133,12 +133,12 @@ namespace AC97
         if (c > 0)
         {
             dataReady = true;
-            Serial::Writeln("</AC97 CheckMusic: {}>", to_string(false));
+            //Serial::Writeln("</AC97 CheckMusic: {}>", to_string(false));
             return false;
         }
 
         
-        Serial::Writeln("</AC97 CheckMusic: {}>", to_string(true));
+        //Serial::Writeln("</AC97 CheckMusic: {}>", to_string(true));
         return true;
 
         // if (audioDestination != NULL)

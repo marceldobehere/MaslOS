@@ -249,6 +249,42 @@ namespace FS_STUFF
         return true;        
     }
 
+    bool FileExists(const char* path)
+    {
+        FilesystemInterface::GenericFilesystemInterface* fsInterface = FS_STUFF::GetFsInterfaceFromFullPath(path);
+        if (fsInterface == NULL)
+            return false;
+        
+        char* relPath = FS_STUFF::GetFilePathFromFullPath(path);
+        if (relPath == NULL)
+            return false;
+
+        bool res = fsInterface->FileExists(relPath);
+
+        _Free(relPath);
+        return res;
+    }
+
+    bool CreateFileIfNotExist(const char* path)
+    {
+        FilesystemInterface::GenericFilesystemInterface* fsInterface = FS_STUFF::GetFsInterfaceFromFullPath(path);
+        if (fsInterface == NULL || path == NULL)
+            return false;
+        
+        char* relPath = FS_STUFF::GetFilePathFromFullPath(path);
+        if (relPath == NULL)
+            return false;
+
+        if (!fsInterface->FileExists(relPath))
+        {
+            fsInterface->CreateFile(relPath);
+            _Free(relPath);
+            return true;
+        }
+        _Free(relPath);
+        return false;
+    }
+
     bool WriteFileToFullPath(const char* path, char* buffer, int bufferLen, bool createIfNotExists)
     {
         FilesystemInterface::GenericFilesystemInterface* fsInterface = FS_STUFF::GetFsInterfaceFromFullPath(path);
@@ -258,12 +294,6 @@ namespace FS_STUFF
         char* relPath = FS_STUFF::GetFilePathFromFullPath(path);
         if (relPath == NULL)
             return false;
-
-        if (buffer == NULL)
-        {
-            _Free(relPath);
-            return false;
-        }
 
         if (!fsInterface->FileExists(relPath))
         {
@@ -278,26 +308,36 @@ namespace FS_STUFF
             }
         }
 
-        // GlobalRenderer->Clear(Colors.black);
-        // GlobalRenderer->Println("PATH: \"{}\"", path, Colors.bgreen);
-        // GlobalRenderer->Println("RELPATH: \"{}\"", relPath, Colors.bgreen);
-        // GlobalRenderer->Println("LEN: {}", to_string(bufferLen), Colors.bgreen);
-        // GlobalRenderer->Println("BUF: \"{}\"", buffer, Colors.bgreen);
-
-        // while (true);
 
         const char* res = fsInterface->WriteFile(relPath, bufferLen, (void*) buffer);
-
-        //GlobalRenderer->Println(res);
-
-        //while (true);
-        //fsInterface->SaveFSTable();
 
         _Free(relPath);
         return true;    
     }
 
+    TaskReadFile* ReadFileTask(const char* path)
+    {
+        if (path == NULL)
+            return NULL;
+
+        return NewReadFileTask(path);
+    }    
     
+    TaskWriteFile* WriteFileTask(const char* path, char* buffer, int bufferLen, bool createIfNotExists)
+    {
+        if (path == NULL)
+            return NULL;
+
+        if (!FileExists(path))
+        {
+            if (createIfNotExists)
+                CreateFileIfNotExist(path);
+            else
+                return NULL;
+        }
+
+        return NewWriteFileTask(path, buffer, bufferLen);
+    }
 
     bool OpenFile(const char* path)
     {
