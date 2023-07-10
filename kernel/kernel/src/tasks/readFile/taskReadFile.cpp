@@ -68,7 +68,7 @@ void TaskReadFile::Do()
 
     fsInterface->ReadFileBuffer(relPath, dataPos, readLen, (void*)(data + dataPos));
     dataPos += readLen;
-    Serial::Writeln("{}% done", to_string((dataPos * 100) / dataLen));
+    //Serial::Writeln("{}% done", to_string((dataPos * 100) / dataLen));
 
     _Free(relPath);
 

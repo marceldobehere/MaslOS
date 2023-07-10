@@ -103,14 +103,14 @@ namespace AC97
             return true;
         }
 
-        if (!dataReady)
-        {
-            int c = audioDestination->RequestBuffers();
-            if (c > 0)
-            {
-                dataReady = true;
-            }
-        }
+        // if (!dataReady)
+        // {
+        //     int c = audioDestination->RequestBuffers();
+        //     if (c > 0)
+        //     {
+        //         dataReady = true;
+        //     }
+        // }
 
 
         QuickCheck = false;
@@ -122,6 +122,7 @@ namespace AC97
         //Serial::Writeln("<AC97 CheckMusic>");
         if (dataReady)
         {
+            return false;
             bool ret =!handle_irq(); 
             //Serial::Writeln("</AC97 CheckMusic: {}>", to_string(ret));
             return ret;
@@ -298,6 +299,7 @@ namespace AC97
 
     bool AC97Driver::handle_irq() 
     {
+        lastCheckTime = PIT::TimeSinceBootMS();
         //Read the status
         auto status_byte = inw(m_output_channel + ChannelRegisters::STATUS);
         BufferStatus status = {.value = status_byte};

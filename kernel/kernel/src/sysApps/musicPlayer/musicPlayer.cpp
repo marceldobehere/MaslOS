@@ -153,7 +153,7 @@ namespace SysApps
         
         if (!FS_STUFF::FileExists(path))
         {
-            Serial::Writeln("FILE DOES NOT EXIST");
+            //Serial::Writeln("FILE DOES NOT EXIST");
             return;
         }
 
@@ -168,7 +168,7 @@ namespace SysApps
         _Free(timeText->text);
         timeText->text = StrCopy("00:00 / 00:00");
 
-        Serial::Writeln("Creating task!");
+        //Serial::Writeln("Creating task!");
         guiInstance->OnWaitTaskDoneHelp = (void*)this;
         guiInstance->OnWaitTaskDoneCallback = (void(*)(void*, Task*))(void*)&OnTaskDone;
         guiInstance->waitTask2 = FS_STUFF::ReadFileTask(path);
@@ -178,6 +178,9 @@ namespace SysApps
     {
         TaskReadFile* tsk = (TaskReadFile*)_tsk;
 
+        paused = true;
+        _Free(playBtn->textComp->text);
+        playBtn->textComp->text = StrCopy("Play");
 
         if (musicSource != NULL)
         {
@@ -206,7 +209,7 @@ namespace SysApps
 
         musicFileLen = tsk->dataLen;
 
-        if (musicFileLen < 100)
+        if (musicFileLen < 50)
         {
             _Free(musicFileData);
             musicFileData = NULL;
@@ -255,9 +258,9 @@ namespace SysApps
         int sampleRate = *((uint32_t*)(musicFileData + 24));
         int bitsPerSample = *((uint16_t*)(musicFileData + 34));
 
-        // Serial::Writeln("Channels: {}", to_string(channels));
-        // Serial::Writeln("SampleRate: {}", to_string(sampleRate));
-        // Serial::Writeln("BitsPerSample: {}", to_string(bitsPerSample));
+        Serial::Writeln("Channels: {}", to_string(channels));
+        Serial::Writeln("SampleRate: {}", to_string(sampleRate));
+        Serial::Writeln("BitsPerSample: {}", to_string(bitsPerSample));
 
 
         if (osData.ac97Driver != NULL)
@@ -266,7 +269,8 @@ namespace SysApps
             if (osData.audioDestinations.getCount() > 0)
             {
                 int sampleCount = sampleRate / 2;
-                //Serial::Writeln("SampleCount: {}", to_string(sampleCount));
+                Serial::Writeln("SampleCount: {}", to_string(sampleCount));
+                Serial::Writeln();
                 if (musicSource == NULL)
                 {
                     //Println(window, "> Creating Audiosource");
@@ -329,7 +333,7 @@ namespace SysApps
 
     void MusicPlayer::OnTaskDone(Task* task)
     {
-        Serial::Writeln("TASK DONE!");
+        //Serial::Writeln("TASK DONE!");
         if (task->GetType() == TaskType::SIMPLE_DATA)
         {
             TaskSimpleData* tsk = (TaskSimpleData*)task;
@@ -337,7 +341,7 @@ namespace SysApps
             {
                 const char* path = (const char*)tsk->data;
 
-                Serial::Writeln("Opening file: {}", path);
+                //Serial::Writeln("Opening file: {}", path);
                 LoadFile(path);
 
                 _Free(path);
@@ -348,7 +352,7 @@ namespace SysApps
             TaskReadFile* tsk = (TaskReadFile*)task;
             if (tsk->data != NULL)
             {
-                Serial::Writeln("Loading file...");
+                //Serial::Writeln("Loading file...");
                 LoadFileBuff((void*)tsk);
             }
         }
@@ -396,15 +400,15 @@ namespace SysApps
                     bytesToRead = fileLeft;
                 }
 
-                // Serial::Writeln("READING");
-                // Serial::Writeln("Sample Count: {}", to_string(sampleCount));
-                // Serial::Writeln("Bytes Per Sample: {}", to_string(bytesPerSample));
-                // Serial::Writeln("Bytes To Read (1): {}", to_string(sampleCount * bytesPerSample * channelCount));
-                // Serial::Writeln("File Left: {}", to_string(fileLeft));
-                // Serial::Writeln("Bytes To Read (2): {}", to_string(bytesToRead));
-                // Serial::Writeln("File Pos: {}", to_string(musicFilePos));
-                // //Serial::Writeln("File Len: {}", to_string(musicFileLen));
-                // Serial::Writeln();
+                Serial::Writeln("READING");
+                Serial::Writeln("Sample Count: {}", to_string(sampleCount));
+                Serial::Writeln("Bytes Per Sample: {}", to_string(bytesPerSample));
+                Serial::Writeln("Bytes To Read (1): {}", to_string(sampleCount * bytesPerSample * channelCount));
+                Serial::Writeln("File Left: {}", to_string(fileLeft));
+                Serial::Writeln("Bytes To Read (2): {}", to_string(bytesToRead));
+                Serial::Writeln("File Pos: {}", to_string(musicFilePos));
+                Serial::Writeln("File Len: {}", to_string(musicFileLen));
+                Serial::Writeln();
 
 
                 if (bytesToRead == 0)
@@ -453,17 +457,27 @@ namespace SysApps
             int endSec = musicFileLenSec % 60;
             int endMin = (musicFileLenSec / 60); // % 60;
 
+            const char* toFree = NULL;
             _Free(timeText->text);
             timeText->text = StrCopy("");
-            timeText->text = StrAppend(timeText->text, StrPadLeft(to_string(startMin), '0', 2, false), true);
+
+            toFree = StrPadLeft(to_string(startMin), '0', 2, false);
+            timeText->text = StrAppend(timeText->text, toFree, true);
+            _Free(toFree);
             timeText->text = StrAppend(timeText->text, ":", true);
-            timeText->text = StrAppend(timeText->text, StrPadLeft(to_string(startSec), '0', 2, false), true);
+            toFree = StrPadLeft(to_string(startSec), '0', 2, false);
+            timeText->text = StrAppend(timeText->text, toFree, true);
+            _Free(toFree);
             
             timeText->text = StrAppend(timeText->text, " / ", true);
             
-            timeText->text = StrAppend(timeText->text, StrPadLeft(to_string(endMin), '0', 2, false), true);
+            toFree = StrPadLeft(to_string(endMin), '0', 2, false);
+            timeText->text = StrAppend(timeText->text, toFree, true);
+            _Free(toFree);
             timeText->text = StrAppend(timeText->text, ":", true);
-            timeText->text = StrAppend(timeText->text, StrPadLeft(to_string(endSec), '0', 2, false), true);
+            toFree = StrPadLeft(to_string(endSec), '0', 2, false);
+            timeText->text = StrAppend(timeText->text, toFree, true);
+            _Free(toFree);
         }
     }
 

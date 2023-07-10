@@ -304,6 +304,7 @@ namespace Audio
         if (dest->sources == NULL)
             return;
         dest->sources->add(this);
+        destinations->add((void*)dest);
     }
     void BasicAudioSource::DisconnectFrom(BasicAudioDestination* dest)
     {

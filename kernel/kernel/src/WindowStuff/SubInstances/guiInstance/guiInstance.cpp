@@ -90,7 +90,7 @@ void GuiInstance::Render()
 
     if (waitTask == NULL && !waitingForTask && waitTask2 != NULL)
     {
-        Serial::Writeln("Switching to Task2");
+        //Serial::Writeln("Switching to Task2");
         waitTask = waitTask2;
         waitTask2 = NULL;
     }

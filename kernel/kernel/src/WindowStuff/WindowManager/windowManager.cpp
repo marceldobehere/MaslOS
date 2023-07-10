@@ -1073,7 +1073,7 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
         if (osData.ac97Driver != NULL)
-            osData.debugTerminalWindow->Log("AC97 DATA RDY: {}", to_string(osData.ac97Driver->dataReady), Colors.yellow);
+            osData.debugTerminalWindow->Log("AC97 DATA SRCS: {}", to_string(osData.ac97Driver->audioDestination->sources->getCount()), Colors.yellow);
         else
             osData.debugTerminalWindow->Log("<NO AC97>", Colors.yellow);
         RemoveFromStack();
