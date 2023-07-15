@@ -5,7 +5,7 @@
 #include "../cStdLib/cstrTools.h"
 #include "../memory/heap.h"
 #include "../osData/osData.h"
-#include "../kernelStuff/other_IO/serial/serial.h"
+#include "..//devices/serial/serial.h"
 
 bool PrintAll = true;
 int PrintLayer = 0;

@@ -6,7 +6,7 @@
 #include "guiStuff/components/textField/textFieldComponent.h"
 #include "../../../memory/heap.h"
 #include "../../../cStdLib/cstrTools.h"
-#include "../../../kernelStuff/other_IO/serial/serial.h"
+#include "../../..//devices/serial/serial.h"
 
 GuiInstance::GuiInstance(Window* window)
 {

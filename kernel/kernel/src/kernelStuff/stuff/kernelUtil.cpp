@@ -3,11 +3,11 @@
 uint64_t _KernelStart; 
 uint64_t _KernelEnd;
 
-#include "../other_IO/acpi/acpiShutdown.h"
+#include "../../devices/acpi/acpiShutdown.h"
 
 // #include "../../interrupts/panic.h"
 
-#include "../other_IO/rtc/rtc.h"
+#include "../../devices/rtc/rtc.h"
 
 
 void DoPCIWithoutMCFG(BootInfo* bootInfo)
@@ -766,15 +766,15 @@ void InitStartMenuWindow(BootInfo* bootInfo)
 
 
 
-#include "../Disk_Stuff/Disk_Interfaces/ram/ramDiskInterface.h"
-#include "../Disk_Stuff/Partition_Interfaces/mraps/mrapsPartitionInterface.h"
-#include "../Disk_Stuff/Filesystem_Interfaces/mrafs/mrafsFileSystemInterface.h"
+#include "../diskStuff/Disk_Interfaces/ram/ramDiskInterface.h"
+#include "../diskStuff/Partition_Interfaces/mraps/mrapsPartitionInterface.h"
+#include "../diskStuff/Filesystem_Interfaces/mrafs/mrafsFileSystemInterface.h"
 
 BasicRenderer r = *((BasicRenderer*)NULL);
 
 #include "../../audio/audio.h"
 #include "../../audio/audioDevStuff.h"
-#include "../other_IO/serial/serial.h"
+#include "../../devices/serial/serial.h"
 
 
 KernelInfo InitializeKernel(BootInfo* bootInfo)

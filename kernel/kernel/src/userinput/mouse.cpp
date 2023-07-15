@@ -1,7 +1,7 @@
 #include "mouse.h"
 #include "../WindowStuff/Window/window.h"
 #include "../WindowStuff/WindowManager/windowManager.h"
-#include "../kernelStuff/other_IO/pit/pit.h"
+#include "../devices/pit/pit.h"
 #include "../osData/osData.h"
 #include "../rendering/VirtualRenderer.h"
 #include "../tasks/closeWindow/taskWindowClose.h"

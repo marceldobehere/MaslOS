@@ -1,7 +1,7 @@
 #pragma once
 
 #include "rendering/Framebuffer.h"
-#include "kernelStuff/other_IO/acpi/acpi.h"
+#include "devices/acpi/acpi.h"
 #include "kernelStuff/kernelFiles/kernelFiles.h"
 #include "kernelStuff/kernelFiles/ImageStruct.h"
 #include "kernelStuff/kernelFiles/FileStruct.h"

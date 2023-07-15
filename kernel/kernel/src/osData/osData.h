@@ -11,7 +11,7 @@
 
 #include "../customClasses/list.h"
 
-#include "../kernelStuff/other_IO/ac97/ac97.h"
+#include "../devices/ac97/ac97.h"
 
 struct OSData
 {

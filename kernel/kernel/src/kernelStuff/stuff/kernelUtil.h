@@ -40,7 +40,7 @@ struct KernelInfo
 #include "../../osData/userData.h"
 #include "../../osData/MStack/MStackM.h"
 
-#include "../other_IO/gdt/gdt.h" 
+#include "../../devices/gdt/gdt.h" 
 
 
 #include "../../interrupts/IDT.h"
@@ -55,7 +55,7 @@ struct KernelInfo
 #include "../../memory/heap.h"
 #include "../../cmdParsing/cmdParser.h"
 
-#include "../other_IO/pit/pit.h"
+#include "../../devices/pit/pit.h"
 
 //#include "../../customClasses/array.h"
 #include "../../customClasses/list.h"
@@ -63,8 +63,8 @@ struct KernelInfo
 #include "../kernelFiles/kernelFiles.h"
 #include "../kernelFiles/ZIPStruct.h"
 
-#include "../other_IO/acpi/acpi.h"
-#include "../other_IO/pci/pci.h"
+#include "../../devices/acpi/acpi.h"
+#include "../../devices/pci/pci.h"
 
 #include "../../rendering/VirtualRenderer.h"
 
@@ -72,7 +72,6 @@ struct KernelInfo
 #include "../../WindowStuff/SubInstances/debugTerminalInstance/debugTerminalInstance.h"
 #include "../../WindowStuff/SubInstances/newTerminalInstance/newTerminalInstance.h"
 
-//#include "../other_IO/sb16/sb16.h"
 
 void PrepareACPI(BootInfo* bootInfo);
 

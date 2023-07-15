@@ -88,12 +88,12 @@ template class List<ConsoleChar>;
 template class Array<List<ConsoleChar>*>;
 template class List<List<ConsoleChar>*>;
 
-#include "../kernelStuff/Disk_Stuff/Partition_Interfaces/generic/partitionStructs.h"
+#include "../kernelStuff/diskStuff/Partition_Interfaces/generic/partitionStructs.h"
 
 template class Array<PartitionInterface::PartitionInfo*>;
 template class  List<PartitionInterface::PartitionInfo*>;
 
-#include "../kernelStuff/Disk_Stuff/Filesystem_Interfaces/generic/fileSystemStructs.h"
+#include "../kernelStuff/diskStuff/Filesystem_Interfaces/generic/fileSystemStructs.h"
 
 template class Array<FilesystemInterface::BaseInfo*>;
 template class  List<FilesystemInterface::BaseInfo*>;
@@ -104,12 +104,12 @@ template class  List<FilesystemInterface::FileInfo*>;
 template class Array<FilesystemInterface::FolderInfo*>;
 template class  List<FilesystemInterface::FolderInfo*>;
 
-// #include "../kernelStuff/Disk_Stuff/Partition_Interfaces/generic/genericPartitionInterface.h"
+// #include "../kernelStuff/diskStuff/Partition_Interfaces/generic/genericPartitionInterface.h"
 
 // template class Array<PartitionInterface::GenericPartitionInterface*>;
 // template class  List<PartitionInterface::GenericPartitionInterface*>;
 
-#include "../kernelStuff/Disk_Stuff/Disk_Interfaces/generic/genericDiskInterface.h"
+#include "../kernelStuff/diskStuff/Disk_Interfaces/generic/genericDiskInterface.h"
 
 template class Array<DiskInterface::GenericDiskInterface*>;
 template class List<DiskInterface::GenericDiskInterface*>;

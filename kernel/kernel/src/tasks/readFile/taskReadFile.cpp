@@ -2,12 +2,12 @@
 #include "../../memory/heap.h"
 #include "../../cStdLib/cstrTools.h"
 
-#include "../../kernelStuff/Disk_Stuff/Disk_Interfaces/ram/ramDiskInterface.h"
-#include "../../kernelStuff/Disk_Stuff/Disk_Interfaces/file/fileDiskInterface.h"
-#include "../../kernelStuff/Disk_Stuff/Partition_Interfaces/mraps/mrapsPartitionInterface.h"
-#include "../../kernelStuff/Disk_Stuff/Filesystem_Interfaces/mrafs/mrafsFileSystemInterface.h"
+#include "../../kernelStuff/diskStuff/Disk_Interfaces/ram/ramDiskInterface.h"
+#include "../../kernelStuff/diskStuff/Disk_Interfaces/file/fileDiskInterface.h"
+#include "../../kernelStuff/diskStuff/Partition_Interfaces/mraps/mrapsPartitionInterface.h"
+#include "../../kernelStuff/diskStuff/Filesystem_Interfaces/mrafs/mrafsFileSystemInterface.h"
 #include "../../fsStuff/fsStuff.h"
-#include "../../kernelStuff/other_IO/serial/serial.h"
+#include "../..//devices/serial/serial.h"
 #include "../../kernelStuff/stuff/cstr.h"
 
 TaskReadFile::TaskReadFile(const char* path)

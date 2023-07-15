@@ -8,7 +8,7 @@
 #include "WindowStuff/SubInstances/guiInstance/guiStuff/components/textField/textFieldComponent.h"
 #include "WindowStuff/SubInstances/customInstance/customInstance.h"
 #include "tasks/closeWindow/taskWindowClose.h"
-#include "kernelStuff/other_IO/acpi/acpiShutdown.h"
+#include "devices/acpi/acpiShutdown.h"
 #include "sysApps/explorer/explorer.h"
 
 #include "rnd/rnd.h"
@@ -104,7 +104,7 @@ void TestKeyHandler(GuiComponentStuff::BaseComponent* btn, GuiComponentStuff::Ke
 
 
 
-#include "./kernelStuff/other_IO/serial/serial.h"
+#include ".//devices/serial/serial.h"
 
 
 void RenderLoop()

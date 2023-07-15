@@ -38,13 +38,13 @@ $(OBJDIR)/interrupts/interrupts.o: $(SRCDIR)/interrupts/interrupts.cpp
 	$(CC) -mno-red-zone -mgeneral-regs-only -ffreestanding -fno-omit-frame-pointer -c $^ -o $@
 
 
-$(OBJDIR)/kernelStuff/other_IO/pit/pit.o: $(SRCDIR)/kernelStuff/other_IO/pit/pit.cpp
+$(OBJDIR)/devices/pit/pit.o: $(SRCDIR)/devices/pit/pit.cpp
 	@ echo X==== COMPILING PIT $^
 	@ mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 
-$(OBJDIR)/kernelStuff/other_IO/ahci/ahci.o: $(SRCDIR)/kernelStuff/other_IO/ahci/ahci.cpp
+$(OBJDIR)/devices/ahci/ahci.o: $(SRCDIR)/devices/ahci/ahci.cpp
 	@ echo X==== COMPILING AHCI $^
 	@ mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $^ -o $@

@@ -1,5 +1,5 @@
 #include "testTask.h"
-#include "../../kernelStuff/other_IO/pit/pit.h"
+#include "../../devices/pit/pit.h"
 #include "../../memory/heap.h"
 #include "../../osData/osData.h"
 #include "../../osData/MStack/MStackM.h"

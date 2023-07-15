@@ -8,14 +8,14 @@
 #include "../userinput/keyboard.h"
 #include "../userinput/mouse.h"
 #include "../osData/osData.h"
-#include "../kernelStuff/other_IO/pit/pit.h"
+#include "../devices/pit/pit.h"
 #include "../tasks/sleep/taskSleep.h"
 #include "../tasks/playBeep/playBeep.h"
 #include "../tasks/test/testTask.h"
-#include "../kernelStuff/Disk_Stuff/Disk_Interfaces/ram/ramDiskInterface.h"
-#include "../kernelStuff/Disk_Stuff/Disk_Interfaces/file/fileDiskInterface.h"
-#include "../kernelStuff/Disk_Stuff/Partition_Interfaces/mraps/mrapsPartitionInterface.h"
-#include "../kernelStuff/Disk_Stuff/Filesystem_Interfaces/mrafs/mrafsFileSystemInterface.h"
+#include "../kernelStuff/diskStuff/Disk_Interfaces/ram/ramDiskInterface.h"
+#include "../kernelStuff/diskStuff/Disk_Interfaces/file/fileDiskInterface.h"
+#include "../kernelStuff/diskStuff/Partition_Interfaces/mraps/mrapsPartitionInterface.h"
+#include "../kernelStuff/diskStuff/Filesystem_Interfaces/mrafs/mrafsFileSystemInterface.h"
 #include "../WindowStuff/SubInstances/connect4Instance/connect4Instance.h"
 #include "../tasks/taskMgrTask/taskMgrTask.h"
 #include "../tasks/closeWindow/taskWindowClose.h"
@@ -231,8 +231,7 @@ void EditPartitionSetting(PartitionInterface::PartitionInfo* part, const char* p
 #include "../tasks/doomTask/taskDoom.h"
 
 #include "../audio/audioDevStuff.h"
-//#include "../kernelStuff/other_IO/sb16/sb16.h"
-#include "../kernelStuff/other_IO/serial/serial.h"
+#include "..//devices/serial/serial.h"
 
 
 BuiltinCommand BuiltinCommandFromStr(char* i)

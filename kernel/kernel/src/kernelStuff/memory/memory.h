@@ -5,7 +5,7 @@
 #include "../../rendering/Cols.h"
 #include "../kernelFiles/FileStruct.h"  //kernelFiles::
 #include "../kernelFiles/ZIPStruct.h"
-#include "../other_IO/acpi/acpi.h"
+#include "../../devices/acpi/acpi.h"
 
 
 struct BootInfo

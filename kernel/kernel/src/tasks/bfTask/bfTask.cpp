@@ -1,5 +1,5 @@
 #include "bfTask.h"
-#include "../../kernelStuff/other_IO/pit/pit.h"
+#include "../../devices/pit/pit.h"
 #include "../../memory/heap.h"
 #include "../../interrupts/interrupts.h"
 #include "../../cStdLib/cstrTools.h"

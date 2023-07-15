@@ -3,7 +3,7 @@
 #include "../cStdLib/cstrTools.h"
 #include "../kernelStuff/stuff/cstr.h"
 #include "../interrupts/panic.h"
-#include "../kernelStuff/other_IO/serial/serial.h"
+#include "..//devices/serial/serial.h"
 
 namespace Audio
 {
