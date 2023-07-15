@@ -1,5 +1,5 @@
 #include "genericDiskInterface.h"
-#include "../../../../OSDATA/osdata.h"
+#include "../../../../osData/osData.h"
 #include "../ram/ramDiskInterface.h"
 #include "../sata/sataDiskInterface.h"
 #include "../file/fileDiskInterface.h"

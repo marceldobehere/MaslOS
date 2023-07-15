@@ -3,7 +3,7 @@
 #include "../../memory/heap.h"
 //#include "../../interrupts/interrupts.h"
 #include "../../cStdLib/cstrTools.h"
-//#include "../../OSDATA/MStack/MStackM.h"
+//#include "../../osData/MStack/MStackM.h"
 //#include "terminalInstance.h"
 #include "../../kernelStuff/stuff/cstr.h"
 #include "../sleep/taskSleep.h"
@@ -82,7 +82,7 @@ TaskMAAB::TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInst
 }
 
 #include "../../interrupts/panic.h"
-#include "../../OSDATA/MStack/MStackM.h"
+#include "../../osData/MStack/MStackM.h"
 
 void TaskMAAB::OnExternalWindowClose(Window* window)
 {
@@ -2173,7 +2173,7 @@ void TaskMAAB::Math(OpNumber opNum, DatatypeNumber typeNum, uint64_t addr1, uint
 
 
 #include "../closeWindow/taskWindowClose.h"
-#include "../../OSDATA/osdata.h"
+#include "../../osData/osData.h"
 
 void TaskMAAB::Free()
 {

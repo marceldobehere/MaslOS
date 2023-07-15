@@ -1,5 +1,5 @@
 #include "imageRectangleComponent.h"
-#include "../../../../../../OSDATA/MStack/MStackM.h"
+#include "../../../../../../osData/MStack/MStackM.h"
 #include "../../../../../../fsStuff/fsStuff.h"
 
 namespace GuiComponentStuff

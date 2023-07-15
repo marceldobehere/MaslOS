@@ -2,7 +2,7 @@
 
 #include "../../../../customClasses/list.h"
 #include "../../../../memory/heap.h"
-#include "../../../../OSDATA/osdata.h"
+#include "../../../../osData/osData.h"
 
 namespace PartitionInterface
 {

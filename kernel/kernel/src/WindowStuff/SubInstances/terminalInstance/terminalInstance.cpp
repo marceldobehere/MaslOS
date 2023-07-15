@@ -1,5 +1,5 @@
 #include "terminalInstance.h"
-#include "../../../OSDATA/MStack/MStackM.h"
+#include "../../../osData/MStack/MStackM.h"
 #include "../newTerminalInstance/newTerminalInstance.h"
 
 TerminalInstance::TerminalInstance(OSUser* user)

@@ -3,8 +3,8 @@
 #include "../../memory/heap.h"
 #include "../../interrupts/interrupts.h"
 #include "../../cStdLib/cstrTools.h"
-#include "../../OSDATA/MStack/MStackM.h"
-#include "../../OSDATA/osStats.h"
+#include "../../osData/MStack/MStackM.h"
+#include "../../osData/osStats.h"
 
 
 TaskTaskManager::TaskTaskManager(Window* window)

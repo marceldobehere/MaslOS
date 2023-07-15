@@ -296,7 +296,7 @@ void RemoveThingFromList(GuiComponentStuff::BaseComponent* comp)
         currentInst->allComponents->removeAt(indx);
 }
 
-#include "../../../OSDATA/MStack/MStackM.h"
+#include "../../../osData/MStack/MStackM.h"
 
 void GuiInstance::Free() 
 {

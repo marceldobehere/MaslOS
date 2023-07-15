@@ -3,7 +3,7 @@
 #include "../../../../paging/PageTableManager.h"
 #include "../../Filesystem_Interfaces/generic/genericFileSystemInterface.h"
 #include "../../../../cStdLib/cstrTools.h"
-#include "../../../../OSDATA/osdata.h"
+#include "../../../../osData/osData.h"
 
 namespace DiskInterface
 {

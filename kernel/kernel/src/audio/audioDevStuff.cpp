@@ -1,8 +1,8 @@
 #include "audioDevStuff.h"
 #include "../interrupts/interrupts.h"
-#include "../OSDATA/MStack/MStackM.h"
+#include "../osData/MStack/MStackM.h"
 #include "../rnd/rnd.h"
-#include "../OSDATA/osdata.h"
+#include "../osData/osData.h"
 
 namespace AudioDeviceStuff
 {

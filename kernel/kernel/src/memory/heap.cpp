@@ -1,7 +1,7 @@
 #include "heap.h"
 #include "../paging/PageTableManager.h"
 #include "../paging/PageFrameAllocator.h"
-#include "../OSDATA/osdata.h"
+#include "../osData/osData.h"
 
 
 const uint32_t HeapMagicNum = 2406789212;

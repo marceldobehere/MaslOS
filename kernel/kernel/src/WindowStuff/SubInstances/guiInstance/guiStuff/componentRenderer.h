@@ -1,6 +1,6 @@
 #pragma once
 #include "generalStuff.h"
-#include "../../../../Rendering/S-Font.h"
+#include "../../../../rendering/S-Font.h"
 
 namespace GuiComponentStuff
 {

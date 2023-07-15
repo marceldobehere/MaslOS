@@ -1,5 +1,5 @@
 #include "ahci.h"
-#include "../../../OSDATA/osdata.h"
+#include "../../../osData/osData.h"
 #include "../../../paging/PageTableManager.h"
 #include "../../../memory/heap.h"
 #include "../../memory/memory.h"

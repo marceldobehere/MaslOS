@@ -1,5 +1,5 @@
 #include "kernelStuff/stuff/kernelUtil.h"
-#include "OSDATA/osStats.h"
+#include "osData/osStats.h"
 #include "WindowStuff/SubInstances/guiInstance/guiInstance.h"
 #include "WindowStuff/SubInstances/guiInstance/guiStuff/components/rectangle/rectangleComponent.h"
 #include "WindowStuff/SubInstances/guiInstance/guiStuff/components/box/boxComponent.h"

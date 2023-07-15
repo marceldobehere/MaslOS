@@ -3,7 +3,7 @@
 #include "FileStruct.h"
 #include "ImageStruct.h"
 
-#include "../../Rendering/Framebuffer.h"
+#include "../../rendering/Framebuffer.h"
 
 namespace kernelFiles
 {

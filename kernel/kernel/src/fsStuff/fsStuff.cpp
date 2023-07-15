@@ -5,7 +5,7 @@
 #include "../paging/PageFrameAllocator.h"
 #include "../kernelStuff/stuff/cstr.h"
 #include "../cStdLib/cstrTools.h"
-#include "../OSDATA/osdata.h"
+#include "../osData/osData.h"
 #include "../tasks/enterHandler/taskEnterHandler.h"
 
 #include "../sysApps/imgTest/imgTest.h"

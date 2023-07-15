@@ -2,7 +2,7 @@
 #include "../mrafs/mrafsFileSystemInterface.h"
 #include "../../../../memory/heap.h"
 #include "../../../../cStdLib/cstrTools.h"
-#include "../../../../OSDATA/osdata.h"
+#include "../../../../osData/osData.h"
 
 namespace FilesystemInterface
 {

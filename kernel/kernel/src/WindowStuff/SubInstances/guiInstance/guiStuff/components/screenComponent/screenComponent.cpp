@@ -1,6 +1,6 @@
 #include "screenComponent.h"
-#include "../../../../../../Rendering/Cols.h"
-#include "../../../../../../OSDATA/MStack/MStackM.h"
+#include "../../../../../../rendering/Cols.h"
+#include "../../../../../../osData/MStack/MStackM.h"
 
 namespace GuiComponentStuff
 {

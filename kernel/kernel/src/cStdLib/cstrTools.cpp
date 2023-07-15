@@ -1,7 +1,7 @@
 #include "cstrTools.h"
 #include "../paging/PageFrameAllocator.h"
 #include "../memory/heap.h"
-#include "../OSDATA/MStack/MStackM.h"
+#include "../osData/MStack/MStackM.h"
 
 bool StrEquals(const char* a, const char* b)
 {

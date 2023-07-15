@@ -1,7 +1,7 @@
 #include "ZIPStruct.h"
 #include "../../cStdLib/cstrTools.h"
 #include <stddef.h>
-#include "../../OSDATA/MStack/MStackM.h"
+#include "../../osData/MStack/MStackM.h"
 
 namespace kernelFiles
 {

@@ -1,6 +1,6 @@
 #include "pci.h"
 #include "../../../paging/PageTableManager.h"
-#include "../../../OSDATA/osdata.h"
+#include "../../../osData/osData.h"
 #include "../ahci/ahci.h"
 #include "../ac97/ac97.h"
 #include "../serial/serial.h"

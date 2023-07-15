@@ -1,9 +1,9 @@
 #include "buttonComponent.h"
-#include "../../../../../../Rendering/Cols.h"
-//#include "../../../../../../OSDATA/osdata.h"
+#include "../../../../../../rendering/Cols.h"
+//#include "../../../../../../osData/osData.h"
 #include "../../../../../../userinput/mouse.h"
 #include "../screenComponent/screenComponent.h"
-#include "../../../../../../OSDATA/MStack/MStackM.h"
+#include "../../../../../../osData/MStack/MStackM.h"
 
 
 

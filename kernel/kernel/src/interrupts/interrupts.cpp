@@ -1,13 +1,13 @@
 #include "interrupts.h"
 
-#include "../Rendering/BasicRenderer.h"
+#include "../rendering/BasicRenderer.h"
 #include "../userinput/keyboard.h"
 #include "../userinput/mouse.h"
 #include "panic.h"
 #include "../kernelStuff/IO/IO.h"
 #include "../kernelStuff/other_IO/pit/pit.h"
-#include "../OSDATA/MStack/MStackM.h"
-#include "../OSDATA/osStats.h"
+#include "../osData/MStack/MStackM.h"
+#include "../osData/osStats.h"
 
 #include "../kernelStuff/other_IO/acpi/acpiShutdown.h"
 

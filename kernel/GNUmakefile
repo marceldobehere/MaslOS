@@ -132,10 +132,10 @@ $(KERNEL): $(OBJ)
 kernel/src/WindowStuff/WindowManager/%.o: kernel/src/WindowStuff/WindowManager/%.cpp
 	$(CC) $(CFLAGS2) -O2 -c $< -o $@	
 	
-%/Rendering/BasicRenderer.o: %/Rendering/BasicRenderer.cpp
+%/rendering/BasicRenderer.o: %/rendering/BasicRenderer.cpp
 	$(CC) $(CFLAGS2) -O1 -c $< -o $@	
 	
-%/Rendering/VirtualRenderer.o: %/Rendering/VirtualRenderer.cpp
+%/rendering/VirtualRenderer.o: %/rendering/VirtualRenderer.cpp
 	$(CC) $(CFLAGS2) -O1 -c $< -o $@	
 
 

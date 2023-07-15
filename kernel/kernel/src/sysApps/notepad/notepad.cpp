@@ -1,7 +1,7 @@
 #include "notepad.h"
 #include "../../cStdLib/cstrTools.h"
 #include "../../memory/heap.h"
-#include "../../OSDATA/osdata.h"
+#include "../../osData/osData.h"
 #include "../../fsStuff/fsStuff.h"
 #include "../../rnd/rnd.h"
 #include "../openFileExplorer/openFileExplorer.h"

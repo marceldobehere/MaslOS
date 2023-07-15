@@ -8,8 +8,8 @@ extern uint64_t _KernelStart;
 extern uint64_t _KernelEnd;
 
 
-#include "../../Rendering/BasicRenderer.h"
-#include "../../Rendering/Cols.h"
+#include "../../rendering/BasicRenderer.h"
+#include "../../rendering/Cols.h"
 #include "cstr.h" 
 
 // #include "paging/PageFrameAllocator.h"  
@@ -36,9 +36,9 @@ struct KernelInfo
 
 
 
-#include "../../OSDATA/osdata.h"
-#include "../../OSDATA/userdata.h"
-#include "../../OSDATA/MStack/MStackM.h"
+#include "../../osData/osData.h"
+#include "../../osData/userData.h"
+#include "../../osData/MStack/MStackM.h"
 
 #include "../other_IO/gdt/gdt.h" 
 
@@ -66,7 +66,7 @@ struct KernelInfo
 #include "../other_IO/acpi/acpi.h"
 #include "../other_IO/pci/pci.h"
 
-#include "../../Rendering/VirtualRenderer.h"
+#include "../../rendering/VirtualRenderer.h"
 
 #include "../../WindowStuff/Taskbar/taskbar.h"
 #include "../../WindowStuff/SubInstances/debugTerminalInstance/debugTerminalInstance.h"

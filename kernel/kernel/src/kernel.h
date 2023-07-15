@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Rendering/Framebuffer.h"
+#include "rendering/Framebuffer.h"
 #include "kernelStuff/other_IO/acpi/acpi.h"
 #include "kernelStuff/kernelFiles/kernelFiles.h"
 #include "kernelStuff/kernelFiles/ImageStruct.h"
 #include "kernelStuff/kernelFiles/FileStruct.h"
 #include "kernelStuff/kernelFiles/ZIPStruct.h"
 
-#include "Rendering/S-Font.h"
+#include "rendering/S-Font.h"
 
 struct MaslOsAssetStruct
 {

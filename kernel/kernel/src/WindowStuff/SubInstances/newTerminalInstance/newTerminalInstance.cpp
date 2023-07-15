@@ -1,6 +1,6 @@
 #include "newTerminalInstance.h"
 #include "../../../memory/heap.h"
-#include "../../../OSDATA/MStack/MStackM.h"
+#include "../../../osData/MStack/MStackM.h"
 #include "../../../kernelStuff/other_IO/serial/serial.h"
 
 void ClearListList(List<List<ConsoleChar>*>* list)

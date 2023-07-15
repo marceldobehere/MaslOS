@@ -1,6 +1,6 @@
 #pragma once
 #include <stdint.h>
-#include "../OSDATA/userdata.h"
+#include "../osData/userData.h"
 #include "../WindowStuff/Window/window.h"
 
 struct StringArrData

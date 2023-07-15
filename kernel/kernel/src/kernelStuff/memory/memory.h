@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../Rendering/BasicRenderer.h"
+#include "../../rendering/BasicRenderer.h"
 #include "efiMemory.h"
-#include "../../Rendering/Cols.h"
+#include "../../rendering/Cols.h"
 #include "../kernelFiles/FileStruct.h"  //kernelFiles::
 #include "../kernelFiles/ZIPStruct.h"
 #include "../other_IO/acpi/acpi.h"

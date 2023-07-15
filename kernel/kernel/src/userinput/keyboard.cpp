@@ -2,11 +2,11 @@
 
 #include <stdint.h>
 
-#include "../Rendering/BasicRenderer.h"
+#include "../rendering/BasicRenderer.h"
 #include "../cmdParsing/cmdParser.h"
-#include "../Rendering/Cols.h"
-#include "../OSDATA/userdata.h"
-#include "../OSDATA/osdata.h"
+#include "../rendering/Cols.h"
+#include "../osData/userData.h"
+#include "../osData/osData.h"
 #include "../tasks/enterHandler/taskEnterHandler.h"
 #include "../tasks/taskMgrTask/taskMgrTask.h"
 #include "../WindowStuff/SubInstances/connect4Instance/connect4Instance.h"
