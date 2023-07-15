@@ -1,6 +1,8 @@
 # MaslOS
 an OS written in C++ and a bit of C.
+
 The base was made following [Ponchos OS Dev Youtube Playlist](https://www.youtube.com/playlist?list=PLxN4E629pPnJxCQCLy7E0SQY_zuumOVyZ)
+
 The OS is now using [limine](https://github.com/limine-bootloader/limine) as the bootloader.
 
 ## Wiki and other Pages
@@ -35,12 +37,11 @@ Here are the [Terminal Commands](https://github.com/marceldobehere/MaslOS/wiki/T
   - RAM/File Hex Viewer
   - Notepad (Really Basic but works)
   - DOOM (Port from [here](https://github.com/Daivuk/PureDOOM). Mostly works though you can only run 1 instance of DOOM at the same time and relaunching is currently broken lol)
+  - Music player
 * Audio
-  + PC Speaker 
-    - "MIDI" Playback (WIP but exists)
-    - 1 bit raw audio playback (WIP but works)
-  - AC97 Driver (WIP)
-  - Sound System and API (WIP)
+  - PC Speaker 
+  - AC97 Driver (Works in VM)
+  - Custom Sound System (Which supports the AC97 Device and PC-Speaker and all devices I'll write drivers for)
 * Keyboard
   - PS/2 Keyboard support
 * Mouse
@@ -72,7 +73,7 @@ Here are the [Terminal Commands](https://github.com/marceldobehere/MaslOS/wiki/T
     - Advanced Fatal General Protection Fault Handler and recoverer
     - Emergency Kernel Panic
     - DePaST (Debug Panic Serial Terminal)
-  - 2 Crash Commands!
+  - 4 Crash Commands!
   - BF Interpreter
   - [MAAB Interpreter](https://github.com/marceldobehere/MAAL-Marcels-Amazing-Assembly-Language)
   - Experimental .o runner (Still majorly WIP)
