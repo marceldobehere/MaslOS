@@ -249,11 +249,8 @@ BuiltinCommand BuiltinCommandFromStr(char* i)
   else if (StrEquals(i, "img")) return Command_Image;
   else if (StrEquals(i, "music")) return Command_MusicPlayer;
   else if (StrEquals(i, "doom")) return Command_Doom;
-  else if (StrEquals(i, "music test")) return Command_MusicTest;
   else if (StrEquals(i, "sb test")) return Command_SbTest;
   else if (StrEquals(i, "sb reset")) return Command_SbReset;
-  else if (StrEquals(i, "music clear")) return Command_MusicClear;
-  else if (StrEquals(i, "music mario")) return Command_MusicMario;
   else if (StrEquals(i, "tetris")) return Command_Tetris;
   else if (StrEquals(i, "heap check")) return Command_HeapCheck;
   else if (StrEquals(i, "shutdown")) return Command_ShutDown;
@@ -268,6 +265,7 @@ BuiltinCommand BuiltinCommandFromStr(char* i)
   else if (StrEquals(i, "crash 3")) return Command_Crash3;
   else if (StrEquals(i, "crash 4")) return Command_Crash4;
   else if (StrEquals(i, "renderloop")) return Command_RenderLoop;
+  else if (StrEquals(i, "resdefspk")) return Command_ResetDefaultSpeaker;
   else return Command_Invalid;
 }
 
@@ -280,10 +278,7 @@ void HelpCommand(Window* window)
         " - clear                   clears the terminal screen\n"
         " - benchmark reset         resets the bench mark\n"
         " - malloc                  mallocs memory 20G\n"
-        " - music test              test music\n"
         " - sb test                 test ac97\n"
-        " - music clear             clear music\n"
-        " - music mario             play mario music\n"
         " - shutdown                turn off operating system\n"
         " - explorer                open explorer\n"
         " - notepad                 open notepad\n"
@@ -298,6 +293,7 @@ void HelpCommand(Window* window)
         " - crash 2                 Causes a trivial but blocking kernel panic\n"
         " - crash 3                 Causes a kernel panic\n"
         " - crash 4                 Causes a memory corruption and crashes\n"
+        " - resdefspk               Resets the default speaker\n"
         ;
     Print(window, helpMessage);
 }
@@ -361,16 +357,6 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             RemoveFromStack();
             return;
         }
-        case Command_MusicTest: {
-            for (int i = 60; i < 103; i++)
-            {
-                Music::addCmd(Music::NoteCommand(i, 100, true));
-                Music::addCmd(Music::NoteCommand(100));
-            }
-
-            RemoveFromStack();
-            return;
-        }
         case Command_SbReset: 
         {
             Println(window, "> Resetting AC97 thingy");
@@ -382,115 +368,53 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             RemoveFromStack();
             return;
         }
-        case Command_SbTest: {
-            if (osData.ac97Driver != NULL)
+        case Command_ResetDefaultSpeaker:
+        {
+            Println(window, "> Resetting default speaker to the PC Speaker");
+            osData.defaultAudioOutputDevice = osData.pcSpeakerDev;
+            RemoveFromStack();
+            return;
+        }
+        case Command_SbTest: 
+        {
+            AddToStack();
+            DefaultInstance* instance = window->instance;
+            if (instance != NULL && osData.defaultAudioOutputDevice != NULL)
             {
-                AddToStack();
-                DefaultInstance* instance = window->instance;
-                if (instance != NULL && osData.audioDestinations.getCount() > 0)
+                int sampleRate = 44100;
+                int sampleCount = sampleRate * 10;
+                if (instance->audioSource == NULL)
                 {
-                    int sampleRate = 44100;
-                    int sampleCount = sampleRate * 10;
-                    if (instance->audioSource == NULL)
-                    {
-                        Println(window, "> Creating Audiosource");
-                        instance->audioSource = (void*)new Audio::BasicAudioSource(
-                            Audio::AudioBuffer::Create16BitMonoBuffer(sampleRate, sampleCount)
-                        );
-                        Println(window, "> Linking Audiosource to AC97");
-                        ((Audio::BasicAudioSource*)instance->audioSource)->ConnectTo(osData.audioDestinations.elementAt(0));
-                    }
-                    Audio::BasicAudioSource* src = (Audio::BasicAudioSource*)instance->audioSource;
-
-                    if (!src->readyToSend)
-                    {
-                        Println(window, "> Filling Data");
-                        uint16_t* arr = (uint16_t*)src->buffer->data;
-                        int dif = 40;
-                        for (int i = 0; i < dif; i++)
-                        {
-                            MusicBit16Test::FillArray(arr, (i * sampleCount)/dif, sampleCount/dif, ((1000*(i+1)) / dif), sampleRate);
-                        }
-                        src->buffer->sampleCount = sampleCount;
-                        src->samplesSent = 0;
-                        src->readyToSend = true;
-                        Println(window, "> Ready To send");
-                    }
-                    else
-                    {
-                        Print(window, "> Still sending Data. ({}", to_string(src->samplesSent));
-                        Println(window, " of {} samples)", to_string(src->buffer->sampleCount));
-                    }
+                    Println(window, "> Creating Audiosource");
+                    instance->audioSource = (void*)new Audio::BasicAudioSource(
+                        Audio::AudioBuffer::Create16BitMonoBuffer(sampleRate, sampleCount)
+                    );
+                    Println(window, "> Linking Audiosource to Default Output Device \"{}\"", osData.defaultAudioOutputDevice->deviceName);
+                    ((Audio::BasicAudioSource*)instance->audioSource)->ConnectTo(osData.defaultAudioOutputDevice->destination);
                 }
+                Audio::BasicAudioSource* src = (Audio::BasicAudioSource*)instance->audioSource;
 
-
-                // int amt = 48000;
-                // int step = 0x1000;
-                // int hz = 200;
-                // uint16_t* testBuff = (uint16_t*)_Malloc(amt*2);
-                // Println(window, "Malloc Test Array: {}", ConvertHexToString((uint64_t)testBuff));
-                // for (int i = 0; i + step <= amt; i += step)
-                // {
-                //     AddToStack();
-                //     MusicBit16Test::FillArray(testBuff, i, step, hz);
-                //     //Println(window, "HZ: {}", to_string(hz));
-                //     hz += 10;
-                //     RemoveFromStack();
-                // }
-                // RemoveFromStack();
-                
-                // AddToStack();
-                // Println(window, "Fill Test Array");
-                // uint64_t tCount = 0;
-                // tCount = osData.ac97Driver->writeBuffer(0, (uint8_t*)testBuff, amt*2);
-                // RemoveFromStack();
-
-                // AddToStack();
-                // Println(window, "Wrote {} bytes", to_string(tCount));
-                // RemoveFromStack();
-
-                // AddToStack();
-                // _Free(testBuff);
-                // //terminal->tasks.add(NewDebugViewerTask(window, (uint8_t*)testBuff, amt*2));
-                // RemoveFromStack();
-
-                // AddToStack();
-                // Println(window, "Freed Test Array");
-                // RemoveFromStack();
-                
-                
-                // uint64_t tArr2 = (uint64_t)GlobalAllocator->RequestPage();
-                // Println(window, "ARR2: {}", ConvertHexToString(tArr2));
-                
-                // SB16Test::TestMusicArr = (uint16_t*)tArr2;
-                // SB16Test::FillArray();
-
-                // uint64_t tArr = (uint64_t)SB16Test::TestMusicArr;
-                // Println(window, "ARR1: {}", ConvertHexToString(tArr));
-                // SB16::SB16SetBuff((uint32_t)tArr, SB16Test::TestMusicArrLen * 2);
-            }
-            else
-            {
-                Println(window, "No AC97 Driver :(");
+                if (!src->readyToSend)
+                {
+                    Println(window, "> Filling Data");
+                    uint16_t* arr = (uint16_t*)src->buffer->data;
+                    int dif = 40;
+                    for (int i = 0; i < dif; i++)
+                    {
+                        MusicBit16Test::FillArray(arr, (i * sampleCount)/dif, sampleCount/dif, ((1000*(i+1)) / dif), sampleRate);
+                    }
+                    src->buffer->sampleCount = sampleCount;
+                    src->samplesSent = 0;
+                    src->readyToSend = true;
+                    Println(window, "> Ready To send");
+                }
+                else
+                {
+                    Print(window, "> Still sending Data. ({}", to_string(src->samplesSent));
+                    Println(window, " of {} samples)", to_string(src->buffer->sampleCount));
+                }
             }
 
-            RemoveFromStack();
-            return;
-        }
-        case Command_MusicClear: {
-            Music::listInUse = true;
-            Music::toPlay->clear();
-            Music::listInUse = false;
-
-            Music::rawAudioInUse = true;
-            Music::currentRawAudio->clear();
-            Music::rawAudioInUse = false;
-
-            RemoveFromStack();
-            return;
-        }
-        case Command_MusicMario: {
-            Music::addMario();
             RemoveFromStack();
             return;
         }
@@ -2163,8 +2087,13 @@ void SetCmd(const char* name, const char* val, OSUser** user, Window* window)
         int mVol = to_int(val);
         if (mVol >= 0 && mVol <= 100)
         {
-            Music::volume = mVol;
-            Println(window, "Music Volume set to {}.", val);
+            if (osData.defaultAudioOutputDevice != NULL)
+            {
+                osData.defaultAudioOutputDevice->destination->buffer->volume = mVol;
+                Println(window, "Music Volume set to {}.", val);
+            }
+            else
+                LogError("No Audio Output Device is set!", window);
         }
         else
             LogError("Wanted Music Volume of {} is out of range!", val, window);

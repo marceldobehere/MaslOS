@@ -54,7 +54,13 @@ struct OSData
     WindowManager::WindowPointerBufferThing* windowPointerThing;
 
     List<DiskInterface::GenericDiskInterface*> diskInterfaces;
-    List<Audio::BasicAudioDestination*> audioDestinations;
+    //List<Audio::BasicAudioDestination*> audioDestinations;
+
+    List<Audio::AudioInputDevice*> audioInputDevices;
+    List<Audio::AudioOutputDevice*> audioOutputDevices;
+
+    Audio::AudioInputDevice* defaultAudioInputDevice = NULL;
+    Audio::AudioOutputDevice* defaultAudioOutputDevice = NULL;
 
     double mouseSensitivity = 1;
 
@@ -62,6 +68,7 @@ struct OSData
 
     uint32_t wantedFps = 60;
     AC97::AC97Driver* ac97Driver = NULL;
+    Audio::AudioOutputDevice* pcSpeakerDev;
 
 };
 

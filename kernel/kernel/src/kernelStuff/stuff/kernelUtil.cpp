@@ -814,6 +814,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     //osData.realMainWindow->framebuffer = r.framebuffer;
 
     PrintMsg("> Initing Serial Interface");
+    Serial::pciCard = NULL;
     Serial::Init();
     StepDone();
 
@@ -953,7 +954,15 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     osData.diskInterfaces = List<DiskInterface::GenericDiskInterface*>();
 
     PrintMsg("> Creating List for Audio Destinations");
-    osData.audioDestinations = List<Audio::BasicAudioDestination*>();
+    //osData.audioDestinations = List<Audio::BasicAudioDestination*>();
+    osData.audioInputDevices = List<Audio::AudioInputDevice*>();
+    osData.audioOutputDevices = List<Audio::AudioOutputDevice*>();
+
+    osData.pcSpeakerDev = new Audio::AudioOutputDevice("PC Speaker", new Audio::AudioBuffer(8, 29829, 1, 1500));
+    osData.defaultAudioOutputDevice = osData.pcSpeakerDev;
+    Music::pcSpk = osData.pcSpeakerDev;
+    Music::pcSpk->destination->buffer->ClearBuffer();
+    Music::pcSpk->destination->buffer->sampleCount = Music::pcSpk->destination->buffer->totalSampleCount;
 
     osData.windowIconZIP = bootInfo->windowIconsZIP;
     osData.windowButtonZIP = bootInfo->windowButtonZIP;

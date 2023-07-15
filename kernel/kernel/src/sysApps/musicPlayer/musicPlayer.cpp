@@ -263,46 +263,43 @@ namespace SysApps
         Serial::Writeln("BitsPerSample: {}", to_string(bitsPerSample));
 
 
-        if (osData.ac97Driver != NULL)
+        //AddToStack();
+        if (osData.defaultAudioOutputDevice != NULL)
         {
-            AddToStack();
-            if (osData.audioDestinations.getCount() > 0)
+            int sampleCount = sampleRate / 2;
+            Serial::Writeln("SampleCount: {}", to_string(sampleCount));
+            Serial::Writeln();
+            if (musicSource == NULL)
             {
-                int sampleCount = sampleRate / 2;
-                Serial::Writeln("SampleCount: {}", to_string(sampleCount));
-                Serial::Writeln();
-                if (musicSource == NULL)
-                {
-                    //Println(window, "> Creating Audiosource");
-                    musicSource = (void*)new Audio::BasicAudioSource(
-                        new Audio::AudioBuffer(bitsPerSample, sampleRate, channels, sampleCount)
-                    );
-                    //musicSource->buffer->sampleCount = sampleCount;
-                    musicSource->OnFinishHelp = (void*)this;
-                    musicSource->OnFinish = (void(*)(void*, Audio::BasicAudioDestination*))(void*)&OnBufferFinish;
-                    //Println(window, "> Linking Audiosource to AC97");
-                    musicSource->ConnectTo(osData.audioDestinations.elementAt(0));
-                }
-
-                //paused = false;
-                HandleMusic();
-
-                // if (!musicSource->readyToSend)
-                // {
-                //     //Println(window, "> Filling Data");
-                //     uint16_t* arr = (uint16_t*)musicSource->buffer->data;
-                //     MusicBit16Test::FillArray(arr, 0, sampleCount, 400, sampleRate);
-                //     musicSource->buffer->sampleCount = sampleCount;
-                //     musicSource->samplesSent = 0;
-                //     musicSource->readyToSend = true;
-                //     //Println(window, "> Ready To send");
-                // }
-                // else
-                // {
-                //     //Print(window, "> Still sending Data. ({}", to_string(src->samplesSent));
-                //     //Println(window, " of {} samples)", to_string(src->buffer->sampleCount));
-                // }
+                //Println(window, "> Creating Audiosource");
+                musicSource = (void*)new Audio::BasicAudioSource(
+                    new Audio::AudioBuffer(bitsPerSample, sampleRate, channels, sampleCount)
+                );
+                //musicSource->buffer->sampleCount = sampleCount;
+                musicSource->OnFinishHelp = (void*)this;
+                musicSource->OnFinish = (void(*)(void*, Audio::BasicAudioDestination*))(void*)&OnBufferFinish;
+                //Println(window, "> Linking Audiosource to AC97");
+                musicSource->ConnectTo(osData.defaultAudioOutputDevice->destination);
             }
+
+            //paused = false;
+            HandleMusic();
+
+            // if (!musicSource->readyToSend)
+            // {
+            //     //Println(window, "> Filling Data");
+            //     uint16_t* arr = (uint16_t*)musicSource->buffer->data;
+            //     MusicBit16Test::FillArray(arr, 0, sampleCount, 400, sampleRate);
+            //     musicSource->buffer->sampleCount = sampleCount;
+            //     musicSource->samplesSent = 0;
+            //     musicSource->readyToSend = true;
+            //     //Println(window, "> Ready To send");
+            // }
+            // else
+            // {
+            //     //Print(window, "> Still sending Data. ({}", to_string(src->samplesSent));
+            //     //Println(window, " of {} samples)", to_string(src->buffer->sampleCount));
+            // }
         }
     }
 
@@ -400,15 +397,15 @@ namespace SysApps
                     bytesToRead = fileLeft;
                 }
 
-                Serial::Writeln("READING");
-                Serial::Writeln("Sample Count: {}", to_string(sampleCount));
-                Serial::Writeln("Bytes Per Sample: {}", to_string(bytesPerSample));
-                Serial::Writeln("Bytes To Read (1): {}", to_string(sampleCount * bytesPerSample * channelCount));
-                Serial::Writeln("File Left: {}", to_string(fileLeft));
-                Serial::Writeln("Bytes To Read (2): {}", to_string(bytesToRead));
-                Serial::Writeln("File Pos: {}", to_string(musicFilePos));
-                Serial::Writeln("File Len: {}", to_string(musicFileLen));
-                Serial::Writeln();
+                // Serial::Writeln("READING");
+                // Serial::Writeln("Sample Count: {}", to_string(sampleCount));
+                // Serial::Writeln("Bytes Per Sample: {}", to_string(bytesPerSample));
+                // Serial::Writeln("Bytes To Read (1): {}", to_string(sampleCount * bytesPerSample * channelCount));
+                // Serial::Writeln("File Left: {}", to_string(fileLeft));
+                // Serial::Writeln("Bytes To Read (2): {}", to_string(bytesToRead));
+                // Serial::Writeln("File Pos: {}", to_string(musicFilePos));
+                // Serial::Writeln("File Len: {}", to_string(musicFileLen));
+                // Serial::Writeln();
 
 
                 if (bytesToRead == 0)

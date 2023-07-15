@@ -885,7 +885,7 @@ if (window != NULL)
         AddToStack();
         //osData.debugTerminalWindow->Log("             : ################", Colors.black);
         osData.debugTerminalWindow->renderer->CursorPosition.x = 0;
-        osData.debugTerminalWindow->renderer->CursorPosition.y -= 16 * 17;
+        osData.debugTerminalWindow->renderer->CursorPosition.y -= 16 * 16;
 
         AddToStack();
         osData.debugTerminalWindow->renderer->Clear(
@@ -1026,17 +1026,7 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.x + 240,
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
-        osData.debugTerminalWindow->Log("MUSIC COUNT: {}", to_string(Music::toPlay->getCount()), Colors.yellow);
-        RemoveFromStack();
-
-        AddToStack();
-        osData.debugTerminalWindow->renderer->Clear(
-            osData.debugTerminalWindow->renderer->CursorPosition.x,
-            osData.debugTerminalWindow->renderer->CursorPosition.y,
-            osData.debugTerminalWindow->renderer->CursorPosition.x + 240,
-            osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
-            Colors.black);
-        osData.debugTerminalWindow->Log("RAW AUDIO COUNT: {}", to_string(Music::currentRawAudio->getCount()), Colors.yellow);
+        osData.debugTerminalWindow->Log("PC SPEAKER INDEX: {}", to_string(Music::currentRawAudioIndex), Colors.yellow);
         RemoveFromStack();
 
         AddToStack();

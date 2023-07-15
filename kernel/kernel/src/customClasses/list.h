@@ -129,7 +129,13 @@ template class List<Music::Note>;
 template class Array<Music::NoteCommand>;
 template class List<Music::NoteCommand>;
 
+#include "../audio/audio.h"
 
+template class Array<Audio::AudioInputDevice*>;
+template class List<Audio::AudioInputDevice*>;
+
+template class Array<Audio::AudioOutputDevice*>;
+template class List<Audio::AudioOutputDevice*>;
 
 
 

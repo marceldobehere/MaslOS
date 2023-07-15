@@ -1,4 +1,11 @@
 #pragma once
+namespace Audio
+{
+    class BasicAudioSource;
+    class BasicAudioDestination;
+    class AudioInputDevice;
+    class AudioOutputDevice;
+}
 #include "../customClasses/list.h"
 
 namespace Audio
@@ -30,6 +37,8 @@ namespace Audio
 
     class BasicAudioSource;
     class BasicAudioDestination;
+    class AudioInputDevice;
+    class AudioOutputDevice;
 
     class BasicAudioDestination
     {
@@ -59,5 +68,30 @@ namespace Audio
         void DisconnectFrom(BasicAudioDestination* dest);
         void Free();
     };
+
+    class AudioInputDevice
+    {
+        public:
+        const char* deviceName;
+        BasicAudioSource* source;
+
+        AudioInputDevice(const char* deviceName, AudioBuffer* buff);
+        AudioInputDevice(const char* deviceName, BasicAudioSource* source);
+
+        void Free();
+    };
+
+    class AudioOutputDevice
+    {
+        public:
+        const char* deviceName;
+        BasicAudioDestination* destination;
+
+        AudioOutputDevice(const char* deviceName, AudioBuffer* buff);
+        AudioOutputDevice(const char* deviceName, BasicAudioDestination* destination);
+
+        void Free();
+    };
+    
 
 }

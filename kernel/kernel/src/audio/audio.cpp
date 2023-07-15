@@ -53,6 +53,25 @@ namespace Audio
             
             srcSample = (srcSample * srcVol) / 100;
 
+            // deal with changing bits per second messing with the actual audio data/volume bc ranges are different
+            if (srcBPS == 16 && destBPS == 8)
+            {
+                uint16_t sixteenBit = (uint16_t)srcSample;
+                uint8_t eightBit = sixteenBit >> 8;
+                eightBit += eightBit < 0xff && ((sixteenBit & 0xff) > 0x80);
+                srcSample = eightBit;
+            }
+            else if (srcBPS == 8 && destBPS == 16)
+            {
+                uint16_t sixteenBit = 0;
+                uint8_t eightBit = (uint8_t)srcSample;
+                if (eightBit & 0x80)
+                    sixteenBit = 0xff00 | eightBit;
+                else
+                    sixteenBit = eightBit;
+                srcSample = sixteenBit;
+            }
+
             long destIndex = ((destIndx * destCC + destTC) * destBPS) / 8;
             // convert from 32 bit to dest bps
             switch (destBPS)
@@ -334,6 +353,52 @@ namespace Audio
         if (buffer != NULL)
             buffer->Free();
         buffer = NULL;
+        _Free(this);
+    }
+
+    AudioInputDevice::AudioInputDevice(const char* deviceName, AudioBuffer* buff)
+    {
+        this->deviceName = StrCopy(deviceName);
+        this->source = new BasicAudioSource(buff);
+    }
+
+    AudioInputDevice::AudioInputDevice(const char* deviceName, BasicAudioSource* source)
+    {
+        this->deviceName = StrCopy(deviceName);
+        this->source = source;
+    }
+
+    void AudioInputDevice::Free()
+    {
+        if (deviceName != NULL)
+            _Free(deviceName);
+        deviceName = NULL;
+        if (source != NULL)
+            source->Free();
+        source = NULL;
+        _Free(this);
+    }
+
+    AudioOutputDevice::AudioOutputDevice(const char* deviceName, AudioBuffer* buff)
+    {
+        this->deviceName = StrCopy(deviceName);
+        this->destination = new BasicAudioDestination(buff);
+    }
+
+    AudioOutputDevice::AudioOutputDevice(const char* deviceName, BasicAudioDestination* destination)
+    {
+        this->deviceName = StrCopy(deviceName);
+        this->destination = destination;
+    }
+
+    void AudioOutputDevice::Free()
+    {
+        if (deviceName != NULL)
+            _Free(deviceName);
+        deviceName = NULL;
+        if (destination != NULL)
+            destination->Free();
+        destination = NULL;
         _Free(this);
     }
 }

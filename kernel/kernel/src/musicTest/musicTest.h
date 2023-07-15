@@ -5,24 +5,15 @@
 
 namespace Music
 {
-    extern List<NoteCommand>* toPlay;
-    extern List<Note>* currentNotes;
-    extern List<uint8_t>* currentRawAudio;
-    extern bool rawAudioInUse;
     extern int currentRawAudioIndex;
-    extern int currentIndex;
-    extern int currentCount;
     extern int rawAudioDiv; // 59.6591 
+    extern bool needMoreData;
+    extern Audio::AudioOutputDevice* pcSpk;
+    extern bool currentState;
+
     void init();
-    extern bool listInUse;
-    void addCmd(NoteCommand note);
     void play(int timeYes);
-    extern bool paused;
-    extern int volume;
     void resetTest();
 
-    int getNoteDurFromMidiNote(int midi);
-
-    void addMario();
 
 }

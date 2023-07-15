@@ -1137,7 +1137,7 @@ void boot(BootInfo* bootInfo)
 
     debugTerminalWindow->Log("Kernel Initialised Successfully!");
 
-    for (int i = 0; i < 17; i++)
+    for (int i = 0; i < 16; i++)
         debugTerminalWindow->Log("");
     //debugTerminalWindow->renderer->CursorPosition.y = 16 * 16;
 
