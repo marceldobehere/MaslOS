@@ -8,19 +8,10 @@
 
 #include "../WindowStuff/WindowManager/windowManager.h"
 
-//#include "../WindowStuff/Window/window.h"
-//#include "../kernelStuff/Disk_Stuff/Disk_Interfaces/generic/genericDiskInterface.h"
 
-#define LIST_INCLUDE_GENERIC_DISK_INTERFACE
-#define LIST_INCLUDE_TASK
-#define LIST_INCLUDE_WINDOW
 #include "../customClasses/list.h"
-#undef LIST_INCLUDE_WINDOW
-#undef LIST_INCLUDE_TASK
-#undef LIST_INCLUDE_GENERIC_DISK_INTERFACE
 
 #include "../kernelStuff/other_IO/ac97/ac97.h"
-#include "../customClasses/list_audioStuff.h"
 
 struct OSData
 {

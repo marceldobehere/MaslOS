@@ -1,6 +1,6 @@
 #include "cmdParser.h"
 #include "../Rendering/BasicRenderer.h"
-#include "cstrTools.h"
+#include "../cStdLib/cstrTools.h"
 #include "../Rendering/Cols.h"
 #include <stdint.h>
 #include "../memory/heap.h"
@@ -230,9 +230,8 @@ void EditPartitionSetting(PartitionInterface::PartitionInfo* part, const char* p
 #include "../sysApps/musicPlayer/musicPlayer.h"
 #include "../tasks/doomTask/taskDoom.h"
 
-#include "../musicTest/musicTest.h"
+#include "../audio/audioDevStuff.h"
 //#include "../kernelStuff/other_IO/sb16/sb16.h"
-#include "../musicTest/sbTest.h"
 #include "../kernelStuff/other_IO/serial/serial.h"
 
 
@@ -249,8 +248,8 @@ BuiltinCommand BuiltinCommandFromStr(char* i)
   else if (StrEquals(i, "img")) return Command_Image;
   else if (StrEquals(i, "music")) return Command_MusicPlayer;
   else if (StrEquals(i, "doom")) return Command_Doom;
-  else if (StrEquals(i, "sb test")) return Command_SbTest;
-  else if (StrEquals(i, "sb reset")) return Command_SbReset;
+  else if (StrEquals(i, "music test")) return Command_MusicTest;
+  else if (StrEquals(i, "ac97 reset")) return Command_AC97Reset;
   else if (StrEquals(i, "tetris")) return Command_Tetris;
   else if (StrEquals(i, "heap check")) return Command_HeapCheck;
   else if (StrEquals(i, "shutdown")) return Command_ShutDown;
@@ -277,8 +276,9 @@ void HelpCommand(Window* window)
         " - exit                    exit terminal\n"
         " - clear                   clears the terminal screen\n"
         " - benchmark reset         resets the bench mark\n"
-        " - malloc                  mallocs memory 20G\n"
-        " - sb test                 test ac97\n"
+        " - malloc                  mallocs memory 20KB\n"
+        " - ac97 reset              resets the ac97 card\n"
+        " - music test              test music\n"
         " - shutdown                turn off operating system\n"
         " - explorer                open explorer\n"
         " - notepad                 open notepad\n"
@@ -288,7 +288,7 @@ void HelpCommand(Window* window)
         " - connect [four | 4]      open connect four game\n"
         " - taskmgr                 open task manager\n"
         " - dbg | debug viewer      open debug viewer\n"
-        " - heapCheck               ...\n"
+        " - heapCheck               Performs a Heap Check\n"
         " - crash                   Causes a trivial kernel panic\n"
         " - crash 2                 Causes a trivial but blocking kernel panic\n"
         " - crash 3                 Causes a kernel panic\n"
@@ -357,10 +357,10 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             RemoveFromStack();
             return;
         }
-        case Command_SbReset: 
+        case Command_AC97Reset: 
         {
             Println(window, "> Resetting AC97 thingy");
-            Music::resetTest();
+            AudioDeviceStuff::resetTest();
             if (osData.ac97Driver != NULL)
             {
                 osData.ac97Driver->DoQuickCheck();
@@ -375,7 +375,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             RemoveFromStack();
             return;
         }
-        case Command_SbTest: 
+        case Command_MusicTest: 
         {
             AddToStack();
             DefaultInstance* instance = window->instance;
@@ -401,7 +401,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                     int dif = 40;
                     for (int i = 0; i < dif; i++)
                     {
-                        MusicBit16Test::FillArray(arr, (i * sampleCount)/dif, sampleCount/dif, ((1000*(i+1)) / dif), sampleRate);
+                        Audio::FillArray(arr, (i * sampleCount)/dif, sampleCount/dif, ((1000*(i+1)) / dif), sampleRate);
                     }
                     src->buffer->sampleCount = sampleCount;
                     src->samplesSent = 0;

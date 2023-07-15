@@ -252,14 +252,14 @@ __attribute__((interrupt)) void MouseInt_handler(interrupt_frame* frame)
 
 bool speakA = false;
 
-#include "../musicTest/musicTest.h"
+#include "../audio/audioDevStuff.h"
 
 __attribute__((interrupt)) void PITInt_handler(interrupt_frame* frame)
 { 
     AddToStack();
     PIT::Tick();
     PIC_EndMaster();
-    Music::play(PIT::FreqAdder);
+    AudioDeviceStuff::play(PIT::FreqAdder);
 
     // TestSetSpeakerPosition(speakA);
     // speakA = !speakA;

@@ -1,7 +1,7 @@
 #include "genericPartitionInterface.h"
 #include "../mraps/mrapsPartitionInterface.h"
 #include "../../../../memory/heap.h"
-#include "../../../../cmdParsing/cstrTools.h"
+#include "../../../../cStdLib/cstrTools.h"
 
 namespace PartitionInterface
 {

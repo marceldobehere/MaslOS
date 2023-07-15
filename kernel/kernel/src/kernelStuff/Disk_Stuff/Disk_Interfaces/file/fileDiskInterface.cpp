@@ -2,7 +2,7 @@
 #include "../../../../memory/heap.h"
 #include "../../../../paging/PageTableManager.h"
 #include "../../Filesystem_Interfaces/generic/genericFileSystemInterface.h"
-#include "../../../../cmdParsing/cstrTools.h"
+#include "../../../../cStdLib/cstrTools.h"
 #include "../../../../OSDATA/osdata.h"
 
 namespace DiskInterface

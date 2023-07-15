@@ -1,5 +1,5 @@
 #include "partitionStructs.h"
-#include "../../../../cmdParsing/cstrTools.h"
+#include "../../../../cStdLib/cstrTools.h"
 #include "../../../../memory/heap.h"
 
 namespace PartitionInterface

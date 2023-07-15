@@ -5,7 +5,7 @@
 #include "guiStuff/components/imageRect/imageRectangleComponent.h"
 #include "guiStuff/components/textField/textFieldComponent.h"
 #include "../../../memory/heap.h"
-#include "../../../cmdParsing/cstrTools.h"
+#include "../../../cStdLib/cstrTools.h"
 #include "../../../kernelStuff/other_IO/serial/serial.h"
 
 GuiInstance::GuiInstance(Window* window)

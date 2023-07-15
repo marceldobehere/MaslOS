@@ -2,6 +2,12 @@
 #include <stdint.h>
 #include "../../generalStuff.h"
 #include "../../componentRenderer.h"
+
+namespace GuiComponentStuff
+{
+    class BaseComponent;
+}
+
 #include "../../../../../../customClasses/list.h"
 
 namespace GuiComponentStuff

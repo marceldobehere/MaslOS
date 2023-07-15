@@ -2,7 +2,7 @@
 #include "BasicRenderer.h"
 #include "../kernelStuff/stuff/cstr.h"
 #include "Cols.h"
-#include "../cmdParsing/cstrTools.h"
+#include "../cStdLib/cstrTools.h"
 #include "../memory/heap.h"
 #include "../OSDATA/osdata.h"
 #include "../kernelStuff/other_IO/serial/serial.h"

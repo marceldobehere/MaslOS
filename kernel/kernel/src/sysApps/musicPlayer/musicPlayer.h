@@ -5,8 +5,6 @@
 #include "../../WindowStuff/SubInstances/guiInstance/guiStuff/components/textField/textFieldComponent.h"
 #include "../../WindowStuff/SubInstances/guiInstance/guiStuff/components/button/buttonComponent.h"
 #include "../../WindowStuff/SubInstances/guiInstance/guiStuff/components/imageRect/imageRectangleComponent.h"
-#include "../../musicTest/musicTest.h"
-#include "../../musicTest/sbTest.h"
 #include "../../audio/audio.h"
 
 namespace SysApps

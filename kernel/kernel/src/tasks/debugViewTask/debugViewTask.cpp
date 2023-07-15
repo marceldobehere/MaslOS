@@ -2,7 +2,7 @@
 #include "../../kernelStuff/other_IO/pit/pit.h"
 #include "../../memory/heap.h"
 #include "../../interrupts/interrupts.h"
-#include "../../cmdParsing/cstrTools.h"
+#include "../../cStdLib/cstrTools.h"
 #include "../../OSDATA/MStack/MStackM.h"
 #include "../../OSDATA/osStats.h"
 

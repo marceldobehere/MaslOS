@@ -1,6 +1,6 @@
 #include "taskWriteFile.h"
 #include "../../memory/heap.h"
-#include "../../cmdParsing/cstrTools.h"
+#include "../../cStdLib/cstrTools.h"
 
 #include "../../kernelStuff/Disk_Stuff/Disk_Interfaces/ram/ramDiskInterface.h"
 #include "../../kernelStuff/Disk_Stuff/Disk_Interfaces/file/fileDiskInterface.h"

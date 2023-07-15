@@ -4,7 +4,7 @@
 #include "../memory/heap.h"
 #include "../paging/PageFrameAllocator.h"
 #include "../kernelStuff/stuff/cstr.h"
-#include "../cmdParsing/cstrTools.h"
+#include "../cStdLib/cstrTools.h"
 #include "../OSDATA/osdata.h"
 #include "../tasks/enterHandler/taskEnterHandler.h"
 

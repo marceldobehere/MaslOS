@@ -1,5 +1,5 @@
 #include "ZIPStruct.h"
-#include "../../cmdParsing/cstrTools.h"
+#include "../../cStdLib/cstrTools.h"
 #include <stddef.h>
 #include "../../OSDATA/MStack/MStackM.h"
 

@@ -94,4 +94,6 @@ namespace Audio
     };
     
 
+
+    void FillArray(uint16_t* buf, int start, int len, int freq, int sampleRate);
 }

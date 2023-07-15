@@ -1,5 +1,5 @@
 #pragma once
-#include "../../cmdParsing/cstrTools.h"
+#include "../../cStdLib/cstrTools.h"
 
 struct MStack
 {

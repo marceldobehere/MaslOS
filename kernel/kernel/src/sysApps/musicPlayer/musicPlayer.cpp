@@ -1,5 +1,5 @@
 #include "musicPlayer.h"
-#include "../../cmdParsing/cstrTools.h"
+#include "../../cStdLib/cstrTools.h"
 #include "../../memory/heap.h"
 #include "../../OSDATA/osdata.h"
 #include "../../fsStuff/fsStuff.h"

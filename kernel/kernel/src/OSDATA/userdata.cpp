@@ -1,5 +1,5 @@
 #include "userdata.h"
-#include "../cmdParsing/cstrTools.h"
+#include "../cStdLib/cstrTools.h"
 
 OSUser adminUser;
 OSUser guestUser;

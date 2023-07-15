@@ -11,7 +11,7 @@ extern "C"
 #include "../../userinput/kbScancodeTranslation.h"
 #include "../../userinput/mouse.h"
 #include "../../fsStuff/fsStuff.h"
-#include "../../cmdParsing/cstrTools.h"
+#include "../../cStdLib/cstrTools.h"
 #include "../../OSDATA/MStack/MStackM.h"
 
 List<void*>* openMallocs = NULL;

@@ -1,7 +1,6 @@
 #pragma once
 #include "../base/baseComponent.h"
 #include "../../../../../Window/window.h"
-#include "../../../../../../customClasses/list_BaseComponent.h"
 #include "../box/boxComponent.h"
 #include "../text/textComponent.h"
 #include "../rectangle/rectangleComponent.h"

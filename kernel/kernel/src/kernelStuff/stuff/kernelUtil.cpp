@@ -772,7 +772,8 @@ void InitStartMenuWindow(BootInfo* bootInfo)
 
 BasicRenderer r = *((BasicRenderer*)NULL);
 
-#include "../../musicTest/musicTest.h"
+#include "../../audio/audio.h"
+#include "../../audio/audioDevStuff.h"
 #include "../other_IO/serial/serial.h"
 
 
@@ -849,7 +850,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     //GlobalRenderer->Println("BG IMG: {}", to_string((uint64_t)bootInfo->bgImage), Colors.orange);
 
-    Music::init();
+    AudioDeviceStuff::init();
     
 
     //uint8_t* bleh = (uint8_t*) malloc(sizeof(Framebuffer), "Converting Image to Framebuffer");;
@@ -960,9 +961,9 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
     osData.pcSpeakerDev = new Audio::AudioOutputDevice("PC Speaker", new Audio::AudioBuffer(8, 29829, 1, 1500));
     osData.defaultAudioOutputDevice = osData.pcSpeakerDev;
-    Music::pcSpk = osData.pcSpeakerDev;
-    Music::pcSpk->destination->buffer->ClearBuffer();
-    Music::pcSpk->destination->buffer->sampleCount = Music::pcSpk->destination->buffer->totalSampleCount;
+    AudioDeviceStuff::pcSpk = osData.pcSpeakerDev;
+    AudioDeviceStuff::pcSpk->destination->buffer->ClearBuffer();
+    AudioDeviceStuff::pcSpk->destination->buffer->sampleCount = AudioDeviceStuff::pcSpk->destination->buffer->totalSampleCount;
 
     osData.windowIconZIP = bootInfo->windowIconsZIP;
     osData.windowButtonZIP = bootInfo->windowButtonZIP;

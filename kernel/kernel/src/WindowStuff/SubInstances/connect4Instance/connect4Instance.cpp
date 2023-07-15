@@ -1,5 +1,5 @@
 #include "connect4Instance.h"
-#include "../../../cmdParsing/cstrTools.h"
+#include "../../../cStdLib/cstrTools.h"
 #include "../../../memory/heap.h"
 #include "../../../kernelStuff/stuff/cstr.h"
 
