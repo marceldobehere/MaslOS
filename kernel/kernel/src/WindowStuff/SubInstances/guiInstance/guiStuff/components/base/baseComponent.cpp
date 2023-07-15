@@ -1,5 +1,5 @@
 #include "baseComponent.h"
-#include "../../../../../../customClasses/list.h"
+#include "../../../../../../cStdLib/list.h"
 #include "../rectangle/rectangleComponent.h"
 #include "../screenComponent/screenComponent.h"
 #include "../box/boxComponent.h"

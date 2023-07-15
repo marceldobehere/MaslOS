@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "../kernelStuff/stuff/math.h"
+#include "../cStdLib/math.h"
 #include "Framebuffer.h"
 #include "S-Font.h"
 #include <stdint.h> 

@@ -1,5 +1,5 @@
 #include "taskEnterHandler.h"
-#include "../../kernelStuff/stuff/cstr.h"
+#include "../../cStdLib/cstr.h"
 #include "../../interrupts/panic.h"
 #include "../../memory/heap.h"
 

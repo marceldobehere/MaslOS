@@ -1,7 +1,7 @@
 #pragma once
 #include "../base/baseComponent.h"
 #include "../../../../../Window/window.h"
-#include "../../../../../../customClasses/list.h"
+#include "../../../../../../cStdLib/list.h"
 
 namespace GuiComponentStuff
 {

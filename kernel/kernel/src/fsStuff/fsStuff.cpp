@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "../memory/heap.h"
 #include "../paging/PageFrameAllocator.h"
-#include "../kernelStuff/stuff/cstr.h"
+#include "../cStdLib/cstr.h"
 #include "../cStdLib/cstrTools.h"
 #include "../osData/osData.h"
 #include "../tasks/enterHandler/taskEnterHandler.h"

@@ -3,7 +3,7 @@
 #include "../kernelStuff/memory/efiMemory.h"
 #include "bitmap.h"
 #include "../kernelStuff/memory/memory.h"
-#include "../kernelStuff/stuff/cstr.h"
+#include "../cStdLib/cstr.h"
 #include "../interrupts/panic.h"
 #include "../memory/heap.h"
 

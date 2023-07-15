@@ -1,7 +1,7 @@
 #include "audio.h"
 #include "../memory/heap.h"
 #include "../cStdLib/cstrTools.h"
-#include "../kernelStuff/stuff/cstr.h"
+#include "../cStdLib/cstr.h"
 #include "../interrupts/panic.h"
 #include "..//devices/serial/serial.h"
 

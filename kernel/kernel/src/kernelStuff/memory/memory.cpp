@@ -1,5 +1,5 @@
 #include "memory.h"
-#include "../stuff/cstr.h"
+#include "../../cStdLib/cstr.h"
 
 uint64_t GetMemorySize(EFI_MEMORY_DESCRIPTOR* mMap, uint64_t mMapEntries, uint64_t mMapDescSize)
 {

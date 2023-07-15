@@ -1,5 +1,5 @@
 #include "dispTypes.h"
-#include "../../kernelStuff/stuff/cstr.h"
+#include "../../cStdLib/cstr.h"
 
 const char* PrintArg(dispVar var)
 {

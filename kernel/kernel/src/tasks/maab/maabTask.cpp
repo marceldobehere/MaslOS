@@ -5,7 +5,7 @@
 #include "../../cStdLib/cstrTools.h"
 //#include "../../osData/MStack/MStackM.h"
 //#include "terminalInstance.h"
-#include "../../kernelStuff/stuff/cstr.h"
+#include "../../cStdLib/cstr.h"
 #include "../sleep/taskSleep.h"
 #include "../../WindowStuff/SubInstances/guiInstance/guiInstance.h"
 #include "../../WindowStuff/SubInstances/guiInstance/guiStuff/components/text/textComponent.h"

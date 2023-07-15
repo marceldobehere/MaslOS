@@ -1,7 +1,7 @@
 #include "connect4Instance.h"
 #include "../../../cStdLib/cstrTools.h"
 #include "../../../memory/heap.h"
-#include "../../../kernelStuff/stuff/cstr.h"
+#include "../../../cStdLib/cstr.h"
 
 Connect4Instance::Connect4Instance(Window* window)
 {

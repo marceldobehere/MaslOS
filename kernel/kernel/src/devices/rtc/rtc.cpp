@@ -1,6 +1,6 @@
 #include "rtc.h"
 #include "../../kernelStuff/IO/IO.h"
-#include "../../kernelStuff/stuff/cstr.h"
+#include "../../cStdLib/cstr.h"
 #include "../pit/pit.h"
 #include "../../osData/MStack/MStackM.h"
 #define CURRENT_YEAR_STR        (__DATE__ + 7)                            // Change this each year!

@@ -8,7 +8,7 @@
 #include "../../kernelStuff/diskStuff/Filesystem_Interfaces/mrafs/mrafsFileSystemInterface.h"
 #include "../../fsStuff/fsStuff.h"
 #include "../..//devices/serial/serial.h"
-#include "../../kernelStuff/stuff/cstr.h"
+#include "../../cStdLib/cstr.h"
 
 TaskReadFile::TaskReadFile(const char* path)
 {

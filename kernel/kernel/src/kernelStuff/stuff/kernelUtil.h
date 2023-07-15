@@ -10,7 +10,7 @@ extern uint64_t _KernelEnd;
 
 #include "../../rendering/BasicRenderer.h"
 #include "../../rendering/Cols.h"
-#include "cstr.h" 
+#include "../../cStdLib/cstr.h" 
 
 // #include "paging/PageFrameAllocator.h"  
 // #include "paging/PageMapIndexer.h"
@@ -57,8 +57,8 @@ struct KernelInfo
 
 #include "../../devices/pit/pit.h"
 
-//#include "../../customClasses/array.h"
-#include "../../customClasses/list.h"
+//#include "../../cStdLib/array.h"
+#include "../../cStdLib/list.h"
 
 #include "../kernelFiles/kernelFiles.h"
 #include "../kernelFiles/ZIPStruct.h"

@@ -3,13 +3,13 @@
 
 //#include "../kernelStuff/stuff/stackmacro.h"
 #include "../kernelStuff/stuff/kernelUtil.h"
-//#include "../customClasses/list.h"
+//#include "../cStdLib/list.h"
 
 
 #include "../WindowStuff/WindowManager/windowManager.h"
 
 
-#include "../customClasses/list.h"
+#include "../cStdLib/list.h"
 
 #include "../devices/ac97/ac97.h"
 

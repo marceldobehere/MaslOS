@@ -1,14 +1,14 @@
 #pragma once
 
 #include "../kernelStuff/IO/IO.h"
-#include "../kernelStuff/stuff/math.h"
+#include "../cStdLib/math.h"
 #include "../rendering/BasicRenderer.h"
-#include "../kernelStuff/stuff/cstr.h"
+#include "../cStdLib/cstr.h"
 #include "../rendering/Cols.h"
 #include "../kernelStuff/kernelFiles/ImageStruct.h"
 #include "../kernelStuff/kernelFiles/ZIPStruct.h"
 #define LIST_INCLUDE_MOUSE_PACKET
-#include "../customClasses/list.h"
+#include "../cStdLib/list.h"
 #undef LIST_INCLUDE_MOUSE_PACKET
 
 extern int mouseCycleSkip;

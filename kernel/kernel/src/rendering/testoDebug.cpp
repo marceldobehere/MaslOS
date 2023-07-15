@@ -1,6 +1,6 @@
 
 #include "BasicRenderer.h"
-#include "../kernelStuff/stuff/cstr.h"
+#include "../cStdLib/cstr.h"
 #include "Cols.h"
 #include "../cStdLib/cstrTools.h"
 #include "../memory/heap.h"
