@@ -38,6 +38,7 @@ Here are the [Terminal Commands](https://github.com/marceldobehere/MaslOS/wiki/T
   - Notepad (Really Basic but works)
   - DOOM (Port from [here](https://github.com/Daivuk/PureDOOM). Mostly works though you can only run 1 instance of DOOM at the same time and relaunching is currently broken lol)
   - Music player
+  - Magnifier
 * Audio
   - PC Speaker 
   - AC97 Driver (Works in VM)
@@ -122,13 +123,15 @@ Go into the MaslOS Folder and run the `RUN.sh` file
 ## Screenshots
 
 ![The MaslOS Splashscreen](/images/boot.PNG "The MaslOS Splashscreen")
-![Doom Port](/images/doom.png "DOOM 2 running on MaslOS")
 ![The Desktop with some windows open](/images/desktop.PNG "The Desktop with some windows open")
 ![Experimental Raytracer Demo](/images/raycaster%20demo.png "An experimental Raytracer Demo")
 ![Explorer Gif](/images/explorer%20yes.gif "Explorer Gif")
 ![Notepad Gif](/images/notepad%20yes.gif "Notepad Gif")
 ![Image Viewer](/images/image-component.PNG "Image Viewer")
+![Magnifier](/images/magnifier1.PNG "Magnifier App")
+![Music Player](/images/music%20player.PNG "Music Player App")
 ![Pong running on real hardware](/images/pongus.jpg "Pong running on real hardware")
+![Doom Port](/images/doom.png "DOOM 2 running on MaslOS")
 ![MAAB Interpreter](/images/maab.png "MAAB Interpreter running with the windows interpreter next to it")
 ![The Desktop](/images/desktop%20background.PNG "The Desktop")
 ![Playing around with the Terminals](/images/terminal%20test%201.PNG "Playing around with the Terminals")
