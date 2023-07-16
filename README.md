@@ -5,6 +5,8 @@ The base was made following [Ponchos OS Dev Youtube Playlist](https://www.youtub
 
 The OS is now using [limine](https://github.com/limine-bootloader/limine) as the bootloader.
 
+![The MaslOS Splashscreen](/images/boot.PNG "The MaslOS Splashscreen")
+
 ## Wiki and other Pages
 
 Here is the [Masl OS Wiki](https://github.com/marceldobehere/MaslOS/wiki).
