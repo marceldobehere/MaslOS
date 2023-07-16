@@ -5,7 +5,7 @@ The base was made following [Ponchos OS Dev Youtube Playlist](https://www.youtub
 
 The OS is now using [limine](https://github.com/limine-bootloader/limine) as the bootloader.
 
-![The MaslOS Splashscreen](/images/boot.PNG "The MaslOS Splashscreen")
+![Thumbnail](/images/thumbnail.PNG "MaslOS running with some sample apps")
 
 ## Wiki and other Pages
 
@@ -41,6 +41,7 @@ Here are the [Terminal Commands](https://github.com/marceldobehere/MaslOS/wiki/T
   - DOOM (Port from [here](https://github.com/Daivuk/PureDOOM). Mostly works though you can only run 1 instance of DOOM at the same time and relaunching is currently broken lol)
   - Music player
   - Magnifier
+  - Paint (WIP but you can draw and stuff)
 * Audio
   - PC Speaker 
   - AC97 Driver (Works in VM)
@@ -132,6 +133,7 @@ Go into the MaslOS Folder and run the `RUN.sh` file
 ![Image Viewer](/images/image-component.PNG "Image Viewer")
 ![Magnifier](/images/magnifier1.PNG "Magnifier App")
 ![Music Player](/images/music%20player.PNG "Music Player App")
+![Paint](/images/paint.PNG "Paint App")
 ![Pong running on real hardware](/images/pongus.jpg "Pong running on real hardware")
 ![Doom Port](/images/doom.png "DOOM 2 running on MaslOS")
 ![MAAB Interpreter](/images/maab.png "MAAB Interpreter running with the windows interpreter next to it")
