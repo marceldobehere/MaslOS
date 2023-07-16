@@ -230,6 +230,7 @@ void EditPartitionSetting(PartitionInterface::PartitionInfo* part, const char* p
 #include "../sysApps/notepad/notepad.h"
 #include "../sysApps/imgTest/imgTest.h"
 #include "../sysApps/musicPlayer/musicPlayer.h"
+#include "../sysApps/paint/paint.h"
 
 #include "../sysApps/magnifier/magnifier.h"
 
@@ -269,6 +270,7 @@ BuiltinCommand BuiltinCommandFromStr(char* i)
   else if (StrEquals(i, "resdefspk")) return Command_ResetDefaultSpeaker;
   else if (StrEquals(i, "mag")) return Command_Magnifier;
   else if (StrEquals(i, "magnifier")) return Command_Magnifier;
+  else if (StrEquals(i, "paint")) return Command_Paint;
   else return Command_Invalid;
 }
 
@@ -299,6 +301,7 @@ void HelpCommand(Window* window)
         " - crash 4                 Causes a memory corruption and crashes\n"
         " - resdefspk               Resets the default speaker\n"
         " - magnifier               Opens the magnifier\n"
+        " - paint                    Opens the paint app\n"
         ;
     Print(window, helpMessage);
 }
@@ -364,6 +367,11 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         }
         case Command_Magnifier: {
             new SysApps::Magnifier();
+            RemoveFromStack();
+            return;
+        }
+        case Command_Paint: {
+            new SysApps::Paint();
             RemoveFromStack();
             return;
         }

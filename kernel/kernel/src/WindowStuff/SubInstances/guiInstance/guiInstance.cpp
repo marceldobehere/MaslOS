@@ -4,6 +4,9 @@
 #include "guiStuff/components/screenComponent/screenComponent.h"
 #include "guiStuff/components/imageRect/imageRectangleComponent.h"
 #include "guiStuff/components/textField/textFieldComponent.h"
+#include "guiStuff/components/canvas/canvasComponent.h"
+
+
 #include "../../../memory/heap.h"
 #include "../../../cStdLib/cstrTools.h"
 #include "../../..//devices/serial/serial.h"
@@ -709,6 +712,19 @@ bool GuiInstance::CreateComponentWithIdAndParent(int64_t id, GuiComponentStuff::
         allComponents->add(comp->actualTextFieldStuff);
         allComponents->add(comp->rectComp);
         allComponents->add(comp->textComp);
+
+        allComponents->add(comp);
+        return ComponentAddChild(parentId, comp);
+    }
+    if (type == GuiComponentStuff::ComponentType::CANVAS)
+    {
+        GuiComponentStuff::CanvasComponent* comp =
+        new GuiComponentStuff::CanvasComponent(
+            Colors.black,
+            GuiComponentStuff::ComponentSize(50, 50),
+            parentComp 
+        );
+        comp->id = id;
 
         allComponents->add(comp);
         return ComponentAddChild(parentId, comp);

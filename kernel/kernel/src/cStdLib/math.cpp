@@ -25,3 +25,13 @@ MPoint::MPoint()
     this->x = 0;
     this->y = 0;
 }
+
+bool MPoint::operator==(const MPoint& other)
+{
+    return (this->x == other.x && this->y == other.y);
+}
+
+bool MPoint::operator!=(const MPoint& other)
+{
+    return (this->x != other.x || this->y != other.y);
+}

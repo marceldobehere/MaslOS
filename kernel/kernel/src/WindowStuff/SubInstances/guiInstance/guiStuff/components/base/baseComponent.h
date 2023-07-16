@@ -21,7 +21,8 @@ namespace GuiComponentStuff
         TEXT = 4,
         BUTTON = 5,
         TEXTFIELD = 6,
-        IMAGE_RECT = 7
+        IMAGE_RECT = 7,
+        CANVAS = 8,
     };
 
 

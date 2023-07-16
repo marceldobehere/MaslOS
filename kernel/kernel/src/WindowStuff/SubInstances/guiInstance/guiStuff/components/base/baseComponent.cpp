@@ -1,5 +1,6 @@
 #include "baseComponent.h"
 #include "../../../../../../cStdLib/list.h"
+
 #include "../rectangle/rectangleComponent.h"
 #include "../screenComponent/screenComponent.h"
 #include "../box/boxComponent.h"
@@ -7,6 +8,8 @@
 #include "../button/buttonComponent.h"
 #include "../textField/textFieldComponent.h"
 #include "../imageRect/imageRectangleComponent.h"
+#include "../canvas/canvasComponent.h"
+
 #include "../../../../../../osData/MStack/MStackM.h"
 #include "../../../guiInstance.h"
 
@@ -43,6 +46,8 @@ namespace GuiComponentStuff
             ((TextFieldComponent*)this)->Render(field);
         if (componentType == IMAGE_RECT)
             ((ImageRectangleComponent*)this)->Render(field);
+        if (componentType == CANVAS)
+            ((CanvasComponent*)this)->Render(field);
         RemoveFromStack();
     }
 
@@ -66,6 +71,8 @@ namespace GuiComponentStuff
             ((TextFieldComponent*)this)->CheckUpdates();
         if (componentType == IMAGE_RECT)
             ((ImageRectangleComponent*)this)->CheckUpdates();
+        if (componentType == CANVAS)
+            ((CanvasComponent*)this)->CheckUpdates();
         RemoveFromStack();
     }
 
@@ -85,6 +92,8 @@ namespace GuiComponentStuff
             ((TextFieldComponent*)this)->MouseClicked(info);
         if (componentType == IMAGE_RECT)
             ((ImageRectangleComponent*)this)->MouseClicked(info);
+        if (componentType == CANVAS)
+            ((CanvasComponent*)this)->MouseClicked(info);
     }
 
     void BaseComponent::KeyHit(KeyHitEventInfo info)
@@ -103,6 +112,8 @@ namespace GuiComponentStuff
             ((TextFieldComponent*)this)->KeyHit(info);
         if (componentType == IMAGE_RECT)
             ((ImageRectangleComponent*)this)->KeyHit(info);
+        if (componentType == CANVAS)
+            ((CanvasComponent*)this)->KeyHit(info);
     }
 
     bool BaseComponent::Destroy(bool destroyChildren, void (*callBackFunc)(BaseComponent* comp))
@@ -134,6 +145,8 @@ namespace GuiComponentStuff
             ((TextFieldComponent*)this)->Destroy(destroyChildren, callBackFunc);
         if (componentType == IMAGE_RECT)
             ((ImageRectangleComponent*)this)->Destroy(destroyChildren, callBackFunc);
+        if (componentType == CANVAS)
+            ((CanvasComponent*)this)->Destroy(destroyChildren, callBackFunc);
 
         RemoveFromStack();
         return true;
@@ -155,6 +168,8 @@ namespace GuiComponentStuff
             return ((TextFieldComponent*)this)->GetActualComponentSize();
         if (componentType == IMAGE_RECT)
             return ((ImageRectangleComponent*)this)->GetActualComponentSize();
+        if (componentType == CANVAS)
+            return ((CanvasComponent*)this)->GetActualComponentSize();
 
         return ComponentSize(0, 0);
     }
@@ -192,39 +207,6 @@ namespace GuiComponentStuff
         return Field(position, GetActualComponentSize());
     }
 
-    // BaseComponent* BaseComponent::GetComponentFromId(uint64_t id)
-    // {
-    //     if (this->id == id)
-    //         return this;
-
-    //     if (componentType == ComponentType::SCREEN)
-    //     {
-    //         BaseComponent* found = NULL;
-    //         ScreenComponent* screen = (ScreenComponent*)this;
-    //         for (int i = 0; found == NULL && i < screen->children->getCount(); i++)
-    //             found = screen->children->elementAt(i)->GetComponentFromId(id);
-                
-    //         return found;
-    //     }
-
-    //     if (componentType == ComponentType::BOX)
-    //     {
-    //         BaseComponent* found = NULL;
-    //         BoxComponent* box = (BoxComponent*)this;
-    //         for (int i = 0; found == NULL && i < box->children->getCount(); i++)
-    //             found = box->children->elementAt(i)->GetComponentFromId(id);
-                
-    //         return found;
-    //     }
-
-    //     if (componentType == ComponentType::BUTTON)
-    //         return ((ButtonComponent*)this)->actualButtonStuff->GetComponentFromId(id);
-
-    //     if (componentType == ComponentType::TEXTFIELD)
-    //         return ((TextFieldComponent*)this)->actualButtonStuff->GetComponentFromId(id);
-
-    //     return NULL;
-    // }
 
     void* BaseComponent::GetScreen()
     {
@@ -253,6 +235,8 @@ namespace GuiComponentStuff
             return ((TextFieldComponent*)this)->SetAttribute(type, val);
         if (componentType == IMAGE_RECT)
             return ((ImageRectangleComponent*)this)->SetAttribute(type, val);
+        if (componentType == CANVAS)
+            return ((CanvasComponent*)this)->SetAttribute(type, val);
 
         return false;
     }
@@ -273,6 +257,8 @@ namespace GuiComponentStuff
             return ((TextFieldComponent*)this)->GetAttribute(type);
         if (componentType == IMAGE_RECT)
             return ((ImageRectangleComponent*)this)->GetAttribute(type);
+        if (componentType == CANVAS)
+            return ((CanvasComponent*)this)->GetAttribute(type);
 
         return 0;
     }
@@ -293,6 +279,8 @@ namespace GuiComponentStuff
             return ((TextFieldComponent*)this)->GetAttributeSize(type);
         if (componentType == IMAGE_RECT)
             return ((ImageRectangleComponent*)this)->GetAttributeSize(type);
+        if (componentType == CANVAS)
+            return ((CanvasComponent*)this)->GetAttributeSize(type);
 
         return 0;
     }

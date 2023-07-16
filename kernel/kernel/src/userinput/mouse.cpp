@@ -21,7 +21,7 @@
 #define MouseRight  1 
 #define MouseMiddle 2
 
-bool MouseClickState[3] = {false, false, false};
+bool MouseClickState[3] = {false, false, false}; // Left Right Middle
 
 kernelFiles::ZIPFile* mouseZIP;
 kernelFiles::ImageFile* currentMouseImage;

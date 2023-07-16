@@ -43,6 +43,7 @@ enum BuiltinCommand {
     Command_Invalid,
     Command_ResetDefaultSpeaker,
     Command_Magnifier,
+    Command_Paint,
 };
 BuiltinCommand BuiltinCommandFromStr(char* i);
 
