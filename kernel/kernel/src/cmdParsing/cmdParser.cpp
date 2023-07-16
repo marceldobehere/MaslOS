@@ -223,12 +223,15 @@ void EditPartitionSetting(PartitionInterface::PartitionInfo* part, const char* p
     
 }
 
+#include "../tasks/doomTask/taskDoom.h"
+
 #include "../sysApps/explorer/explorer.h"
 #include "../sysApps/tetris/tetris.h"
 #include "../sysApps/notepad/notepad.h"
 #include "../sysApps/imgTest/imgTest.h"
 #include "../sysApps/musicPlayer/musicPlayer.h"
-#include "../tasks/doomTask/taskDoom.h"
+
+#include "../sysApps/magnifier/magnifier.h"
 
 #include "../audio/audioDevStuff.h"
 #include "..//devices/serial/serial.h"
@@ -264,6 +267,8 @@ BuiltinCommand BuiltinCommandFromStr(char* i)
   else if (StrEquals(i, "crash 4")) return Command_Crash4;
   else if (StrEquals(i, "renderloop")) return Command_RenderLoop;
   else if (StrEquals(i, "resdefspk")) return Command_ResetDefaultSpeaker;
+  else if (StrEquals(i, "mag")) return Command_Magnifier;
+  else if (StrEquals(i, "magnifier")) return Command_Magnifier;
   else return Command_Invalid;
 }
 
@@ -293,6 +298,7 @@ void HelpCommand(Window* window)
         " - crash 3                 Causes a kernel panic\n"
         " - crash 4                 Causes a memory corruption and crashes\n"
         " - resdefspk               Resets the default speaker\n"
+        " - magnifier               Opens the magnifier\n"
         ;
     Print(window, helpMessage);
 }
@@ -353,6 +359,11 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         }
         case Command_Doom: {
             terminal->tasks.add(NewDoomTask(window));
+            RemoveFromStack();
+            return;
+        }
+        case Command_Magnifier: {
+            new SysApps::Magnifier();
             RemoveFromStack();
             return;
         }

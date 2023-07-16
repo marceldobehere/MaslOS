@@ -24,10 +24,11 @@
         bred =   0xffFF0000,
         bblue =  0xff0000FF,
         bgreen = 0xff00FF00,
-        tblack =  0x00000000;
+        tblack =  0x00000000,
+        lime =    0xffC0FF00;
     } Colors;
     
-    static const int colCount = 27;
+    static const int colCount = 28;
 
     static const char* colNames[colCount] =
     {
@@ -58,6 +59,7 @@
         "dark blue",
         "transparent black",
         "tblack",
+        "lime"
     };
 
     static uint32_t colValues[colCount] = 
@@ -89,4 +91,5 @@
         Colors.dblue,
         Colors.tblack,
         Colors.tblack,
+        Colors.lime
     };

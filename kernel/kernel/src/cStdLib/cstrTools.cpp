@@ -68,12 +68,8 @@ char* StrCopy(const char* og)
 char* StrAppend(const char* a, const char* b, bool freeA)
 {
     AddToStack();
-    int sizeA = 0;
-    for (int i = 0; a[i] != 0; i++)
-        sizeA++;
-    int sizeB = 0;
-    for (int i = 0; b[i] != 0; i++)
-        sizeB++;
+    int sizeA = StrLen(a);
+    int sizeB = StrLen(b);
 
     char* newStr = (char*)_Malloc(sizeA + sizeB + 1, "strappend");
 
