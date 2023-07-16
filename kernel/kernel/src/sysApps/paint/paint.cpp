@@ -15,7 +15,7 @@ namespace SysApps
     { //0xAARRGGBB
         0xFF000000, // Black
         0xFF7F7F7F, // Dark Gray
-        0xFF7D000, // Dark Red
+        0xFF7E0102, // Dark Red
         0xFF7E8000, // Dark Yellow
         0xFF027F03, // Dark Green
         0xFF00807E, // Dark Light Blue
