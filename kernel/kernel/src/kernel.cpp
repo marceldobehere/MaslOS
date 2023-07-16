@@ -968,6 +968,120 @@ void boot(BootInfo* bootInfo)
     }
 
 
+
+    
+    osData.windows.add(osData.debugTerminalWindow);
+
+
+
+    debugTerminalWindow->Log("Kernel Initialised Successfully!");
+
+    for (int i = 0; i < 16; i++)
+        debugTerminalWindow->Log("");
+    //debugTerminalWindow->renderer->CursorPosition.y = 16 * 16;
+
+    ((TerminalInstance*)mainWindow->instance)->Cls();
+    ((TerminalInstance*)mainWindow->instance)->KeyboardPrintStart();
+    //mainWindow->Render();
+
+
+
+
+    //new SysApps::Explorer();
+
+
+    osData.wantedFps = 150;
+    osData.bgTaskRun = true;
+    MStackData::BenchmarkStackPointer1 = 0;
+    MStackData::BenchmarkStackPointer2 = 0;
+    MStackData::BenchmarkStackPointerSave = 0;
+    RenderLoop();
+
+
+
+
+    for (int i = 0; i < 50; i++)
+        GlobalRenderer->ClearDotted(Colors.black);    
+    for (int i = 0; i < 50; i++)
+        GlobalRenderer->Clear(Colors.black);
+    GlobalRenderer->color = Colors.white;
+    GlobalRenderer->Println("Shutting down...");
+    for (int i = 0; i < 50; i++)
+        GlobalRenderer->ClearButDont();    
+
+    PowerOffAcpi();
+
+    GlobalRenderer->Clear(Colors.black);
+    GlobalRenderer->Println("The ACPI shutdown failed!", Colors.yellow);
+
+    GlobalRenderer->Println();
+    GlobalRenderer->Println("Please shut down the computer manually.", Colors.white);
+
+    while (true)
+        asm("hlt");
+
+    RemoveFromStack();
+    return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include "kernel.h"
+
+ 
+void bootTest(Framebuffer fb, ACPI::RSDP2* rsdp, PSF1_FONT* psf1_font, MaslOsAssetStruct* assets, void* freeMemStart, void* extraMemStart, uint64_t freeMemSize, void* kernelStart, uint64_t kernelSize, void* kernelStartV)
+{
+    MStackData::BenchmarkEnabled = false;
+    BootInfo tempBootInfo;
+    tempBootInfo.framebuffer = &fb;
+    tempBootInfo.rsdp = rsdp;
+
+    tempBootInfo.psf1_font = psf1_font;
+
+    tempBootInfo.testImage = assets->testImage;
+    tempBootInfo.bootImage = assets->bootImage;
+    tempBootInfo.MButton = assets->MButton;
+    tempBootInfo.MButtonS = assets->MButtonS;
+    tempBootInfo.bgImage = assets->bgImage;
+    tempBootInfo.maabZIP = assets->maabZIP;
+    tempBootInfo.otherZIP = assets->otherZIP;
+
+    tempBootInfo.mouseZIP = assets->mouseZIP;
+    tempBootInfo.windowButtonZIP = assets->windowButtonZIP;
+    tempBootInfo.windowIconsZIP = assets->windowIconsZIP;
+
+    tempBootInfo.mMapStart = freeMemStart;
+    tempBootInfo.m2MapStart = extraMemStart;
+    tempBootInfo.mMapSize = freeMemSize;
+    
+    tempBootInfo.kernelStart = kernelStart;
+    tempBootInfo.kernelSize = kernelSize;
+    tempBootInfo.kernelStartV = kernelStartV;
+
+    for (int y = 0; y < 100; y++)
+        for (int x = 500; x < 600; x++)
+            *(uint32_t*)((uint64_t)fb.BaseAddress + 4 * (x + y * fb.PixelsPerScanLine)) = (Colors.yellow * ((x + y + 1) % 2)) + (Colors.green * ((x + y) % 2));
+
+    //while (true);
+
+    boot(&tempBootInfo);
+    return;
+}
+
+
+
+/*
     AddToStack();
     GuiInstance* testGui;
     GuiComponentStuff::BoxComponent* box;
@@ -1127,115 +1241,5 @@ void boot(BootInfo* bootInfo)
         }
     }
     RemoveFromStack();
-    
 
-
-    
-    osData.windows.add(osData.debugTerminalWindow);
-
-
-
-    debugTerminalWindow->Log("Kernel Initialised Successfully!");
-
-    for (int i = 0; i < 16; i++)
-        debugTerminalWindow->Log("");
-    //debugTerminalWindow->renderer->CursorPosition.y = 16 * 16;
-
-    ((TerminalInstance*)mainWindow->instance)->Cls();
-    ((TerminalInstance*)mainWindow->instance)->KeyboardPrintStart();
-    //mainWindow->Render();
-
-
-
-
-    //new SysApps::Explorer();
-
-
-    osData.wantedFps = 150;
-    osData.bgTaskRun = true;
-    MStackData::BenchmarkStackPointer1 = 0;
-    MStackData::BenchmarkStackPointer2 = 0;
-    MStackData::BenchmarkStackPointerSave = 0;
-    RenderLoop();
-
-
-
-
-    for (int i = 0; i < 50; i++)
-        GlobalRenderer->ClearDotted(Colors.black);    
-    for (int i = 0; i < 50; i++)
-        GlobalRenderer->Clear(Colors.black);
-    GlobalRenderer->color = Colors.white;
-    GlobalRenderer->Println("Shutting down...");
-    for (int i = 0; i < 50; i++)
-        GlobalRenderer->ClearButDont();    
-
-    PowerOffAcpi();
-
-    GlobalRenderer->Clear(Colors.black);
-    GlobalRenderer->Println("The ACPI shutdown failed!", Colors.yellow);
-
-    GlobalRenderer->Println();
-    GlobalRenderer->Println("Please shut down the computer manually.", Colors.white);
-
-    while (true)
-        asm("hlt");
-
-    RemoveFromStack();
-    return;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#include "kernel.h"
-
- 
-void bootTest(Framebuffer fb, ACPI::RSDP2* rsdp, PSF1_FONT* psf1_font, MaslOsAssetStruct* assets, void* freeMemStart, void* extraMemStart, uint64_t freeMemSize, void* kernelStart, uint64_t kernelSize, void* kernelStartV)
-{
-    MStackData::BenchmarkEnabled = false;
-    BootInfo tempBootInfo;
-    tempBootInfo.framebuffer = &fb;
-    tempBootInfo.rsdp = rsdp;
-
-    tempBootInfo.psf1_font = psf1_font;
-
-    tempBootInfo.testImage = assets->testImage;
-    tempBootInfo.bootImage = assets->bootImage;
-    tempBootInfo.MButton = assets->MButton;
-    tempBootInfo.MButtonS = assets->MButtonS;
-    tempBootInfo.bgImage = assets->bgImage;
-    tempBootInfo.maabZIP = assets->maabZIP;
-    tempBootInfo.otherZIP = assets->otherZIP;
-
-    tempBootInfo.mouseZIP = assets->mouseZIP;
-    tempBootInfo.windowButtonZIP = assets->windowButtonZIP;
-    tempBootInfo.windowIconsZIP = assets->windowIconsZIP;
-
-    tempBootInfo.mMapStart = freeMemStart;
-    tempBootInfo.m2MapStart = extraMemStart;
-    tempBootInfo.mMapSize = freeMemSize;
-    
-    tempBootInfo.kernelStart = kernelStart;
-    tempBootInfo.kernelSize = kernelSize;
-    tempBootInfo.kernelStartV = kernelStartV;
-
-    for (int y = 0; y < 100; y++)
-        for (int x = 500; x < 600; x++)
-            *(uint32_t*)((uint64_t)fb.BaseAddress + 4 * (x + y * fb.PixelsPerScanLine)) = (Colors.yellow * ((x + y + 1) % 2)) + (Colors.green * ((x + y) % 2));
-
-    //while (true);
-
-    boot(&tempBootInfo);
-    return;
-}
+*/
