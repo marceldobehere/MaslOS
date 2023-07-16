@@ -576,6 +576,27 @@ void StartMenuButtonClick(GuiComponentStuff::BaseComponent* comp, GuiComponentSt
             BLEHUS_HIDE = true;
         }
 
+        if (comp->id == 1009)
+        {
+            BLEHUS_TITLE = "Music Player";
+            BLEHUS_CMD   = "music";
+            BLEHUS_HIDE = true;
+        }
+
+        if (comp->id == 1010)
+        {
+            BLEHUS_TITLE = "Magnifier";
+            BLEHUS_CMD   = "mag";
+            BLEHUS_HIDE = true;
+        }
+
+        if (comp->id == 1011)
+        {
+            BLEHUS_TITLE = "Paint";
+            BLEHUS_CMD   = "paint";
+            BLEHUS_HIDE = true;
+        }
+
 
 
         //Window* oldActive = activeWindow;
@@ -616,7 +637,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
     GuiComponentStuff::RectangleComponent* testRect;
 
     int sW = 200;
-    int sH = 300;
+    int sH = 320;
 
     {
         Window* window = (Window*)_Malloc(sizeof(Window), "GUI Window");
@@ -749,6 +770,45 @@ void InitStartMenuWindow(BootInfo* bootInfo)
             );
             btn->mouseClickedCallBack = StartMenuButtonClick;
             btn->id = 1008;
+            
+            testGui->screen->children->add(btn);
+        }
+
+        {
+            GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("Music Player", 
+            Colors.bgreen, Colors.yellow, Colors.black, 
+            Colors.black, Colors.black, Colors.white,
+            GuiComponentStuff::ComponentSize(104, 20),
+            GuiComponentStuff::Position(0, 240), testGui->screen
+            );
+            btn->mouseClickedCallBack = StartMenuButtonClick;
+            btn->id = 1009;
+            
+            testGui->screen->children->add(btn);
+        }
+
+        {
+            GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("Magnifier", 
+            Colors.bgreen, Colors.yellow, Colors.black, 
+            Colors.black, Colors.black, Colors.white,
+            GuiComponentStuff::ComponentSize(80, 20),
+            GuiComponentStuff::Position(0, 260), testGui->screen
+            );
+            btn->mouseClickedCallBack = StartMenuButtonClick;
+            btn->id = 1010;
+            
+            testGui->screen->children->add(btn);
+        }
+
+        {
+            GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("Paint", 
+            Colors.bgreen, Colors.yellow, Colors.black, 
+            Colors.black, Colors.black, Colors.white,
+            GuiComponentStuff::ComponentSize(48, 20),
+            GuiComponentStuff::Position(0, 280), testGui->screen
+            );
+            btn->mouseClickedCallBack = StartMenuButtonClick;
+            btn->id = 1011;
             
             testGui->screen->children->add(btn);
         }
