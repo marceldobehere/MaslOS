@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <stddef.h>
 
 enum TaskType
 {
@@ -19,8 +20,6 @@ enum TaskType
     WRITE_FILE,
 };
 
-const char* TaskTypeToString(TaskType type);
-
 class Task
 {
     protected:
@@ -28,11 +27,22 @@ class Task
         TaskType type;
 
     public:
+        const char* TaskText = "<IDK>";
+
+        void* DoTaskFuncHelp = NULL;
+        void (*DoTaskFunc)(void* bruh) = NULL;
+
+        void* FreeTaskFuncHelp = NULL;
+        void (*FreeTaskFunc)(void* bruh) = NULL;
+
+    public:
         int32_t tempTime = 0;
         int32_t actTime = 0;
         bool GetDone();
         TaskType GetType();
         Task();
+
+
 
     bool operator==(Task other)
     {

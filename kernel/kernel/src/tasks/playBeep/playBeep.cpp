@@ -15,6 +15,12 @@ TaskPlayBeep::TaskPlayBeep(uint64_t onDuration, uint64_t offDuration, uint64_t t
     startTime = PIT::TimeSinceBootMicroS();
     switchTime = startTime;
     endTime = startTime + totalDuration * 1000;
+
+    this->TaskText = "<PLAY BEEP TASK>";
+    this->DoTaskFuncHelp = (void*)this;
+    this->DoTaskFunc = (void(*)(void*))(void*)&Do;
+    this->FreeTaskFuncHelp = (void*)this;
+    this->FreeTaskFunc = (void(*)(void*))(void*)&Free;
 }
 
 
@@ -51,8 +57,7 @@ void TaskPlayBeep::Do()
 
 TaskPlayBeep* NewBeepTask(uint64_t onDuration, uint64_t offDuration, uint64_t totalDuration)
 {
-    TaskPlayBeep* task = (TaskPlayBeep*)_Malloc(sizeof(TaskPlayBeep), "New Play Beep Task");
-    *task = TaskPlayBeep(onDuration, offDuration, totalDuration);
+    TaskPlayBeep* task = new TaskPlayBeep(onDuration, offDuration, totalDuration);
     return task;
 }
 

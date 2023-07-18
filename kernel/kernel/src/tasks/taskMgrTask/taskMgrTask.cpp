@@ -14,6 +14,12 @@ TaskTaskManager::TaskTaskManager(Window* window)
     type = TaskType::TASK_MGR;
     callCount = 0;
 
+    this->TaskText = "<TASKMGR TASK>";
+    this->DoTaskFuncHelp = (void*)this;
+    this->DoTaskFunc = (void(*)(void*))(void*)&Do;
+    this->FreeTaskFuncHelp = (void*)this;
+    this->FreeTaskFunc = (void(*)(void*))(void*)&Free;
+
     oldTitle = window->title;
     exit = false;
     window->title = "Task Manager";
@@ -102,7 +108,7 @@ void TaskTaskManager::Do()
             for (int i2 = 0; i2 < terminal->tasks.getCount(); i2++)
             {
                 window->renderer->Print("   - Task {}: ", to_string(tI));
-                window->renderer->Println("\"{}\"", TaskTypeToString(terminal->tasks.elementAt(i2)->GetType()));
+                window->renderer->Println("\"{}\"", terminal->tasks.elementAt(i2)->TaskText);
                 tI++;
             }
         }
@@ -113,7 +119,7 @@ void TaskTaskManager::Do()
     for (int i2 = 0; i2 < osData.osTasks.getCount(); i2++)
     {
         window->renderer->Print(" - OS Task {}: ", to_string(i2));
-        window->renderer->Println("\"{}\"", TaskTypeToString(osData.osTasks.elementAt(i2)->GetType()));
+        window->renderer->Println("\"{}\"", osData.osTasks.elementAt(i2)->TaskText);
     }
     window->renderer->Println();
     window->renderer->Println("------------------");
@@ -212,7 +218,6 @@ void TaskTaskManager::Free()
 
 TaskTaskManager* NewTaskManagerTask(Window* window)
 {
-    TaskTaskManager* task = (TaskTaskManager*)_Malloc(sizeof(TaskTaskManager));
-    *task = TaskTaskManager(window);
+    TaskTaskManager* task = new TaskTaskManager(window);
     return task;
 }

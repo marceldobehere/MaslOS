@@ -2,6 +2,7 @@
 #include "../paging/PageTableManager.h"
 #include "../paging/PageFrameAllocator.h"
 #include "../osData/osData.h"
+#include "../devices/serial/serial.h"
 
 
 const uint32_t HeapMagicNum = 2406789212;
@@ -473,6 +474,7 @@ void* _Xmalloc(size_t size, const char* text, const char* func, const char* file
                 mallocCount++;
                 usedHeapCount++;
                 RemoveFromStack();
+                //Serial::Writeln("> Malloced (1) to 0x{}", ConvertHexToString(((uint64_t)current + sizeof(HeapSegHdr))));
                 return (void*)((uint64_t)current + sizeof(HeapSegHdr));
             }
             if (current->length == size)
@@ -487,6 +489,7 @@ void* _Xmalloc(size_t size, const char* text, const char* func, const char* file
                 mallocCount++;
                 usedHeapCount++;
                 RemoveFromStack();
+                //Serial::Writeln("> Malloced (2) to 0x{}", ConvertHexToString(((uint64_t)current + sizeof(HeapSegHdr))));
                 return (void*)((uint64_t)current + sizeof(HeapSegHdr));
             }
         }

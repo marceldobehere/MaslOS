@@ -37,6 +37,13 @@ TaskDebugViewer::TaskDebugViewer(Window* window, char* coolBuf, uint64_t coolBuf
     ((TerminalInstance*)window->instance)->takeInput = false;
     oldIcon = window->icon;
     window->icon = WindowManager::internalWindowIcons[WindowManager::windowIconEnum.DEBUG];
+
+
+    this->TaskText = "<DEBUG VIEWER TASK>";
+    this->DoTaskFuncHelp = (void*)this;
+    this->DoTaskFunc = (void(*)(void*))(void*)&Do;
+    this->FreeTaskFuncHelp = (void*)this;
+    this->FreeTaskFunc = (void(*)(void*))(void*)&Free;
 }
 
 void TaskDebugViewer::Do()
@@ -267,14 +274,12 @@ void TaskDebugViewer::Free()
 
 TaskDebugViewer* NewDebugViewerTask(Window* window, char* coolBuf, uint64_t coolBufLen)
 {
-    TaskDebugViewer* task = (TaskDebugViewer*)_Malloc(sizeof(TaskDebugViewer));
-    *task = TaskDebugViewer(window, coolBuf, coolBufLen);
+    TaskDebugViewer* task = new TaskDebugViewer(window, coolBuf, coolBufLen);
     return task;
 }
 
 TaskDebugViewer* NewDebugViewerTask(Window* window)
 {
-    TaskDebugViewer* task = (TaskDebugViewer*)_Malloc(sizeof(TaskDebugViewer));
-    *task = TaskDebugViewer(window, NULL, 0);
+    TaskDebugViewer* task = new TaskDebugViewer(window, NULL, 0);
     return task;
 }

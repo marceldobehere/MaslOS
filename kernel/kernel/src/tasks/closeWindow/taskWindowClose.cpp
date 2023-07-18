@@ -4,19 +4,18 @@
 #include "../../osData/osData.h"
 #include "../../WindowStuff/SubInstances/guiInstance/guiInstance.h"
 
-// TaskSleep::TaskSleep(double time)
-// {
-//     done = false;
-//     type = TaskType::SLEEP;
-//     startTime = PIT::TimeSinceBoot;
-//     endTime = startTime + time;
-// }
 
 TaskWindowClose::TaskWindowClose(Window* window)
 {
     done = false;
     type = TaskType::CLOSEWINDOW;
     this->window = window;
+
+    this->TaskText = "<CLOSE WINDOW TASK>";
+    this->DoTaskFuncHelp = (void*)this;
+    this->DoTaskFunc = (void(*)(void*))(void*)&Do;
+    this->FreeTaskFuncHelp = (void*)this;
+    this->FreeTaskFunc = (void(*)(void*))(void*)&Free;
 }
 
 
@@ -78,8 +77,7 @@ void TaskWindowClose::Do()
 
 TaskWindowClose* NewWindowCloseTask(Window* window)
 {
-    TaskWindowClose* task = (TaskWindowClose*)_Malloc(sizeof(TaskWindowClose), "New Window Close Task");
-    *task = TaskWindowClose(window);
+    TaskWindowClose* task = new TaskWindowClose(window);
     return task;
 }
 

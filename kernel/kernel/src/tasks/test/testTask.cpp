@@ -693,6 +693,12 @@ TaskTest::TaskTest(void* data, uint64_t len, Window* window)
     _memcpy(data, dataCopy, len);
     this->window = window;
 
+    this->TaskText = "<.O LOADER TASK>";
+    this->DoTaskFuncHelp = (void*)this;
+    this->DoTaskFunc = (void(*)(void*))(void*)&Do;
+    this->FreeTaskFuncHelp = (void*)this;
+    this->FreeTaskFunc = (void(*)(void*))(void*)&Free;
+
     kernelAppData.test = false;
     kernelAppData.window = (OS_Window*)_Malloc(sizeof(OS_Window));
     kernelAppData.window->window = (void*)window;
@@ -721,8 +727,7 @@ void TaskTest::Do()
 
 TaskTest* NewTestTask(void* data, uint64_t len, Window* window)
 {
-    TaskTest* task = (TaskTest*)_Malloc(sizeof(TaskTest), "New Test Task");
-    *task = TaskTest(data, len, window);
+    TaskTest* task = new TaskTest(data, len, window);
     return task;
 }
 

@@ -18,6 +18,12 @@ TaskReadFile::TaskReadFile(const char* path)
     dataLen = 0;
     dataPos = 0;
     this->path = StrCopy(path);
+
+    this->TaskText = "<READ FILE TASK>";
+    this->DoTaskFuncHelp = (void*)this;
+    this->DoTaskFunc = (void(*)(void*))(void*)&Do;
+    this->FreeTaskFuncHelp = (void*)this;
+    this->FreeTaskFunc = (void(*)(void*))(void*)&Free;
 }
 
 
@@ -92,7 +98,6 @@ void TaskReadFile::Free()
 
 TaskReadFile* NewReadFileTask(const char* path)
 {
-    TaskReadFile* task = (TaskReadFile*)_Malloc(sizeof(TaskReadFile), "New Read File Task");
-    *task = TaskReadFile(path);
+    TaskReadFile* task = new TaskReadFile(path);
     return task;
 }

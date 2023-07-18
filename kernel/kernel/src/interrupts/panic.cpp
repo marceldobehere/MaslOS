@@ -522,13 +522,25 @@ void Panic(const char* panicMessage, const char* var, bool lock)
                 crashWindow->renderer->Println("A (probably) non-fatal Kernel Panic has occured! (MNFCC: {})", to_string(osData.maxNonFatalCrashCount), Colors.bred);
                 crashWindow->renderer->Println("-------------------------------------------------------", Colors.bred);
                 crashWindow->renderer->Println();
+
+                Serial::Writeln("-------------------------------------------------------");
+                Serial::Writeln("A (probably) non-fatal Kernel Panic has occured! (MNFCC: {})", to_string(osData.maxNonFatalCrashCount));
+                Serial::Writeln("-------------------------------------------------------");
+                Serial::Writeln();
                 //GlobalRenderer->Println("BRUH 5.3", Colors.yellow);
                 crashWindow->renderer->Println("Panic Message:", Colors.yellow);
                 crashWindow->renderer->Print(panicMessage, var, Colors.bred);
                 crashWindow->renderer->Println("  (MNFCC: {})",  to_string(osData.maxNonFatalCrashCount), Colors.white);
 
+                Serial::Writeln("Panic Message: {}  (MNFCC: {})", panicMessage, to_string(osData.maxNonFatalCrashCount));
+
+
                 crashWindow->renderer->Println();
                 crashWindow->renderer->Println();
+
+                Serial::Writeln();
+                Serial::Writeln();
+                
                 //GlobalRenderer->Println("BRUH 5.4", Colors.yellow);
                 PrintMStackTrace(MStackData::stackArr, MStackData::stackPointer, crashWindow->renderer, Colors.yellow);
                 //GlobalRenderer->Println("BRUH 5.5", Colors.yellow);

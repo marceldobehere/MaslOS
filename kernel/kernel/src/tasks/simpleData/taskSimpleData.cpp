@@ -6,6 +6,12 @@ TaskSimpleData::TaskSimpleData()
     done = false;
     type = TaskType::SIMPLE_DATA;
     data = NULL;
+
+    this->TaskText = "<SIMPLE DATA TASK>";
+    this->DoTaskFuncHelp = (void*)this;
+    this->DoTaskFunc = (void(*)(void*))(void*)&Do;
+    this->FreeTaskFuncHelp = (void*)this;
+    this->FreeTaskFunc = (void(*)(void*))(void*)&Free;
 }
 
 
@@ -25,7 +31,6 @@ void TaskSimpleData::Free()
 
 TaskSimpleData* NewSimpleDataTask()
 {
-    TaskSimpleData* task = (TaskSimpleData*)_Malloc(sizeof(TaskSimpleData), "New Simple Data Task");
-    *task = TaskSimpleData();
+    TaskSimpleData* task = new TaskSimpleData();
     return task;
 }

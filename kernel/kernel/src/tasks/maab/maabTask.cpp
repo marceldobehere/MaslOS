@@ -25,6 +25,13 @@ TaskMAAB::TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInst
 	done = false;
 	tempTask = NULL;
 
+    this->TaskText = "<MAAB TASK>";
+    this->DoTaskFuncHelp = (void*)this;
+    this->DoTaskFunc = (void(*)(void*))(void*)&Do;
+    this->FreeTaskFuncHelp = (void*)this;
+    this->FreeTaskFunc = (void(*)(void*))(void*)&Free;
+
+
 	//this->code = (uint8_t*)malloc(codeLen);
 	//for (int i = 0; i < codeLen; i++)
 	//	this->code[i] = code[i];

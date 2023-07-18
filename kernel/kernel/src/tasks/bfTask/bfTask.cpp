@@ -31,6 +31,12 @@ TaskBF::TaskBF(const char* code, Window* window)
     ((TerminalInstance*)window->instance)->userlen = 0;
     ((TerminalInstance*)window->instance)->takeInput = false;
     waitInput = false;
+
+    this->TaskText = "<BF INTERPRETER TASK>";
+    this->DoTaskFuncHelp = (void*)this;
+    this->DoTaskFunc = (void(*)(void*))(void*)&Do;
+    this->FreeTaskFuncHelp = (void*)this;
+    this->FreeTaskFunc = (void(*)(void*))(void*)&Free;
 }
 
 void TaskBF::Do()
@@ -158,7 +164,6 @@ void TaskBF::Free()
 
 TaskBF* NewBFTask(const char* code, Window* window)
 {
-    TaskBF* task = (TaskBF*)_Malloc(sizeof(TaskBF));
-    *task = TaskBF(code, window);
+    TaskBF* task = new TaskBF(code, window);
     return task;
 }

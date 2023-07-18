@@ -2,13 +2,6 @@
 #include "../../devices/pit/pit.h"
 #include "../../memory/heap.h"
 
-// TaskSleep::TaskSleep(double time)
-// {
-//     done = false;
-//     type = TaskType::SLEEP;
-//     startTime = PIT::TimeSinceBoot;
-//     endTime = startTime + time;
-// }
 
 TaskSleep::TaskSleep(uint64_t ms)
 {
@@ -16,6 +9,12 @@ TaskSleep::TaskSleep(uint64_t ms)
     type = TaskType::SLEEP;
     startTime = PIT::TimeSinceBootMS();
     endTime = startTime + ms;
+
+    this->TaskText = "<SLEEP TASK>";
+    this->DoTaskFuncHelp = (void*)this;
+    this->DoTaskFunc = (void(*)(void*))(void*)&Do;
+    this->FreeTaskFuncHelp = (void*)this;
+    this->FreeTaskFunc = (void(*)(void*))(void*)&Free;
 }
 
 
@@ -34,8 +33,7 @@ void TaskSleep::Do()
 
 TaskSleep* NewSleepTask(uint64_t ms)
 {
-    TaskSleep* task = (TaskSleep*)_Malloc(sizeof(TaskSleep), "New Sleep Task");
-    *task = TaskSleep(ms);
+    TaskSleep* task = new TaskSleep(ms);
     return task;
 }
 

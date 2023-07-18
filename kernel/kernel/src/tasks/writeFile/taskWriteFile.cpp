@@ -16,6 +16,12 @@ TaskWriteFile::TaskWriteFile(const char* path, char* buffer, uint64_t len)
     dataLen = len;
     dataPos = 0;
     this->path = StrCopy(path);
+
+    this->TaskText = "<WRITE FILE TASK>";
+    this->DoTaskFuncHelp = (void*)this;
+    this->DoTaskFunc = (void(*)(void*))(void*)&Do;
+    this->FreeTaskFuncHelp = (void*)this;
+    this->FreeTaskFunc = (void(*)(void*))(void*)&Free;
 }
 
 
@@ -94,7 +100,6 @@ void TaskWriteFile::Free()
 
 TaskWriteFile* NewWriteFileTask(const char* path, char* buffer, uint64_t len)
 {
-    TaskWriteFile* task = (TaskWriteFile*)_Malloc(sizeof(TaskWriteFile), "New Write File Task");
-    *task = TaskWriteFile(path, buffer, len);
+    TaskWriteFile* task = new TaskWriteFile(path, buffer, len);
     return task;
 }

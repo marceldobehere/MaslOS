@@ -289,6 +289,12 @@ TaskDoom::TaskDoom(Window* window)
     window->newSize.height = DOOM_HEIGHT * DOOM_SCALE;
     lastTime = PIT::TimeSinceBootMS();
 
+
+    this->TaskText = "<DOOM>";
+    this->DoTaskFuncHelp = (void*)this;
+    this->DoTaskFunc = (void(*)(void*))(void*)&Do;
+    this->FreeTaskFuncHelp = (void*)this;
+    this->FreeTaskFunc = (void(*)(void*))(void*)&Free;
     
 
     AddToStack();
@@ -464,7 +470,6 @@ void TaskDoom::Free()
 
 TaskDoom* NewDoomTask(Window* window)
 {
-    TaskDoom* task = (TaskDoom*)_Malloc(sizeof(TaskDoom), "New Doom Task");
-    *task = TaskDoom(window);
+    TaskDoom* task = new TaskDoom(window);
     return task;
 }
