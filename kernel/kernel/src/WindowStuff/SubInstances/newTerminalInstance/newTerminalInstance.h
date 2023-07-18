@@ -4,9 +4,8 @@
 #include "../../../osData/userData.h"
 #include "../defaultInstance/defaultInstance.h"
 #include "../../Window/window.h"
-#define LIST_INCLUDE_CONSOLE_CHAR
-#include "../../../cStdLib/list.h"
-#undef LIST_INCLUDE_CONSOLE_CHAR
+
+#include "../../../cStdLib/list/list_consoleChar.h"
 
 class NewTerminalInstance : public DefaultInstance
 {

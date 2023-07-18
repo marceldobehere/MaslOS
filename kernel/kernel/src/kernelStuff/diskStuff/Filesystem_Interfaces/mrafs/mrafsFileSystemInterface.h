@@ -1,17 +1,31 @@
 #pragma once
-#include "../generic/genericFileSystemInterface.h"
+#include <stddef.h>
+#include <stdint.h>
 
 namespace FilesystemInterface
 {
-    class MrafsFilesystemInterface : public GenericFilesystemInterface
+    namespace MrafsFilesystemStuff
     {
-    public:
         struct FSPartitionInfo
         {
             uint64_t sizeInBytes;
             uint64_t locationInBytes;
             bool free;
         };
+    }
+}
+
+#include "../generic/genericFileSystemInterface.h"
+
+
+namespace FilesystemInterface
+{
+    using namespace MrafsFilesystemStuff;
+
+    class MrafsFilesystemInterface : public GenericFilesystemInterface
+    {
+    public:
+
 
 
     private:
@@ -28,9 +42,9 @@ namespace FilesystemInterface
 
         
         const uint64_t maxFSTableSize = 5000000;
-    
+        
         //FilesystemInterfaceType InterfaceType = FilesystemInterface::Mrafs;
-        List<void*> fsPartitionList = List<void*>(10);
+        List<FSPartitionInfo*> fsPartitionList = List<FSPartitionInfo*>(10);
         List<FileInfo*> fsFileList = List<FileInfo*>(10);
         List<FolderInfo*> fsFolderList = List<FolderInfo*>(10);
         //void* partitionInterface = NULL;

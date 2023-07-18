@@ -30,14 +30,6 @@ namespace SysApps
         GuiComponentStuff::ButtonComponent* saveBtn;
         GuiComponentStuff::ButtonComponent* saveAsBtn;
         GuiComponentStuff::TextFieldComponent* textComp;
-
-
-        // List<void*> folderCompsYes = List<void*>(4);
-        // List<const char*> folderPathsYes = List<const char*>(4);
-        // List<void*> driveCompsYes = List<void*>(4);
-        // List<const char*> drivePathsYes = List<const char*>(4);
-        // List<void*> fileCompsYes = List<void*>(4);
-        // List<const char*> filePathsYes = List<const char*>(4);
         
         const char* lastSavePath;
         int ScrollY;

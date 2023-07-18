@@ -1,5 +1,6 @@
 #pragma once
 #include "../task.h"
+#include "../../cStdLib/math.h"
 #include <stdint.h>
 
 class TaskReadFile : public Task

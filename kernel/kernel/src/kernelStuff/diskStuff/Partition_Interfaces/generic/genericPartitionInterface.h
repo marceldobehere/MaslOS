@@ -2,7 +2,14 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "partitionStructs.h"
-#include "../../../../cStdLib/list.h"
+
+namespace PartitionInterface
+{
+    class GenericPartitionInterface;
+}
+
+#include "../../../../cStdLib/list/list_partInfo.h"
+#include "../../Disk_Interfaces/generic/genericDiskInterface.h"
 
 
 namespace PartitionInterface

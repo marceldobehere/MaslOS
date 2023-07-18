@@ -3,9 +3,7 @@
 #include "../defaultInstance/defaultInstance.h"
 
 #include "../../Window/window.h"
-#define LIST_INCLUDE_TASK
-#include "../../../cStdLib/list.h"
-#undef LIST_INCLUDE_TASK
+#include "../../../cStdLib/list/list_task.h"
 
 enum commandMode
 {

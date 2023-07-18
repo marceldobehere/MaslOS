@@ -545,20 +545,23 @@ void HandleKeyboard(uint8_t scancode)
                 }
                 else
                 {
-                    if ((activeWindow->allowKeyboardDrawing && !instance->GetBusy()))
+                    if (ascii != '\r')
                     {
-                        if (instance->mode == commandMode::mode_none)
-                            ((NewTerminalInstance*)instance->newTermInstance)->Print(ascii);
-                        else if (instance->mode == commandMode::enterText)
-                            ((NewTerminalInstance*)instance->newTermInstance)->Print(ascii);
-                        else if (instance->mode == commandMode::enterPassword)
-                            ((NewTerminalInstance*)instance->newTermInstance)->Print("*");
-                    }
+                        if ((activeWindow->allowKeyboardDrawing && !instance->GetBusy()))
+                        {
+                            if (instance->mode == commandMode::mode_none)
+                                ((NewTerminalInstance*)instance->newTermInstance)->Print(ascii);
+                            else if (instance->mode == commandMode::enterText)
+                                ((NewTerminalInstance*)instance->newTermInstance)->Print(ascii);
+                            else if (instance->mode == commandMode::enterPassword)
+                                ((NewTerminalInstance*)instance->newTermInstance)->Print("*");
+                        }
 
-                    if ((instance->userlen < 255 && !instance->GetBusy()) || instance->takeInput)
-                    {
-                        instance->terminalInput[instance->userlen] = ascii;
-                        instance->userlen++;
+                        if ((instance->userlen < 255 && !instance->GetBusy()) || instance->takeInput)
+                        {
+                            instance->terminalInput[instance->userlen] = ascii;
+                            instance->userlen++;
+                        }
                     }
                 }
             }

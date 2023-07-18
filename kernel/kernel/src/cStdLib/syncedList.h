@@ -1,11 +1,10 @@
 #pragma once
 #include "stdint.h"
 //#include "array.h"
-#define LIST_INCLUDE_WINDOW
-#define LIST_INCLUDE_TASK
-#include "list.h"
-#undef LIST_INCLUDE_WINDOW
-#undef LIST_INCLUDE_TASK
+
+#include "list/list_window.h"
+#include "list/list_task.h"
+
 
 
 template <typename T> class SyncedList

@@ -2,6 +2,12 @@
 #include "fileSystemStructs.h"
 //#include "../../../../memory/heap.h"
 //#include "../../Partition_Interfaces/generic/genericPartitionInterface.h"
+
+namespace FilesystemInterface
+{
+    class GenericFilesystemInterface;
+}
+
 #include "../../Partition_Interfaces/generic/genericPartitionInterface.h"
 
 

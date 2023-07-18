@@ -1451,7 +1451,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                                                 Println(window, "Partition Data:", Colors.yellow);
                                                 for (int i = 0; i < partCount; i++)
                                                 {   
-                                                    FilesystemInterface::MrafsFilesystemInterface::FSPartitionInfo* info = (FilesystemInterface::MrafsFilesystemInterface::FSPartitionInfo*)mrafsInterface->fsPartitionList[i];
+                                                    FilesystemInterface::MrafsFilesystemStuff::FSPartitionInfo* info = (FilesystemInterface::MrafsFilesystemStuff::FSPartitionInfo*)mrafsInterface->fsPartitionList[i];
                                                     Println(window, " + Partition {}:", to_string(i), Colors.orange);
                                                     Println(window, "    - Free:        {}", info->free ? "true" : "false", Colors.yellow);
                                                     Println(window, "    - Location:    0x{}", ConvertHexToString((uint64_t)info->locationInBytes), Colors.yellow);

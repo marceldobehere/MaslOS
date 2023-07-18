@@ -7,9 +7,8 @@
 #include "../rendering/Cols.h"
 #include "../kernelStuff/kernelFiles/ImageStruct.h"
 #include "../kernelStuff/kernelFiles/ZIPStruct.h"
-#define LIST_INCLUDE_MOUSE_PACKET
-#include "../cStdLib/list.h"
-#undef LIST_INCLUDE_MOUSE_PACKET
+
+#include "../cStdLib/list/list_mousePacket.h"
 
 extern int mouseCycleSkip;
 

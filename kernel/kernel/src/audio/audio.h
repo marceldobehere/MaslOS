@@ -6,7 +6,7 @@ namespace Audio
     class AudioInputDevice;
     class AudioOutputDevice;
 }
-#include "../cStdLib/list.h"
+#include "../cStdLib/list/list_audio.h"
 
 namespace Audio
 {
@@ -43,7 +43,7 @@ namespace Audio
     class BasicAudioDestination
     {
         public:
-        List<void*>* sources; // BasicAudioSource*
+        List<BasicAudioSource*>* sources; // BasicAudioSource*
         AudioBuffer* buffer;
 
         BasicAudioDestination(AudioBuffer* buffer);
@@ -56,7 +56,7 @@ namespace Audio
     class BasicAudioSource
     {
         public:
-        List<void*>* destinations;
+        List<BasicAudioDestination*>* destinations;
         AudioBuffer* buffer;
         int samplesSent;
         bool readyToSend;

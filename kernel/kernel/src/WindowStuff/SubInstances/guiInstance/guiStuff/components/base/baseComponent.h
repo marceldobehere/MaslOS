@@ -8,7 +8,7 @@ namespace GuiComponentStuff
     class BaseComponent;
 }
 
-#include "../../../../../../cStdLib/list.h"
+#include "../../../../../../cStdLib/list/list_guiField.h"
 
 namespace GuiComponentStuff
 {

@@ -1,9 +1,9 @@
 #include "audio.h"
 #include "../memory/heap.h"
-#include "../cStdLib/cstrTools.h"
-#include "../cStdLib/cstr.h"
+#include "../cStdLib/cStdLib.h"
 #include "../interrupts/panic.h"
-#include "..//devices/serial/serial.h"
+#include "../devices/serial/serial.h"
+
 
 namespace Audio
 {
@@ -225,7 +225,7 @@ namespace Audio
 
     BasicAudioDestination::BasicAudioDestination(AudioBuffer* buffer)
     {
-        sources = new List<void*>();
+        sources = new List<BasicAudioSource*>();
         this->buffer = buffer;
         this->buffer->sampleCount = this->buffer->totalSampleCount;
     }
@@ -273,7 +273,7 @@ namespace Audio
         int c = 0;
         for (int i = 0; i < sources->getCount(); i++)
         {
-            BasicAudioSource* src = (BasicAudioSource*)sources->elementAt(i);
+            BasicAudioSource* src = sources->elementAt(i);
             c += RequestBuffer(src);
         }
         return c;
@@ -285,7 +285,7 @@ namespace Audio
             return true;
         for (int i = 0; i < sources->getCount(); i++)
         {
-            BasicAudioSource* src = (BasicAudioSource*)sources->elementAt(i);
+            BasicAudioSource* src = sources->elementAt(i);
             if (src->readyToSend)
                 return false;
         }
@@ -309,7 +309,7 @@ namespace Audio
 
     BasicAudioSource::BasicAudioSource(AudioBuffer* buffer)
     {
-        this->destinations = new List<void*>();
+        this->destinations = new List<BasicAudioDestination*>();
         this->buffer = buffer;
         this->readyToSend = false;
         this->samplesSent = 0;
@@ -323,7 +323,7 @@ namespace Audio
         if (dest->sources == NULL)
             return;
         dest->sources->add(this);
-        destinations->add((void*)dest);
+        destinations->add(dest);
     }
     void BasicAudioSource::DisconnectFrom(BasicAudioDestination* dest)
     {
@@ -342,7 +342,7 @@ namespace Audio
         {
             for (int i = 0; i < destinations->getCount(); i++)
             {
-                BasicAudioDestination* dest = (BasicAudioDestination*)destinations->elementAt(i);
+                BasicAudioDestination* dest = destinations->elementAt(i);
                 if (dest != NULL)
                     DisconnectFrom(dest);
             }

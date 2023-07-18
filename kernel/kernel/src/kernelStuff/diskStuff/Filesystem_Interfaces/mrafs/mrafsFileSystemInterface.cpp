@@ -91,7 +91,7 @@ namespace FilesystemInterface
         return -1;
     }
 
-    MrafsFilesystemInterface::FSPartitionInfo* MrafsFilesystemInterface::CreateFilePartition(uint64_t size)
+    FSPartitionInfo* MrafsFilesystemInterface::CreateFilePartition(uint64_t size)
     {
         //osData.mainTerminalWindow->Log("AAA 0");
 

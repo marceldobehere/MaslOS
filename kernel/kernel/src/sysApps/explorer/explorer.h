@@ -5,6 +5,8 @@
 #include "../../WindowStuff/SubInstances/guiInstance/guiStuff/components/textField/textFieldComponent.h"
 #include "../../WindowStuff/SubInstances/guiInstance/guiStuff/components/button/buttonComponent.h"
 
+#include "../../cStdLib/list/list_guiBtn.h"
+
 namespace SysApps
 {
     class Explorer
@@ -16,11 +18,11 @@ namespace SysApps
         GuiComponentStuff::BoxComponent* fileListComp;
         GuiComponentStuff::TextFieldComponent* pathComp;
         GuiComponentStuff::ButtonComponent* goUpBtn;
-        List<void*> folderCompsYes = List<void*>(4);
+        List<GuiComponentStuff::ButtonComponent*> folderCompsYes = List<GuiComponentStuff::ButtonComponent*>(4);
         List<const char*> folderPathsYes = List<const char*>(4);
-        List<void*> driveCompsYes = List<void*>(4);
+        List<GuiComponentStuff::ButtonComponent*> driveCompsYes = List<GuiComponentStuff::ButtonComponent*>(4);
         List<const char*> drivePathsYes = List<const char*>(4);
-        List<void*> fileCompsYes = List<void*>(4);
+        List<GuiComponentStuff::ButtonComponent*> fileCompsYes = List<GuiComponentStuff::ButtonComponent*>(4);
         List<const char*> filePathsYes = List<const char*>(4);
         
         const char* path;
