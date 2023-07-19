@@ -41,6 +41,10 @@ void DoTask(Task* task)
 
 void FreeTask(Task* task)
 {
+
+    if ((((uint64_t)task->DoTaskFuncHelp) & 0xFFFF000000000000) == 0xFFFF000000000000)
+        Panic("TASK HAS NOT BEEN INSTANTIATED WITH NEW!", true);
+
     if (task->FreeTaskFunc != NULL)
     {
         task->FreeTaskFunc(task->FreeTaskFuncHelp);

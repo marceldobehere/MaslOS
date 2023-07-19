@@ -301,7 +301,7 @@ void HelpCommand(Window* window)
         " - crash 4                 Causes a memory corruption and crashes\n"
         " - resdefspk               Resets the default speaker\n"
         " - magnifier               Opens the magnifier\n"
-        " - paint                    Opens the paint app\n"
+        " - paint                   Opens the paint app\n"
         ;
     Print(window, helpMessage);
 }
