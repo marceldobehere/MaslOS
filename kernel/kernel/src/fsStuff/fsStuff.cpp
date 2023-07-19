@@ -377,8 +377,7 @@ namespace FS_STUFF
     void RunTerminalCommand(const char* terminalCommand, const char* terminalWindowTitle, bool hideTerminalWindow, bool autoCloseTerminalWindow)
     {
         Window* mainWindow = (Window*)_Malloc(sizeof(Window), "App Window");
-        TerminalInstance* terminal = (TerminalInstance*)_Malloc(sizeof(TerminalInstance), "App Terminal");
-        *terminal = TerminalInstance(&guestUser);
+        TerminalInstance* terminal = new TerminalInstance(&guestUser);
         *(mainWindow) = Window((DefaultInstance*)terminal, Size(500, 500), Position(50, 50), terminalWindowTitle, true, true, true);
         mainWindow->hidden = hideTerminalWindow;
         mainWindow->oldHidden = !hideTerminalWindow;

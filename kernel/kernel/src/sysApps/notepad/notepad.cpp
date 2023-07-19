@@ -18,8 +18,7 @@ namespace SysApps
         //window =
 
         window = (Window*)_Malloc(sizeof(Window), "Notepad Window");
-        GuiInstance* gui = (GuiInstance*)_Malloc(sizeof(GuiInstance), "Notepad GUI");
-        *gui = GuiInstance(window);
+        GuiInstance* gui = new GuiInstance(window);
         *(window) = Window((DefaultInstance*)gui, Size(400, 300), Position(100, 100), "Notepad", true, true, true);
         osData.windows.insertAt(window, 0);
         window->hidden = true;

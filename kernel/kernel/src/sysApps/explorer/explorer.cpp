@@ -17,8 +17,7 @@ namespace SysApps
         //window =
 
         window = (Window*)_Malloc(sizeof(Window), "Explorer Window");
-        GuiInstance* gui = (GuiInstance*)_Malloc(sizeof(GuiInstance), "Explorer GUI");
-        *gui = GuiInstance(window);
+        GuiInstance* gui = new GuiInstance(window);
         *(window) = Window((DefaultInstance*)gui, Size(400, 300), Position(100, 100), "Explorer", true, true, true);
         osData.windows.insertAt(window, 0);
         window->hidden = true;

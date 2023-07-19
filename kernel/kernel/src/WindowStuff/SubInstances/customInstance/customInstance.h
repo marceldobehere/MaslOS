@@ -9,4 +9,5 @@ class CustomInstance : public DefaultInstance
 {
     public:
     CustomInstance(InstanceType type);
+    void Free();
 };

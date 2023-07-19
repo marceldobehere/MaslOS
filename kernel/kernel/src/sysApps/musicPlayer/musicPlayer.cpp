@@ -20,8 +20,7 @@ namespace SysApps
 
         AddToStack();
         window = (Window*)_Malloc(sizeof(Window), "Music Player Window");
-        GuiInstance* gui = (GuiInstance*)_Malloc(sizeof(GuiInstance), "Music Player GUI");
-        *gui = GuiInstance(window);
+        GuiInstance* gui = new  GuiInstance(window);
         *(window) = Window((DefaultInstance*)gui, Size(400, 300), Position(100, 100), "Music Player", true, true, true);
         osData.windows.insertAt(window, 0);
         window->hidden = true;

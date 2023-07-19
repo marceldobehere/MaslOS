@@ -30,6 +30,9 @@ void DoTask(Task* task)
     if (task->GetDone())
         return;
 
+    if ((((uint64_t)task->DoTaskFuncHelp) & 0xFFFF000000000000) == 0xFFFF000000000000)
+        Panic("TASK HAS NOT BEEN INSTANTIATED WITH NEW!", true);
+
     if (task->DoTaskFunc != NULL)
         task->DoTaskFunc(task->DoTaskFuncHelp);
     else

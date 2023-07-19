@@ -5,6 +5,9 @@
 #include "../guiInstance/guiInstance.h"
 #include "../../../memory/heap.h"
 #include "../../../audio/audio.h"
+#include "../../../interrupts/panic.h"
+#include "../../../devices/serial/serial.h"
+#include "../../../cStdLib/cStdLib.h"
 
 
 void DefaultInstance::DefaultFree()
@@ -15,49 +18,18 @@ void DefaultInstance::DefaultFree()
         source->Free();
         source = NULL;
     }
-    switch (this->instanceType)
+
+    if ((((uint64_t)FreeFuncHelp) & 0xFFFF000000000000) == 0xFFFF000000000000)
+        Panic("INSTANCE HAS NOT BEEN INSTANTIATED WITH NEW!", true);
+
+    if (FreeFunc != NULL)
     {
-        case InstanceType::Default:
-        case InstanceType::WARNING:
-        case InstanceType::CRASH:
-        {
-            _Free(this);
-            break;
-        }
-        case InstanceType::DebugTerminal:
-        {
-            _Free(this);
-            break;
-        }
-        case InstanceType::Terminal:
-        case InstanceType::TESTO_PGM:
-        {
-            ((TerminalInstance*)this)->Free();
-            _Free(this);
-            break;
-        }
-        case InstanceType::NewTerminal:
-        {
-            ((NewTerminalInstance*)this)->Free();
-            _Free(this);
-            break;
-        }
-        case InstanceType::Connect4:
-        {
-            ((Connect4Instance*)this)->Free();
-            _Free(this);
-            break;
-        }
-        case InstanceType::GUI:
-        {
-            ((GuiInstance*)this)->Free();
-            _Free(this);
-            break;
-        }
-        default: 
-        {
-            _Free(this);
-            break;
-        }
+        Serial::Writeln("> FREE FUNC HELP: {}", ConvertHexToString((uint64_t)FreeFuncHelp));
+        FreeFunc(FreeFuncHelp);
+        _Free(this);
+    }
+    else
+    {
+        Panic("> Instance has no FreeFunc!", true);
     }
 }

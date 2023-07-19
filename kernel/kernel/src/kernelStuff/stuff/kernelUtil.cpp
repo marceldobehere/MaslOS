@@ -460,8 +460,7 @@ void PrepareWindows(Framebuffer* img)
     Window* debugTerminalWindow;
     {
         debugTerminalWindow = (Window*)_Malloc(sizeof(Window), "Debug Terminal Window");
-        DebugTerminalInstance* dterminal = (DebugTerminalInstance*)_Malloc(sizeof(DebugTerminalInstance), "Debug Terminal Instance");
-        *dterminal = DebugTerminalInstance(debugTerminalWindow);
+        DebugTerminalInstance* dterminal = new DebugTerminalInstance(debugTerminalWindow);
         
 
 
@@ -601,8 +600,7 @@ void StartMenuButtonClick(GuiComponentStuff::BaseComponent* comp, GuiComponentSt
 
         //Window* oldActive = activeWindow;
         Window* mainWindow = (Window*)_Malloc(sizeof(Window), "App Window");
-        TerminalInstance* terminal = (TerminalInstance*)_Malloc(sizeof(TerminalInstance), "App Terminal");
-        *terminal = TerminalInstance(&guestUser);
+        TerminalInstance* terminal = new TerminalInstance(&guestUser);
         *(mainWindow) = Window((DefaultInstance*)terminal, Size(500, 500), Position(50, 50), BLEHUS_TITLE, true, true, true);
         mainWindow->hidden = BLEHUS_HIDE;
         mainWindow->oldHidden = !BLEHUS_HIDE;
@@ -642,8 +640,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
     {
         Window* window = (Window*)_Malloc(sizeof(Window), "GUI Window");
         osData.startMenuWindow = window;
-        GuiInstance* gui = (GuiInstance*)_Malloc(sizeof(GuiInstance), "GUI Instance");
-        *gui = GuiInstance(window);
+        GuiInstance* gui = new GuiInstance(window);
         *(window) = Window((DefaultInstance*)gui, Size(sW, sH), Position(1, GlobalRenderer->framebuffer->Height - sH - osData.windowPointerThing->taskbar->Height), "Start Menu", false, true, false);
         window->moveToFront = true;
         window->hidden = true;

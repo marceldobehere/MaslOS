@@ -462,8 +462,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         case Command_ConnectFour: {
             {
                 Window* con4Window = (Window*)_Malloc(sizeof(Window), "Connect 4 Window");
-                Connect4Instance* connect4 = (Connect4Instance*)_Malloc(sizeof(Connect4Instance), "Connect 4 Instance");
-                *connect4 = Connect4Instance(con4Window);
+                Connect4Instance* connect4 = new Connect4Instance(con4Window);
                 *(con4Window) = Window((DefaultInstance*)connect4, Size(200, 200), Position(10, 40), "Connect 4", true, true, true);
                 osData.windows.add(con4Window);
 

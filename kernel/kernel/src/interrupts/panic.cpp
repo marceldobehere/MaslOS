@@ -280,8 +280,7 @@ void LockLoop()
     Serial::Writeln("> Creating Debug Terminal Instance...");
     {
         mainWindow = (Window*)_Malloc(sizeof(Window), "DePaST Window");
-        TerminalInstance* terminal = (TerminalInstance*)_Malloc(sizeof(TerminalInstance), "Terminal Instance for DePaST Window");
-        *terminal = TerminalInstance(mainUser);
+        TerminalInstance* terminal = new TerminalInstance(mainUser);
         oldTerm = terminal;
 
         Serial::Writeln("> Setting Terminal to redirect to Serial...");

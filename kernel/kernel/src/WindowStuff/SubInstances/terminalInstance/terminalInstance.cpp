@@ -18,6 +18,8 @@ TerminalInstance::TerminalInstance(OSUser* user)
     printUser = false;
     newTermInstance = _Malloc(sizeof(NewTerminalInstance));
     *((NewTerminalInstance*)newTermInstance) = NewTerminalInstance();
+    FreeFuncHelp = (void*)this;
+    FreeFunc = (void(*)(void*))&Free;
 }
 void TerminalInstance::SetWindow(Window* window)
 {

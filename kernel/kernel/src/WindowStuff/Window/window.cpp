@@ -537,8 +537,7 @@ bool CreateWindowWithId(int64_t id)
         return false;
 
     Window* _mainWindow = (Window*)_Malloc(sizeof(Window), "Window");
-    GuiInstance* _gui = (GuiInstance*)_Malloc(sizeof(GuiInstance), "GUI Instance");
-    *_gui = GuiInstance(_mainWindow);
+    GuiInstance* _gui = new GuiInstance(_mainWindow);
     *(_mainWindow) = Window((DefaultInstance*)_gui, Size(100, 100), Position(10, 40), "Window", true, true, true);
     _mainWindow->windowId = id;
     osData.windows.add(_mainWindow);

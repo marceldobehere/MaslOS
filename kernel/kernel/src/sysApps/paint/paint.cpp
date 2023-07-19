@@ -52,8 +52,7 @@ namespace SysApps
         //window =
 
         window = (Window*)_Malloc(sizeof(Window), "Paint Window");
-        GuiInstance* gui = (GuiInstance*)_Malloc(sizeof(GuiInstance), "Paint");
-        *gui = GuiInstance(window);
+        GuiInstance* gui = new GuiInstance(window);
         *(window) = Window((DefaultInstance*)gui, Size(280, 400), Position(100, 100), "Paint", true, true, true);
         osData.windows.insertAt(window, 0);
         window->hidden = true;

@@ -12,6 +12,7 @@ class DebugTerminalInstance : public DefaultInstance
 
     public:
     DebugTerminalInstance(Window* window);
+    void Free();
 
 
 };

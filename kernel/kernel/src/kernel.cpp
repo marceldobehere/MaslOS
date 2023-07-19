@@ -126,7 +126,6 @@ void RenderLoop()
     uint64_t timeForFps = 1000;
 
 
-
     while(!osData.exit)
     {
 
@@ -952,10 +951,9 @@ void boot(BootInfo* bootInfo)
     Window* mainWindow;
     {
         mainWindow = (Window*)_Malloc(sizeof(Window), "Main window");
-        TerminalInstance* terminal = (TerminalInstance*)_Malloc(sizeof(TerminalInstance), "Terminal Instance for main window");
-        *terminal = TerminalInstance(&adminUser);
-        // NewTerminalInstance* terminal = (NewTerminalInstance*)malloc(sizeof(NewTerminalInstance), "New Terminal Instance for main window");
-        // *terminal = NewTerminalInstance(&adminUser, mainWindow);
+        TerminalInstance* terminal = new TerminalInstance(&adminUser);
+        //TerminalInstance* terminal = (TerminalInstance*)_Malloc(sizeof(TerminalInstance), "Terminal Instance for main window");
+        //*terminal = TerminalInstance(&adminUser);
 
         *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(5, 30), "Main Window", true, true, true);
         osData.windows.add(mainWindow);
