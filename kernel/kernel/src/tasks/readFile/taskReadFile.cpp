@@ -20,9 +20,7 @@ TaskReadFile::TaskReadFile(const char* path)
     this->path = StrCopy(path);
 
     this->TaskText = "<READ FILE TASK>";
-    this->DoTaskFuncHelp = (void*)this;
     this->DoTaskFunc = (void(*)(void*))(void*)&Do;
-    this->FreeTaskFuncHelp = (void*)this;
     this->FreeTaskFunc = (void(*)(void*))(void*)&Free;
 }
 

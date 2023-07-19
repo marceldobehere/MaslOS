@@ -635,6 +635,9 @@ void Panic(const char* panicMessage, bool lock)
     Panic(panicMessage, NULL, lock);
 }
 
-
+bool CheckKernelSpaceAddr(void* addr)
+{
+    return (uint64_t)addr >= 0xFFFF800000000000;
+}
 
 

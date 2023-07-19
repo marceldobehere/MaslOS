@@ -33,9 +33,7 @@ TaskBF::TaskBF(const char* code, Window* window)
     waitInput = false;
 
     this->TaskText = "<BF INTERPRETER TASK>";
-    this->DoTaskFuncHelp = (void*)this;
     this->DoTaskFunc = (void(*)(void*))(void*)&Do;
-    this->FreeTaskFuncHelp = (void*)this;
     this->FreeTaskFunc = (void(*)(void*))(void*)&Free;
 }
 

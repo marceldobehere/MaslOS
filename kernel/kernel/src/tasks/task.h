@@ -29,10 +29,8 @@ class Task
     public:
         const char* TaskText = "<IDK>";
 
-        void* DoTaskFuncHelp = NULL;
-        void (*DoTaskFunc)(void* bruh) = NULL;
 
-        void* FreeTaskFuncHelp = NULL;
+        void (*DoTaskFunc)(void* bruh) = NULL;
         void (*FreeTaskFunc)(void* bruh) = NULL;
 
     public:

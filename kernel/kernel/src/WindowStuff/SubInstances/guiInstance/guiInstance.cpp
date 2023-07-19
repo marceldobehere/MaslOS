@@ -21,7 +21,6 @@ GuiInstance::GuiInstance(Window* window)
     this->window = window;
     oldResizeable = false;
     instanceType = InstanceType::GUI;
-    FreeFuncHelp = (void*)this;
     FreeFunc = (void(*)(void*))&Free;
 }
 

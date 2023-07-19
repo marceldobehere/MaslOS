@@ -19,13 +19,12 @@ void DefaultInstance::DefaultFree()
         source = NULL;
     }
 
-    if ((((uint64_t)FreeFuncHelp) & 0xFFFF000000000000) == 0xFFFF000000000000)
+    if (CheckKernelSpaceAddr(this))
         Panic("INSTANCE HAS NOT BEEN INSTANTIATED WITH NEW!", true);
 
     if (FreeFunc != NULL)
     {
-        Serial::Writeln("> FREE FUNC HELP: {}", ConvertHexToString((uint64_t)FreeFuncHelp));
-        FreeFunc(FreeFuncHelp);
+        FreeFunc(this);
         _Free(this);
     }
     else

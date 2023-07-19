@@ -18,9 +18,7 @@ Task::Task()
     done = false;
     this->type = TaskType::NONE;
     TaskText = "<IDK>";
-    DoTaskFuncHelp = NULL;
     DoTaskFunc = NULL;
-    FreeTaskFuncHelp = NULL;
     FreeTaskFunc = NULL;
 }
 
@@ -30,11 +28,11 @@ void DoTask(Task* task)
     if (task->GetDone())
         return;
 
-    if ((((uint64_t)task->DoTaskFuncHelp) & 0xFFFF000000000000) == 0xFFFF000000000000)
+    if (CheckKernelSpaceAddr(task))
         Panic("TASK HAS NOT BEEN INSTANTIATED WITH NEW!", true);
 
     if (task->DoTaskFunc != NULL)
-        task->DoTaskFunc(task->DoTaskFuncHelp);
+        task->DoTaskFunc(task);
     else
         Panic("Task has no DoTaskFunc!");
 }
@@ -42,12 +40,12 @@ void DoTask(Task* task)
 void FreeTask(Task* task)
 {
 
-    if ((((uint64_t)task->DoTaskFuncHelp) & 0xFFFF000000000000) == 0xFFFF000000000000)
+    if (CheckKernelSpaceAddr(task))
         Panic("TASK HAS NOT BEEN INSTANTIATED WITH NEW!", true);
 
     if (task->FreeTaskFunc != NULL)
     {
-        task->FreeTaskFunc(task->FreeTaskFuncHelp);
+        task->FreeTaskFunc(task);
         _Free((void*)task);
     }
     else

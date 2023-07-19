@@ -15,9 +15,7 @@ TaskTaskManager::TaskTaskManager(Window* window)
     callCount = 0;
 
     this->TaskText = "<TASKMGR TASK>";
-    this->DoTaskFuncHelp = (void*)this;
     this->DoTaskFunc = (void(*)(void*))(void*)&Do;
-    this->FreeTaskFuncHelp = (void*)this;
     this->FreeTaskFunc = (void(*)(void*))(void*)&Free;
 
     oldTitle = window->title;

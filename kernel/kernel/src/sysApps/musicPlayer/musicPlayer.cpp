@@ -257,17 +257,17 @@ namespace SysApps
         int sampleRate = *((uint32_t*)(musicFileData + 24));
         int bitsPerSample = *((uint16_t*)(musicFileData + 34));
 
-        Serial::Writeln("Channels: {}", to_string(channels));
-        Serial::Writeln("SampleRate: {}", to_string(sampleRate));
-        Serial::Writeln("BitsPerSample: {}", to_string(bitsPerSample));
+        //Serial::Writeln("Channels: {}", to_string(channels));
+        //Serial::Writeln("SampleRate: {}", to_string(sampleRate));
+        //Serial::Writeln("BitsPerSample: {}", to_string(bitsPerSample));
 
 
         //AddToStack();
         if (osData.defaultAudioOutputDevice != NULL)
         {
             int sampleCount = sampleRate / 2;
-            Serial::Writeln("SampleCount: {}", to_string(sampleCount));
-            Serial::Writeln();
+            //Serial::Writeln("SampleCount: {}", to_string(sampleCount));
+            //Serial::Writeln();
             if (musicSource == NULL)
             {
                 //Println(window, "> Creating Audiosource");
