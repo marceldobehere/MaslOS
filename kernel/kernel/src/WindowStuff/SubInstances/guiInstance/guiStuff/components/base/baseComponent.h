@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <stddef.h>
 #include "../../generalStuff.h"
 #include "../../componentRenderer.h"
 
@@ -49,6 +50,17 @@ namespace GuiComponentStuff
 
 
         public:
+
+
+        void (*RenderFunc)(void* bruh, Field) = NULL;
+        void (*CheckUpdatesFunc)(void* bruh) = NULL;
+        void (*MouseClickedFunc)(void* bruh, MouseClickEventInfo) = NULL;
+        void (*KeyHitFunc)(void* bruh, KeyHitEventInfo) = NULL;
+        void (*DestroyFunc)(void* bruh, bool, void (*)(BaseComponent* comp)) = NULL;
+        ComponentSize (*GetActualComponentSizeFunc)(void* bruh) = NULL;
+        bool (*SetAttributeFunc)(void* bruh, int32_t, uint64_t) = NULL;
+        uint64_t (*GetAttributeFunc)(void* bruh, int32_t) = NULL;
+        int (*GetAttributeSizeFunc)(void* bruh, int32_t) = NULL;
 
         BaseComponent(BaseComponent* parent);
         BaseComponent();

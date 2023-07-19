@@ -6,6 +6,16 @@ namespace GuiComponentStuff
 {
     ScreenComponent::ScreenComponent(Window* window)
     {
+        RenderFunc = (void (*)(void*, Field))&Render;
+        CheckUpdatesFunc = (void (*)(void*))&CheckUpdates;
+        MouseClickedFunc = (void (*)(void*, MouseClickEventInfo))&MouseClicked;
+        KeyHitFunc = (void (*)(void*, KeyHitEventInfo))&KeyHit;
+        DestroyFunc = (void (*)(void*, bool, void (*)(BaseComponent* comp)))&Destroy;
+        GetActualComponentSizeFunc = (ComponentSize (*)(void*))&GetActualComponentSize;
+        SetAttributeFunc = (bool (*)(void*, int32_t, uint64_t))&SetAttribute;
+        GetAttributeFunc = (uint64_t (*)(void*, int32_t))&GetAttribute;
+        GetAttributeSizeFunc = (int (*)(void*, int32_t))&GetAttributeSize;
+        
         this->window = window;
         updateFields = new List<Field>(5);
         finalUpdatedFields = new List<Field>(5);

@@ -31,22 +31,10 @@ namespace GuiComponentStuff
             return;
 
         AddToStack();
-        if (componentType == RECT)
-            ((RectangleComponent*)this)->Render(field);
-        if (componentType == SCREEN)
-            ((ScreenComponent*)this)->Render(field);
-        if (componentType == BOX)
-            ((BoxComponent*)this)->Render(field);
-        if (componentType == TEXT)
-            ((TextComponent*)this)->Render(field);
-        if (componentType == BUTTON)
-            ((ButtonComponent*)this)->Render(field);
-        if (componentType == TEXTFIELD)
-            ((TextFieldComponent*)this)->Render(field);
-        if (componentType == IMAGE_RECT)
-            ((ImageRectangleComponent*)this)->Render(field);
-        if (componentType == CANVAS)
-            ((CanvasComponent*)this)->Render(field);
+        if (RenderFunc != NULL)
+            RenderFunc(this, field);
+        else
+            Panic("COMPONENT HAS NO RENDER FUNC!", true);
         RemoveFromStack();
     }
 
@@ -56,63 +44,31 @@ namespace GuiComponentStuff
             return;
 
         AddToStack();
-        if (componentType == RECT)
-            ((RectangleComponent*)this)->CheckUpdates();
-        if (componentType == SCREEN)
-            ((ScreenComponent*)this)->CheckUpdates();
-        if (componentType == BOX)
-            ((BoxComponent*)this)->CheckUpdates();
-        if (componentType == TEXT)
-            ((TextComponent*)this)->CheckUpdates();
-        if (componentType == BUTTON)
-            ((ButtonComponent*)this)->CheckUpdates();
-        if (componentType == TEXTFIELD)
-            ((TextFieldComponent*)this)->CheckUpdates();
-        if (componentType == IMAGE_RECT)
-            ((ImageRectangleComponent*)this)->CheckUpdates();
-        if (componentType == CANVAS)
-            ((CanvasComponent*)this)->CheckUpdates();
+        if (CheckUpdatesFunc != NULL)
+            CheckUpdatesFunc(this);
+        else
+            Panic("COMPONENT HAS NO CHECK UPDATES FUNC!", true);
         RemoveFromStack();
     }
 
     void BaseComponent::MouseClicked(MouseClickEventInfo info)
     {
-        if (componentType == RECT)
-            ((RectangleComponent*)this)->MouseClicked(info);
-        if (componentType == SCREEN)
-            ((ScreenComponent*)this)->MouseClicked(info);
-        if (componentType == BOX)
-            ((BoxComponent*)this)->MouseClicked(info);
-        if (componentType == TEXT)
-            ((TextComponent*)this)->MouseClicked(info);
-        if (componentType == BUTTON)
-            ((ButtonComponent*)this)->MouseClicked(info);
-        if (componentType == TEXTFIELD)
-            ((TextFieldComponent*)this)->MouseClicked(info);
-        if (componentType == IMAGE_RECT)
-            ((ImageRectangleComponent*)this)->MouseClicked(info);
-        if (componentType == CANVAS)
-            ((CanvasComponent*)this)->MouseClicked(info);
+        AddToStack();
+        if (MouseClickedFunc != NULL)
+            MouseClickedFunc(this, info);
+        else
+            Panic("COMPONENT HAS NO MOUSE CLICKED FUNC!", true);
+        RemoveFromStack();
     }
 
     void BaseComponent::KeyHit(KeyHitEventInfo info)
     {
-        if (componentType == RECT)
-            ((RectangleComponent*)this)->KeyHit(info);
-        if (componentType == SCREEN)
-            ((ScreenComponent*)this)->KeyHit(info);
-        if (componentType == BOX)
-            ((BoxComponent*)this)->KeyHit(info);
-        if (componentType == TEXT)
-            ((TextComponent*)this)->KeyHit(info);
-        if (componentType == BUTTON)
-            ((ButtonComponent*)this)->KeyHit(info);
-        if (componentType == TEXTFIELD)
-            ((TextFieldComponent*)this)->KeyHit(info);
-        if (componentType == IMAGE_RECT)
-            ((ImageRectangleComponent*)this)->KeyHit(info);
-        if (componentType == CANVAS)
-            ((CanvasComponent*)this)->KeyHit(info);
+        AddToStack();
+        if (KeyHitFunc != NULL)
+            KeyHitFunc(this, info);
+        else
+            Panic("COMPONENT HAS NO KEY HIT FUNC!", true);
+        RemoveFromStack();
     }
 
     bool BaseComponent::Destroy(bool destroyChildren, void (*callBackFunc)(BaseComponent* comp))
@@ -122,30 +78,13 @@ namespace GuiComponentStuff
         {
             GuiInstance* blehus = ((GuiInstance*)((Window*)GetWindow())->instance);
             int indx = blehus->GetIndexOfChildFromComponentWithId(parent->id, id);
-            // GlobalRenderer->Clear(Colors.dgray);
-            // GlobalRenderer->Println("P: {}", to_string(parent->id), Colors.white);
-            // GlobalRenderer->Println("C: {}", to_string(id), Colors.white);
-            // GlobalRenderer->Println("TEST: {}", to_string(indx), Colors.white);
-            // while (true);
             blehus->RemoveChildFromComponentWithId(parent->id, indx);
         }
         
-        if (componentType == RECT)
-            ((RectangleComponent*)this)->Destroy(destroyChildren, callBackFunc);
-        if (componentType == SCREEN)
-            ((ScreenComponent*)this)->Destroy(destroyChildren, callBackFunc);
-        if (componentType == BOX)
-            ((BoxComponent*)this)->Destroy(destroyChildren, callBackFunc);
-        if (componentType == TEXT)
-            ((TextComponent*)this)->Destroy(destroyChildren, callBackFunc);
-        if (componentType == BUTTON)
-            ((ButtonComponent*)this)->Destroy(destroyChildren, callBackFunc);
-        if (componentType == TEXTFIELD)
-            ((TextFieldComponent*)this)->Destroy(destroyChildren, callBackFunc);
-        if (componentType == IMAGE_RECT)
-            ((ImageRectangleComponent*)this)->Destroy(destroyChildren, callBackFunc);
-        if (componentType == CANVAS)
-            ((CanvasComponent*)this)->Destroy(destroyChildren, callBackFunc);
+        if (DestroyFunc != NULL)
+            DestroyFunc(this, destroyChildren, callBackFunc);
+        else
+            Panic("COMPONENT HAS NO DESTROY FUNC!", true);
 
         RemoveFromStack();
         return true;
@@ -153,24 +92,17 @@ namespace GuiComponentStuff
 
     ComponentSize BaseComponent::GetActualComponentSize()
     {
-        if (componentType == RECT)
-            return ((RectangleComponent*)this)->GetActualComponentSize();
-        if (componentType == SCREEN)
-            return ((ScreenComponent*)this)->GetActualComponentSize();
-        if (componentType == BOX)
-            return ((BoxComponent*)this)->GetActualComponentSize();
-        if (componentType == TEXT)
-            return ((TextComponent*)this)->GetActualComponentSize();
-        if (componentType == BUTTON)
-            return ((ButtonComponent*)this)->GetActualComponentSize();
-        if (componentType == TEXTFIELD)
-            return ((TextFieldComponent*)this)->GetActualComponentSize();
-        if (componentType == IMAGE_RECT)
-            return ((ImageRectangleComponent*)this)->GetActualComponentSize();
-        if (componentType == CANVAS)
-            return ((CanvasComponent*)this)->GetActualComponentSize();
-
-        return ComponentSize(0, 0);
+        AddToStack();
+        if (GetActualComponentSizeFunc != NULL)
+        {
+            ComponentSize size = GetActualComponentSizeFunc(this);
+            RemoveFromStack();
+            return size;
+        }
+        else
+            Panic("COMPONENT HAS NO GET ACTUAL COMPONENT SIZE FUNC!", true);
+        RemoveFromStack();
+        return ComponentSize();
     }
 
     Position BaseComponent::GetAbsoluteComponentPosition()
@@ -220,67 +152,46 @@ namespace GuiComponentStuff
 
     bool BaseComponent::SetAttribute(int32_t type, uint64_t val)
     {
-        if (componentType == RECT)
-            return ((RectangleComponent*)this)->SetAttribute(type, val);
-        if (componentType == SCREEN)
-            return ((ScreenComponent*)this)->SetAttribute(type, val);
-        if (componentType == BOX)
-            return ((BoxComponent*)this)->SetAttribute(type, val);
-        if (componentType == TEXT)
-            return ((TextComponent*)this)->SetAttribute(type, val);
-        if (componentType == BUTTON)
-            return ((ButtonComponent*)this)->SetAttribute(type, val);
-        if (componentType == TEXTFIELD)
-            return ((TextFieldComponent*)this)->SetAttribute(type, val);
-        if (componentType == IMAGE_RECT)
-            return ((ImageRectangleComponent*)this)->SetAttribute(type, val);
-        if (componentType == CANVAS)
-            return ((CanvasComponent*)this)->SetAttribute(type, val);
-
+        AddToStack();
+        if (SetAttributeFunc != NULL)
+        {
+            bool ret = SetAttributeFunc(this, type, val);
+            RemoveFromStack();
+            return ret;
+        }
+        else
+            Panic("COMPONENT HAS NO SET ATTRIBUTE FUNC!", true);
+        RemoveFromStack();
         return false;
     }
 
     uint64_t BaseComponent::GetAttribute(int32_t type)
     {
-        if (componentType == RECT)
-            return ((RectangleComponent*)this)->GetAttribute(type);
-        if (componentType == SCREEN)
-            return ((ScreenComponent*)this)->GetAttribute(type);
-        if (componentType == BOX)
-            return ((BoxComponent*)this)->GetAttribute(type);
-        if (componentType == TEXT)
-            return ((TextComponent*)this)->GetAttribute(type);
-        if (componentType == BUTTON)
-            return ((ButtonComponent*)this)->GetAttribute(type);
-        if (componentType == TEXTFIELD)
-            return ((TextFieldComponent*)this)->GetAttribute(type);
-        if (componentType == IMAGE_RECT)
-            return ((ImageRectangleComponent*)this)->GetAttribute(type);
-        if (componentType == CANVAS)
-            return ((CanvasComponent*)this)->GetAttribute(type);
-
+        AddToStack();
+        if (GetAttributeFunc != NULL)
+        {
+            uint64_t ret = GetAttributeFunc(this, type);
+            RemoveFromStack();
+            return ret;
+        }
+        else
+            Panic("COMPONENT HAS NO GET ATTRIBUTE FUNC!", true);
+        RemoveFromStack();
         return 0;
     }
 
     int BaseComponent::GetAttributeSize(int32_t type)
     {
-        if (componentType == RECT)
-            return ((RectangleComponent*)this)->GetAttributeSize(type);
-        if (componentType == SCREEN)
-            return ((ScreenComponent*)this)->GetAttributeSize(type);
-        if (componentType == BOX)
-            return ((BoxComponent*)this)->GetAttributeSize(type);
-        if (componentType == TEXT)
-            return ((TextComponent*)this)->GetAttributeSize(type);
-        if (componentType == BUTTON)
-            return ((ButtonComponent*)this)->GetAttributeSize(type);
-        if (componentType == TEXTFIELD)
-            return ((TextFieldComponent*)this)->GetAttributeSize(type);
-        if (componentType == IMAGE_RECT)
-            return ((ImageRectangleComponent*)this)->GetAttributeSize(type);
-        if (componentType == CANVAS)
-            return ((CanvasComponent*)this)->GetAttributeSize(type);
-
+        AddToStack();
+        if (GetAttributeSizeFunc != NULL)
+        {
+            int ret = GetAttributeSizeFunc(this, type);
+            RemoveFromStack();
+            return ret;
+        }
+        else
+            Panic("COMPONENT HAS NO GET ATTRIBUTE SIZE FUNC!", true);
+        RemoveFromStack();
         return 0;
     }
 

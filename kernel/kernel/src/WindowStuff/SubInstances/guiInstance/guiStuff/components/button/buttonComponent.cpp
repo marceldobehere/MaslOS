@@ -11,6 +11,16 @@ namespace GuiComponentStuff
 {
     ButtonComponent::ButtonComponent(const char* text, uint32_t textColDef, uint32_t textColHover, uint32_t textColClick, uint32_t bgColDef, uint32_t bgColHover, uint32_t bgColClick, ComponentSize size, Position position, BaseComponent* parent)
     {
+        RenderFunc = (void (*)(void*, Field))&Render;
+        CheckUpdatesFunc = (void (*)(void*))&CheckUpdates;
+        MouseClickedFunc = (void (*)(void*, MouseClickEventInfo))&MouseClicked;
+        KeyHitFunc = (void (*)(void*, KeyHitEventInfo))&KeyHit;
+        DestroyFunc = (void (*)(void*, bool, void (*)(BaseComponent* comp)))&Destroy;
+        GetActualComponentSizeFunc = (ComponentSize (*)(void*))&GetActualComponentSize;
+        SetAttributeFunc = (bool (*)(void*, int32_t, uint64_t))&SetAttribute;
+        GetAttributeFunc = (uint64_t (*)(void*, int32_t))&GetAttribute;
+        GetAttributeSizeFunc = (int (*)(void*, int32_t))&GetAttributeSize;
+
         OnMouseClickedCallBack = NULL;
         OnMouseClickHelp = NULL;
         mouseClickedCallBack = NULL;

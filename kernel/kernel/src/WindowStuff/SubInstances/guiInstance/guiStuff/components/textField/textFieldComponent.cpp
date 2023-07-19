@@ -12,6 +12,16 @@ namespace GuiComponentStuff
 {
     TextFieldComponent::TextFieldComponent(uint32_t textCol, uint32_t bgCol, ComponentSize size, Position position, BaseComponent* parent)
     {
+        RenderFunc = (void (*)(void*, Field))&Render;
+        CheckUpdatesFunc = (void (*)(void*))&CheckUpdates;
+        MouseClickedFunc = (void (*)(void*, MouseClickEventInfo))&MouseClicked;
+        KeyHitFunc = (void (*)(void*, KeyHitEventInfo))&KeyHit;
+        DestroyFunc = (void (*)(void*, bool, void (*)(BaseComponent* comp)))&Destroy;
+        GetActualComponentSizeFunc = (ComponentSize (*)(void*))&GetActualComponentSize;
+        SetAttributeFunc = (bool (*)(void*, int32_t, uint64_t))&SetAttribute;
+        GetAttributeFunc = (uint64_t (*)(void*, int32_t))&GetAttribute;
+        GetAttributeSizeFunc = (int (*)(void*, int32_t))&GetAttributeSize;
+        
         AdvancedKeyHitCallBack = NULL;
         keyHitCallBack = NULL;
         mouseClickedCallBack = NULL;
