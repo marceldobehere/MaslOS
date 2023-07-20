@@ -10,6 +10,7 @@ const uint32_t HeapMagicNum = 2406789212;
 int64_t lastFreeSize = 0;
 int64_t heapCount = 0;
 int64_t usedHeapCount = 0;
+int64_t usedHeapAmount = 0;
 void* heapStart;
 void* heapEnd;
 HeapSegHdr* lastHdr;
@@ -173,6 +174,7 @@ void SubInitHeap(void* heapAddress, size_t pageCount)
     lastHdr = startSeg;
     heapCount = 1;
     usedHeapCount = 0;
+    usedHeapAmount = 0;
 
     heapInited = true;
 
@@ -292,7 +294,7 @@ void UpdateMallocCache()
 
 
 
-void* _Xmalloc(size_t size, const char* func, const char* file, int line)
+void* _Xmalloc(int64_t size, const char* func, const char* file, int line)
 {
     return _Xmalloc(size, "<NO TEXT GIVEN>", func, file, line);
 }
@@ -388,15 +390,14 @@ bool HeapCheck(bool wait)
 }
 
 
-void* _Xmalloc(size_t size, const char* text, const char* func, const char* file, int line)
+void* _Xmalloc(int64_t size, const char* text, const char* func, const char* file, int line)
 {
     mCount++;
     AddToStack();
     if (!heapInited)
         Panic("Trying to malloc with Heap not being initialized!", true);
 
-
-    if (size == 0)
+    if (size <= 0)
         size = 0x10;
 
     if (size % 0x10 > 0)
@@ -473,6 +474,7 @@ void* _Xmalloc(size_t size, const char* text, const char* func, const char* file
                 current->time = PIT::TimeSinceBootMS();
                 mallocCount++;
                 usedHeapCount++;
+                usedHeapAmount += size;
                 RemoveFromStack();
                 //Serial::Writeln("> Malloced (1) to 0x{}", ConvertHexToString(((uint64_t)current + sizeof(HeapSegHdr))));
                 return (void*)((uint64_t)current + sizeof(HeapSegHdr));
@@ -488,6 +490,7 @@ void* _Xmalloc(size_t size, const char* text, const char* func, const char* file
                 current->time = PIT::TimeSinceBootMS();
                 mallocCount++;
                 usedHeapCount++;
+                usedHeapAmount += size;
                 RemoveFromStack();
                 //Serial::Writeln("> Malloced (2) to 0x{}", ConvertHexToString(((uint64_t)current + sizeof(HeapSegHdr))));
                 return (void*)((uint64_t)current + sizeof(HeapSegHdr));
@@ -567,6 +570,7 @@ void _Xfree(void* address, const char* func, const char* file, int line)
             freeCount++;
             segment->free = true;
             segment->text = "<FREE>";
+            usedHeapAmount -= segment->length;
             //GlobalRenderer->Print("A");
             //GlobalRenderer->Print("<");
             segment->CombineForward();
@@ -574,6 +578,7 @@ void _Xfree(void* address, const char* func, const char* file, int line)
             segment->CombineBackward();
             //GlobalRenderer->Print(">");
             usedHeapCount--;
+            
             RemoveFromStack();
             return;
         }
@@ -797,6 +802,7 @@ bool _XtryFree(void* address, const char* func, const char* file, int line)
             freeCount++;
             segment->free = true;
             segment->text = "<FREE>";
+            usedHeapAmount -= segment->length;
             //GlobalRenderer->Print("A");
             //GlobalRenderer->Print("<");
             segment->CombineForward();
@@ -804,6 +810,7 @@ bool _XtryFree(void* address, const char* func, const char* file, int line)
             segment->CombineBackward();
             //GlobalRenderer->Print(">");
             usedHeapCount--;
+            
 
             RemoveFromStack();
             return true;

@@ -97,6 +97,10 @@ namespace GuiComponentStuff
         {
             ComponentSize size = GetActualComponentSizeFunc(this);
             RemoveFromStack();
+            if (size.FixedX < 0)
+                size.FixedX = 0;
+            if (size.FixedY < 0)
+                size.FixedY = 0;
             return size;
         }
         else

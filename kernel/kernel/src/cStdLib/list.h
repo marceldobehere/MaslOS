@@ -45,6 +45,7 @@ template <typename T> class List
     void removeFirst();
     void removeFirst(int count);
     T elementAt(uint64_t index);
+    T lastElement();
     void set(uint64_t index, T item);
     T& operator[](uint64_t index);
     void clear();

@@ -31,14 +31,14 @@ void TrySwitchToBackupHeap();
 
 void InitializeHeap(void* heapAddress, size_t pageCount);
 
-void* _Xmalloc(size_t size, const char* func, const char* file, int line);
+void* _Xmalloc(int64_t size, const char* func, const char* file, int line);
 void _Xfree(void* address, const char* func, const char* file, int line);
 bool _XtryFree(void* address, const char* func, const char* file, int line);
 
 // void* _X_malloc(size_t size, const char* func, const char* file, int line);
 // void _X_free(void* address, const char* func, const char* file, int line);
 
-void* _Xmalloc(size_t size, const char* text, const char* func, const char* file, int line);
+void* _Xmalloc(int64_t size, const char* text, const char* func, const char* file, int line);
 // void* _X_malloc(size_t size, const char* text, const char* func, const char* file, int line);
 
 
@@ -115,6 +115,7 @@ extern void* heapStart;
 extern int64_t heapCount;
 
 extern int64_t usedHeapCount;
+extern int64_t usedHeapAmount;
 extern int64_t mallocCount;
 extern int64_t freeCount;
 extern int64_t activeMemFlagVal;

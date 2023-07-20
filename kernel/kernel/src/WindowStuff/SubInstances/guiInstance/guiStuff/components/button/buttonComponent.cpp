@@ -174,6 +174,11 @@ namespace GuiComponentStuff
          else
             temp.FixedY = size.ScaledY * parent->GetActualComponentSize().FixedY;
 
+        if (temp.FixedX < 0)
+            temp.FixedX = 0;
+        if (temp.FixedY < 0)
+            temp.FixedY = 0;
+
         return temp;
     }
 

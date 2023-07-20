@@ -71,6 +71,9 @@ namespace Audio
                     sixteenBit = eightBit;
                 srcSample = sixteenBit;
             }
+            // TODO add conversion from any bit to any bit
+            // for 16/32 bits its pretty simple, just multiply/divide
+            // for 8 bit stuff its a bit more pain
 
             long destIndex = ((destIndx * destCC + destTC) * destBPS) / 8;
             // convert from 32 bit to dest bps

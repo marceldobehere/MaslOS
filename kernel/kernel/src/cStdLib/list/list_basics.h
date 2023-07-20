@@ -10,6 +10,12 @@ template class List<bool>;
 template class Array<uint8_t>;
 template class List<uint8_t>;
 
+template class Array<uint64_t>;
+template class List<uint64_t>;
+
+template class Array<int64_t>;
+template class List<int64_t>;
+
 template class Array<const char*>;
 template class List<const char*>;
 

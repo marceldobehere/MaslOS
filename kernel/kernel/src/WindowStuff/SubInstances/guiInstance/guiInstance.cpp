@@ -149,8 +149,8 @@ void GuiInstance::Render()
 
     while (screen->finalUpdatedFields->getCount() > 0)
     {
-        GuiComponentStuff::Field bruh = screen->finalUpdatedFields->elementAt(0);
-        screen->finalUpdatedFields->removeAt(0);
+        GuiComponentStuff::Field bruh = screen->finalUpdatedFields->lastElement();
+        screen->finalUpdatedFields->removeLast();
 
         GuiComponentStuff::ComponentFramebuffer bruhus = GuiComponentStuff::ComponentFramebuffer
             (

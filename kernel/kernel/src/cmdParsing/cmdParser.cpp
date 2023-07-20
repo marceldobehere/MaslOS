@@ -231,8 +231,9 @@ void EditPartitionSetting(PartitionInterface::PartitionInfo* part, const char* p
 #include "../sysApps/imgTest/imgTest.h"
 #include "../sysApps/musicPlayer/musicPlayer.h"
 #include "../sysApps/paint/paint.h"
-
 #include "../sysApps/magnifier/magnifier.h"
+#include "../sysApps/memUsageShower/memUsageShower.h"
+
 
 #include "../audio/audioDevStuff.h"
 #include "..//devices/serial/serial.h"
@@ -271,6 +272,7 @@ BuiltinCommand BuiltinCommandFromStr(char* i)
   else if (StrEquals(i, "mag")) return Command_Magnifier;
   else if (StrEquals(i, "magnifier")) return Command_Magnifier;
   else if (StrEquals(i, "paint")) return Command_Paint;
+  else if (StrEquals(i, "heap monitor"), StrEquals(i, "ram usg")) return Command_RamUsage;
   else return Command_Invalid;
 }
 
@@ -302,6 +304,7 @@ void HelpCommand(Window* window)
         " - resdefspk               Resets the default speaker\n"
         " - magnifier               Opens the magnifier\n"
         " - paint                   Opens the paint app\n"
+        " - heap monitor            Opens the heap monitor\n"
         ;
     Print(window, helpMessage);
 }
@@ -372,6 +375,11 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         }
         case Command_Paint: {
             new SysApps::Paint();
+            RemoveFromStack();
+            return;
+        }
+        case Command_RamUsage: {
+            new SysApps::MemUsageShower();
             RemoveFromStack();
             return;
         }

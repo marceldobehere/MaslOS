@@ -16,7 +16,7 @@ namespace GuiComponentStuff
         SetAttributeFunc = (bool (*)(void*, int32_t, uint64_t))&SetAttribute;
         GetAttributeFunc = (uint64_t (*)(void*, int32_t))&GetAttribute;
         GetAttributeSizeFunc = (int (*)(void*, int32_t))&GetAttributeSize;
-        
+
         this->bgColor = bgColor;
         this->fgColor = fgColor;
         this->text = StrCopy(text);
@@ -154,6 +154,11 @@ namespace GuiComponentStuff
                 temp.FixedY = size.FixedY;
             else
                 temp.FixedY = size.ScaledY * parent->GetActualComponentSize().FixedY;
+
+            if (temp.FixedX < 0)
+                temp.FixedX = 0;
+            if (temp.FixedY < 0)
+                temp.FixedY = 0;
 
             return temp;
         }

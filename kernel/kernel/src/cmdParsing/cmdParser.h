@@ -44,6 +44,7 @@ enum BuiltinCommand {
     Command_ResetDefaultSpeaker,
     Command_Magnifier,
     Command_Paint,
+    Command_RamUsage
 };
 BuiltinCommand BuiltinCommandFromStr(char* i);
 

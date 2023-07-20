@@ -15,7 +15,7 @@ namespace GuiComponentStuff
         SetAttributeFunc = (bool (*)(void*, int32_t, uint64_t))&SetAttribute;
         GetAttributeFunc = (uint64_t (*)(void*, int32_t))&GetAttribute;
         GetAttributeSizeFunc = (int (*)(void*, int32_t))&GetAttributeSize;
-        
+
         this->window = window;
         updateFields = new List<Field>(5);
         finalUpdatedFields = new List<Field>(5);
@@ -123,8 +123,8 @@ namespace GuiComponentStuff
         AddToStack();
         while (updateFields->getCount() > 0)
         {
-            Field bruh = updateFields->elementAt(0);
-            updateFields->removeAt(0);
+            Field bruh = updateFields->lastElement();
+            updateFields->removeLast();
             finalUpdatedFields->add(bruh);
             renderer->bgCol = backgroundColor;
             renderer->Fill(renderer->bgCol, bruh);

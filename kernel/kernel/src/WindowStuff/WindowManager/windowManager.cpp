@@ -908,15 +908,6 @@ if (window != NULL)
         osData.debugTerminalWindow->Log("FPS: {}", to_string(fps), Colors.yellow);
         RemoveFromStack();
 
-        AddToStack();
-        osData.debugTerminalWindow->renderer->Clear(
-            osData.debugTerminalWindow->renderer->CursorPosition.x,
-            osData.debugTerminalWindow->renderer->CursorPosition.y,
-            osData.debugTerminalWindow->renderer->CursorPosition.x + 200,
-            osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
-            Colors.black);
-        osData.debugTerminalWindow->Log("Heap count: {}", to_string(heapCount), Colors.yellow);
-        RemoveFromStack();
 
         AddToStack();
         osData.debugTerminalWindow->renderer->Clear(
@@ -926,6 +917,16 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
         osData.debugTerminalWindow->Log("Used Heap count: {}", to_string(usedHeapCount), Colors.yellow);
+        RemoveFromStack();
+
+        AddToStack();
+        osData.debugTerminalWindow->renderer->Clear(
+            osData.debugTerminalWindow->renderer->CursorPosition.x,
+            osData.debugTerminalWindow->renderer->CursorPosition.y,
+            osData.debugTerminalWindow->renderer->CursorPosition.x + 300,
+            osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
+            Colors.black);
+        osData.debugTerminalWindow->Log("Used Heap amount: {} KB", to_string(usedHeapAmount / 0x1000), Colors.yellow);
         RemoveFromStack();
 
         AddToStack();

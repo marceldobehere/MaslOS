@@ -173,6 +173,7 @@ namespace SysApps
         AddToStack();
         // add colors here
         int startIdForColorButtons = 1300;
+        lastCol = NULL;
         for (int y = 0; y < 2; y++)
         {
             for (int x = 0; x < 14; x++)
@@ -186,12 +187,23 @@ namespace SysApps
 
                 GuiComponentStuff::ButtonComponent* colorBtn = (GuiComponentStuff::ButtonComponent*)guiInstance->GetComponentFromId(startIdForColorButtons);
                 
+
+            
                 colorBtn->position.x = x * 20;
                 colorBtn->position.y = y * 20;
                 colorBtn->size.IsXFixed = true;
                 colorBtn->size.FixedX = 20;
                 colorBtn->size.IsYFixed = true;
                 colorBtn->size.FixedY = 20;
+
+                if (lastCol == NULL)
+                {
+                    lastCol = colorBtn;
+                    lastCol->position.x += 2;
+                    lastCol->position.y += 2;
+                    lastCol->size.FixedX -= 4;
+                    lastCol->size.FixedY -= 4;
+                }
 
                 colorBtn->bgColDef    = DefaultMSColors[x + y * 14];
                 colorBtn->bgColHover = colorBtn->bgColDef | 0xFF000000;
@@ -226,6 +238,10 @@ namespace SysApps
             ); 
             oldMousePos = aPos;
         }
+        canvas->CheckUpdates();
+
+        // canvas->DrawText(0, 0, Colors.black, 1, "Hoi!");
+        // canvas->DrawText(8, 16, Colors.brown, 2, "Hello, world!");
 
 
         RemoveFromStack();
@@ -255,6 +271,22 @@ namespace SysApps
 
     void Paint::OnColorClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
     {
+        if (lastCol != NULL)
+        {
+            lastCol->position.x -= 2;
+            lastCol->position.y -= 2;
+            lastCol->size.FixedX += 4;
+            lastCol->size.FixedY += 4;
+        }
+
+        {
+            lastCol = btn;
+            lastCol->position.x += 2;
+            lastCol->position.y += 2;
+            lastCol->size.FixedX -= 4;
+            lastCol->size.FixedY -= 4;
+        }
+
         currentColor = btn->bgColDef;
     }
 
@@ -292,50 +324,16 @@ namespace SysApps
             if (inRange)
             {
                 if (oldMouseLeftState && oldMousePos != aPos)
-                    DrawLine(oldMousePos.x, oldMousePos.y, aPos.x, aPos.y, currentColor, curSize);
+                    canvas->DrawLine(oldMousePos.x, oldMousePos.y, aPos.x, aPos.y, currentColor, curSize);
                 else if (!oldMouseLeftState)
-                    DrawBlob(aPos.x, aPos.y, currentColor, curSize);
+                    canvas->DrawBlob(aPos.x, aPos.y, currentColor, curSize);
             }
             oldMousePos = aPos;
         }
         oldMouseLeftState = currMouseLeftState;
     }
 
-    void Paint::DrawPixel(int x, int y, uint32_t col)
-    {
-        GuiComponentStuff::ComponentFramebuffer* fb = canvas->renderer->componentFrameBuffer;
-        if (x >= 0 && x < fb->Width && 
-            y >= 0 && y < fb->Height)
-            fb->pixels[x + y * fb->Width] = currentColor;
-    }
-    void Paint::DrawBlob(int x, int y, uint32_t col, int size)
-    {
-        for (int x1 = x - size; x1 <= x + size; x1++)
-        {
-            for (int y1 = y - size; y1 <= y + size; y1++)
-            {
-                DrawPixel(x1, y1, col);
-            }
-        }
-        canvas->UpdateCanvas(x - size, y - size, size*2, size*2);
-    }
-    void Paint::DrawLine(int x1, int y1, int x2, int y2, uint32_t col, int size)
-    {
-        int dx = x2 - x1;
-        int dy = y2 - y1;
-        int steps = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
-        // float xInc = dx / (float)steps;
-        // float yInc = dy / (float)steps;
-
-        for (int i = 0; i < steps; i++)
-        {
-            DrawBlob(
-                (x1 * steps + (dx * i)) / steps, 
-                (y1 * steps + (dy * i)) / steps,
-                col, 
-                size);
-        }
-    }
+   
 
     void Paint::OnTaskDone(Task* task)
     {

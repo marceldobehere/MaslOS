@@ -229,6 +229,11 @@ template <typename T> T List<T>::elementAt(uint64_t index)
     return arr[index];
 }
 
+template <typename T> T List<T>::lastElement()
+{
+    return arr[count - 1];
+}
+
 
 
 template <typename T>bool List<T>::operator==(List<T> other)

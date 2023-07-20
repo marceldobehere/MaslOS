@@ -21,6 +21,7 @@ namespace SysApps
         GuiComponentStuff::ButtonComponent* saveAsBtn;
         GuiComponentStuff::ButtonComponent* clearBtn;
         GuiComponentStuff::BoxComponent* colorBox;
+        GuiComponentStuff::ButtonComponent* lastCol;
         // Colors will be added into the colorbox
         GuiComponentStuff::CanvasComponent* canvas;
         GuiComponentStuff::Position canvasPosition;
@@ -47,9 +48,6 @@ namespace SysApps
         void OnCanvasClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info);
         void OnExternalWindowFrame(Window* window);
 
-        void DrawPixel(int x, int y, uint32_t col);
-        void DrawBlob(int x, int y, uint32_t col, int size);
-        void DrawLine(int x1, int y1, int x2, int y2, uint32_t col, int size);
         
         void OnTaskDone(Task* task);
 
