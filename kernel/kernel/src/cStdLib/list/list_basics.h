@@ -4,6 +4,9 @@
 template class Array<int>;
 template class List<int>;
 
+template class Array<char>;
+template class List<char>;
+
 template class Array<bool>;
 template class List<bool>;
 

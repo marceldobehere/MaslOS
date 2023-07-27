@@ -155,23 +155,6 @@ void RenderLoop()
         osStats.frameStartTime = PIT::TimeSinceBootMicroS();
 
 
-        if (Serial::CanRead())
-        {
-            char c = Serial::Read();
-            if (c == '\r')
-            {
-                Serial::Write("\r\n");
-            }
-            else if (c == '\b')
-            {
-                Serial::Write("\b \b");
-            }
-            else
-            {
-                Serial::Write(c);
-            }
-        }
-
         if (!osData.startMenuWindow->hidden && activeWindow != osData.startMenuWindow)
         {
             osData.startMenuWindow->hidden = true;

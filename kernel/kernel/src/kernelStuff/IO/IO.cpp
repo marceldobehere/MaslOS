@@ -72,3 +72,40 @@ void io_wait(uint64_t us)
     while(us--)
         io_wait();
 }
+
+
+void mOutb(uint64_t address, uint8_t value)
+{
+    (*((volatile uint8_t*)(address)))=(value);
+}
+uint8_t mInb(uint64_t address)
+{
+    return (*((volatile uint8_t*)(address)));
+}
+
+void mOutw(uint64_t address, uint16_t value)
+{
+    (*((volatile uint16_t*)(address)))=(value);
+}
+uint16_t mInw(uint64_t address)
+{
+    return (*((volatile uint16_t*)(address)));
+}
+
+void mOutl(uint64_t address, uint32_t value)
+{
+    (*((volatile uint32_t*)(address)))=(value);
+}
+uint32_t mInl(uint64_t address)
+{
+    return (*((volatile uint32_t*)(address)));
+}
+
+void mOutq(uint64_t address, uint64_t value)
+{
+    (*((volatile uint64_t*)(address)))=(value);
+}
+uint64_t mInq(uint64_t address)
+{
+    return (*((volatile uint64_t*)(address)));
+}

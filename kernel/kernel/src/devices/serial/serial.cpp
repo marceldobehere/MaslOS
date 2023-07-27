@@ -17,6 +17,7 @@ namespace Serial
         {
             osData.debugTerminalWindow->Log("Serial PCI CARD AT: 0x{}", ConvertHexToString(pciCard), Colors.yellow);
             uint64_t bar0 = ((PCI::PCIHeader0*)pciCard)->BAR0;
+            uint64_t bar1 = ((PCI::PCIHeader0*)pciCard)->BAR1;
             uint64_t bar2 = ((PCI::PCIHeader0*)pciCard)->BAR2;
             osData.debugTerminalWindow->Log("Serial PCI CARD BAR0: {}", ConvertHexToString(bar0), Colors.yellow);
             //osData.debugTerminalWindow->Log("Serial PCI CARD BAR2: {}", ConvertHexToString(bar2), Colors.yellow);
@@ -27,6 +28,11 @@ namespace Serial
             pciIoBase = bar0;// & (~0x3);
             //pciIoBase = bar2;// & (~0x3);
             pciIoBase += 0xC0;
+
+
+            // try with membase?
+            //pciIoBase = bar0 + 0x3A7;
+
             //pciIoBase += 0x08;
             osData.debugTerminalWindow->Log("Serial PCI CARD IO BASE: {}", to_string(pciIoBase), Colors.bgreen);
             PCI::enable_interrupt(pciCard);
@@ -149,27 +155,96 @@ namespace Serial
 
     bool CanRead()
     {
-        return SerialWorks && (Sinb(5) & 1);
+        if (osData.serialManager == NULL)
+            return _CanRead();
+        else
+        {
+            if (osData.serialManager->clientConnected)    
+                return osData.serialManager->HasPacket(SerialManager::ReservedHostPortsEnum::RawSerial);
+            else if (osData.serialManager->receiveBuffer->getCount() > 0)
+                return true;
+            else
+                return _CanRead();
+        }
     }
 
     char Read()
     {
+        if (osData.serialManager == NULL)
+            return _Read();
+        else
+        {
+            if (osData.serialManager->clientConnected)    
+            {
+                SerialManager::GenericPacket* packet = osData.serialManager->GetPacket(SerialManager::ReservedHostPortsEnum::RawSerial);
+                if (packet == NULL)
+                    return 0;
+                else
+                {
+                    char ret = packet->data[0];
+                    packet->Free();
+                    return ret;
+                }
+            }
+            else if (osData.serialManager->receiveBuffer->getCount() > 0)
+            {
+                char ret = osData.serialManager->receiveBuffer->elementAt(0);
+                osData.serialManager->receiveBuffer->removeAt(0);
+                return ret;
+            }
+            else
+                return _Read();
+        }
+    }
+    bool CanWrite()
+    {
+        if (osData.serialManager == NULL ||
+            !osData.serialManager->clientConnected)
+            return _CanWrite();
+        else
+            return true;
+    }
+    void Write(char chr)
+    {
+        if (osData.serialManager == NULL ||
+            !osData.serialManager->clientConnected)
+            _Write(chr);
+        else
+        {
+            SerialManager::GenericPacket* packet = 
+            new SerialManager::GenericPacket(
+                SerialManager::PacketType::DATA, 
+                SerialManager::ReservedHostPortsEnum::RawSerial, 
+                SerialManager::ReservedOutClientPortsEnum::RawSerialClient, 
+                1, 
+                (uint8_t*)&chr);
+            osData.serialManager->SendPacket(packet);
+        }
+    }
+
+    bool _CanRead()
+    {
+        return SerialWorks && (Sinb(5) & 1 == 1);
+    }
+
+    char _Read()
+    {
         if (!SerialWorks)
             return 0;
-        while (CanRead() == 0);
+        while (!_CanRead());
         return Sinb(0);
     }
 
-    bool CanWrite()
+    bool _CanWrite()
     {
         return SerialWorks && (Sinb(5) & 0x20);
     }
 
-    void Write(char chr)
+    void _Write(char chr)
     {
         if (!SerialWorks)
             return;
-        while (!CanWrite());
+        while (!_CanWrite());
         Soutb(0, chr);
     }
 
@@ -290,7 +365,12 @@ namespace Serial
             outb(SerialPort + port, value);
         else
             //PCI::write_byte(pciCard, port, value);
-            outb(pciIoBase + port, value);
+        {
+            if (false)
+                mOutb(pciIoBase + port, value);
+            else
+                outb(pciIoBase + port, value);
+        }
     }
 
     uint8_t Sinb(uint16_t port)
@@ -299,6 +379,11 @@ namespace Serial
             return inb(SerialPort + port);
         else
             //return PCI::read_byte(pciCard, port);
-            return inb(pciIoBase + port);
+        {
+            if (false)
+                return mInb(pciIoBase + port);
+            else
+                return inb(pciIoBase + port);
+        }
     }
 }

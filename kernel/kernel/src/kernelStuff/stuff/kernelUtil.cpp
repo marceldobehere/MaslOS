@@ -1002,6 +1002,10 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     // if (!SB16::SB16Init())
     //     PrintMsg("> SB16 is not supported on this system");
     // StepDone();
+
+    PrintMsg("> Initing Serial Manager Thingy");
+    osData.serialManager = new SerialManager::Manager();
+    StepDone();
     
     PrintMsg("> Initing Users");
     initUsers();
