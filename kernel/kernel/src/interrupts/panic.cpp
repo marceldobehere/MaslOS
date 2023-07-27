@@ -138,7 +138,6 @@ void CreateWindowWithBenchmarkData()
 
 
 
-
     bool tempBench = MStackData::BenchmarkEnabled;
     MStackData::BenchmarkEnabled = false;
 
@@ -558,6 +557,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
     else
     {
         kernelPanicCount++;
+        osData.serialManager = NULL;
         GlobalRenderer->ClearDotted(Colors.red);
         GlobalRenderer->Println();
         GlobalRenderer->Println();

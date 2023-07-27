@@ -12,6 +12,8 @@
 
 #include "../devices/ac97/ac97.h"
 
+#include "../serialManager/serialManager.h"
+
 struct OSData
 {
     bool exit;
@@ -59,6 +61,7 @@ struct OSData
     uint32_t wantedFps = 60;
     AC97::AC97Driver* ac97Driver = NULL;
     Audio::AudioOutputDevice* pcSpeakerDev;
+    SerialManager::Manager* serialManager = NULL;
 
 };
 

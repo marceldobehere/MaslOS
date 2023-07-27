@@ -10,6 +10,7 @@
 #include "../osData/osStats.h"
 
 #include "../devices/acpi/acpiShutdown.h"
+#include "../serialManager/serialManager.h"
 
 
 
@@ -260,6 +261,9 @@ __attribute__((interrupt)) void PITInt_handler(interrupt_frame* frame)
     PIT::Tick();
     PIC_EndMaster();
     AudioDeviceStuff::play(PIT::FreqAdder);
+    if (osData.serialManager != NULL)
+        osData.serialManager->DoStuff();
+    
 
     // TestSetSpeakerPosition(speakA);
     // speakA = !speakA;

@@ -272,7 +272,8 @@ BuiltinCommand BuiltinCommandFromStr(char* i)
   else if (StrEquals(i, "mag")) return Command_Magnifier;
   else if (StrEquals(i, "magnifier")) return Command_Magnifier;
   else if (StrEquals(i, "paint")) return Command_Paint;
-  else if (StrEquals(i, "heap monitor"), StrEquals(i, "ram usg")) return Command_RamUsage;
+  else if (StrEquals(i, "heap monitor")) return Command_RamUsage;
+  else if (StrEquals(i, "ram usg")) return Command_RamUsage;
   else return Command_Invalid;
 }
 
