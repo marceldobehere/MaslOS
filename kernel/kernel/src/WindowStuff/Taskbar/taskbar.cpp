@@ -213,7 +213,12 @@ namespace Taskbar
         
         // Time
         {
-            tX = to_string(RTC::Hour);
+            //tX = to_string(RTC::Hour + osData.time_hour);
+            if(RTC::Hour + osData.time_hour > 24){
+                tX = to_string(RTC::Hour + osData.time_hour - 24);
+            }else{
+                tX = to_string(RTC::Hour + osData.time_hour);
+            }
             tL = StrLen(tX);
             for (int i = 0; i < tL; i++)
                 tempTime[i + 0 + (2 - tL)] = tX[i];

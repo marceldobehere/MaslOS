@@ -63,6 +63,7 @@ struct OSData
     Audio::AudioOutputDevice* pcSpeakerDev;
     SerialManager::Manager* serialManager = NULL;
 
+    int time_hour = NULL;
 };
 
 

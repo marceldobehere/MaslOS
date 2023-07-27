@@ -23,6 +23,7 @@
 #include "../tasks/debugViewTask/debugViewTask.h"
 #include "../fsStuff/fsStuff.h"
 #include "../tasks/maab/maabTask.h"
+#include "../devices/rtc/rtc.h"
 
 void Println(Window* window)
 {
@@ -66,6 +67,9 @@ void Print(Window* window, const char *chrs, dispVar vars[], uint32_t col)
     temp->Print(chrs, vars, col);
 }
 
+#define EXIT_COMMAND_TASK   _Free(data); \
+                            RemoveFromStack(); \
+                            return;
 
 
 /*
@@ -599,9 +603,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 
     if (data->len == 0)
     {
-        _Free(data);
-        RemoveFromStack();
-        return;
+        EXIT_COMMAND_TASK
     }
 
     // Println("Parts:");
@@ -618,9 +620,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         */
        Println(window,StrSubstr(input,5),Colors.white);
         
-        _Free(data);
-        RemoveFromStack();
-        return;
+        EXIT_COMMAND_TASK
     }
 
     if (StrEquals(data->data[0], "io"))
@@ -681,9 +681,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         else
             LogError("Invalid IO Command!", window);
         
-        _Free(data);
-        RemoveFromStack();
-        return;
+        EXIT_COMMAND_TASK
     }
 
     if (StrEquals(data->data[0], "serial"))
@@ -707,9 +705,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         else
             LogInvalidArgumentCount(1, data->len-1, window);
         
-        _Free(data);
-        RemoveFromStack();
-        return;
+        EXIT_COMMAND_TASK
     }
 
     if (StrEquals(data->data[0], "bf"))
@@ -719,9 +715,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         else
             LogInvalidArgumentCount(1, data->len-1, window);
         
-        _Free(data);
-        RemoveFromStack();
-        return;
+        EXIT_COMMAND_TASK
     }
 
     if (StrEquals(data->data[0], "img"))
@@ -731,9 +725,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         else
             LogInvalidArgumentCount(1, data->len-1, window);
         
-        _Free(data);
-        RemoveFromStack();
-        return;
+        EXIT_COMMAND_TASK
     }
 
     if (StrEquals(data->data[0], "music"))
@@ -743,9 +735,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         else
             LogInvalidArgumentCount(1, data->len-1, window);
         
-        _Free(data);
-        RemoveFromStack();
-        return;
+        EXIT_COMMAND_TASK
     }
 
     if (StrEquals(data->data[0], "run") || StrEquals(data->data[0], "opn") || StrEquals(data->data[0], "open"))
@@ -755,9 +745,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         else
             LogInvalidArgumentCount(1, data->len-1, window);
         
-        _Free(data);
-        RemoveFromStack();
-        return;
+        EXIT_COMMAND_TASK
     }
 
     if (StrEquals(data->data[0], "dbg") || StrEquals(data->data[0], "debug") || StrEquals(data->data[0], "hex"))
@@ -775,9 +763,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         else
             LogInvalidArgumentCount(1, data->len-1, window);
         
-        _Free(data);
-        RemoveFromStack();
-        return;
+        EXIT_COMMAND_TASK
     }
     
 
@@ -810,9 +796,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         else
             LogInvalidArgumentCount(1, data->len-1, window);
         
-        _Free(data);
-        RemoveFromStack();
-        return;
+        EXIT_COMMAND_TASK
     }
 
     if (StrEquals(data->data[0], "set"))
@@ -824,9 +808,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         else
             LogInvalidArgumentCount(2, data->len-1, window);
         
-        _Free(data);
-        RemoveFromStack();
-        return;
+        EXIT_COMMAND_TASK
     }
 
     if (StrEquals(data->data[0], "get"))
@@ -836,9 +818,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         else
             LogInvalidArgumentCount(1, data->len-1, window);
         
-        _Free(data);
-        RemoveFromStack();
-        return;
+        EXIT_COMMAND_TASK
     }
 
     if (StrEquals(data->data[0], "maab"))
@@ -902,9 +882,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         else
             LogInvalidArgumentCount(1, data->len-1, window);
         
-        _Free(data);
-        RemoveFromStack();
-        return;
+        EXIT_COMMAND_TASK
     }
 
     if (StrEquals(data->data[0], "testo"))
@@ -968,9 +946,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         else
             LogInvalidArgumentCount(1, data->len-1, window);
         
-        _Free(data);
-        RemoveFromStack();
-        return;
+        EXIT_COMMAND_TASK
     }
 
     if (StrEquals(data->data[0], "substr"))
@@ -984,10 +960,30 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         else
             LogInvalidArgumentCount(2, data->len-1, window);
         
-        _Free(data);
-        RemoveFromStack();
-        return;
+        EXIT_COMMAND_TASK
     }
+
+    if (StrEquals(data->data[0], "tset"))
+    {
+        osData.time_hour = to_int(data->data[1]);
+        
+        EXIT_COMMAND_TASK
+    }
+
+    if (StrEquals(data->data[0], "ptime"))
+    {
+        Println(window,"RTC INFO");
+        Println(window,"TIME: ", Colors.yellow);
+        Print(window,"{}.", to_string((int)RTC::Year), Colors.yellow);
+        Print(window,"{}.", to_string((int)RTC::Month), Colors.yellow);
+        Print(window,"{}|", to_string((int)RTC::Day), Colors.yellow);
+        Print(window,"{}:", to_string((int)RTC::Hour + osData.time_hour), Colors.yellow);
+        Print(window,"{}:", to_string((int)RTC::Minute), Colors.yellow);
+        Print(window,"{}", to_string((int)RTC::Second), Colors.yellow);
+        
+        EXIT_COMMAND_TASK
+    }
+
 
 
     if (StrEquals(data->data[0], "login"))
@@ -997,9 +993,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         else
             LogInvalidArgumentCount(1, data->len-1, window);
         
-        _Free(data);
-        RemoveFromStack();
-        return;
+        EXIT_COMMAND_TASK
     }
 
     if (StrEquals(data->data[0], "beep"))
@@ -1923,9 +1917,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             LogError("No valid arguments passed!", window);
         }
         
-        _Free(data);
-        RemoveFromStack();
-        return;
+        EXIT_COMMAND_TASK
     }
 
 
