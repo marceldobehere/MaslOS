@@ -608,10 +608,13 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 
     if (StrEquals(data->data[0], "echo"))
     {
+        /*
         if (data->len == 2)
             Println(window, data->data[1]);
         else
             LogInvalidArgumentCount(1, data->len-1, window);
+        */
+       Println(window,StrSubstr(input,5),Colors.white);
         
         _Free(data);
         RemoveFromStack();
