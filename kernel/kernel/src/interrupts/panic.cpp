@@ -125,7 +125,7 @@ void CreateWindowWithBenchmarkData()
             //GlobalRenderer->Println("BRUH 4.5", Colors.yellow);
             *(benchmarkWindow) = Window(new CustomInstance(InstanceType::WARNING), size, pos, "Crash Benchmark", true, true, true);
             //GlobalRenderer->Println("BRUH 4.6", Colors.yellow);
-            osData.windows.add(benchmarkWindow);
+            osData.windows.Add(benchmarkWindow);
             
             //GlobalRenderer->Println("BRUH 4.7", Colors.yellow);
 
@@ -189,7 +189,7 @@ void LockOsStuffLoop(Window* termWindow)
     AddToStack();
     {
         uint64_t tS = PIT::TimeSinceBootMicroS();
-        if (osData.osTasks.getCount() > 0)
+        if (osData.osTasks.GetCount() > 0)
         {
             uint64_t tS2 = PIT::TimeSinceBootMicroS();
             Task* task = osData.osTasks[0];
@@ -199,7 +199,7 @@ void LockOsStuffLoop(Window* termWindow)
             task->tempTime += PIT::TimeSinceBootMicroS() - tS2;
             if (task->GetDone())
             {
-                osData.osTasks.removeFirst();
+                osData.osTasks.RemoveFirst();
                 FreeTask(task);
             }
         }
@@ -209,9 +209,9 @@ void LockOsStuffLoop(Window* termWindow)
 
     AddToStack();
     {
-        for (int i = 0; i < osData.windows.getCount(); i++)
+        for (int i = 0; i < osData.windows.GetCount(); i++)
         {     
-            i = osData.windows.getCount();
+            i = osData.windows.GetCount();
             Window* window = termWindow; // only do terminal window
             if (window->instance == NULL)
                 continue;
@@ -222,7 +222,7 @@ void LockOsStuffLoop(Window* termWindow)
 
             TerminalInstance* terminal = (TerminalInstance*)window->instance;
 
-            if (terminal->tasks.getCount() > 0)
+            if (terminal->tasks.GetCount() > 0)
             {
                 uint64_t tS2 = PIT::TimeSinceBootMicroS();
                 Task* task = terminal->tasks[0];
@@ -232,7 +232,7 @@ void LockOsStuffLoop(Window* termWindow)
                 task->tempTime += PIT::TimeSinceBootMicroS() - tS2;
                 if (task->GetDone())
                 {
-                    terminal->tasks.removeFirst();
+                    terminal->tasks.RemoveFirst();
                     FreeTask(task);
                     //GlobalRenderer->Println("TASK DONE");
                     terminal->PrintUserIfNeeded();
@@ -290,7 +290,7 @@ void LockLoop()
 
         Serial::Writeln("> Creating Debug Window...");
         *(mainWindow) = Window((DefaultInstance*)terminal, Size(10*8, 2*16), Position(50, 50), "DePaST Window", true, true, true);
-        osData.windows.add(mainWindow);
+        osData.windows.Add(mainWindow);
         Serial::Writeln("> Init Done!");
         terminal->SetWindow(mainWindow);
         terminal->Cls();
@@ -327,7 +327,7 @@ void LockLoop()
                 bool keyHandled = false;
                 {
                     TaskMAAB* maab = NULL;
-                    for (int i = 0; i < oldTerm->tasks.getCount(); i++)
+                    for (int i = 0; i < oldTerm->tasks.GetCount(); i++)
                     {
                         if (oldTerm->tasks[i]->GetType() == TaskType::MAAB)
                         {
@@ -475,7 +475,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         if (osData.tempCrash)
         {
             //GlobalRenderer->Println("BRUH 2", Colors.yellow);
-            for (int i = 0; i < osData.windows.getCount(); i++)
+            for (int i = 0; i < osData.windows.GetCount(); i++)
                 osData.windows[i]->hidden = true;
             //GlobalRenderer->Println("BRUH 3", Colors.yellow);
         }
@@ -495,7 +495,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
                     //GlobalRenderer->Println("BRUH 4.5", Colors.yellow);
                     *(crashWindow) = Window(new CustomInstance(InstanceType::WARNING), size, pos, "Crash Warning", true, true, true);
                     //GlobalRenderer->Println("BRUH 4.6", Colors.yellow);
-                    osData.windows.add(crashWindow);
+                    osData.windows.Add(crashWindow);
                     
                     //GlobalRenderer->Println("BRUH 4.7", Colors.yellow);
 
@@ -503,7 +503,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
                     // //osData.mainTerminalWindow = crashWindow;
                     // osData.activeCrashWindow = crashWindow;
                     // crashWindow->moveToFront = true;
-                    osData.windowsToGetActive.add(crashWindow);
+                    osData.windowsToGetActive.Enqueue(crashWindow);
                 }
             }
             // it crashes between 4 and 5, probably while trying to allocate memory since it used all the memory

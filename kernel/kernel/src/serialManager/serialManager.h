@@ -68,10 +68,9 @@ namespace SerialManager
 
     enum PacketType : uint8_t
     {
-        ON = 10,
-        OFF = 20,
-        PING = 30,
-        DATA = 40,
+        STATE = 10,
+        PING = 20,
+        DATA = 30,
     };
 
     class GenericPacket
@@ -133,5 +132,30 @@ namespace SerialManager
         
         void InitClientStuff();
 
+
+
+
+        bool WorkingHostPorts[ReservedHostPortLen]
+        {
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+        };
+
+
+        bool WorkingOutClientPorts[ReservedOutClientPortLen]
+        {
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+        }; 
     };
 }

@@ -11,36 +11,36 @@ namespace FilesystemInterface
         this->partitionInfo = partitionInfo;
         this->partitionInfo->fsInterface = (void*)this;
 
-        fsPartitionList.clear();
-        fsFolderList.clear();
-        fsFileList.clear();
+        fsPartitionList.Clear();
+        fsFolderList.Clear();
+        fsFileList.Clear();
     }
     void MrafsFilesystemInterface::ClearLists()
     {
         {
-            uint64_t count = fsFileList.getCount();
+            uint64_t count = fsFileList.GetCount();
             while (count--)
             {
                 fsFileList[0]->Destroy();
-                fsFileList.removeFirst();
+                fsFileList.RemoveFirst();
             }
         }
 
         {
-            uint64_t count = fsFolderList.getCount();
+            uint64_t count = fsFolderList.GetCount();
             while (count--)
             {
                 fsFolderList[0]->Destroy();
-                fsFolderList.removeFirst();
+                fsFolderList.RemoveFirst();
             }
         }
 
         {
-            uint64_t count = fsPartitionList.getCount();
+            uint64_t count = fsPartitionList.GetCount();
             while (count--)
             {
                 _Free(fsPartitionList[0]);
-                fsPartitionList.removeFirst();
+                fsPartitionList.RemoveFirst();
             }
         }
     }
@@ -54,7 +54,7 @@ namespace FilesystemInterface
         if (partitionInfo->owner != partitionInterface)
             return -1;
 
-        uint64_t count = fsPartitionList.getCount();
+        uint64_t count = fsPartitionList.GetCount();
         for (uint64_t index = 0; index < count; index++)
             if (((FSPartitionInfo*)fsPartitionList[index])->locationInBytes == location)
                 return index;
@@ -71,7 +71,7 @@ namespace FilesystemInterface
         if (partitionInfo->owner != partitionInterface)
             return -1;
         //osData.mainTerminalWindow->Log("BRUH 0");
-        uint64_t count = fsPartitionList.getCount();
+        uint64_t count = fsPartitionList.GetCount();
         //osData.mainTerminalWindow->Log("BRUH 0, Count: {}", to_string(count), Colors.yellow);
         for (uint64_t index = 0; index < count; index++)
         {
@@ -131,7 +131,7 @@ namespace FilesystemInterface
             return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
         if (partition == NULL)
             return FSCommandResult.ERROR_NO_PARTITION;
-        int64_t pIndex = fsPartitionList.getIndexOf(partition);
+        int64_t pIndex = fsPartitionList.GetIndexOf(partition);
         if (pIndex == -1)
             return FSCommandResult.ERROR_PARTITION_NOT_FOUND;
         
@@ -140,7 +140,7 @@ namespace FilesystemInterface
         
         if (newSize > partition->sizeInBytes)
         {
-            if (pIndex >= fsPartitionList.getCount() - 1)
+            if (pIndex >= fsPartitionList.GetCount() - 1)
                 return FSCommandResult.ERROR_PARTITION_TOO_SMALL;
             FSPartitionInfo* info = ( FSPartitionInfo*)fsPartitionList[pIndex + 1];
             if (!info->free)
@@ -150,7 +150,7 @@ namespace FilesystemInterface
             {
                 partition->sizeInBytes = newSize;
                 _Free(fsPartitionList[pIndex + 1]);
-                fsPartitionList.removeAt(pIndex + 1);
+                fsPartitionList.RemoveAt(pIndex + 1);
                 return FSCommandResult.SUCCESS;
             }
             else
@@ -174,7 +174,7 @@ namespace FilesystemInterface
             info->free = true;
             info->sizeInBytes = sizeDiff;
             info->locationInBytes = partition->locationInBytes + partition->sizeInBytes;
-            fsPartitionList.insertAt(info, pIndex + 1);
+            fsPartitionList.InsertAt(info, pIndex + 1);
             return FSCommandResult.SUCCESS;
         }
 
@@ -192,13 +192,13 @@ namespace FilesystemInterface
             return FSCommandResult.ERROR_INVALID_PARTITION_OWNER;
         if (partition == NULL)
             return FSCommandResult.ERROR_NO_PARTITION;
-        int64_t pIndex = fsPartitionList.getIndexOf(partition);
+        int64_t pIndex = fsPartitionList.GetIndexOf(partition);
         if (pIndex == -1)
             return FSCommandResult.ERROR_PARTITION_NOT_FOUND;
 
         partition->free = true;
 
-        if (pIndex < fsPartitionList.getCount() - 1)
+        if (pIndex < fsPartitionList.GetCount() - 1)
         {
             FSPartitionInfo* pTemp = (FSPartitionInfo*)fsPartitionList[pIndex + 1];
             if (pTemp->free)
@@ -225,7 +225,7 @@ namespace FilesystemInterface
 
     FileInfo* MrafsFilesystemInterface::GetFile(const char* path)
     {
-        uint64_t count = fsFileList.getCount();
+        uint64_t count = fsFileList.GetCount();
         for (uint64_t index = 0; index < count; index++)
         {
             FileInfo* info = fsFileList[index];
@@ -238,7 +238,7 @@ namespace FilesystemInterface
 
     FolderInfo* MrafsFilesystemInterface::GetFolder(const char* path)
     {
-        uint64_t count = fsFolderList.getCount();
+        uint64_t count = fsFolderList.GetCount();
         for (uint64_t index = 0; index < count; index++)
         {
             FolderInfo* info = fsFolderList[index];
@@ -264,7 +264,7 @@ namespace FilesystemInterface
             return FSCommandResult.ERROR_FILE_ALREADY_EXISTS;
         
         file = new FileInfo(new BaseInfo(path, false, false, false), 0, 0);
-        fsFileList.add(file);
+        fsFileList.Add(file);
 
         return SaveFSTable();//return FSCommandResult.SUCCESS;
     }
@@ -283,7 +283,7 @@ namespace FilesystemInterface
             return FSCommandResult.ERROR_FILE_ALREADY_EXISTS;
         
         info = new FileInfo(new BaseInfo(path, false, false, false), 0, 0);
-        fsFileList.add(info);
+        fsFileList.Add(info);
 
         //osData.mainTerminalWindow->Log("BRUH X4, Count: {}", to_string(fsPartitionList.getCount()), Colors.yellow);
         FSPartitionInfo* nPartInfo = CreateFilePartition(sizeInBytes);
@@ -314,7 +314,7 @@ namespace FilesystemInterface
         
 
         folder = new FolderInfo(new BaseInfo(path, false, false, false));
-        fsFolderList.add(folder);
+        fsFolderList.Add(folder);
 
 
         return SaveFSTable();//return FSCommandResult.SUCCESS;
@@ -334,7 +334,7 @@ namespace FilesystemInterface
         if (file == NULL)
             return FSCommandResult.ERROR_FILE_NOT_FOUND;
 
-        int64_t fIndex = fsFileList.getIndexOf(file);
+        int64_t fIndex = fsFileList.GetIndexOf(file);
         if (fIndex == -1)
             return FSCommandResult.ERROR_FILE_NOT_FOUND;
         
@@ -354,7 +354,7 @@ namespace FilesystemInterface
         file->locationInBytes = 0;
 
         file->Destroy();
-        fsFileList.removeAt(fIndex);
+        fsFileList.RemoveAt(fIndex);
 
         
         return SaveFSTable();//return FSCommandResult.SUCCESS;
@@ -373,7 +373,7 @@ namespace FilesystemInterface
         if (folder == NULL)
             return FSCommandResult.ERROR_FOLDER_NOT_FOUND;
 
-        int64_t fIndex = fsFolderList.getIndexOf(folder);
+        int64_t fIndex = fsFolderList.GetIndexOf(folder);
         if (fIndex == -1)
             return FSCommandResult.ERROR_FOLDER_NOT_FOUND;
 
@@ -437,12 +437,12 @@ namespace FilesystemInterface
 
         // free((void*)basePath);
 
-        fIndex = fsFolderList.getIndexOf(folder);
+        fIndex = fsFolderList.GetIndexOf(folder);
         if (fIndex == -1)
             return FSCommandResult.ERROR_FOLDER_NOT_FOUND;
 
         folder->Destroy();
-        fsFolderList.removeAt(fIndex);
+        fsFolderList.RemoveAt(fIndex);
         
         return SaveFSTable();//return FSCommandResult.SUCCESS;
     }
@@ -531,7 +531,7 @@ namespace FilesystemInterface
         if (folder == NULL)
             return FSCommandResult.ERROR_FOLDER_NOT_FOUND;
 
-        int64_t fIndex = fsFolderList.getIndexOf(folder);
+        int64_t fIndex = fsFolderList.GetIndexOf(folder);
         if (fIndex == -1)
             return FSCommandResult.ERROR_FOLDER_NOT_FOUND;
 
@@ -594,7 +594,7 @@ namespace FilesystemInterface
 
         {
             FolderInfo* newFolder = new FolderInfo(new BaseInfo(newPath, false, false, false));
-            fsFolderList.add(newFolder);
+            fsFolderList.Add(newFolder);
         }
 
         //osData.debugTerminalWindow->Log("Bruh 5 (DONE)");
@@ -668,7 +668,7 @@ namespace FilesystemInterface
         if (folder == NULL)
             return FSCommandResult.ERROR_FOLDER_NOT_FOUND;
 
-        int64_t fIndex = fsFolderList.getIndexOf(folder);
+        int64_t fIndex = fsFolderList.GetIndexOf(folder);
         if (fIndex == -1)
             return FSCommandResult.ERROR_FOLDER_NOT_FOUND;
 
@@ -802,7 +802,7 @@ namespace FilesystemInterface
             uint64_t fCount = 0;
             uint64_t fSize = 0;
             {
-                uint64_t count = fsFileList.getCount();
+                uint64_t count = fsFileList.GetCount();
                 for (int index = 0; index < count; index++)
                 {
                     FileInfo* info = fsFileList[index];
@@ -821,7 +821,7 @@ namespace FilesystemInterface
                 strList = (const char**)_Malloc(sizeof(const char*) * fCount, "Malloc for File list");
                 fCount = 0;
                 {
-                    uint64_t count = fsFileList.getCount();
+                    uint64_t count = fsFileList.GetCount();
                     for (int index = 0; index < count; index++)
                     {
                         FileInfo* info = fsFileList[index];
@@ -851,7 +851,7 @@ namespace FilesystemInterface
             uint64_t fCount = 0;
             uint64_t fSize = 0;
             {
-                uint64_t count = fsFileList.getCount();
+                uint64_t count = fsFileList.GetCount();
                 for (int index = 0; index < count; index++)
                 {
                     FileInfo* info = fsFileList[index];
@@ -872,7 +872,7 @@ namespace FilesystemInterface
                 strList = (const char**)_Malloc(sizeof(const char*) * fCount, "Malloc for File list");
                 fCount = 0;
                 {
-                    uint64_t count = fsFileList.getCount();
+                    uint64_t count = fsFileList.GetCount();
                     for (int index = 0; index < count; index++)
                     {
                         FileInfo* info = fsFileList[index];
@@ -912,7 +912,7 @@ namespace FilesystemInterface
             uint64_t fCount = 0;
             uint64_t fSize = 0;
             {
-                uint64_t count = fsFolderList.getCount();
+                uint64_t count = fsFolderList.GetCount();
                 for (int index = 0; index < count; index++)
                 {
                     FolderInfo* info = fsFolderList[index];
@@ -930,7 +930,7 @@ namespace FilesystemInterface
                 strList = (const char**)_Malloc(sizeof(const char*) * fCount, "Malloc for File list");
                 fCount = 0;
                 {
-                    uint64_t count = fsFolderList.getCount();
+                    uint64_t count = fsFolderList.GetCount();
                     for (int index = 0; index < count; index++)
                     {
                         FolderInfo* info = fsFolderList[index];
@@ -960,7 +960,7 @@ namespace FilesystemInterface
             uint64_t fCount = 0;
             uint64_t fSize = 0;
             {
-                uint64_t count = fsFolderList.getCount();
+                uint64_t count = fsFolderList.GetCount();
                 for (int index = 0; index < count; index++)
                 {
                     FolderInfo* info = fsFolderList[index];
@@ -980,7 +980,7 @@ namespace FilesystemInterface
                 strList = (const char**)_Malloc(sizeof(const char*) * fCount, "Malloc for File list");
                 fCount = 0;
                 {
-                    uint64_t count = fsFolderList.getCount();
+                    uint64_t count = fsFolderList.GetCount();
                     for (int index = 0; index < count; index++)
                     {
                         FolderInfo* info = fsFolderList[index];
@@ -1189,7 +1189,7 @@ namespace FilesystemInterface
             newInfo->free = false;
             newInfo->locationInBytes = 0;
             newInfo->sizeInBytes = maxFSTableSize;
-            fsPartitionList.add(newInfo);
+            fsPartitionList.Add(newInfo);
         }
         // {
         //     FSPartitionInfo* newInfo = new FSPartitionInfo();
@@ -1210,7 +1210,7 @@ namespace FilesystemInterface
             newInfo->free = true;
             newInfo->locationInBytes = maxFSTableSize;
             newInfo->sizeInBytes = partitionInfo->sizeInBytes - maxFSTableSize;
-            fsPartitionList.add(newInfo);
+            fsPartitionList.Add(newInfo);
         }
 
         // {
@@ -1237,9 +1237,9 @@ namespace FilesystemInterface
 
         // "MRAFS01"
         uint64_t totalSize;
-        uint32_t fsPartCount = fsPartitionList.getCount();
-        uint32_t fsFileCount = fsFileList.getCount();
-        uint32_t fsFolderCount = fsFolderList.getCount();
+        uint32_t fsPartCount = fsPartitionList.GetCount();
+        uint32_t fsFileCount = fsFileList.GetCount();
+        uint32_t fsFolderCount = fsFolderList.GetCount();
         totalSize = 7+sizeof(totalSize) + sizeof(fsPartCount) + sizeof(fsFileCount) + sizeof(fsFolderCount);
 
         for (uint32_t i = 0; i < fsPartCount; i++)
@@ -1441,7 +1441,7 @@ namespace FilesystemInterface
             for (uint32_t i = 0; i < fsPartCount; i++)
             {
                 FSPartitionInfo* fsPartInfo = (FSPartitionInfo*)_Malloc(sizeof(FSPartitionInfo), "Filesystem Partition Info malloc"); 
-                fsPartitionList.add(fsPartInfo);
+                fsPartitionList.Add(fsPartInfo);
 
                 fsPartInfo->sizeInBytes = *((uint64_t*)tBuffer);
                 tBuffer += 8;
@@ -1454,7 +1454,7 @@ namespace FilesystemInterface
             for (uint32_t i = 0; i < fsFileCount; i++)
             {
                 FileInfo* fsFileInfo = (FileInfo*)_Malloc(sizeof(FileInfo), "Filesystem File Info malloc");
-                fsFileList.add(fsFileInfo);
+                fsFileList.Add(fsFileInfo);
                 fsFileInfo->baseInfo = (BaseInfo*)_Malloc(sizeof(BaseInfo), "Filesystem Base Info malloc");
 
                 fsFileInfo->baseInfo->hidden = *((uint8_t*)tBuffer);
@@ -1487,7 +1487,7 @@ namespace FilesystemInterface
             for (uint32_t i = 0; i < fsFolderCount; i++)
             {
                 FolderInfo* fsFolderInfo = (FolderInfo*)_Malloc(sizeof(FolderInfo), "Filesystem Folder Info malloc");
-                fsFolderList.add(fsFolderInfo); 
+                fsFolderList.Add(fsFolderInfo); 
                 fsFolderInfo->baseInfo = (BaseInfo*)_Malloc(sizeof(BaseInfo), "Filesystem Base Info malloc");
 
                 fsFolderInfo->baseInfo->hidden = *((uint8_t*)tBuffer);

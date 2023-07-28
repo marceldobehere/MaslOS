@@ -20,7 +20,7 @@ namespace SysApps
         //GuiInstance* gui = (GuiInstance*)_Malloc(sizeof(GuiInstance), "Explorer GUI");
         //*gui = GuiInstance(window);
         *(window) = Window(NULL, Size(200, 400), Position(100, 100), "Tetris", true, true, true);
-        osData.windows.insertAt(window, 0);
+        osData.windows.InsertAt(window, 0);
         window->hidden = true;
         //gui->Init();
 
@@ -37,7 +37,7 @@ namespace SysApps
         window->oldHidden = true;
         window->hidden = false;
 
-        osData.windowsToGetActive.add(window);
+        osData.windowsToGetActive.Enqueue(window);
 
         lmaoRenderer = window->renderer;
         lmaoRenderer->Clear(Colors.black);

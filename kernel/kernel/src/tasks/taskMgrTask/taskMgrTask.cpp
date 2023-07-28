@@ -63,9 +63,9 @@ void TaskTaskManager::Do()
     nextTime = cTime + 400;
 
 
-    int tempTaskCount = osData.osTasks.getCount();
+    int tempTaskCount = osData.osTasks.GetCount();
     {
-        for (int i = 0; i < osData.windows.getCount(); i++)
+        for (int i = 0; i < osData.windows.GetCount(); i++)
         {     
             //GlobalRenderer->Print("B");
                 
@@ -77,7 +77,7 @@ void TaskTaskManager::Do()
 
             TerminalInstance* terminal = (TerminalInstance*)window->instance;
 
-            tempTaskCount += terminal->tasks.getCount();
+            tempTaskCount += terminal->tasks.GetCount();
         }
     }
 
@@ -85,14 +85,14 @@ void TaskTaskManager::Do()
 
     window->renderer->Clear(Colors.black);
     window->renderer->Println("Total running Tasks: {}", to_string(tempTaskCount));
-    window->renderer->Println("Window Count: {}", to_string(osData.windows.getCount()));
+    window->renderer->Println("Window Count: {}", to_string(osData.windows.GetCount()));
     window->renderer->Println("------------------");
     window->renderer->Println("Windows:");
     {
         int tI = 0;
-        for (int i = 0; i < osData.windows.getCount(); i++)
+        for (int i = 0; i < osData.windows.GetCount(); i++)
         {
-            Window* temp = osData.windows.elementAt(i);
+            Window* temp = osData.windows.ElementAt(i);
             window->renderer->Print(" + Window {}: ", to_string(i));
             window->renderer->Println("\"{}\"", temp->title);
 
@@ -103,10 +103,10 @@ void TaskTaskManager::Do()
 
             TerminalInstance* terminal = (TerminalInstance*)temp->instance;
 
-            for (int i2 = 0; i2 < terminal->tasks.getCount(); i2++)
+            for (int i2 = 0; i2 < terminal->tasks.GetCount(); i2++)
             {
                 window->renderer->Print("   - Task {}: ", to_string(tI));
-                window->renderer->Println("\"{}\"", terminal->tasks.elementAt(i2)->TaskText);
+                window->renderer->Println("\"{}\"", terminal->tasks.ElementAt(i2)->TaskText);
                 tI++;
             }
         }
@@ -114,10 +114,10 @@ void TaskTaskManager::Do()
     window->renderer->Println();
     window->renderer->Println("------------------");
     window->renderer->Println("OS TASKS:");
-    for (int i2 = 0; i2 < osData.osTasks.getCount(); i2++)
+    for (int i2 = 0; i2 < osData.osTasks.GetCount(); i2++)
     {
         window->renderer->Print(" - OS Task {}: ", to_string(i2));
-        window->renderer->Println("\"{}\"", osData.osTasks.elementAt(i2)->TaskText);
+        window->renderer->Println("\"{}\"", osData.osTasks.ElementAt(i2)->TaskText);
     }
     window->renderer->Println();
     window->renderer->Println("------------------");
@@ -150,9 +150,9 @@ void TaskTaskManager::Do()
             if (osStatsTemp.totalTaskTime != 0)
             {
                 int tI = 0;
-                for (int i = 0; i < osData.windows.getCount(); i++)
+                for (int i = 0; i < osData.windows.GetCount(); i++)
                 {
-                    Window* temp = osData.windows.elementAt(i);
+                    Window* temp = osData.windows.ElementAt(i);
 
                     if (temp->instance == NULL)
                         continue;
@@ -161,9 +161,9 @@ void TaskTaskManager::Do()
 
                     TerminalInstance* terminal = (TerminalInstance*)temp->instance;
 
-                    for (int i2 = 0; i2 < terminal->tasks.getCount(); i2++)
+                    for (int i2 = 0; i2 < terminal->tasks.GetCount(); i2++)
                     {
-                        Task* bruhTask = terminal->tasks.elementAt(i2);
+                        Task* bruhTask = terminal->tasks.ElementAt(i2);
                         window->renderer->Print("       - Task {} Time: ", to_string(tI));
                         window->renderer->Print("{}", to_string(bruhTask->actTime));
                         window->renderer->Println("  ({} %)", to_string((100* bruhTask->actTime)/osStatsTemp.totalTaskTime));

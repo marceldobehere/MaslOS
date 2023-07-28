@@ -289,7 +289,7 @@ namespace AC97
         {
             osData.ac97Driver = this;
             Audio::AudioOutputDevice* dev = new Audio::AudioOutputDevice("AC97 Device", audioDestination);
-            osData.audioOutputDevices.add(dev);
+            osData.audioOutputDevices.Add(dev);
             osData.defaultAudioOutputDevice = dev;
             PrintMsg("> Set as main AC97 Driver");
         }

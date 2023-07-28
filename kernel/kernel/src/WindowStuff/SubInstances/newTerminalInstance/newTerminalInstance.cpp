@@ -6,12 +6,12 @@
 void ClearListList(List<List<ConsoleChar>*>* list)
 {
     AddToStack();
-    while(list->getCount() > 0)
+    while(list->GetCount() > 0)
     {
-        List<ConsoleChar>* tList = list->elementAt(0);
-        tList->free();
+        List<ConsoleChar>* tList = list->ElementAt(0);
+        tList->Free();
         _Free(tList);
-        list->removeFirst();
+        list->RemoveFirst();
     }
     RemoveFromStack();
 }
@@ -24,7 +24,7 @@ List<ConsoleChar>* NewTerminalInstance::AddNewLine()
 
     List<ConsoleChar>* list = (List<ConsoleChar>*)_Malloc(sizeof(List<ConsoleChar>), "New List of console chars");
     *list = List<ConsoleChar>(2);
-    textData.add(list);
+    textData.Add(list);
     RemoveFromStack();
     return list;
 }
@@ -48,7 +48,7 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
         var = StrCopy(var);
 
 
-    List<ConsoleChar>* currList = textData.elementAt(textData.getCount() - 1);
+    List<ConsoleChar>* currList = textData.ElementAt(textData.GetCount() - 1);
     if (currList == 0)
         Panic("LAST LIST IS NULL", true);
 
@@ -65,7 +65,7 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
         if (chrs[index] == '\n')
         {
             currList = AddNewLine();
-            currList = textData.elementAt(textData.getCount() - 1);
+            currList = textData.ElementAt(textData.GetCount() - 1);
         }
         else if (chrs[index] == '\r')
             ;// Maybe implement moving char
@@ -74,7 +74,7 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
             if (chrs[index + 1] == '}')
             {
                 WriteStringIntoList(var, NULL, false);
-                currList = textData.elementAt(textData.getCount() - 1);
+                currList = textData.ElementAt(textData.GetCount() - 1);
                 index++;
             }
         }
@@ -83,28 +83,28 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
             if (chrs[index + 1] == '\\')
             {
                 index++;
-                currList->add(ConsoleChar('\\', fg, bg));
+                currList->Add(ConsoleChar('\\', fg, bg));
                 if (redirectToSerial)
                     Serial::Write('\\');
             }
             else if (chrs[index + 1] == '%')
             {
                 index++;
-                currList->add(ConsoleChar('%', fg, bg));
+                currList->Add(ConsoleChar('%', fg, bg));
                 if (redirectToSerial)
                     Serial::Write('%');
             }
             else if (chrs[index + 1] == '{')
             {
                 index++;
-                currList->add(ConsoleChar('{', fg, bg));
+                currList->Add(ConsoleChar('{', fg, bg));
                 if (redirectToSerial)
                     Serial::Write('{');
             }
             else if (chrs[index + 1] == '}')
             {
                 index++;
-                currList->add(ConsoleChar('}', fg, bg));
+                currList->Add(ConsoleChar('}', fg, bg));
                 if (redirectToSerial)
                     Serial::Write('}');
             }
@@ -113,7 +113,7 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
                 index++;
                 if (chrs[index + 1] == 0 || chrs[index + 2] == 0 || chrs[index + 3] == 0 || chrs[index + 4] == 0 || chrs[index + 5] == 0 || chrs[index + 6] == 0)
                 {
-                    currList->add(ConsoleChar('?', fg, bg));
+                    currList->Add(ConsoleChar('?', fg, bg));
                     if (redirectToSerial)
                         Serial::Write('?');
                 }
@@ -130,7 +130,7 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
                 index++;
                 if (chrs[index + 1] == 0 || chrs[index + 2] == 0 || chrs[index + 3] == 0 || chrs[index + 4] == 0 || chrs[index + 5] == 0 || chrs[index + 6] == 0)
                 {
-                    currList->add(ConsoleChar('?', fg, bg));
+                    currList->Add(ConsoleChar('?', fg, bg));
                     if (redirectToSerial)
                         Serial::Write('?');
                 }
@@ -144,14 +144,14 @@ void NewTerminalInstance::WriteStringIntoList(const char* chrs, const char* var,
             }
             else
             {
-                currList->add(ConsoleChar(chrs[index], fg, bg));
+                currList->Add(ConsoleChar(chrs[index], fg, bg));
                 if (redirectToSerial)
                     Serial::Write(chrs[index]);
             }
         }
         else
         {
-            currList->add(ConsoleChar(chrs[index], fg, bg));
+            currList->Add(ConsoleChar(chrs[index], fg, bg));
             if (redirectToSerial)
                 Serial::Write(chrs[index]);
         }
@@ -171,7 +171,7 @@ void NewTerminalInstance::WriteVarStringIntoList(const char* chrs, dispVar vars[
     AddToStack();
     int len = StrLen(chrs);
 
-    List<ConsoleChar>* currList = textData.elementAt(textData.getCount() - 1);
+    List<ConsoleChar>* currList = textData.ElementAt(textData.GetCount() - 1);
 
 
     uint32_t fg = foregroundColor;
@@ -210,28 +210,28 @@ void NewTerminalInstance::WriteVarStringIntoList(const char* chrs, dispVar vars[
             if (chrs[index + 1] == '\\')
             {
                 index++;
-                currList->add(ConsoleChar('\\', fg, bg));
+                currList->Add(ConsoleChar('\\', fg, bg));
                 if (redirectToSerial)
                     Serial::Write('\\');
             }
             else if (chrs[index + 1] == '%')
             {
                 index++;
-                currList->add(ConsoleChar('%', fg, bg));
+                currList->Add(ConsoleChar('%', fg, bg));
                 if (redirectToSerial)
                     Serial::Write('%');
             }
             else if (chrs[index + 1] == '{')
             {
                 index++;
-                currList->add(ConsoleChar('{', fg, bg));
+                currList->Add(ConsoleChar('{', fg, bg));
                 if (redirectToSerial)
                     Serial::Write('{');
             }
             else if (chrs[index + 1] == '}')
             {
                 index++;
-                currList->add(ConsoleChar('}', fg, bg));
+                currList->Add(ConsoleChar('}', fg, bg));
                 if (redirectToSerial)
                     Serial::Write('}');
             }
@@ -240,7 +240,7 @@ void NewTerminalInstance::WriteVarStringIntoList(const char* chrs, dispVar vars[
                 index++;
                 if (chrs[index + 1] == 0 || chrs[index + 2] == 0 || chrs[index + 3] == 0 || chrs[index + 4] == 0 || chrs[index + 5] == 0 || chrs[index + 6] == 0)
                 {
-                    currList->add(ConsoleChar('?', fg, bg));
+                    currList->Add(ConsoleChar('?', fg, bg));
                     if (redirectToSerial)
                         Serial::Write('?');
                 }
@@ -256,7 +256,7 @@ void NewTerminalInstance::WriteVarStringIntoList(const char* chrs, dispVar vars[
                 index++;
                 if (chrs[index + 1] == 0 || chrs[index + 2] == 0 || chrs[index + 3] == 0 || chrs[index + 4] == 0 || chrs[index + 5] == 0 || chrs[index + 6] == 0)
                 {
-                    currList->add(ConsoleChar('?', fg, bg));
+                    currList->Add(ConsoleChar('?', fg, bg));
                     if (redirectToSerial)
                         Serial::Write('?');
                 }
@@ -269,14 +269,14 @@ void NewTerminalInstance::WriteVarStringIntoList(const char* chrs, dispVar vars[
             }
             else
             {
-                currList->add(ConsoleChar(chrs[index], fg, bg));
+                currList->Add(ConsoleChar(chrs[index], fg, bg));
                 if (redirectToSerial)
                     Serial::Write(chrs[index]);
             }
         }
         else
         {
-            currList->add(ConsoleChar(chrs[index], fg, bg));
+            currList->Add(ConsoleChar(chrs[index], fg, bg));
             if (redirectToSerial)
                 Serial::Write(chrs[index]);
         }
@@ -398,15 +398,15 @@ void NewTerminalInstance::RenderCharChanges()
         int sDy = max(dy1, 0);
         int sDx = max(dx1, 0);
 
-        int maxY = min(dy2 - 1, textData.getCount() - 1);
+        int maxY = min(dy2 - 1, textData.GetCount() - 1);
         for (int dy = sDy; dy <= maxY; dy++)
         {
-            List<ConsoleChar>* tList = textData.elementAt(dy);
+            List<ConsoleChar>* tList = textData.ElementAt(dy);
 
-            int maxX = min(dx2 - 1, tList->getCount() - 1);
+            int maxX = min(dx2 - 1, tList->GetCount() - 1);
             for (int dx = sDx; dx <= maxX; dx++)
             {
-                ConsoleChar chr = tList->elementAt(dx);
+                ConsoleChar chr = tList->ElementAt(dx);
                 // if (((dx - dx1) + ((dy - dy1) * (oldWidth / 8)) < 0) || ((dx - dx1) + ((dy - dy1) * (oldWidth / 8)) > (oldWidth / 8)*(oldHeight / 16)))
                 //         Panic("OUT OF BOUNDS OMGGGGGGGGGGGGGGGGGGG!");
 
@@ -494,7 +494,7 @@ void NewTerminalInstance::DoRender()
 
         window->renderer->Clear(backgroundColor);
         ClearCharArr(tempPixels, (window->size.width/8), (window->size.height/16), foregroundColor, backgroundColor);
-        if (textData.getCount() == 0)
+        if (textData.GetCount() == 0)
         {
             //window->BlitBackbuffer();
             RemoveFromStack(); 
@@ -516,15 +516,15 @@ void NewTerminalInstance::DoRender()
             int sDy = max(dy1, 0);
             int sDx = max(dx1, 0);
 
-            int maxY = min(dy2 - 1, textData.getCount() - 1);
+            int maxY = min(dy2 - 1, textData.GetCount() - 1);
             for (int dy = sDy; dy <= maxY; dy++)
             {
-                List<ConsoleChar>* tList = textData.elementAt(dy);
+                List<ConsoleChar>* tList = textData.ElementAt(dy);
 
-                int maxX = min(dx2 - 1, tList->getCount() - 1);
+                int maxX = min(dx2 - 1, tList->GetCount() - 1);
                 for (int dx = sDx; dx <= maxX; dx++)
                 {
-                    ConsoleChar chr = tList->elementAt(dx);
+                    ConsoleChar chr = tList->ElementAt(dx);
                     window->renderer->putChar(chr.chr, dx*8-fx1, dy*16-fy1, chr.fg, chr.bg);
 
                     if (((dx - dx1) + ((dy - dy1) * (oldWidth / 8)) < 0) || ((dx - dx1) + ((dy - dy1) * (oldWidth / 8)) > (oldWidth / 8)*(oldHeight / 16)))
@@ -562,7 +562,7 @@ void NewTerminalInstance::Clear()
 void NewTerminalInstance::Free()
 {
     ClearListList(&textData);
-    textData.free();
+    textData.Free();
     _Free(tempPixels);
     _Free(tempPixels2);
 }
@@ -599,9 +599,9 @@ void NewTerminalInstance::Print(const char* chrs, dispVar vars[])
 }
 void NewTerminalInstance::DeleteLastCharInLine()
 {
-    List<ConsoleChar>* currList = textData.elementAt(textData.getCount() - 1);
-    if (currList->getCount() > 0)
-        currList->removeLast();
+    List<ConsoleChar>* currList = textData.ElementAt(textData.GetCount() - 1);
+    if (currList->GetCount() > 0)
+        currList->RemoveLast();
 
     Render();
 }

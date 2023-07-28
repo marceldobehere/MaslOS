@@ -38,7 +38,7 @@ namespace GuiComponentStuff
         actualTextFieldStuff = new BoxComponent(parent, size, Colors.tblack);
 
         this->rectComp = new RectangleComponent(bgCol, size, actualTextFieldStuff);
-        actualTextFieldStuff->children->add(rectComp);
+        actualTextFieldStuff->children->Add(rectComp);
 
 
         this->textComp = new TextComponent(actualTextFieldStuff, Colors.tblack, textCol, "", Position());
@@ -46,7 +46,7 @@ namespace GuiComponentStuff
         textComp->center = false;
         textComp->useFixedSize = true;
         textComp->size = size;
-        actualTextFieldStuff->children->add(textComp);
+        actualTextFieldStuff->children->Add(textComp);
 
         mouseClickedCallBack = NULL;
         keyHitCallBack = NULL;
@@ -125,7 +125,7 @@ namespace GuiComponentStuff
             callBackFunc(this);
         actualTextFieldStuff->Destroy(destroyChildren, callBackFunc);
         _Free(actualTextFieldStuff);
-        updateFields->free();
+        updateFields->Free();
         _Free(updateFields);
         RemoveFromStack();
     }

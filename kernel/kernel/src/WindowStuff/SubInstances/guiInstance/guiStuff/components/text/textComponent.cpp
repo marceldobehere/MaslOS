@@ -111,7 +111,7 @@ namespace GuiComponentStuff
         }
 
         if (update)
-            parent->updateFields->add(Field(position, GetActualComponentSize()));
+            parent->updateFields->Add(Field(position, GetActualComponentSize()));
 
         RemoveFromStack();
     }
@@ -132,7 +132,7 @@ namespace GuiComponentStuff
         renderer->Free();
         _Free(oldText);
         _Free(text);
-        updateFields->free();
+        updateFields->Free();
         _Free(updateFields);
         RemoveFromStack();
     }

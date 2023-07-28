@@ -194,7 +194,7 @@ namespace GuiComponentStuff
         // }
 
         if (update)
-            parent->updateFields->add(Field(position, temp));
+            parent->updateFields->Add(Field(position, temp));
 
         RemoveFromStack();
     }
@@ -213,7 +213,7 @@ namespace GuiComponentStuff
         if (callBackFunc != NULL)
             callBackFunc(this);
         renderer->Free();
-        updateFields->free();
+        updateFields->Free();
         _Free(updateFields);
         _Free((void*)imagePath);
         _Free((void*)oldPath);

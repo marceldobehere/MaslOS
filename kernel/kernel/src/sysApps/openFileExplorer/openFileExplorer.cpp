@@ -61,7 +61,7 @@ namespace SysApps
 
         window->OnCloseHelp = (void*)explorer;
         window->OnClose = (void(*)(void*, Window*))(void*)&Explorer::OnExternalWindowClose;
-        osData.osTasks.add(NewWindowCloseTask(window));
+        osData.osTasks.Add(NewWindowCloseTask(window));
 
         _Free(this);
         RemoveFromStack();

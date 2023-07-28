@@ -274,9 +274,9 @@ namespace Audio
         if (sources == NULL)
             return 0;
         int c = 0;
-        for (int i = 0; i < sources->getCount(); i++)
+        for (int i = 0; i < sources->GetCount(); i++)
         {
-            BasicAudioSource* src = sources->elementAt(i);
+            BasicAudioSource* src = sources->ElementAt(i);
             c += RequestBuffer(src);
         }
         return c;
@@ -286,9 +286,9 @@ namespace Audio
     {
         if (sources == NULL)
             return true;
-        for (int i = 0; i < sources->getCount(); i++)
+        for (int i = 0; i < sources->GetCount(); i++)
         {
-            BasicAudioSource* src = sources->elementAt(i);
+            BasicAudioSource* src = sources->ElementAt(i);
             if (src->readyToSend)
                 return false;
         }
@@ -302,7 +302,7 @@ namespace Audio
         buffer = NULL;
         if (sources != NULL)
         {
-            sources->free();
+            sources->Free();
             _Free(sources);
         }
         sources = NULL;
@@ -325,8 +325,8 @@ namespace Audio
             return;
         if (dest->sources == NULL)
             return;
-        dest->sources->add(this);
-        destinations->add(dest);
+        dest->sources->Add(this);
+        destinations->Add(dest);
     }
     void BasicAudioSource::DisconnectFrom(BasicAudioDestination* dest)
     {
@@ -334,22 +334,22 @@ namespace Audio
             return;
         if (dest->sources == NULL)
             return;
-        int indx = dest->sources->getIndexOf(this);
+        int indx = dest->sources->GetIndexOf(this);
         if (indx == -1)
             return;
-        dest->sources->removeAt(indx);
+        dest->sources->RemoveAt(indx);
     }
     void BasicAudioSource::Free()
     {
         if (destinations != NULL)
         {
-            for (int i = 0; i < destinations->getCount(); i++)
+            for (int i = 0; i < destinations->GetCount(); i++)
             {
-                BasicAudioDestination* dest = destinations->elementAt(i);
+                BasicAudioDestination* dest = destinations->ElementAt(i);
                 if (dest != NULL)
                     DisconnectFrom(dest);
             }
-            destinations->free();
+            destinations->Free();
             _Free(destinations);
         }
         destinations = NULL;

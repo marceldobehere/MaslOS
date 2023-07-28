@@ -124,7 +124,7 @@ void PrepareACPI(BootInfo* bootInfo)
     //     GlobalRenderer->Clear(Colors.bblue);
 
     AddToStack();
-    osData.debugTerminalWindow->Log("Drive Count: {}", to_string(osData.diskInterfaces.getCount()), Colors.yellow);
+    osData.debugTerminalWindow->Log("Drive Count: {}", to_string(osData.diskInterfaces.GetCount()), Colors.yellow);
     RemoveFromStack();    
     
     // for (int i = 0; i < 20; i++)
@@ -429,7 +429,7 @@ void PrepareWindowsTemp(Framebuffer* img)
 
     
     osData.windows = List<Window*>();
-    osData.windowsToGetActive = List<Window*>();
+    osData.windowsToGetActive = Queue<Window*>();
     
     osData.windowPointerThing = (WindowManager::WindowPointerBufferThing*)_Malloc(sizeof(WindowManager::WindowPointerBufferThing), "Alloc WindowPointerBufferThing");
     *osData.windowPointerThing = WindowManager::WindowPointerBufferThing(GlobalRenderer->framebuffer, img, Colors.blue);
@@ -605,14 +605,14 @@ void StartMenuButtonClick(GuiComponentStuff::BaseComponent* comp, GuiComponentSt
         mainWindow->hidden = BLEHUS_HIDE;
         mainWindow->oldHidden = !BLEHUS_HIDE;
         
-        osData.windows.add(mainWindow);
+        osData.windows.Add(mainWindow);
         terminal->SetWindow(mainWindow);
         terminal->closeWindowAfterTask = BLEHUS_CLOSE;
         ((TerminalInstance*)mainWindow->instance)->Cls();
         //KeyboardPrintStart(mainWindow);
         //((TerminalInstance*)mainWindow->instance)->KeyboardPrintStart();
         if (!BLEHUS_HIDE)
-            osData.windowsToGetActive.add(mainWindow);
+            osData.windowsToGetActive.Enqueue(mainWindow);
 
         //((NewTerminalInstance*)terminal->newTermInstance)->Println(BLEHUS_CMD);
         {
@@ -622,7 +622,7 @@ void StartMenuButtonClick(GuiComponentStuff::BaseComponent* comp, GuiComponentSt
             terminal->terminalInput[i] = 0;
             terminal->userlen = i;
         }
-        terminal->tasks.add(NewEnterTask(terminal));
+        terminal->tasks.Add(NewEnterTask(terminal));
     }
 }
 
@@ -646,7 +646,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
         window->hidden = true;
         window->resizeable = false;
         window->selectedBorderColor = Colors.orange;
-        osData.windows.add(window);
+        osData.windows.Add(window);
         
         gui->Init();
         gui->screen->backgroundColor = Colors.black;
@@ -664,7 +664,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
             );
             txt->position.x = (sW - txt->GetActualComponentSize().FixedX) / 2;
 
-            testGui->screen->children->add(txt);
+            testGui->screen->children->Add(txt);
         }
     
 
@@ -678,7 +678,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
             btn->mouseClickedCallBack = StartMenuButtonClick;
             btn->id = 1001;
             
-            testGui->screen->children->add(btn);
+            testGui->screen->children->Add(btn);
         }
         {
             GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("Mandelbrot.maab", 
@@ -690,7 +690,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
             btn->mouseClickedCallBack = StartMenuButtonClick;
             btn->id = 1002;
             
-            testGui->screen->children->add(btn);
+            testGui->screen->children->Add(btn);
         }
         {
             GuiComponentStuff::ButtonComponent* btn = new GuiComponentStuff::ButtonComponent("Alert.maab", 
@@ -702,7 +702,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
             btn->mouseClickedCallBack = StartMenuButtonClick;
             btn->id = 1003;
             
-            testGui->screen->children->add(btn);
+            testGui->screen->children->Add(btn);
         }
 
         {
@@ -715,7 +715,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
             btn->mouseClickedCallBack = StartMenuButtonClick;
             btn->id = 1004;
             
-            testGui->screen->children->add(btn);
+            testGui->screen->children->Add(btn);
         }
 
         {
@@ -728,7 +728,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
             btn->mouseClickedCallBack = StartMenuButtonClick;
             btn->id = 1005;
             
-            testGui->screen->children->add(btn);
+            testGui->screen->children->Add(btn);
         }
 
         {
@@ -741,7 +741,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
             btn->mouseClickedCallBack = StartMenuButtonClick;
             btn->id = 1006;
             
-            testGui->screen->children->add(btn);
+            testGui->screen->children->Add(btn);
         }
 
         {
@@ -754,7 +754,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
             btn->mouseClickedCallBack = StartMenuButtonClick;
             btn->id = 1007;
             
-            testGui->screen->children->add(btn);
+            testGui->screen->children->Add(btn);
         }
 
 
@@ -768,7 +768,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
             btn->mouseClickedCallBack = StartMenuButtonClick;
             btn->id = 1008;
             
-            testGui->screen->children->add(btn);
+            testGui->screen->children->Add(btn);
         }
 
         {
@@ -781,7 +781,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
             btn->mouseClickedCallBack = StartMenuButtonClick;
             btn->id = 1009;
             
-            testGui->screen->children->add(btn);
+            testGui->screen->children->Add(btn);
         }
 
         {
@@ -794,7 +794,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
             btn->mouseClickedCallBack = StartMenuButtonClick;
             btn->id = 1010;
             
-            testGui->screen->children->add(btn);
+            testGui->screen->children->Add(btn);
         }
 
         {
@@ -807,7 +807,7 @@ void InitStartMenuWindow(BootInfo* bootInfo)
             btn->mouseClickedCallBack = StartMenuButtonClick;
             btn->id = 1011;
             
-            testGui->screen->children->add(btn);
+            testGui->screen->children->Add(btn);
         }
 
     }
@@ -1101,7 +1101,7 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
 
         DiskInterface::RamDiskInterface* ramDisk = new DiskInterface::RamDiskInterface(totSize2);
         
-        osData.diskInterfaces.add(ramDisk);
+        osData.diskInterfaces.Add(ramDisk);
 
         DiskInterface::GenericDiskInterface* diskInterface = ramDisk;
         PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)new PartitionInterface::MRAPSPartitionInterface(diskInterface);

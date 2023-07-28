@@ -44,15 +44,15 @@ void HandleEnter()
 
 bool KeyboardScancodeState[256];
 
-#include "../cStdLib/list.h"
+#include "../cStdLib/queue/queue_basics.h"
 
-List<uint8_t>* scancodesToGo;
+Queue<uint8_t>* scancodesToGo;
 bool keyListInit = false;
 
 void InitKeyboardListRam()
 {
-    scancodesToGo = new List<uint8_t>(10);
-    scancodesToGo->clear();
+    scancodesToGo = new Queue<uint8_t>(10);
+    scancodesToGo->Clear();
     keyListInit = true;
 }
 
@@ -145,10 +145,10 @@ void HandleKeyboard(uint8_t scancode)
     {
         TerminalInstance* bruh1 = ((TerminalInstance*)activeWindow->instance);
         NewTerminalInstance* bruh2 = ((NewTerminalInstance*)bruh1->newTermInstance);
-        if (bruh1->tasks.getCount() > 0)
+        if (bruh1->tasks.GetCount() > 0)
         {
-            Task* tsk = bruh1->tasks.elementAt(0);
-            bruh1->tasks.removeFirst();
+            Task* tsk = bruh1->tasks.ElementAt(0);
+            bruh1->tasks.RemoveFirst();
             FreeTask(tsk);
 
             bruh2->Println("\n\nCurrent Task forcibly stopped!", Colors.bred);
@@ -160,7 +160,7 @@ void HandleKeyboard(uint8_t scancode)
 
     if (lAlt && scancode == 0x3E && activeWindow != NULL)
     {
-        osData.osTasks.add(NewWindowCloseTask(activeWindow));
+        osData.osTasks.Add(NewWindowCloseTask(activeWindow));
         return;
     }
 
@@ -170,7 +170,7 @@ void HandleKeyboard(uint8_t scancode)
         int64_t index = Taskbar::taskWindowList->getIndexOf(activeWindow);
         index = (index + count + 1) % count;
         Window* w = Taskbar::taskWindowList->elementAt(index);
-        osData.windowsToGetActive.add(w);
+        osData.windowsToGetActive.Enqueue(w);
 
         return;
     }
@@ -180,13 +180,13 @@ void HandleKeyboard(uint8_t scancode)
         Window* mainWindow = (Window*)_Malloc(sizeof(Window), "Main Window");
         TerminalInstance* terminal = new TerminalInstance(&guestUser);
         *(mainWindow) = Window((DefaultInstance*)terminal, Size(600, 500), Position(10, 40), "Terminal Window", true, true, true);
-        osData.windows.add(mainWindow);
+        osData.windows.Add(mainWindow);
         terminal->SetWindow(mainWindow);
         ((TerminalInstance*)mainWindow->instance)->Cls();
         //KeyboardPrintStart(mainWindow);
         ((TerminalInstance*)mainWindow->instance)->KeyboardPrintStart();
 
-        osData.windowsToGetActive.add(mainWindow);
+        osData.windowsToGetActive.Enqueue(mainWindow);
     }
 
 
@@ -356,7 +356,7 @@ void HandleKeyboard(uint8_t scancode)
         {
             TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
             TaskMAAB* maab = NULL;
-            for (int i = 0; i < instance->tasks.getCount(); i++)
+            for (int i = 0; i < instance->tasks.GetCount(); i++)
             {
                 if (instance->tasks[i]->GetType() == TaskType::MAAB)
                 {
@@ -371,7 +371,7 @@ void HandleKeyboard(uint8_t scancode)
                 {
                     if (activeWindow->allowKeyboardDrawing)
                         ((NewTerminalInstance*)instance->newTermInstance)->Println();
-                    instance->tasks.add(NewEnterTask(instance));
+                    instance->tasks.Add(NewEnterTask(instance));
                 }
             }
             else
@@ -405,7 +405,7 @@ void HandleKeyboard(uint8_t scancode)
             TerminalInstance* instance = (TerminalInstance*)activeWindow->instance;
 
             TaskMAAB* maab = NULL;
-            for (int i = 0; i < instance->tasks.getCount(); i++)
+            for (int i = 0; i < instance->tasks.GetCount(); i++)
             {
                 if (instance->tasks[i]->GetType() == TaskType::MAAB)
                 {
@@ -501,7 +501,7 @@ void HandleKeyboard(uint8_t scancode)
                 //NewTerminalInstance* inst = NULL;
                 TaskMAAB* maab = NULL;
                 TaskTaskManager* taskMgr = NULL;
-                for (int i = 0; i < instance->tasks.getCount(); i++)
+                for (int i = 0; i < instance->tasks.GetCount(); i++)
                 {
                     if (instance->tasks[i]->GetType() == TaskType::MAAB)
                     {
@@ -622,14 +622,13 @@ void HandleKeyboardList(int amt)
     AddToStack();
     for (int i = 0; i < amt; i++)
     {
-        if (scancodesToGo->getCount() < 1)
+        if (scancodesToGo->GetCount() < 1)
         {
             RemoveFromStack();
             return;
         }
         
-        uint8_t current = scancodesToGo->elementAt(0);
-        scancodesToGo->removeFirst();
+        uint8_t current = scancodesToGo->Dequeue();
         HandleKeyboard(current);
     }
     RemoveFromStack();
@@ -640,7 +639,7 @@ void AddScancodeToKeyboardList(uint8_t scancode)
     if (!keyListInit)
         return;
 
-    scancodesToGo->add(scancode);
+    scancodesToGo->Enqueue(scancode);
 }
 
 int GetKeyboardCount()
@@ -648,6 +647,6 @@ int GetKeyboardCount()
     if (!keyListInit)
         return 0;
 
-    return scancodesToGo->getCount();
+    return scancodesToGo->GetCount();
 }
 

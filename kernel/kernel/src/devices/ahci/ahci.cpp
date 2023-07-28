@@ -391,7 +391,7 @@ namespace AHCI
                     osData.debugTerminalWindow->Log("* - Partition Type: undefined",  Colors.orange);
                 }
             }
-            osData.diskInterfaces.add(testDiskInterface);
+            osData.diskInterfaces.Add(testDiskInterface);
 
             {
                 if (testDiskInterface->partitionInterface != NULL)
@@ -399,7 +399,7 @@ namespace AHCI
                     PartitionInterface::GenericPartitionInterface* tDiskInterface = ((PartitionInterface::GenericPartitionInterface*)testDiskInterface->partitionInterface);
                     tDiskInterface->LoadPartitionTable();
                     
-                    int pLen = tDiskInterface->partitionList.getCount();
+                    int pLen = tDiskInterface->partitionList.GetCount();
                     //osData.debugTerminalWindow->Log("<bruh {}>", to_string(pLen),  Colors.orange);
                     for (int i = 0; i < pLen; i++)
                     {

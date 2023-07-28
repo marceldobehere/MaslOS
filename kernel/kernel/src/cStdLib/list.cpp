@@ -4,7 +4,7 @@
 #include "./list/list_all.h"
 
 
-template <typename T> void List<T>::init(uint64_t capacity)
+template <typename T> void List<T>::Init(uint64_t capacity)
 {
     AddToStack();
     if (capacity < 2)
@@ -12,72 +12,72 @@ template <typename T> void List<T>::init(uint64_t capacity)
     freed = false;
     count = 0;
     cap = capacity;
-    arr.reInit(capacity);
+    arr.ReInit(capacity);
     RemoveFromStack();
 }
 
 template <typename T> List<T>::List(uint64_t capacity) : arr(Array<T>(4))
 {
     AddToStack();
-    init(capacity);
+    Init(capacity);
     RemoveFromStack();
 }
 
 template <typename T> List<T>::List() : arr(Array<T>(4))
 {
     AddToStack();
-    init(4);
+    Init(4);
     RemoveFromStack();
 }
 
-template <typename T> void List<T>::free()
+template <typename T> void List<T>::Free()
 {
     AddToStack();
-    arr.free();
+    arr.Free();
     cap = 0;
     freed = true;
     count = 0;
     RemoveFromStack();
 }
 
-template <typename T>void List<T>::expandArr()
+template <typename T>void List<T>::ExpandArr()
 {
     AddToStack();
-    Array<T> newArr = Array<T>(arr.getSize());
-    arr.copy(newArr);
+    Array<T> newArr = Array<T>(arr.GetSize());
+    arr.Copy(newArr);
     
     cap *= 2;
-    arr.reInit(cap);
+    arr.ReInit(cap);
     
-    newArr.copy(arr);
-    newArr.free();
+    newArr.Copy(arr);
+    newArr.Free();
     RemoveFromStack();
 }
 
-template <typename T> List<T> List<T>::clone()
+template <typename T> List<T> List<T>::Clone()
 {
     AddToStack();
     List<T> newList = List<T>(cap);
 
     for (uint64_t i = 0; i < count; i++)
-        newList.add(arr[i]);
+        newList.Add(arr[i]);
 
     RemoveFromStack();
     return newList;
 }
 
-template <typename T> uint64_t List<T>::getCount()
+template <typename T> uint64_t List<T>::GetCount()
 {
     return count;
 }
 
-template <typename T> uint64_t List<T>::getCapacity()
+template <typename T> uint64_t List<T>::GetCapacity()
 {
     return cap;
 }
 
 
-template <typename T> int64_t List<T>::getIndexOf(T item)
+template <typename T> int64_t List<T>::GetIndexOf(T item)
 {
     AddToStack();
     for (uint64_t index = 0; index < count; index++)
@@ -90,18 +90,18 @@ template <typename T> int64_t List<T>::getIndexOf(T item)
     return -1;
 }
 
-template <typename T> void List<T>::add(T item)
+template <typename T> void List<T>::Add(T item)
 {
     //AddToStack();
     if (count >= cap)
-        expandArr();
+        ExpandArr();
 
     arr[count] = item;
     count++;
     //RemoveFromStack();
 }
 
-template <typename T> void List<T>::set(uint64_t index, T item)
+template <typename T> void List<T>::Set(uint64_t index, T item)
 {
     //AddToStack();
     int64_t indx = index;
@@ -112,7 +112,7 @@ template <typename T> void List<T>::set(uint64_t index, T item)
     //RemoveFromStack();
 }
 
-template <typename T> void List<T>::insertAt(T item, uint64_t index)
+template <typename T> void List<T>::InsertAt(T item, uint64_t index)
 {
     int64_t indx = index;
     if (index > count || indx < 0)
@@ -120,7 +120,7 @@ template <typename T> void List<T>::insertAt(T item, uint64_t index)
     
     AddToStack();
     if (count + 1 > cap)
-        expandArr();
+        ExpandArr();
     
 
 
@@ -137,7 +137,7 @@ template <typename T> void List<T>::insertAt(T item, uint64_t index)
     RemoveFromStack();
 }
 
-template <typename T> void List<T>::clear()
+template <typename T> void List<T>::Clear()
 {
     AddToStack();
     // for (uint64_t i = 0; i < count; i++)
@@ -147,7 +147,7 @@ template <typename T> void List<T>::clear()
     RemoveFromStack();
 }
 
-template <typename T> void List<T>::removeAt(uint64_t index)
+template <typename T> void List<T>::RemoveAt(uint64_t index)
 {
     AddToStack();
     if (index < 0 || index >= count)
@@ -166,7 +166,7 @@ template <typename T> void List<T>::removeAt(uint64_t index)
     RemoveFromStack();
 }
 
-template <typename T> void List<T>::removeFirst()
+template <typename T> void List<T>::RemoveFirst()
 {
     AddToStack();
     if (count == 0)
@@ -175,12 +175,12 @@ template <typename T> void List<T>::removeFirst()
         return;
     }
 
-    removeAt(0);
+    RemoveAt(0);
 
     RemoveFromStack();
 }
 
-template <typename T> void List<T>::removeFirst(int amt)
+template <typename T> void List<T>::RemoveFirst(int amt)
 {
     AddToStack();
     if (count == 0 || amt <= 0)
@@ -201,7 +201,7 @@ template <typename T> void List<T>::removeFirst(int amt)
     RemoveFromStack();
 }
 
-template <typename T> void List<T>::removeLast()
+template <typename T> void List<T>::RemoveLast()
 {
     AddToStack();
     if (count == 0)
@@ -224,12 +224,12 @@ template <typename T> T& List<T>::operator[](uint64_t index)
     return data;
 }
 
-template <typename T> T List<T>::elementAt(uint64_t index)
+template <typename T> T List<T>::ElementAt(uint64_t index)
 {
     return arr[index];
 }
 
-template <typename T> T List<T>::lastElement()
+template <typename T> T List<T>::LastElement()
 {
     return arr[count - 1];
 }
@@ -266,7 +266,7 @@ template <typename T> Array<T>::Array(uint64_t size)
     RemoveFromStack();
 }
 
-template <typename T> void Array<T>::reInit(uint64_t size)
+template <typename T> void Array<T>::ReInit(uint64_t size)
 {
     AddToStack();
     if (size < 2)
@@ -274,7 +274,7 @@ template <typename T> void Array<T>::reInit(uint64_t size)
     this->size = size;
 
 
-    free();
+    Free();
     arr = (T*)_Malloc(size * sizeof(T), "Array re-init");
 
     freed = false;
@@ -296,7 +296,7 @@ template <typename T> T& Array<T>::operator[](uint64_t index)
     return t;
 }
 
-template <typename T> void Array<T>::free()
+template <typename T> void Array<T>::Free()
 {
     AddToStack();
     if (freed)
@@ -313,7 +313,7 @@ template <typename T> void Array<T>::free()
 }
 
 
-template <typename T> Array<T> Array<T>::clone()
+template <typename T> Array<T> Array<T>::Clone()
 {
     AddToStack();
     Array<T> newArr = Array<T>(size);
@@ -326,7 +326,7 @@ template <typename T> Array<T> Array<T>::clone()
 }
 
 
-template <typename T> void Array<T>::copy(Array<T> target)
+template <typename T> void Array<T>::Copy(Array<T> target)
 {
     AddToStack();
     for (uint64_t i = 0; i < size; i++)
@@ -334,7 +334,7 @@ template <typename T> void Array<T>::copy(Array<T> target)
     RemoveFromStack();
 }
 
-template <typename T> uint64_t Array<T>::getSize()
+template <typename T> uint64_t Array<T>::GetSize()
 {
     return size;
 }

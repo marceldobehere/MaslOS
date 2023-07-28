@@ -14,7 +14,7 @@ namespace PartitionInterface
         sizeof(PartitionInfo);
         busy = false;
         driveSize = diskInterface->GetMaxSectorCount() * 512;
-        partitionList.clear();
+        partitionList.Clear();
     }
     // This partition interface reserves 20 sectors
     // (1 Boot sector + 19 Data sectors)
@@ -24,13 +24,13 @@ namespace PartitionInterface
         if (driveSize < 20 * 512)
             return CommandResult.ERROR_DISK_TOO_SMALL;
         
-        for (int i = 0; i < partitionList.getCount(); i++)
+        for (int i = 0; i < partitionList.GetCount(); i++)
             partitionList[i]->Destroy();
-        partitionList.clear();
+        partitionList.Clear();
 
-        partitionList.add(new PartitionInfo("Boot Partition", "This is the Bootsector.", "boot_sector", PartitionType::Boot, 512, 0, true, (void*)this));
-        partitionList.add(new PartitionInfo("Partition Table Partition", "This is the Partition Table which stores all the partition data.", "partition_manager", PartitionType::PartitionData, 512 * 19, 512, true, (void*)this));
-        partitionList.add(new PartitionInfo("Empty Partition", "This is the default generated Partition made my MRAPS.", "empty_test", PartitionType::Undefined, (driveSize - (512 * 20)), 20 * 512, false, (void*)this));
+        partitionList.Add(new PartitionInfo("Boot Partition", "This is the Bootsector.", "boot_sector", PartitionType::Boot, 512, 0, true, (void*)this));
+        partitionList.Add(new PartitionInfo("Partition Table Partition", "This is the Partition Table which stores all the partition data.", "partition_manager", PartitionType::PartitionData, 512 * 19, 512, true, (void*)this));
+        partitionList.Add(new PartitionInfo("Empty Partition", "This is the default generated Partition made my MRAPS.", "empty_test", PartitionType::Undefined, (driveSize - (512 * 20)), 20 * 512, false, (void*)this));
 
         return SavePartitionTable();
     }
@@ -67,8 +67,8 @@ namespace PartitionInterface
 
         if (newSize > partition->sizeInBytes)
         {
-            int indexOfNextPartition = partitionList.getIndexOf(partition) + 1;
-            if (indexOfNextPartition == 0 || indexOfNextPartition >= partitionList.getCount())
+            int indexOfNextPartition = partitionList.GetIndexOf(partition) + 1;
+            if (indexOfNextPartition == 0 || indexOfNextPartition >= partitionList.GetCount())
                 return CommandResult.ERROR_PARTITION_TOO_SMALL;
             PartitionInfo* nextPartition = partitionList[indexOfNextPartition];
             if (nextPartition->type != PartitionType::Undefined)
@@ -80,7 +80,7 @@ namespace PartitionInterface
             {
                 // INCREASE THIS PARTITIONS SIZE BY THE SIZE OF NEXT PARTITION
                 partition->sizeInBytes += nextPartition->sizeInBytes;
-                partitionList.removeAt(indexOfNextPartition);
+                partitionList.RemoveAt(indexOfNextPartition);
                 nextPartition->Destroy();
             }
             else
@@ -103,7 +103,7 @@ namespace PartitionInterface
             uint64_t remainingSize = ogSize - newSize;
             partition->sizeInBytes = newSize;
 
-            int indexOfCurrentPartition = partitionList.getIndexOf(partition);
+            int indexOfCurrentPartition = partitionList.GetIndexOf(partition);
             if (indexOfCurrentPartition == -1)
                 return CommandResult.ERROR_PARTITION_NOT_FOUND;
             
@@ -113,7 +113,7 @@ namespace PartitionInterface
             newPartition->locationInBytes = partition->locationInBytes + partition->sizeInBytes;
             newPartition->owner = this;
             newPartition->type = PartitionType::Undefined;
-            partitionList.insertAt(newPartition, indexOfCurrentPartition + 1);
+            partitionList.InsertAt(newPartition, indexOfCurrentPartition + 1);
             return DeletePartition(newPartition); // To make it combine with other empty partitions if they exist
         }
 
@@ -135,12 +135,12 @@ namespace PartitionInterface
         // Set Partition Type To Undefined
         partition->type = PartitionType::Undefined;
 
-        int indexOfThisPartition = partitionList.getIndexOf(partition);
+        int indexOfThisPartition = partitionList.GetIndexOf(partition);
         if (indexOfThisPartition == -1)
             return CommandResult.ERROR_PARTITION_NOT_FOUND;
         
         // Check if Partition After is undefined aswell (combine if yes)
-        if ((indexOfThisPartition + 1) < partitionList.getCount())
+        if ((indexOfThisPartition + 1) < partitionList.GetCount())
         {
             PartitionInfo* nextPart = partitionList[indexOfThisPartition + 1];
             if (nextPart->type == PartitionType::Undefined)
@@ -251,9 +251,9 @@ namespace PartitionInterface
 
     const char* MRAPSPartitionInterface::LoadPartitionTable()
     {
-        for (int i = 0; i < partitionList.getCount(); i++)
+        for (int i = 0; i < partitionList.GetCount(); i++)
             partitionList[i]->Destroy();
-        partitionList.clear();
+        partitionList.Clear();
         uint8_t* buffer = (uint8_t*)_Malloc(19*512, "Malloc For Buffer for Disk Read");
         _memset(buffer, 0, 19 * 512);
         
@@ -336,7 +336,7 @@ namespace PartitionInterface
 
                 info->owner = (void*)this;
 
-                partitionList.add(info);
+                partitionList.Add(info);
             }
         }
 
@@ -347,7 +347,7 @@ namespace PartitionInterface
     const char* MRAPSPartitionInterface::SavePartitionTable()
     {
         // Sector 1 - 19
-        uint16_t partitionCount = (uint16_t)partitionList.getCount();
+        uint16_t partitionCount = (uint16_t)partitionList.GetCount();
         uint64_t totalSize = sizeof(totalSize) + sizeof(partitionCount);
         {
             for (int i = 0; i < partitionCount; i++)

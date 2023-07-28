@@ -509,9 +509,9 @@ void Window::Log(const char* message, uint32_t col)
 
 Window* FindWindowWithId(int64_t id)
 {
-    for (int i = 0; i < osData.windows.getCount(); i++)
-        if (osData.windows.elementAt(i)->windowId == id)
-            return osData.windows.elementAt(i);
+    for (int i = 0; i < osData.windows.GetCount(); i++)
+        if (osData.windows.ElementAt(i)->windowId == id)
+            return osData.windows.ElementAt(i);
 
     return NULL;
 }
@@ -524,7 +524,7 @@ bool DeleteWindowWithId(int64_t id)
     if (window == NULL)
         return false;
     
-    osData.osTasks.add(NewWindowCloseTask(window));
+    osData.osTasks.Add(NewWindowCloseTask(window));
     return true;
 }
 
@@ -540,10 +540,10 @@ bool CreateWindowWithId(int64_t id)
     GuiInstance* _gui = new GuiInstance(_mainWindow);
     *(_mainWindow) = Window((DefaultInstance*)_gui, Size(100, 100), Position(10, 40), "Window", true, true, true);
     _mainWindow->windowId = id;
-    osData.windows.add(_mainWindow);
+    osData.windows.Add(_mainWindow);
     _gui->Init();
 
-    osData.windowsToGetActive.add(_mainWindow);
+    osData.windowsToGetActive.Enqueue(_mainWindow);
 
     return true;
 }

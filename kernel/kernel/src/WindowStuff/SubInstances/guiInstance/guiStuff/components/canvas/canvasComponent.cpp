@@ -68,11 +68,11 @@ namespace GuiComponentStuff
             UpdateCanvas();
         }
 
-        while (updateFields->getCount() > 0)
+        while (updateFields->GetCount() > 0)
         {
-            Field tempField = updateFields->lastElement();
-            updateFields->removeLast();
-            parent->updateFields->add(tempField + position);
+            Field tempField = updateFields->LastElement();
+            updateFields->RemoveLast();
+            parent->updateFields->Add(tempField + position);
         }
             
         
@@ -96,7 +96,7 @@ namespace GuiComponentStuff
 
     void CanvasComponent::UpdateCanvas()
     {
-        updateFields->clear();
+        updateFields->Clear();
         UpdateCanvas(Field(Position(), GetActualComponentSize()));
     }
     void CanvasComponent::UpdateCanvas(int x, int y)
@@ -110,7 +110,7 @@ namespace GuiComponentStuff
     void CanvasComponent::UpdateCanvas(Field field)
     {
         AddToStack();
-        updateFields->add(field);
+        updateFields->Add(field);
         RemoveFromStack();
     }
 
@@ -128,7 +128,7 @@ namespace GuiComponentStuff
         if (callBackFunc != NULL)
             callBackFunc(this);
         renderer->Free();
-        updateFields->free();
+        updateFields->Free();
         _Free(updateFields);
         RemoveFromStack();
     }

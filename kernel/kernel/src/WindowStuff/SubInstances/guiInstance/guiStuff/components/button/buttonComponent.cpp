@@ -44,12 +44,12 @@ namespace GuiComponentStuff
         actualButtonStuff = new BoxComponent(parent, size, Colors.tblack);
 
         this->rectComp = new RectangleComponent(bgColDef, size, actualButtonStuff);
-        actualButtonStuff->children->add(rectComp);
+        actualButtonStuff->children->Add(rectComp);
         rectComp->id = 123401;
 
         this->textComp = new TextComponent(actualButtonStuff, Colors.tblack, textColDef, text, Position());
         textComp->center = true;
-        actualButtonStuff->children->add(textComp);
+        actualButtonStuff->children->Add(textComp);
         textComp->id = 123402;
 
         mouseClickedCallBack = NULL;
@@ -153,7 +153,7 @@ namespace GuiComponentStuff
             callBackFunc(this);
         actualButtonStuff->Destroy(destroyChildren, callBackFunc);
         _Free(actualButtonStuff);
-        updateFields->free();
+        updateFields->Free();
         _Free(updateFields);
         RemoveFromStack();
     }

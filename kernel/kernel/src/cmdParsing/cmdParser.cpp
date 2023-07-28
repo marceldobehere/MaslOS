@@ -365,7 +365,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             return;
         }
         case Command_Doom: {
-            terminal->tasks.add(NewDoomTask(window));
+            terminal->tasks.Add(NewDoomTask(window));
             RemoveFromStack();
             return;
         }
@@ -464,7 +464,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             return;
         }
         case Command_Exit: {
-            osData.osTasks.add(NewWindowCloseTask(window));
+            osData.osTasks.Add(NewWindowCloseTask(window));
             RemoveFromStack();
             return;
         }
@@ -473,11 +473,11 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                 Window* con4Window = (Window*)_Malloc(sizeof(Window), "Connect 4 Window");
                 Connect4Instance* connect4 = new Connect4Instance(con4Window);
                 *(con4Window) = Window((DefaultInstance*)connect4, Size(200, 200), Position(10, 40), "Connect 4", true, true, true);
-                osData.windows.add(con4Window);
+                osData.windows.Add(con4Window);
 
                 connect4->Init();
 
-                osData.windowsToGetActive.add(con4Window);
+                osData.windowsToGetActive.Enqueue(con4Window);
 
                 RemoveFromStack();
                 return;
@@ -486,12 +486,12 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             return;
         }
         case Command_TaskManager: {
-            terminal->tasks.add(NewTaskManagerTask(window));
+            terminal->tasks.Add(NewTaskManagerTask(window));
             RemoveFromStack();
             return;
         }
         case Command_DebugViewer: {
-            terminal->tasks.add(NewDebugViewerTask(window));
+            terminal->tasks.Add(NewDebugViewerTask(window));
             RemoveFromStack();
             return;
         }
@@ -711,7 +711,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
     if (StrEquals(data->data[0], "bf"))
     {
         if (data->len == 2)
-            terminal->tasks.add(NewBFTask(data->data[1], window));
+            terminal->tasks.Add(NewBFTask(data->data[1], window));
         else
             LogInvalidArgumentCount(1, data->len-1, window);
         
@@ -764,7 +764,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             char* buf = NULL;
             int len = 0;
             if (FS_STUFF::ReadFileFromFullPath(data->data[1], &buf, &len))
-                terminal->tasks.add(NewDebugViewerTask(window, buf, len));
+                terminal->tasks.Add(NewDebugViewerTask(window, buf, len));
             else
                 LogError("File not found!", window);
         }
@@ -794,7 +794,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                         {
                             TerminalInstance* terminal = (TerminalInstance*)window->instance;
 
-                            terminal->tasks.add(NewSleepTask(time));
+                            terminal->tasks.Add(NewSleepTask(time));
                         }
                     }
 
@@ -876,7 +876,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                             //Println(window, "> File exists!");
                             int fSize = fsInterface->GetFileInfo(relPath)->sizeInBytes;
 
-                            terminal->tasks.add(NewMAABTask(fSize, buf, window, terminal));
+                            terminal->tasks.Add(NewMAABTask(fSize, buf, window, terminal));
 
                             _Free((void*)buf);
                         }
@@ -942,7 +942,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                             //Println(window, "> File exists!");
                             int fSize = fsInterface->GetFileInfo(relPath)->sizeInBytes;
 
-                            terminal->tasks.add(NewTestTask(buf, fSize, window));
+                            terminal->tasks.Add(NewTestTask(buf, fSize, window));
                             
                             _Free((void*)buf);
                         }
@@ -1006,7 +1006,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             int offDur = to_int(data->data[2]);
             int totDur = to_int(data->data[3]);
             int size = to_int(data->data[3]);
-            terminal->tasks.add(NewBeepTask(onDur, offDur, totDur));
+            terminal->tasks.Add(NewBeepTask(onDur, offDur, totDur));
             Println(window, "Playing beep...");
 
             _Free(data);
@@ -1035,7 +1035,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         if (data->len > 1)
             BLEH = to_int(data->data[1]);
         // Println(window, "TEST VAL: {}", to_string(BLEH), Colors.yellow);
-        if (data->len > 1 && !StrEquals(data->data[1], "create") && (BLEH < 0 || BLEH >= osData.diskInterfaces.getCount()))
+        if (data->len > 1 && !StrEquals(data->data[1], "create") && (BLEH < 0 || BLEH >= osData.diskInterfaces.GetCount()))
             LogError("Invalid Disk Number selected!", window);
         else if (data->len == 4)
         {
@@ -1044,7 +1044,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                 if (StrEquals(data->data[2], "ram disk"))
                 {
                     int size = to_int(data->data[3]);
-                    osData.diskInterfaces.add(new DiskInterface::RamDiskInterface(size));
+                    osData.diskInterfaces.Add(new DiskInterface::RamDiskInterface(size));
                     Println(window, "Ram Disk with {} sectors created!", to_string(size), (*user)->colData.defaultTextColor);
                 }
                 else
@@ -1163,7 +1163,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                     PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
                     if (partInterface != NULL)
                     {
-                        uint64_t partCount = partInterface->partitionList.getCount();
+                        uint64_t partCount = partInterface->partitionList.GetCount();
                         Println(window, "Partition Count: {}", to_string(partCount), Colors.yellow);
                         Println(window, "Partition Data:", Colors.yellow);
                         for (int i = 0; i < partCount; i++)
@@ -1209,7 +1209,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                 PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
                 if (partInterface == NULL)
                     LogError("Drive has no Partition Manager!", window);
-                else if (partNum < 0 || partNum >= partInterface->partitionList.getCount())
+                else if (partNum < 0 || partNum >= partInterface->partitionList.GetCount())
                     LogError("Invalid Partition selected!", window);
                 else
                 {
@@ -1348,7 +1348,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                     int64_t partID = to_int(data->data[4]);
                     const char* filename = data->data[5];
 
-                    if (diskID < 0 || diskID >= osData.diskInterfaces.getCount())
+                    if (diskID < 0 || diskID >= osData.diskInterfaces.GetCount())
                         LogError("Invalid Disk selected!", window);
                     else
                     {
@@ -1356,7 +1356,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                         PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
                         if (partInterface == NULL)
                             LogError("Drive has no Partition Manager!", window);
-                        else if (partID < 0 || partID >= partInterface->partitionList.getCount())
+                        else if (partID < 0 || partID >= partInterface->partitionList.GetCount())
                             LogError("Invalid Partition selected!", window);
                         else
                         {
@@ -1369,7 +1369,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                                     LogError("The File was not found!", window);
                                 else
                                 {
-                                    osData.diskInterfaces.add(new DiskInterface::FileDiskInterface(filename, fsInterface));
+                                    osData.diskInterfaces.Add(new DiskInterface::FileDiskInterface(filename, fsInterface));
                                     Println(window, "File Disk from file \"{}\" created!", filename, (*user)->colData.defaultTextColor);
                                 }
                             }
@@ -1396,7 +1396,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                     PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
                     if (partInterface == NULL)
                         LogError("Drive has no Partition Manager!", window);
-                    else if (partNum < 0 || partNum >= partInterface->partitionList.getCount())
+                    else if (partNum < 0 || partNum >= partInterface->partitionList.GetCount())
                         LogError("Invalid Partition selected!", window);
                     else
                     {
@@ -1454,7 +1454,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
 
                                             AddToStack();
                                             {
-                                                uint64_t partCount = mrafsInterface->fsPartitionList.getCount();
+                                                uint64_t partCount = mrafsInterface->fsPartitionList.GetCount();
                                                 Println(window, "Partition Count: {}", to_string(partCount), Colors.yellow);
                                                 Println(window, "Partition Data:", Colors.yellow);
                                                 for (int i = 0; i < partCount; i++)
@@ -1470,7 +1470,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                                             
                                             AddToStack();
                                             {
-                                                uint64_t partCount = mrafsInterface->fsFileList.getCount();
+                                                uint64_t partCount = mrafsInterface->fsFileList.GetCount();
                                                 Println(window, "File Count: {}", to_string(partCount), Colors.yellow);
                                                 Println(window, "File Data:", Colors.yellow);
                                                 for (int i = 0; i < partCount; i++)
@@ -1490,7 +1490,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                                             
                                             AddToStack();
                                             {
-                                                uint64_t partCount = mrafsInterface->fsFolderList.getCount();
+                                                uint64_t partCount = mrafsInterface->fsFolderList.GetCount();
                                                 Println(window, "Folder Count: {}", to_string(partCount), Colors.yellow);
                                                 Println(window, "Folder Data:", Colors.yellow);
                                                 for (int i = 0; i < partCount; i++)
@@ -1530,7 +1530,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                     PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
                     if (partInterface == NULL)
                         LogError("Drive has no Partition Manager!", window);
-                    else if (partNum < 0 || partNum >= partInterface->partitionList.getCount())
+                    else if (partNum < 0 || partNum >= partInterface->partitionList.GetCount())
                         LogError("Invalid Partition selected!", window);
                     else
                     {
@@ -1588,7 +1588,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                 PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
                 if (partInterface == NULL)
                     LogError("Drive has no Partition Manager!", window);
-                else if (partNum < 0 || partNum >= partInterface->partitionList.getCount())
+                else if (partNum < 0 || partNum >= partInterface->partitionList.GetCount())
                     LogError("Invalid Partition selected!", window);
                 else
                 { 
@@ -1621,7 +1621,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                 PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
                 if (partInterface == NULL)
                     LogError("Drive has no Partition Manager!", window);
-                else if (partNum < 0 || partNum >= partInterface->partitionList.getCount())
+                else if (partNum < 0 || partNum >= partInterface->partitionList.GetCount())
                     LogError("Invalid Partition selected!", window);
                 else
                 {
@@ -1695,7 +1695,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                 PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
                 if (partInterface == NULL)
                     LogError("Drive has no Partition Manager!", window);
-                else if (partNum < 0 || partNum >= partInterface->partitionList.getCount())
+                else if (partNum < 0 || partNum >= partInterface->partitionList.GetCount())
                     LogError("Invalid Partition selected!", window);
                 else
                 { 
@@ -1839,7 +1839,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
                 PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
                 if (partInterface == NULL)
                     LogError("Drive has no Partition Manager!", window);
-                else if (partNum < 0 || partNum >= partInterface->partitionList.getCount())
+                else if (partNum < 0 || partNum >= partInterface->partitionList.GetCount())
                     LogError("Invalid Partition selected!", window);
                 else
                 { 
@@ -2349,13 +2349,13 @@ void GetCmd(const char* name, OSUser* user, Window* window)
     else if (StrEquals(name, "drives"))
     {
         Println(window, "Available Drives:", Colors.bgreen);
-        for (int i = 0; i < osData.diskInterfaces.getCount(); i++)
+        for (int i = 0; i < osData.diskInterfaces.GetCount(); i++)
         {
             DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[i];
             if (diskInterface->partitionInterface == NULL)
                 continue;
             PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
-            for (int i2 = 0; i2 < partInterface->partitionList.getCount(); i2++)
+            for (int i2 = 0; i2 < partInterface->partitionList.GetCount(); i2++)
             {
                 PartitionInterface::PartitionInfo* partInfo = partInterface->partitionList[i2];
                 if (!partInfo->hidden && partInfo->type == PartitionInterface::PartitionType::Normal)
@@ -2440,7 +2440,7 @@ void GetCmd(const char* name, OSUser* user, Window* window)
     }
     else if (StrEquals(name, "disk count"))
     {
-        Println(window, "Disk Count: {}", to_string(osData.diskInterfaces.getCount()), user->colData.defaultTextColor);
+        Println(window, "Disk Count: {}", to_string(osData.diskInterfaces.GetCount()), user->colData.defaultTextColor);
     }
     else if (StrEquals(name, "heap stats"))
     {

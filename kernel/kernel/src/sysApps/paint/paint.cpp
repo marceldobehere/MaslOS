@@ -54,7 +54,7 @@ namespace SysApps
         window = (Window*)_Malloc(sizeof(Window), "Paint Window");
         GuiInstance* gui = new GuiInstance(window);
         *(window) = Window((DefaultInstance*)gui, Size(280, 400), Position(100, 100), "Paint", true, true, true);
-        osData.windows.insertAt(window, 0);
+        osData.windows.InsertAt(window, 0);
         window->hidden = true;
         //window->resizeable = false;
         gui->Init();
@@ -69,7 +69,7 @@ namespace SysApps
 
         window->oldHidden = true;
         window->hidden = false;
-        osData.windowsToGetActive.add(window);
+        osData.windowsToGetActive.Enqueue(window);
 
         guiInstance = gui;
 

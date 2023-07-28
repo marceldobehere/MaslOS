@@ -34,16 +34,16 @@ void doomPrint(const char* str)
 void* doomMalloc(int size)
 {
     void* bruh = _Malloc(size, "DOOM MALLOC");
-    openMallocs->add(bruh);
+    openMallocs->Add(bruh);
     return bruh;
 }
 
 void doomFree(void* ptr)
 {
-    int indx = openMallocs->getIndexOf(ptr);
+    int indx = openMallocs->GetIndexOf(ptr);
     if (indx != -1)
     {
-        openMallocs->removeAt(indx);
+        openMallocs->RemoveAt(indx);
         _Free(ptr);
     }
 }
@@ -98,9 +98,9 @@ void* doomOpen(const char* path, const char* mode)
     bruhFile->bufferLen = resBufferLen;
     bruhFile->pos = 0;
     bruhFile->path = StrCopy(path);
-    openMallocs->add((void*)bruhFile);
-    openMallocs->add((void*)bruhFile->buffer);
-    openMallocs->add((void*)bruhFile->path);
+    openMallocs->Add((void*)bruhFile);
+    openMallocs->Add((void*)bruhFile->buffer);
+    openMallocs->Add((void*)bruhFile->path);
 
 
     //PIT::Sleep(1000);
@@ -457,12 +457,12 @@ void TaskDoom::Free()
     window->allowKeyboardDrawing = true;
     ((TerminalInstance*)window->instance)->takeInput = true;
 
-    while (openMallocs->getCount() > 0)
+    while (openMallocs->GetCount() > 0)
     {
-        void* data = openMallocs->elementAt(0);
+        void* data = openMallocs->ElementAt(0);
         _Free(data);
         
-        openMallocs->removeFirst();
+        openMallocs->RemoveFirst();
     }
 }
 

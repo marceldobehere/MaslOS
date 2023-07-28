@@ -27,7 +27,7 @@ namespace WindowManager
         }
 
         //GlobalRenderer->Println("Mouse POS Check");
-        for (int64_t i = osData.windows.getCount() - 1; i >= 0; i--)
+        for (int64_t i = osData.windows.GetCount() - 1; i >= 0; i--)
         {
             if (osData.windows[i]->hidden)
                 continue;
@@ -259,7 +259,7 @@ namespace WindowManager
         DrawBGRect(x1, y1, x2, y2);
         
 
-        int count = osData.windows.getCount();
+        int count = osData.windows.GetCount();
         for (int i = 0; i < count; i++)
             RenderWindowRect(osData.windows[i], x1, y1, x2, y2);
 
@@ -936,7 +936,7 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.x + 240,
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
-        osData.debugTerminalWindow->Log("Mouse Packet Count: {}", to_string(mousePackets.getCount()), Colors.yellow);
+        osData.debugTerminalWindow->Log("Mouse Packet Count: {}", to_string(mousePackets.GetCount()), Colors.yellow);
         RemoveFromStack();
 
         AddToStack();
@@ -1065,7 +1065,7 @@ if (window != NULL)
             osData.debugTerminalWindow->renderer->CursorPosition.y + 16,
             Colors.black);
         if (osData.ac97Driver != NULL)
-            osData.debugTerminalWindow->Log("AC97 DATA SRCS: {}", to_string(osData.ac97Driver->audioDestination->sources->getCount()), Colors.yellow);
+            osData.debugTerminalWindow->Log("AC97 DATA SRCS: {}", to_string(osData.ac97Driver->audioDestination->sources->GetCount()), Colors.yellow);
         else
             osData.debugTerminalWindow->Log("<NO AC97>", Colors.yellow);
         RemoveFromStack();

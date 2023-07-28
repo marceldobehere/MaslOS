@@ -10,7 +10,7 @@ template <typename T> void SyncedList<T>::init(uint64_t capacity)
     freed = false;
     count = 0;
     cap = capacity;
-    arr.reInit(capacity);
+    arr.ReInit(capacity);
     RemoveFromStack();
 }
 
@@ -18,9 +18,9 @@ template <typename T> SyncedList<T>::SyncedList(List<T>* list) : arr(Array<T>(0)
 {
     AddToStack();
     syncList = list;
-    init(list->getCapacity());
-    for (int i = 0; i < list->getCount(); i++)
-        add(list->elementAt(i));
+    init(list->GetCapacity());
+    for (int i = 0; i < list->GetCount(); i++)
+        add(list->ElementAt(i));
     RemoveFromStack();
 }
 
@@ -29,7 +29,7 @@ template <typename T> SyncedList<T>::SyncedList(List<T>* list) : arr(Array<T>(0)
 template <typename T> void SyncedList<T>::free()
 {
     AddToStack();
-    arr.free();
+    arr.Free();
     cap = 0;
     freed = true;
     count = 0;
@@ -41,8 +41,8 @@ template <typename T>void SyncedList<T>::expandArr()
     AddToStack();
     cap *= 2;
     Array<T> newArr = Array<T>(cap);
-    arr.copy(newArr);
-    arr.free();
+    arr.Copy(newArr);
+    arr.Free();
     arr = newArr;
     RemoveFromStack();
 }
@@ -176,12 +176,12 @@ template <typename T> T SyncedList<T>::elementAt(uint64_t index)
 
 template <typename T> void SyncedList<T>::sync()
 {
-    for (int i = 0; i < syncList->getCount(); i++)
-        if (this->getIndexOf(syncList->elementAt(i)) == -1)
-            add(syncList->elementAt(i));
+    for (int i = 0; i < syncList->GetCount(); i++)
+        if (this->getIndexOf(syncList->ElementAt(i)) == -1)
+            add(syncList->ElementAt(i));
         
     for (int i = 0; i < count; i++)
-        if (syncList->getIndexOf(this->arr[i]) == -1)
+        if (syncList->GetIndexOf(this->arr[i]) == -1)
         {
             removeAt(i);
             i--;

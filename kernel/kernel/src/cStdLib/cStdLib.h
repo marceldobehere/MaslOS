@@ -4,3 +4,4 @@
 #include "cstr.h"
 #include "math.h"
 #include "../osData/osData.h"
+#include "../interrupts/panic.h"

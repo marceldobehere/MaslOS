@@ -27,7 +27,7 @@ void TaskWindowClose::Do()
         return;
     }
 
-    int64_t index = osData.windows.getIndexOf(window);
+    int64_t index = osData.windows.GetIndexOf(window);
     if (index == -1)
     {
         done = true;
@@ -49,7 +49,7 @@ void TaskWindowClose::Do()
     }
     else
     {
-        osData.windows.removeAt(index);
+        osData.windows.RemoveAt(index);
 
         osData.windowPointerThing->UpdatePointerRect(
             window->position.x - 1, 

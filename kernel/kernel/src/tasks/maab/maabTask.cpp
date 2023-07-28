@@ -92,13 +92,13 @@ TaskMAAB::TaskMAAB(uint32_t codeLen, uint8_t* code, Window* window, TerminalInst
 void TaskMAAB::OnExternalWindowClose(Window* window)
 {
 	AddToStack();
-	int indx = windowsCreated->getIndexOf(window);
+	int indx = windowsCreated->GetIndexOf(window);
 	if (indx == -1)
 	{
 		RemoveFromStack();
 		return;
 	}
-	windowsCreated->removeAt(indx);	
+	windowsCreated->RemoveAt(indx);	
 	//Panic("BLEHUS MAXIMUS 2", true);
 	RemoveFromStack();
 }
@@ -624,7 +624,7 @@ void TaskMAAB::Do()
 						win->OnCloseHelp = (void*)this;
 						win->OnClose = (void(*)(void*, Window*))(void*)&OnExternalWindowClose;
 						
-						windowsCreated->add(win);
+						windowsCreated->Add(win);
 					}
 					//tempTask = NewSleepTask(amt);
 
@@ -2188,16 +2188,16 @@ void TaskMAAB::Free()
 	if (tempTask != NULL)
 		FreeTask(tempTask);
 
-	for (int i = 0; i < windowsCreated->getCount(); i++)
+	for (int i = 0; i < windowsCreated->GetCount(); i++)
 	{
-		Window* win = windowsCreated->elementAt(i);
+		Window* win = windowsCreated->ElementAt(i);
 		win->OnClose = NULL;
 		win->OnResize = NULL;
-		osData.osTasks.add(NewWindowCloseTask(win));
+		osData.osTasks.Add(NewWindowCloseTask(win));
 	}
 
 
-	windowsCreated->free();
+	windowsCreated->Free();
 	_Free((void*)windowsCreated);
 }
 

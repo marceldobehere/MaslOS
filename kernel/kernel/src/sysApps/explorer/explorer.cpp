@@ -19,7 +19,7 @@ namespace SysApps
         window = (Window*)_Malloc(sizeof(Window), "Explorer Window");
         GuiInstance* gui = new GuiInstance(window);
         *(window) = Window((DefaultInstance*)gui, Size(400, 300), Position(100, 100), "Explorer", true, true, true);
-        osData.windows.insertAt(window, 0);
+        osData.windows.InsertAt(window, 0);
         window->hidden = true;
         //window->resizeable = false;
         gui->Init();
@@ -32,7 +32,7 @@ namespace SysApps
 
         window->oldHidden = true;
         window->hidden = false;
-        osData.windowsToGetActive.add(window);
+        osData.windowsToGetActive.Enqueue(window);
 
         guiInstance = gui;
         lastClickedComp = NULL;
@@ -130,12 +130,12 @@ namespace SysApps
         _Free(path);
         
         ClearLists();
-        folderCompsYes.free();
-        folderPathsYes.free();
-        driveCompsYes.free();
-        drivePathsYes.free();
-        fileCompsYes.free();
-        filePathsYes.free();
+        folderCompsYes.Free();
+        folderPathsYes.Free();
+        driveCompsYes.Free();
+        drivePathsYes.Free();
+        fileCompsYes.Free();
+        filePathsYes.Free();
 
         _Free(this);
         RemoveFromStack();
@@ -143,19 +143,19 @@ namespace SysApps
 
     void Explorer::ClearLists()
     {
-        for (int i = 0; i < folderPathsYes.getCount(); i++)
-            _Free((void*)folderPathsYes.elementAt(i)); 
-        for (int i = 0; i < drivePathsYes.getCount(); i++)
-            _Free((void*)drivePathsYes.elementAt(i)); 
-        for (int i = 0; i < filePathsYes.getCount(); i++)
-            _Free((void*)filePathsYes.elementAt(i));
+        for (int i = 0; i < folderPathsYes.GetCount(); i++)
+            _Free((void*)folderPathsYes.ElementAt(i)); 
+        for (int i = 0; i < drivePathsYes.GetCount(); i++)
+            _Free((void*)drivePathsYes.ElementAt(i)); 
+        for (int i = 0; i < filePathsYes.GetCount(); i++)
+            _Free((void*)filePathsYes.ElementAt(i));
 
-        folderCompsYes.clear();
-        folderPathsYes.clear();
-        driveCompsYes.clear();
-        drivePathsYes.clear();
-        fileCompsYes.clear();
-        filePathsYes.clear();
+        folderCompsYes.Clear();
+        folderPathsYes.Clear();
+        driveCompsYes.Clear();
+        drivePathsYes.Clear();
+        fileCompsYes.Clear();
+        filePathsYes.Clear();
     }
 
     void Explorer::Reload()
@@ -169,11 +169,11 @@ namespace SysApps
         const char* dir = FS_STUFF::GetFolderPathFromFullPath(path);
         FilesystemInterface::GenericFilesystemInterface* fsInterface = FS_STUFF::GetFsInterfaceFromFullPath(path);
         
-        if (fileListComp->children->getCount() > 0)
+        if (fileListComp->children->GetCount() > 0)
         {
-            while (fileListComp->children->getCount() > 0)
+            while (fileListComp->children->GetCount() > 0)
             {
-                GuiComponentStuff::BaseComponent* comp = fileListComp->children->elementAt(0);
+                GuiComponentStuff::BaseComponent* comp = fileListComp->children->ElementAt(0);
                 uint64_t coolId = RND::lehmer64();
                 comp->id = coolId;
                 guiInstance->DeleteComponentWithId(coolId, true);
@@ -232,8 +232,8 @@ namespace SysApps
                     btnComp->size.FixedY = 16;
                     btnComp->size.FixedX = StrLen(textComp->text) * 8;
                     
-                    folderCompsYes.add(btnComp);
-                    folderPathsYes.add(tempo);
+                    folderCompsYes.Add(btnComp);
+                    folderPathsYes.Add(tempo);
 
                     //_Free(tempo);
                     btnComp->position.x = 0;
@@ -267,9 +267,9 @@ namespace SysApps
                     btnComp->size.FixedY = 16;
                     btnComp->size.FixedX = StrLen(textComp->text) * 8;
                     
-                    fileCompsYes.add(btnComp);
+                    fileCompsYes.Add(btnComp);
                     const char* tBLEH = StrCombine(drive, ":");
-                    filePathsYes.add(StrCombine(tBLEH, dataList[i]));
+                    filePathsYes.Add(StrCombine(tBLEH, dataList[i]));
                     _Free(tBLEH);
 
                     _Free(tempo);
@@ -287,13 +287,13 @@ namespace SysApps
         else
         {
             int _y = 0;
-            for (int i = 0; i < osData.diskInterfaces.getCount(); i++)
+            for (int i = 0; i < osData.diskInterfaces.GetCount(); i++)
             {
                 DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[i];
                 if (diskInterface->partitionInterface == NULL)
                     continue;
                 PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
-                for (int i2 = 0; i2 < partInterface->partitionList.getCount(); i2++)
+                for (int i2 = 0; i2 < partInterface->partitionList.GetCount(); i2++)
                 {
                     PartitionInterface::PartitionInfo* partInfo = partInterface->partitionList[i2];
                     if (!partInfo->hidden && partInfo->type == PartitionInterface::PartitionType::Normal)
@@ -308,8 +308,8 @@ namespace SysApps
                         btnComp->OnMouseClickedCallBack = (void(*)(void*, GuiComponentStuff::BaseComponent*, GuiComponentStuff::MouseClickEventInfo))(void*)&OnDriveClick;
 
                         GuiComponentStuff::TextComponent* textComp = btnComp->textComp;
-                        driveCompsYes.add(btnComp);
-                        drivePathsYes.add(StrCombine(partInfo->driveName, ":"));
+                        driveCompsYes.Add(btnComp);
+                        drivePathsYes.Add(StrCombine(partInfo->driveName, ":"));
 
                         // guiInstance->CreateComponentWithIdAndParent(coolId, GuiComponentStuff::ComponentType::TEXT, 1022);
                         // GuiComponentStuff::TextComponent* textComp = (GuiComponentStuff::TextComponent*)guiInstance->GetComponentFromId(coolId);
@@ -343,7 +343,7 @@ namespace SysApps
     
     void Explorer::OnFolderClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
     {
-        int indx = folderCompsYes.getIndexOf(btn);
+        int indx = folderCompsYes.GetIndexOf(btn);
         if (indx == -1)
             return;
         const char* pathThing = folderPathsYes[indx];
@@ -359,7 +359,7 @@ namespace SysApps
     }
     void Explorer::OnFileClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
     {
-        int indx = fileCompsYes.getIndexOf(btn);
+        int indx = fileCompsYes.GetIndexOf(btn);
         if (indx == -1)
             return;
         const char* pathThing = filePathsYes[indx];
@@ -372,7 +372,7 @@ namespace SysApps
 
     void Explorer::OnDriveClick(GuiComponentStuff::ButtonComponent* btn, GuiComponentStuff::MouseClickEventInfo info)
     {
-        int indx = driveCompsYes.getIndexOf(btn);
+        int indx = driveCompsYes.GetIndexOf(btn);
         if (indx == -1)
             return;
         const char* pathThing = drivePathsYes[indx];

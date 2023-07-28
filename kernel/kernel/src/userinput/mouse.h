@@ -8,14 +8,14 @@
 #include "../kernelStuff/kernelFiles/ImageStruct.h"
 #include "../kernelStuff/kernelFiles/ZIPStruct.h"
 
-#include "../cStdLib/list/list_mousePacket.h"
+#include "../cStdLib/queue/queue_mousePacket.h"
 
 extern int mouseCycleSkip;
 
 extern kernelFiles::ZIPFile* mouseZIP;
 extern kernelFiles::ImageFile* currentMouseImage;
 extern const char* currentMouseImageName;
-extern List<MousePacket> mousePackets;
+extern Queue<MousePacket> mousePackets;
 
 void Mousewait();
 

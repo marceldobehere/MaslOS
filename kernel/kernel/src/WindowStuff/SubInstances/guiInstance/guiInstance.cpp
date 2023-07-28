@@ -31,7 +31,7 @@ void GuiInstance::Init()
     //window->renderer->Clear(Colors.white);
     allComponents = new List<GuiComponentStuff::BaseComponent*>(10);
     screen = new GuiComponentStuff::ScreenComponent(window);
-    allComponents->add(screen);
+    allComponents->Add(screen);
     screen->id = 1234;
     window->renderer->Clear(Colors.white);
     screen->CheckUpdates();
@@ -147,10 +147,10 @@ void GuiInstance::Render()
 
     screen->CheckUpdates();
 
-    while (screen->finalUpdatedFields->getCount() > 0)
+    while (screen->finalUpdatedFields->GetCount() > 0)
     {
-        GuiComponentStuff::Field bruh = screen->finalUpdatedFields->lastElement();
-        screen->finalUpdatedFields->removeLast();
+        GuiComponentStuff::Field bruh = screen->finalUpdatedFields->LastElement();
+        screen->finalUpdatedFields->RemoveLast();
 
         GuiComponentStuff::ComponentFramebuffer bruhus = GuiComponentStuff::ComponentFramebuffer
             (
@@ -177,9 +177,9 @@ GuiComponentStuff::BaseComponent* GuiInstance::GetComponentFromId(uint64_t id)
     if (screen->id == id)
         return screen;
 
-    for (int i = 0; i < allComponents->getCount(); i++)
+    for (int i = 0; i < allComponents->GetCount(); i++)
     {
-        GuiComponentStuff::BaseComponent* comp = allComponents->elementAt(i);
+        GuiComponentStuff::BaseComponent* comp = allComponents->ElementAt(i);
         if (comp == NULL)
             continue;
         if (comp->id == id)
@@ -200,17 +200,17 @@ GuiComponentStuff::BaseComponent* GuiInstance::GetChildFromComponentWithId(uint6
     if (base->componentType == GuiComponentStuff::ComponentType::BOX)
     {
         GuiComponentStuff::BoxComponent* box = (GuiComponentStuff::BoxComponent*)base;
-        if (index >= box->children->getCount())
+        if (index >= box->children->GetCount())
             return NULL;
-        return box->children->elementAt(index);
+        return box->children->ElementAt(index);
     }
 
     if (base->componentType == GuiComponentStuff::ComponentType::SCREEN)
     {
         GuiComponentStuff::ScreenComponent* scr = (GuiComponentStuff::ScreenComponent*)base;
-        if (index >= scr->children->getCount())
+        if (index >= scr->children->GetCount())
             return NULL;
-        return scr->children->elementAt(index);
+        return scr->children->ElementAt(index);
     }
 
     if (base->componentType == GuiComponentStuff::ComponentType::BUTTON)
@@ -246,13 +246,13 @@ int GuiInstance::GetIndexOfChildFromComponentWithId(uint64_t id, uint64_t childI
     if (base->componentType == GuiComponentStuff::ComponentType::BOX)
     {
         GuiComponentStuff::BoxComponent* box = (GuiComponentStuff::BoxComponent*)base;
-        return box->children->getIndexOf(child);
+        return box->children->GetIndexOf(child);
     }
 
     if (base->componentType == GuiComponentStuff::ComponentType::SCREEN)
     {
         GuiComponentStuff::ScreenComponent* scr = (GuiComponentStuff::ScreenComponent*)base;
-        return scr->children->getIndexOf(child);
+        return scr->children->GetIndexOf(child);
     }
 
     return -1;
@@ -271,18 +271,18 @@ bool GuiInstance::RemoveChildFromComponentWithId(uint64_t id, int index)
     if (base->componentType == GuiComponentStuff::ComponentType::BOX)
     {
         GuiComponentStuff::BoxComponent* box = (GuiComponentStuff::BoxComponent*)base;
-        if (index >= box->children->getCount() || index < 0)
+        if (index >= box->children->GetCount() || index < 0)
             return false;
-        box->children->removeAt(index);
+        box->children->RemoveAt(index);
         return true;
     }
 
     if (base->componentType == GuiComponentStuff::ComponentType::SCREEN)
     {
         GuiComponentStuff::ScreenComponent* scr = (GuiComponentStuff::ScreenComponent*)base;
-        if (index >= scr->children->getCount())
+        if (index >= scr->children->GetCount())
             return false;
-        scr->children->removeAt(index);
+        scr->children->RemoveAt(index);
         return true;
     }
 
@@ -295,9 +295,9 @@ GuiInstance* currentInst;
 
 void RemoveThingFromList(GuiComponentStuff::BaseComponent* comp)
 {
-    int indx = currentInst->allComponents->getIndexOf(comp);
+    int indx = currentInst->allComponents->GetIndexOf(comp);
     if (indx != -1)
-        currentInst->allComponents->removeAt(indx);
+        currentInst->allComponents->RemoveAt(indx);
 }
 
 #include "../../../osData/MStack/MStackM.h"
@@ -318,11 +318,11 @@ void GuiInstance::Free()
     _Free(tScreen);
     
     AddToStack();
-    for (int i = 0; i < allComponents->getCount(); i++)
+    for (int i = 0; i < allComponents->GetCount(); i++)
     {
-        if (allComponents->elementAt(i)->componentType != GuiComponentStuff::ComponentType::SCREEN)
+        if (allComponents->ElementAt(i)->componentType != GuiComponentStuff::ComponentType::SCREEN)
             continue;
-        GuiComponentStuff::ScreenComponent* bruh = (GuiComponentStuff::ScreenComponent*)allComponents->elementAt(i);
+        GuiComponentStuff::ScreenComponent* bruh = (GuiComponentStuff::ScreenComponent*)allComponents->ElementAt(i);
         AddToStack();
         RemoveThingFromList(bruh);
         RemoveFromStack();
@@ -336,7 +336,7 @@ void GuiInstance::Free()
     }
     RemoveFromStack();
 
-    allComponents->free();
+    allComponents->Free();
     _Free(allComponents);
 
 
@@ -552,13 +552,13 @@ bool GuiInstance::ComponentAddChild(int64_t id, GuiComponentStuff::BaseComponent
     if (parentComp->componentType == GuiComponentStuff::ComponentType::BOX)
     {
         GuiComponentStuff::BoxComponent* box = (GuiComponentStuff::BoxComponent*)parentComp;
-        box->children->add(childComp);
+        box->children->Add(childComp);
         return true;
     }
     if (parentComp->componentType == GuiComponentStuff::ComponentType::SCREEN)
     {
         GuiComponentStuff::ScreenComponent* scr = (GuiComponentStuff::ScreenComponent*)parentComp;
-        scr->children->add(childComp);
+        scr->children->Add(childComp);
         return true;
     }
 
@@ -575,19 +575,19 @@ bool GuiInstance::ComponentRemoveChild(int64_t id, int64_t childId)
     if (parentComp->componentType == GuiComponentStuff::ComponentType::BOX)
     {
         GuiComponentStuff::BoxComponent* box = (GuiComponentStuff::BoxComponent*)parentComp;
-        int indx = box->children->getIndexOf(childComp);
+        int indx = box->children->GetIndexOf(childComp);
         if (indx == -1)
             return false;
-        box->children->removeAt(indx);
+        box->children->RemoveAt(indx);
         return true;
     }
     if (parentComp->componentType == GuiComponentStuff::ComponentType::SCREEN)
     {
         GuiComponentStuff::ScreenComponent* scr = (GuiComponentStuff::ScreenComponent*)parentComp;
-        int indx = scr->children->getIndexOf(childComp);
+        int indx = scr->children->GetIndexOf(childComp);
         if (indx == -1)
             return false;
-        scr->children->removeAt(indx);
+        scr->children->RemoveAt(indx);
         return true;
     }
 
@@ -621,7 +621,7 @@ bool GuiInstance::CreateComponentWithIdAndParent(int64_t id, GuiComponentStuff::
         GuiComponentStuff::ScreenComponent* scr = new GuiComponentStuff::ScreenComponent(window);
         scr->parent = parentComp;
 
-        allComponents->add(scr);
+        allComponents->Add(scr);
         return ComponentAddChild(parentId, scr);
     }
 
@@ -635,7 +635,7 @@ bool GuiInstance::CreateComponentWithIdAndParent(int64_t id, GuiComponentStuff::
         );
         comp->id = id;
 
-        allComponents->add(comp);
+        allComponents->Add(comp);
         return ComponentAddChild(parentId, comp);
     }
     if (type == GuiComponentStuff::ComponentType::BUTTON)
@@ -649,12 +649,12 @@ bool GuiInstance::CreateComponentWithIdAndParent(int64_t id, GuiComponentStuff::
             parentComp
         );
         comp->id = id;
-        allComponents->add(comp->actualButtonStuff);
-        allComponents->add(comp->rectComp);
-        allComponents->add(comp->textComp);
+        allComponents->Add(comp->actualButtonStuff);
+        allComponents->Add(comp->rectComp);
+        allComponents->Add(comp->textComp);
         
 
-        allComponents->add(comp);
+        allComponents->Add(comp);
         return ComponentAddChild(parentId, comp);
     }
     if (type == GuiComponentStuff::ComponentType::RECT)
@@ -667,7 +667,7 @@ bool GuiInstance::CreateComponentWithIdAndParent(int64_t id, GuiComponentStuff::
         );
         comp->id = id;
 
-        allComponents->add(comp);
+        allComponents->Add(comp);
         return ComponentAddChild(parentId, comp);
     }
     if (type == GuiComponentStuff::ComponentType::IMAGE_RECT)
@@ -680,7 +680,7 @@ bool GuiInstance::CreateComponentWithIdAndParent(int64_t id, GuiComponentStuff::
         );
         comp->id = id;
 
-        allComponents->add(comp);
+        allComponents->Add(comp);
         return ComponentAddChild(parentId, comp);
     }
     if (type == GuiComponentStuff::ComponentType::TEXT)
@@ -695,7 +695,7 @@ bool GuiInstance::CreateComponentWithIdAndParent(int64_t id, GuiComponentStuff::
         );
         comp->id = id;
 
-        allComponents->add(comp);
+        allComponents->Add(comp);
         return ComponentAddChild(parentId, comp);
     }
     if (type == GuiComponentStuff::ComponentType::TEXTFIELD)
@@ -710,11 +710,11 @@ bool GuiInstance::CreateComponentWithIdAndParent(int64_t id, GuiComponentStuff::
         );
         comp->id = id;
 
-        allComponents->add(comp->actualTextFieldStuff);
-        allComponents->add(comp->rectComp);
-        allComponents->add(comp->textComp);
+        allComponents->Add(comp->actualTextFieldStuff);
+        allComponents->Add(comp->rectComp);
+        allComponents->Add(comp->textComp);
 
-        allComponents->add(comp);
+        allComponents->Add(comp);
         return ComponentAddChild(parentId, comp);
     }
     if (type == GuiComponentStuff::ComponentType::CANVAS)
@@ -727,7 +727,7 @@ bool GuiInstance::CreateComponentWithIdAndParent(int64_t id, GuiComponentStuff::
         );
         comp->id = id;
 
-        allComponents->add(comp);
+        allComponents->Add(comp);
         return ComponentAddChild(parentId, comp);
     }
 

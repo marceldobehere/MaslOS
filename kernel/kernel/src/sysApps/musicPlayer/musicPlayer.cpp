@@ -22,7 +22,7 @@ namespace SysApps
         window = (Window*)_Malloc(sizeof(Window), "Music Player Window");
         GuiInstance* gui = new  GuiInstance(window);
         *(window) = Window((DefaultInstance*)gui, Size(400, 300), Position(100, 100), "Music Player", true, true, true);
-        osData.windows.insertAt(window, 0);
+        osData.windows.InsertAt(window, 0);
         window->hidden = true;
         //window->resizeable = false;
         gui->Init();
@@ -40,7 +40,7 @@ namespace SysApps
         AddToStack();
         window->oldHidden = true;
         window->hidden = false;
-        osData.windowsToGetActive.add(window);
+        osData.windowsToGetActive.Enqueue(window);
 
         guiInstance = gui;
 

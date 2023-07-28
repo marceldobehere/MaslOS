@@ -11,13 +11,13 @@ template <typename T> class Array
 
     public:
     //bool freed;
-    uint64_t getSize();
+    uint64_t GetSize();
     Array<T>(uint64_t size);
     T& operator[](uint64_t index);
-    void free();
-    Array<T> clone();
-    void copy(Array<T> target);
-    void reInit(uint64_t size);
+    void Free();
+    Array<T> Clone();
+    void Copy(Array<T> target);
+    void ReInit(uint64_t size);
 };
 
 template <typename T> class List
@@ -27,28 +27,28 @@ template <typename T> class List
     uint64_t cap;
     Array<T> arr;
     bool freed;
-    void init(uint64_t capacity);
-    void expandArr();
+    void Init(uint64_t capacity);
+    void ExpandArr();
 
     public:
     List<T>(uint64_t capacity);
     List<T>();
-    void free();
-    List<T> clone(); 
-    uint64_t getCount();
-    uint64_t getCapacity();
-    int64_t getIndexOf(T item);
-    void add(T item);
-    void insertAt(T item, uint64_t index);
-    void removeAt(uint64_t index);
-    void removeLast();
-    void removeFirst();
-    void removeFirst(int count);
-    T elementAt(uint64_t index);
-    T lastElement();
-    void set(uint64_t index, T item);
+    void Free();
+    List<T> Clone(); 
+    uint64_t GetCount();
+    uint64_t GetCapacity();
+    int64_t GetIndexOf(T item);
+    void Add(T item);
+    void InsertAt(T item, uint64_t index);
+    void RemoveAt(uint64_t index);
+    void RemoveLast();
+    void RemoveFirst();
+    void RemoveFirst(int count);
+    T ElementAt(uint64_t index);
+    T LastElement();
+    void Set(uint64_t index, T item);
     T& operator[](uint64_t index);
-    void clear();
+    void Clear();
     bool operator==(List<T> other);
 };
 
@@ -62,6 +62,7 @@ template <typename T> class List
 // // template class  List<PartitionInterface::GenericPartitionInterface*>;
 
 // #include "../kernelStuff/diskStuff/Filesystem_Interfaces/generic/genericFileSystemInterface.h"
+
 
 
 

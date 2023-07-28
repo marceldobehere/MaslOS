@@ -12,7 +12,7 @@ namespace SysApps
         keyPressed = false;
         
         *(window) = Window(NULL, Size(400, 300), Position(100, 100), "Magnifier", true, true, true);
-        osData.windows.insertAt(window, 0);
+        osData.windows.InsertAt(window, 0);
         window->hidden = true;
 
 
@@ -25,7 +25,7 @@ namespace SysApps
 
         window->oldHidden = true;
         window->hidden = false;
-        osData.windowsToGetActive.add(window);
+        osData.windowsToGetActive.Enqueue(window);
 
         UpdateTitle();
         Render();

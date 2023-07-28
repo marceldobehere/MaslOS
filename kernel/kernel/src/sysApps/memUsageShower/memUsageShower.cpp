@@ -22,7 +22,7 @@ namespace SysApps
         window = (Window*)_Malloc(sizeof(Window), "Mem Usage Shower Window");
         GuiInstance* gui = new GuiInstance(window);
         *(window) = Window((DefaultInstance*)gui, Size(300, 200), Position(100, 100), "RAM Usage", true, true, true);
-        osData.windows.insertAt(window, 0);
+        osData.windows.InsertAt(window, 0);
         window->hidden = true;
         //window->resizeable = false;
         gui->Init();
@@ -37,7 +37,7 @@ namespace SysApps
 
         window->oldHidden = true;
         window->hidden = false;
-        osData.windowsToGetActive.add(window);
+        osData.windowsToGetActive.Enqueue(window);
 
         guiInstance = gui;
 
@@ -67,7 +67,7 @@ namespace SysApps
         wantedListCount = 30;
         memUsageList = new List<int64_t>(wantedListCount);
         for (int i = 0; i < wantedListCount; i++)
-            memUsageList->add(usedHeapAmount);
+            memUsageList->Add(usedHeapAmount);
         
         DoRender();
         RemoveFromStack();
@@ -78,7 +78,7 @@ namespace SysApps
         //Serial::Writeln("> START FRAME");
         canvas->Clear();
 
-        if (memUsageList->getCount() < 2)
+        if (memUsageList->GetCount() < 2)
             return;
 
         int canvasW = canvas->renderer->componentFrameBuffer->Width;
@@ -87,11 +87,11 @@ namespace SysApps
         if (canvasW < 1 || canvasH < 1)
             return;
         
-        int64_t max = memUsageList->elementAt(0);
-        int64_t min = memUsageList->elementAt(0);
-        for (int i = 1; i < memUsageList->getCount(); i++)
+        int64_t max = memUsageList->ElementAt(0);
+        int64_t min = memUsageList->ElementAt(0);
+        for (int i = 1; i < memUsageList->GetCount(); i++)
         {
-            int64_t val = memUsageList->elementAt(i);
+            int64_t val = memUsageList->ElementAt(i);
             if (val > max)
                 max = val;
             if (val < min)
@@ -119,7 +119,7 @@ namespace SysApps
 
         int lX, lY, lX2;
         {
-            int64_t val = memUsageList->elementAt(0);
+            int64_t val = memUsageList->ElementAt(0);
             lX = 0;
             lX2 = 0;
             lY = ((val - min) * canvasH) / maxMin;
@@ -128,7 +128,7 @@ namespace SysApps
 
         for (int i = 0; i < wantedListCount; i++)
         {
-            int64_t val = memUsageList->elementAt(i);
+            int64_t val = memUsageList->ElementAt(i);
             int x = (i * canvasW) / (wantedListCount - 1);
             int y = ((val - min) * canvasH) / maxMin;
             y = canvasH - y - 1;
@@ -204,7 +204,7 @@ namespace SysApps
 
             int64_t avg = 0;
             for (int i = 0; i < wantedListCount; i++)
-                avg += memUsageList->elementAt(i);
+                avg += memUsageList->ElementAt(i);
             avg /= wantedListCount;
 
             temp = to_string(avg / 0x1000);
@@ -246,12 +246,12 @@ namespace SysApps
             return;
         lastTimeMS = currTimeMS;
 
-        while (memUsageList->getCount() - 1 < wantedListCount)
-            memUsageList->add(usedHeapAmount);
-        while (memUsageList->getCount() > wantedListCount)
-            memUsageList->removeAt(0);
+        while (memUsageList->GetCount() - 1 < wantedListCount)
+            memUsageList->Add(usedHeapAmount);
+        while (memUsageList->GetCount() > wantedListCount)
+            memUsageList->RemoveAt(0);
 
-        if (memUsageList->getCount() < 1)
+        if (memUsageList->GetCount() < 1)
             return;
 
         DoRender();
@@ -281,7 +281,7 @@ namespace SysApps
 
         if (memUsageList != NULL)
         {
-            memUsageList->free();
+            memUsageList->Free();
             _Free(memUsageList);
             memUsageList = NULL;
         }

@@ -97,41 +97,42 @@ namespace Serial
         {
             // Disable all interrupts
             Soutb(1, 0x00);
-            io_wait(500);
+            io_wait(100);
             // Enable DLAB (set baud rate divisor)
             Soutb(3, 0x80);
-            io_wait(500);
+            io_wait(100);
             // Set divisor to 3 (lo byte) 38400 baud
             Soutb(0, 0x03);
             //                  (hi byte)
             Soutb(1, 0x00);
-            io_wait(500);
+            io_wait(100);
             // 8 bits, no parity, one stop bit
             Soutb(3, 0x03);
             // Enable FIFO, clear them, with 14-byte threshold
             Soutb(2, 0xC7);
             // IRQs enabled, RTS/DSR set
             Soutb(4, 0x0B);
-            io_wait(500);
+            io_wait(100);
         }
         
-        io_wait(500);
-        while (_CanRead())
-            _Read();
+
+        while (Sinb(5) & 1 == 1)
+            Sinb(0);
 
         Soutb(4, 0x1E);    // Set in loopback mode, test the serial chip
-
         
-        while (_CanRead())
-            _Read();
+        while (Sinb(5) & 1 == 1)
+            Sinb(0);
         
         Soutb(0, 0xAE);    // Test serial chip (send byte 0xAE and check if serial returns same byte)
-        io_wait(10);
+        io_wait(500);
         // Check if serial is faulty (i.e: not same byte as sent)
         if(Sinb(0) != 0xAE)
         {
             if (pciCard != 0)
                 osData.debugTerminalWindow->Log("Serial PCI NO WORK :(!");
+            else
+                osData.debugTerminalWindow->Log("Serial Port NO WORK :(!");
             RemoveFromStack();
             SerialWorks = false;
             return false;
@@ -168,7 +169,7 @@ namespace Serial
                 return true;
             if (osData.serialManager->clientConnected)    
                 return osData.serialManager->HasPacket(SerialManager::ReservedHostPortsEnum::RawSerial);
-            else if (osData.serialManager->receiveBuffer->getCount() > 0)
+            else if (osData.serialManager->receiveBuffer->GetCount() > 0)
                 return true;
             else
                 return _CanRead();
@@ -202,10 +203,10 @@ namespace Serial
                 
                 return ret;
             }
-            else if (osData.serialManager->receiveBuffer->getCount() > 0)
+            else if (osData.serialManager->receiveBuffer->GetCount() > 0)
             {
-                char ret = osData.serialManager->receiveBuffer->elementAt(0);
-                osData.serialManager->receiveBuffer->removeAt(0);
+                char ret = osData.serialManager->receiveBuffer->ElementAt(0);
+                osData.serialManager->receiveBuffer->RemoveAt(0);
                 return ret;
             }
             else

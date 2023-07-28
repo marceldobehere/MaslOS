@@ -28,19 +28,19 @@ void TerminalInstance::SetWindow(Window* window)
 
 bool TerminalInstance::GetBusy()
 {
-    return tasks.getCount() != 0;
+    return tasks.GetCount() != 0;
 }
 
 void TerminalInstance::Free()
 {
-    while (tasks.getCount() > 0)
+    while (tasks.GetCount() > 0)
     {
-        Task* tsk = tasks.elementAt(0);
-        tasks.removeFirst();
+        Task* tsk = tasks.ElementAt(0);
+        tasks.RemoveFirst();
         FreeTask(tsk);
     }
 
-    tasks.free();
+    tasks.Free();
     
     if (newTermInstance != NULL)
     {

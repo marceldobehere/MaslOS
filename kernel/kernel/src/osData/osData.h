@@ -14,6 +14,8 @@
 
 #include "../serialManager/serialManager.h"
 
+#include "../cStdLib/queue/queue_all.h"
+
 struct OSData
 {
     bool exit;
@@ -21,7 +23,7 @@ struct OSData
     bool verboseBoot;
     KernelInfo* kernelInfo;
     List<Window*> windows;
-    List<Window*> windowsToGetActive;
+    Queue<Window*> windowsToGetActive;
     List<Task*> osTasks;
     kernelFiles::ZIPFile* windowButtonZIP;
     kernelFiles::ZIPFile* windowIconZIP;

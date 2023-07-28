@@ -77,6 +77,19 @@ namespace SerialManager
         for (int i = 0; i < SignatureLen; i++)
             Serial::_Write(Signature[i]);
         
+        uint8_t ON = 1;
+        uint8_t OFF = 0;
+
+        // send enabled ports
+        SendPacket(new GenericPacket(
+            PacketType::STATE,
+            ReservedHostPortsEnum::RawSerial,
+            ReservedOutClientPortsEnum::RawSerialClient,
+            1,
+            &ON
+        ));
+
+
         // write hoi packet
         Serial::Write("\nConnection to MaslOS established!\n");
         RemoveFromStack();
@@ -105,16 +118,70 @@ namespace SerialManager
             }
         RemoveFromStack();
 
+
+        if (packet->type == PacketType::STATE)
+        {
+            bool work = packet->data[0] == 1;
+
+            for (int i = 0; i < ReservedOutClientPortLen; i++)
+                if (ReservedOutClientPorts[i] == packet->from)
+                {
+                    WorkingOutClientPorts[i] = work;
+                    break;
+                }
+
+            for (int i = 0; i < ReservedHostPortLen; i++)
+                if (ReservedHostPorts[i] == packet->from)
+                {
+                    WorkingHostPorts[i] = work;
+                    break;
+                }
+
+            if (!hasToBeSentOut)
+            {
+                packet->Free();
+                RemoveFromStack();
+                return;
+            }
+        }
+
+        bool canPacketBeSent = true;
+        if (hasToBeSentOut)
+        {
+            for (int i = 0; i < ReservedOutClientPortLen; i++)
+                if (ReservedOutClientPorts[i] == packet->to)
+                {
+                    canPacketBeSent = WorkingOutClientPorts[i];
+                    break;
+                }
+        }
+        else
+        {
+            for (int i = 0; i < ReservedHostPortLen; i++)
+                if (ReservedHostPorts[i] == packet->to)
+                {
+                    canPacketBeSent = WorkingHostPorts[i];
+                    break;
+                }
+        }
+
+        if (!canPacketBeSent && packet->type != PacketType::STATE)
+        {
+            packet->Free();
+            RemoveFromStack();
+            return;
+        }
+
         if (hasToBeSentOut)
         {
             AddToStack();
-            packetsToBeSent->add(packet);
+            packetsToBeSent->Add(packet);
             RemoveFromStack();
         }
         else
         {
             AddToStack();
-            packetsReceived->add(packet);
+            packetsReceived->Add(packet);
             RemoveFromStack();
         }
         RemoveFromStack();
@@ -122,8 +189,8 @@ namespace SerialManager
 
     bool Manager::HasPacket(uint16_t to)
     {
-        for (int t = 0; t < packetsReceived->getCount(); t++)
-            if (packetsReceived->elementAt(t)->to == to)
+        for (int t = 0; t < packetsReceived->GetCount(); t++)
+            if (packetsReceived->ElementAt(t)->to == to)
                 return true;
             
         return false;
@@ -132,11 +199,11 @@ namespace SerialManager
     GenericPacket* Manager::GetPacket(uint16_t to)
     {
         AddToStack();
-        for (int t = 0; t < packetsReceived->getCount(); t++)
-            if (packetsReceived->elementAt(t)->to == to)
+        for (int t = 0; t < packetsReceived->GetCount(); t++)
+            if (packetsReceived->ElementAt(t)->to == to)
             {
-                GenericPacket* temp = packetsReceived->elementAt(t);
-                packetsReceived->removeAt(t);
+                GenericPacket* temp = packetsReceived->ElementAt(t);
+                packetsReceived->RemoveAt(t);
 
                 RemoveFromStack();
                 return temp;
@@ -151,42 +218,42 @@ namespace SerialManager
         AddToStack();
         if (!clientConnected)
         {
-            packetsToBeSent->clear();
+            packetsToBeSent->Clear();
             RemoveFromStack();
             return false;
         }
 
-        if (currentSendPacket == NULL && packetsToBeSent->getCount() > 0)
+        if (currentSendPacket == NULL && packetsToBeSent->GetCount() > 0)
         {
-            currentSendPacket = packetsToBeSent->elementAt(0);
-            packetsToBeSent->removeAt(0);
-            sendBuffer->clear();
+            currentSendPacket = packetsToBeSent->ElementAt(0);
+            packetsToBeSent->RemoveAt(0);
+            sendBuffer->Clear();
 
             for (int i = 0; i < SignatureLen; i++)
-                sendBuffer->add(Signature[i]);
+                sendBuffer->Add(Signature[i]);
 
-            sendBuffer->add(currentSendPacket->type);
+            sendBuffer->Add(currentSendPacket->type);
 
             {
                 uint8_t* len = (uint8_t*)&currentSendPacket->len;
                 for (int i = 0; i < 4; i++)
-                    sendBuffer->add(len[i]);
+                    sendBuffer->Add(len[i]);
             }
 
             {
                 uint8_t* from = (uint8_t*)&currentSendPacket->from;
                 for (int i = 0; i < 2; i++)
-                    sendBuffer->add(from[i]);
+                    sendBuffer->Add(from[i]);
             }
 
             {
                 uint8_t* to = (uint8_t*)&currentSendPacket->to;
                 for (int i = 0; i < 2; i++)
-                    sendBuffer->add(to[i]);
+                    sendBuffer->Add(to[i]);
             }
 
             for (int i = 0; i < currentSendPacket->len; i++)
-                sendBuffer->add(currentSendPacket->data[i]);
+                sendBuffer->Add(currentSendPacket->data[i]);
         }
         if (currentSendPacket == NULL)
         {
@@ -194,10 +261,10 @@ namespace SerialManager
             return false;
         }
         
-        if (sendBuffer->getCount() > 0)
+        if (sendBuffer->GetCount() > 0)
         {
-            char c = sendBuffer->elementAt(0);
-            sendBuffer->removeAt(0);
+            char c = sendBuffer->ElementAt(0);
+            sendBuffer->RemoveAt(0);
             Serial::_Write(c);
         }
         else
@@ -220,7 +287,7 @@ namespace SerialManager
 
         AddToStack();
         char c = Serial::_Read();
-        receiveBuffer->add(c);
+        receiveBuffer->Add(c);
 
         // if (receiveBuffer->getCount() < SignatureLen)
         // {
@@ -228,12 +295,12 @@ namespace SerialManager
         //     return true;
         // }
 
-        if (receiveBuffer->getCount() > 0 && receiveBuffer->getCount() <= SignatureLen)
+        if (receiveBuffer->GetCount() > 0 && receiveBuffer->GetCount() <= SignatureLen)
         {
-            int recLen = receiveBuffer->getCount();
+            int recLen = receiveBuffer->GetCount();
             bool signatureOk = true;
             for (int i = 0; i < recLen; i++)
-                if (receiveBuffer->elementAt(i) != Signature[i])
+                if (receiveBuffer->ElementAt(i) != Signature[i])
                     signatureOk = false;
                     
             if (!signatureOk)
@@ -242,7 +309,7 @@ namespace SerialManager
 
                 char* tBuff = (char*)_Malloc(recLen);
                 for (int i = 0; i < recLen; i++)
-                    tBuff[i] = receiveBuffer->elementAt(i);
+                    tBuff[i] = receiveBuffer->ElementAt(i);
 
                 GenericPacket* packet = new GenericPacket(
                     PacketType::DATA, 
@@ -258,7 +325,7 @@ namespace SerialManager
                 RemoveFromStack();
                 
 
-                receiveBuffer->clear();
+                receiveBuffer->Clear();
             }
 
             RemoveFromStack();
@@ -266,18 +333,18 @@ namespace SerialManager
         }
 
 
-        if (receiveBuffer->getCount() < SignatureLen + 5)
+        if (receiveBuffer->GetCount() < SignatureLen + 5)
         {
             RemoveFromStack();
             return true;
         }
 
 
-        if (receiveBuffer->getCount() == SignatureLen + 5)
+        if (receiveBuffer->GetCount() == SignatureLen + 5)
         {
             char tempBuff[4] = {0, 0, 0, 0};
             for (int i = 0; i < 4; i++)
-                tempBuff[i] = receiveBuffer->elementAt(SignatureLen + i + 1);
+                tempBuff[i] = receiveBuffer->ElementAt(SignatureLen + i + 1);
 
             int tempLen = *((int*)tempBuff) + 9 + SignatureLen;
 
@@ -293,7 +360,7 @@ namespace SerialManager
         }
 
 
-        if (receiveBuffer->getCount() < receiveBufferLen)
+        if (receiveBuffer->GetCount() < receiveBufferLen)
         {
             RemoveFromStack();
             return true;
@@ -301,11 +368,11 @@ namespace SerialManager
 
 
 
-        if (receiveBuffer->getCount() == receiveBufferLen)
+        if (receiveBuffer->GetCount() == receiveBufferLen)
         {
             char* tBuff = (char*)_Malloc(receiveBufferLen);
             for (int i = 0; i < receiveBufferLen; i++)
-                tBuff[i] = receiveBuffer->elementAt(i);
+                tBuff[i] = receiveBuffer->ElementAt(i);
 
             GenericPacket* packet = new GenericPacket(
                 (PacketType)tBuff[SignatureLen], 
@@ -320,7 +387,7 @@ namespace SerialManager
             SendPacket(packet);
             RemoveFromStack();
             
-            receiveBuffer->clear();
+            receiveBuffer->Clear();
 
             RemoveFromStack();
             return true;

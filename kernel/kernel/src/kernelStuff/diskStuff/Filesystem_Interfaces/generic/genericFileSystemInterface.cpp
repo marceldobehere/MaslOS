@@ -12,7 +12,7 @@ namespace FilesystemInterface
         if (partitionInterface == NULL)
             return FilesystemInterfaceType::None;
         //osData.debugTerminalWindow->Log("<BRUH 2>");
-        if (index < 0 || index >= partitionInterface->partitionList.getCount())
+        if (index < 0 || index >= partitionInterface->partitionList.GetCount())
             return FilesystemInterfaceType::None;
         //osData.debugTerminalWindow->Log("<BRUH 3>");
         // check for MRAFS  

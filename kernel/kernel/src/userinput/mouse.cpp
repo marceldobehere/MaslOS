@@ -95,7 +95,7 @@ uint32_t mouseColFront = Colors.white, mouseColBack = Colors.black;
 
 bool clicks[3] = {false, false, false};
 uint64_t clickTimes[3] = {0, 0, 0};
-List<MousePacket> mousePackets;
+Queue<MousePacket> mousePackets;
 
 MPoint IMousePosition;
 MPoint MousePosition;
@@ -358,7 +358,7 @@ void InitPS2Mouse(kernelFiles::ZIPFile* _mouseZIP, const char* _mouseName)
     outb(0x64, 0xA8);
     Mousewait();
 
-    mousePackets = List<MousePacket>(4);
+    mousePackets = Queue<MousePacket>(4);
 
     for (int i = 0; i < 3; i++)
     {
@@ -442,7 +442,7 @@ void HandlePS2Mouse(uint8_t data)
             MouseCycle = 0;
 
             AddToStack();
-            mousePackets.add(MousePacket(mousePacketArr));
+            mousePackets.Enqueue(MousePacket(mousePacketArr));
             RemoveFromStack();
 
             break;
@@ -500,7 +500,7 @@ void HandleClick(bool L, bool R, bool M)
                 {
                     // osData.debugTerminalWindow->Log("Count: {}", to_string(osData.osTasks.getCount()), Colors.yellow);
                     // osData.debugTerminalWindow->Log("Cap: {}", to_string(osData.osTasks.getCapacity()), Colors.yellow);
-                    osData.osTasks.add(NewWindowCloseTask(WindowManager::currentActionWindow));
+                    osData.osTasks.Add(NewWindowCloseTask(WindowManager::currentActionWindow));
                 }
                 else
                 {
@@ -528,7 +528,7 @@ void HandleClick(bool L, bool R, bool M)
             {
                 AddToStack();
                 
-                osData.windowsToGetActive.add(WindowManager::currentActionWindow);
+                osData.windowsToGetActive.Enqueue(WindowManager::currentActionWindow);
                 if (WindowManager::currentActionWindow->resizeable)
                     WindowManager::currentActionWindow->maximize = !WindowManager::currentActionWindow->maximize;
                 RemoveFromStack();
@@ -562,7 +562,7 @@ void HandleClick(bool L, bool R, bool M)
                 AddToStack();
                 if (M && Taskbar::activeTabWindow != NULL) // Taskbar Button Middle-Clicked
                 {
-                    osData.osTasks.add(NewWindowCloseTask(Taskbar::activeTabWindow));
+                    osData.osTasks.Add(NewWindowCloseTask(Taskbar::activeTabWindow));
                 }
                 RemoveFromStack();
 
@@ -584,7 +584,7 @@ void HandleClick(bool L, bool R, bool M)
             }
             else if (MousePosition.y >= osData.windowPointerThing->virtualScreenBuffer->Height - osData.windowPointerThing->taskbar->Height)
             {
-                osData.windowsToGetActive.add(NULL);    
+                osData.windowsToGetActive.Enqueue(NULL);    
             }
             else if (window != NULL)
             {
@@ -710,13 +710,12 @@ void ProcessMousePackets()
 void ProcessMousePackets(int limit)
 {
     AddToStack();
-    int l = mousePackets.getCount();
+    int l = mousePackets.GetCount();
     if (l > limit)
         l = limit;
     for (int i = 0; i < l; i++)
     {
-        ProcessMousePacket(mousePackets[0]);
-        mousePackets.removeAt(0);
+        ProcessMousePacket(mousePackets.Dequeue());
     }
     RemoveFromStack();
 }

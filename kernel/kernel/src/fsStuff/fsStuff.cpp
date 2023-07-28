@@ -178,14 +178,14 @@ namespace FS_STUFF
         }
         
         FilesystemInterface::GenericFilesystemInterface* foundFsInterface = NULL;
-        for (int i = 0; i < osData.diskInterfaces.getCount(); i++)
+        for (int i = 0; i < osData.diskInterfaces.GetCount(); i++)
         {
             DiskInterface::GenericDiskInterface* diskInterface = osData.diskInterfaces[i];
             if (diskInterface->partitionInterface == NULL)
                 continue;
 
             PartitionInterface::GenericPartitionInterface* partInterface = (PartitionInterface::GenericPartitionInterface*)diskInterface->partitionInterface;
-            for (int i2 = 0; i2 < partInterface->partitionList.getCount(); i2++)
+            for (int i2 = 0; i2 < partInterface->partitionList.GetCount(); i2++)
             {
                 PartitionInterface::PartitionInfo* partInfo = partInterface->partitionList[i2];
                 if (!partInfo->hidden && partInfo->type == PartitionInterface::PartitionType::Normal)
@@ -382,14 +382,14 @@ namespace FS_STUFF
         mainWindow->hidden = hideTerminalWindow;
         mainWindow->oldHidden = !hideTerminalWindow;
         
-        osData.windows.add(mainWindow);
+        osData.windows.Add(mainWindow);
         terminal->SetWindow(mainWindow);
         terminal->closeWindowAfterTask = autoCloseTerminalWindow;
         ((TerminalInstance*)mainWindow->instance)->Cls();
         //KeyboardPrintStart(mainWindow);
         //((TerminalInstance*)mainWindow->instance)->KeyboardPrintStart();
         if (!hideTerminalWindow)
-            osData.windowsToGetActive.add(mainWindow);
+            osData.windowsToGetActive.Enqueue(mainWindow);
 
         //((NewTerminalInstance*)terminal->newTermInstance)->Println(BLEHUS_CMD);
         {
@@ -399,7 +399,7 @@ namespace FS_STUFF
             terminal->terminalInput[i] = 0;
             terminal->userlen = i;
         }
-        terminal->tasks.add(NewEnterTask(terminal));
+        terminal->tasks.Add(NewEnterTask(terminal));
     }
 }
 

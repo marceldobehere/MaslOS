@@ -34,7 +34,7 @@ namespace GuiComponentStuff
         tempSelectedComponent = NULL;
         selectedComponent = NULL;
 
-        updateFields->add(Field(Position(), GetActualComponentSize()));
+        updateFields->Add(Field(Position(), GetActualComponentSize()));
         CheckUpdates(); 
     }
 
@@ -67,69 +67,69 @@ namespace GuiComponentStuff
         }
         RemoveFromStack();
 
-        for (int i = 0; i < children->getCount(); i++)
-            children->elementAt(i)->CheckUpdates();
+        for (int i = 0; i < children->GetCount(); i++)
+            children->ElementAt(i)->CheckUpdates();
         {
-            int cCount = children->getCount();
-            while (childrenFields->getCount() > cCount)
+            int cCount = children->GetCount();
+            while (childrenFields->GetCount() > cCount)
             {
-                updateFields->add(childrenFields->elementAt(childrenFields->getCount() - 1));
-                childrenFields->removeLast();
-                childrenHidden->removeLast();
+                updateFields->Add(childrenFields->ElementAt(childrenFields->GetCount() - 1));
+                childrenFields->RemoveLast();
+                childrenHidden->RemoveLast();
             }
-            while (childrenFields->getCount() < cCount)
+            while (childrenFields->GetCount() < cCount)
             {
-                childrenFields->add(Field());
-                childrenHidden->add(false);
+                childrenFields->Add(Field());
+                childrenHidden->Add(false);
             }
         }
         {
-            for (int i = 0; i < childrenFields->getCount(); i++)
+            for (int i = 0; i < childrenFields->GetCount(); i++)
             {
-                Field a = childrenFields->elementAt(i);
-                Field b = children->elementAt(i)->GetFieldWithPos();
-                bool a1 = childrenHidden->elementAt(i);
-                bool b1 = children->elementAt(i)->hidden;
+                Field a = childrenFields->ElementAt(i);
+                Field b = children->ElementAt(i)->GetFieldWithPos();
+                bool a1 = childrenHidden->ElementAt(i);
+                bool b1 = children->ElementAt(i)->hidden;
 
                 if (a != b || a1 != b1)
                 {
-                    childrenFields->set(i, b);
-                    childrenHidden->set(i, b1);
-                    updateFields->add(a);
-                    updateFields->add(b);
+                    childrenFields->Set(i, b);
+                    childrenHidden->Set(i, b1);
+                    updateFields->Add(a);
+                    updateFields->Add(b);
                 }
             }
         }
         {
-            for (int i = 0; i < childrenFields->getCount(); i++)
+            for (int i = 0; i < childrenFields->GetCount(); i++)
             {
-                Field a = childrenFields->elementAt(i);
-                Field b = children->elementAt(i)->GetFieldWithPos();
+                Field a = childrenFields->ElementAt(i);
+                Field b = children->ElementAt(i)->GetFieldWithPos();
 
                 if (a != b)
                 {
-                    childrenFields->set(i, b);
-                    updateFields->add(a);
-                    updateFields->add(b);
+                    childrenFields->Set(i, b);
+                    updateFields->Add(a);
+                    updateFields->Add(b);
                 }
             }
         }
         if (update)
         {
-            updateFields->clear();
-            updateFields->add(Field(Position(), GetActualComponentSize()));
+            updateFields->Clear();
+            updateFields->Add(Field(Position(), GetActualComponentSize()));
         }
 
         AddToStack();
-        while (updateFields->getCount() > 0)
+        while (updateFields->GetCount() > 0)
         {
-            Field bruh = updateFields->lastElement();
-            updateFields->removeLast();
-            finalUpdatedFields->add(bruh);
+            Field bruh = updateFields->LastElement();
+            updateFields->RemoveLast();
+            finalUpdatedFields->Add(bruh);
             renderer->bgCol = backgroundColor;
             renderer->Fill(renderer->bgCol, bruh);
-            for (int i = 0; i < children->getCount(); i++)
-                children->elementAt(i)->Render(bruh - children->elementAt(i)->position);
+            for (int i = 0; i < children->GetCount(); i++)
+                children->ElementAt(i)->Render(bruh - children->ElementAt(i)->position);
 
         }
         RemoveFromStack();
@@ -203,24 +203,24 @@ namespace GuiComponentStuff
         if (callBackFunc != NULL)
             callBackFunc(this);
         if (destroyChildren)
-            for (int i = 0; i < children->getCount(); i++)
+            for (int i = 0; i < children->GetCount(); i++)
             {
                 AddToStack();
-                BaseComponent* ch = children->elementAt(i);
+                BaseComponent* ch = children->ElementAt(i);
                 ch->Destroy(true, callBackFunc);
                 _Free(ch);
                 RemoveFromStack();
             }
         AddToStack();
-        children->free();
+        children->Free();
         _Free(children);
-        updateFields->free();
+        updateFields->Free();
         _Free(updateFields);
-        finalUpdatedFields->free();
+        finalUpdatedFields->Free();
         _Free(finalUpdatedFields);
-        childrenFields->free();
+        childrenFields->Free();
         _Free(childrenFields);
-        childrenHidden->free();
+        childrenHidden->Free();
         _Free(childrenHidden);
         RemoveFromStack();
 
