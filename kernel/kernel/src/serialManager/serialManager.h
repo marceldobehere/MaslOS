@@ -79,8 +79,8 @@ namespace SerialManager
     public:
         PacketType type;    // BYTE 0
         int len;          // BYTE 1-4
-        uint16_t to;           // BYTE 5-6
-        uint16_t from;        // BYTE 7-8
+        uint16_t from;        // BYTE 5-6
+        uint16_t to;           // BYTE 7-8
         char* data;         // BYTE 9-...
 
         uint64_t timeSent; // only used for timeout on the list

@@ -26,6 +26,7 @@ struct HeapSegHdr
 
 extern bool backupHeapFailed;
 extern bool usingBackupHeap;
+extern bool mallocToCache;
 void SwitchToBackupHeap();
 void TrySwitchToBackupHeap();
 

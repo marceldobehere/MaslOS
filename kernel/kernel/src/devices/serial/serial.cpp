@@ -8,6 +8,8 @@ namespace Serial
     uint64_t pciCard = 0;
     bool SerialWorks = false;
     uint16_t pciIoBase = 0;
+    SerialManager::GenericPacket* currentSerialReadPacket = NULL;
+    int currentSerialReadPacketIndex = 0;
 
     bool Init()
     {
@@ -95,35 +97,36 @@ namespace Serial
         {
             // Disable all interrupts
             Soutb(1, 0x00);
-            io_wait(100);
-
+            io_wait(500);
             // Enable DLAB (set baud rate divisor)
             Soutb(3, 0x80);
-            io_wait(100);
-
+            io_wait(500);
             // Set divisor to 3 (lo byte) 38400 baud
             Soutb(0, 0x03);
             //                  (hi byte)
             Soutb(1, 0x00);
-            io_wait(100);
-
+            io_wait(500);
             // 8 bits, no parity, one stop bit
             Soutb(3, 0x03);
-            io_wait(100);
             // Enable FIFO, clear them, with 14-byte threshold
             Soutb(2, 0xC7);
-            io_wait(100);
             // IRQs enabled, RTS/DSR set
             Soutb(4, 0x0B);
-            io_wait(100);
+            io_wait(500);
         }
         
-        
-        Soutb(4, 0x1E);    // Set in loopback mode, test the serial chip
-        io_wait(100);
-        Soutb(0, 0xAE);    // Test serial chip (send byte 0xAE and check if serial returns same byte)
-        io_wait(100);
+        io_wait(500);
+        while (_CanRead())
+            _Read();
 
+        Soutb(4, 0x1E);    // Set in loopback mode, test the serial chip
+
+        
+        while (_CanRead())
+            _Read();
+        
+        Soutb(0, 0xAE);    // Test serial chip (send byte 0xAE and check if serial returns same byte)
+        io_wait(10);
         // Check if serial is faulty (i.e: not same byte as sent)
         if(Sinb(0) != 0xAE)
         {
@@ -150,6 +153,8 @@ namespace Serial
         Soutb(4, 0x0F);
         RemoveFromStack();
         SerialWorks = true;
+        currentSerialReadPacket = NULL;
+        currentSerialReadPacketIndex = 0;
         return true;
     }
 
@@ -159,6 +164,8 @@ namespace Serial
             return _CanRead();
         else
         {
+            if (currentSerialReadPacket != NULL)
+                return true;
             if (osData.serialManager->clientConnected)    
                 return osData.serialManager->HasPacket(SerialManager::ReservedHostPortsEnum::RawSerial);
             else if (osData.serialManager->receiveBuffer->getCount() > 0)
@@ -174,17 +181,26 @@ namespace Serial
             return _Read();
         else
         {
-            if (osData.serialManager->clientConnected)    
+            if (currentSerialReadPacket == NULL && osData.serialManager->clientConnected)
             {
-                SerialManager::GenericPacket* packet = osData.serialManager->GetPacket(SerialManager::ReservedHostPortsEnum::RawSerial);
-                if (packet == NULL)
-                    return 0;
-                else
+                currentSerialReadPacket = osData.serialManager->GetPacket(SerialManager::ReservedHostPortsEnum::RawSerial);
+                currentSerialReadPacketIndex = 0;
+            }
+            
+            if (currentSerialReadPacket == NULL && osData.serialManager->clientConnected)
+                return 0;
+            if (currentSerialReadPacket != NULL)    
+            {
+                char ret = currentSerialReadPacket->data[currentSerialReadPacketIndex];
+                currentSerialReadPacketIndex++;
+                if (currentSerialReadPacketIndex >= currentSerialReadPacket->len)
                 {
-                    char ret = packet->data[0];
-                    packet->Free();
-                    return ret;
+                    currentSerialReadPacket->Free();
+                    currentSerialReadPacket = NULL;
+                    currentSerialReadPacketIndex = 0;
                 }
+                
+                return ret;
             }
             else if (osData.serialManager->receiveBuffer->getCount() > 0)
             {
@@ -270,12 +286,28 @@ namespace Serial
 
     void Write(const char* str)
     {
-        if (!SerialWorks || str == 0)
+        if (!SerialWorks || str == NULL)
             return;
-        while (*str != 0)
+        if (osData.serialManager == NULL ||
+            !osData.serialManager->clientConnected)
         {
-            Write(*str);
-            str++;
+            while (*str != 0)
+            {
+                Write(*str);
+                str++;
+            }
+            return;
+        }
+        else
+        {
+            SerialManager::GenericPacket* packet = 
+            new SerialManager::GenericPacket(
+                SerialManager::PacketType::DATA, 
+                SerialManager::ReservedHostPortsEnum::RawSerial, 
+                SerialManager::ReservedOutClientPortsEnum::RawSerialClient, 
+                StrLen(str), 
+                (uint8_t*)str);
+            osData.serialManager->SendPacket(packet);
         }
     }
 
