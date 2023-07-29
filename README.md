@@ -93,7 +93,7 @@ Here are the [Terminal Commands](https://github.com/marceldobehere/MaslOS/wiki/T
     - Audio sharing (TODO, Though idk how good it'll be at 10KB/S)
     - Remote Mouse/Keyboard input (TODO)
     - Possibly TCP/UDP Networking using the client computer as a proxy (TODO)
-    - File Browser to client (TODO)
+    - Network Drive of Client (TODO)
 
 
 ## How to run (Linux)
