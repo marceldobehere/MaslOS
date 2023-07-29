@@ -577,6 +577,8 @@ void HandleClick(bool L, bool R, bool M)
                     {
                         osData.startMenuWindow->hidden = false;
                         osData.startMenuWindow->moveToFront = true;
+                        int sH = osData.startMenuWindow->size.height;
+                        osData.startMenuWindow->newPosition.y = (osData.windowPointerThing->actualScreenBuffer->Height - sH - osData.windowPointerThing->taskbar->Height);
                         activeWindow = osData.startMenuWindow;
                     }
                 }
@@ -872,13 +874,13 @@ void ProcessMousePacket(MousePacket packet)
 
     if(IMousePosition.x < 0)
         IMousePosition.x = 0;
-    else if(IMousePosition.x > GlobalRenderer->framebuffer->Width - 16)
-        IMousePosition.x = GlobalRenderer->framebuffer->Width - 16;
+    else if(IMousePosition.x > osData.windowPointerThing->actualScreenBuffer->Width - 16)
+        IMousePosition.x = osData.windowPointerThing->actualScreenBuffer->Width - 16;
 
     if(IMousePosition.y < 0)
         IMousePosition.y = 0;
-    else if(IMousePosition.y > GlobalRenderer->framebuffer->Height - 16)
-        IMousePosition.y = GlobalRenderer->framebuffer->Height - 16;
+    else if(IMousePosition.y > osData.windowPointerThing->actualScreenBuffer->Height - 16)
+        IMousePosition.y = osData.windowPointerThing->actualScreenBuffer->Height - 16;
 
 
     //DrawMousePointer();

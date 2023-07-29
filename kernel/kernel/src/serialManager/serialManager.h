@@ -10,6 +10,8 @@ namespace SerialManager
 
 #include "../cStdLib/list/list_serialPacket.h"
 #include "../cStdLib/list/list_basics.h"
+#include "../cStdLib/queue/queue_serialPacket.h"
+#include "../cStdLib/queue/queue_basics.h"
 
 namespace SerialManager
 {
@@ -107,11 +109,11 @@ namespace SerialManager
     class Manager
     {
     public:
-        List<GenericPacket*>* packetsToBeSent = NULL; // to be sent out to serial
+        Queue<GenericPacket*>* packetsToBeSent = NULL; // to be sent out to serial
         List<GenericPacket*>* packetsReceived = NULL; // received from serial or locally
         
         GenericPacket* currentSendPacket = NULL;
-        List<char>* sendBuffer = NULL;
+        Queue<char>* sendBuffer = NULL;
 
         List<char>* receiveBuffer = NULL;
         int receiveBufferLen = 0;
@@ -122,10 +124,13 @@ namespace SerialManager
 
         Manager();
         void SendPacket(uint16_t from, uint16_t to, GenericPacket* packet);
+        bool HasPacketToBeSentOut(GenericPacket* packet);
+        bool CanPacketBeSent(bool sentOut, GenericPacket* packet);
         void SendPacket(GenericPacket* packet);
         bool HasPacket(uint16_t to);
         GenericPacket* GetPacket(uint16_t to);
 
+        bool InInt;
         void DoStuff();
         bool DoSendStuff();
         bool DoReceiveStuff();
@@ -150,8 +155,8 @@ namespace SerialManager
         bool WorkingOutClientPorts[ReservedOutClientPortLen]
         {
             true,
-            false,
-            false,
+            true,
+            true,
             false,
             false,
             false,

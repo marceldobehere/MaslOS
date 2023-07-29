@@ -102,6 +102,7 @@ namespace WindowManager
         PointerFramebuffer *copyOfVirtualBuffer;
 
         WindowPointerBufferThing(Framebuffer *actualScreenBuffer, Framebuffer *background, uint32_t backgroundColor);
+        void Resize(Framebuffer* actualScreenBuffer);
 
         // uint32_t* GetPixelAt(int x, int y);
         void DrawBGRect(int x1, int y1, int x2, int y2);
@@ -116,66 +117,6 @@ namespace WindowManager
         void Render();
         void UpdateWindowBorder(Window *window);
     
-        inline uint64_t RenderActualSquare(int _x1, int _y1, int _x2, int _y2)
-        {
-            //AddToStack();
-
-            uint64_t h = actualScreenBuffer->Height, w = actualScreenBuffer->Width, bpl = actualScreenBuffer->PixelsPerScanLine;
-
-
-            if (_x1 < 0)
-                _x1 = 0;
-            // if (_x2 < 0)
-            //     _x2 = 0;
-            if (_y1 < 0)
-                _y1 = 0;
-            // if (_y2 < 0)
-            //     _y2 = 0;
-
-            // if (_x1 >= w)
-            //     _x1 = w - 1;
-            if (_x2 >= w)
-                _x2 = w - 1;
-            // if (_y1 >= h)
-            //     _y1 = h - 1;
-            if (_y2 >= h)
-                _y2 = h - 1;
-
-            if (_x1 > _x2)
-                return 0;
-            if (_y1 > _y2)
-                return 0;
-
-            //
-            uint64_t counta = 0;
-            uint64_t xdiff = _x2 - _x1;
-            uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress + _x1 + w * _y1;
-            uint32_t*  cPixel = (uint32_t*)  copyOfScreenBuffer->BaseAddress + _x1 + w * _y1;
-
-            int64_t wMinusSomeStuff = w - (xdiff+1);
-
-            // DRAW SQUARE
-            for (int64_t y1 = _y1; y1 <= _y2; y1++)
-            {
-                int64_t y1TimesBpl = y1 * bpl;
-                for (int64_t x1 = _x1; x1 <= _x2; x1++)
-                {
-                    uint32_t col = **vPixel;
-                    if (*cPixel != col)
-                    {
-                        *cPixel = col;
-                        *(((uint32_t*) actualScreenBuffer->BaseAddress) + (x1 + y1TimesBpl)) = col; //counta + 0xff111111;
-                        counta++;
-                    }
-                    vPixel++;
-                    cPixel++;
-                }
-                vPixel += wMinusSomeStuff;
-                cPixel += wMinusSomeStuff;
-            }
-
-            //RemoveFromStack();
-            return counta;
-        }
+        uint64_t RenderActualSquare(int _x1, int _y1, int _x2, int _y2);
     };
 }

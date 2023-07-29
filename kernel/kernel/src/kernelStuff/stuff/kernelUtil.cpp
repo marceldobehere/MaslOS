@@ -832,6 +832,7 @@ BasicRenderer r = *((BasicRenderer*)NULL);
 #include "../../audio/audio.h"
 #include "../../audio/audioDevStuff.h"
 #include "../../devices/serial/serial.h"
+#include "../../display/normalDisplay/normalDisplay.h"
 
 
 KernelInfo InitializeKernel(BootInfo* bootInfo)
@@ -915,6 +916,8 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     //*bleh = 5;
 
     
+    osData.currentDisplay = new NormalDisplay(GlobalRenderer->framebuffer);
+
 
     PrintMsg("> Getting Background Image");
     Framebuffer* bgImg = kernelFiles::ConvertImageToFramebuffer(bootInfo->bgImage);

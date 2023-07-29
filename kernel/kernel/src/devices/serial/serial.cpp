@@ -102,13 +102,14 @@ namespace Serial
             Soutb(3, 0x80);
             io_wait(100);
             // Set divisor to 3 (lo byte) 38400 baud
-            Soutb(0, 0x03);
+            Soutb(0, 0x01); // NVM WE DO 1 -> 115200 baud
             //                  (hi byte)
             Soutb(1, 0x00);
             io_wait(100);
             // 8 bits, no parity, one stop bit
             Soutb(3, 0x03);
             // Enable FIFO, clear them, with 14-byte threshold
+            // actually looking at the data sheet its 224 bytes apparently
             Soutb(2, 0xC7);
             // IRQs enabled, RTS/DSR set
             Soutb(4, 0x0B);

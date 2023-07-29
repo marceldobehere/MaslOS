@@ -471,7 +471,7 @@ void HandleKeyboard(uint8_t scancode)
             else if (activeWindow->renderer->CursorPosition.y >= 16)
             {
                 activeWindow->renderer->CursorPosition.y -= 16;
-                activeWindow->renderer->CursorPosition.x = GlobalRenderer->framebuffer->Width - 8;
+                activeWindow->renderer->CursorPosition.x = activeWindow->renderer->framebuffer->Width - 8;
             }
         }
     }

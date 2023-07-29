@@ -2383,7 +2383,7 @@ void GetCmd(const char* name, OSUser* user, Window* window)
     }
     else if (StrEquals(name, "screen resolution"))
     {
-        dispVar vars[] = {dispVar((uint64_t)GlobalRenderer->framebuffer->Width), dispVar((uint64_t)GlobalRenderer->framebuffer->Height)};
+        dispVar vars[] = {dispVar((uint64_t)osData.windowPointerThing->actualScreenBuffer->Width), dispVar((uint64_t)osData.windowPointerThing->actualScreenBuffer->Height)};
         Println(window, "Screen Resolution: {0}x{1}.", vars);
     }
     else if (StrEquals(name, "mnfcc") || StrEquals(name, "max non fatal crash count"))

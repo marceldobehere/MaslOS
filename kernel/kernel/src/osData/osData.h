@@ -14,6 +14,8 @@
 
 #include "../serialManager/serialManager.h"
 
+#include "../display/generic/genericDisplay.h"
+
 #include "../cStdLib/queue/queue_all.h"
 
 struct OSData
@@ -64,6 +66,7 @@ struct OSData
     AC97::AC97Driver* ac97Driver = NULL;
     Audio::AudioOutputDevice* pcSpeakerDev;
     SerialManager::Manager* serialManager = NULL;
+    GenericDisplay* currentDisplay = NULL;
 
 };
 

@@ -53,7 +53,11 @@ namespace Taskbar
 
 
         AddToStack();
-        
+
+        taskbarBuffer = osData.windowPointerThing->taskbar;
+        renderer->framebuffer = taskbarBuffer;
+
+
         AddToStack();
         {
             uint32_t* endAddr = (uint32_t*)((uint64_t)taskbarBuffer->BaseAddress + taskbarBuffer->BufferSize);
@@ -126,7 +130,7 @@ namespace Taskbar
 
                 bool hover = window == activeWindow;
 
-                if (MousePosition.x >= x && MousePosition.x < (x + size) && MousePosition.y >= ypos && MousePosition.y < GlobalRenderer->framebuffer->Height)
+                if (MousePosition.x >= x && MousePosition.x < (x + size) && MousePosition.y >= ypos && MousePosition.y < osData.windowPointerThing->actualScreenBuffer->Height)
                 {
                     hover = true;
                     tempWindow = window;

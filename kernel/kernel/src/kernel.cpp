@@ -304,8 +304,8 @@ void RenderLoop()
                     if (window->maximize && window->oldMaximize)
                     {
                         if (window->position.x != 0 || window->position.y != 23 || 
-                        window->size.width != GlobalRenderer->framebuffer->Width ||
-                        window->size.height != GlobalRenderer->framebuffer->Height - 23)
+                        window->size.width != osData.windowPointerThing->actualScreenBuffer->Width ||
+                        window->size.height != osData.windowPointerThing->actualScreenBuffer->Height - 23)
                         {
                             window->maximize = false;
                             
@@ -340,7 +340,7 @@ void RenderLoop()
                             window->oldPreMaxTitle = window->showTitleBar;
 
                             window->newPosition = Position(0, 23);
-                            window->newSize = Size(GlobalRenderer->framebuffer->Width, GlobalRenderer->framebuffer->Height - 23);
+                            window->newSize = Size(osData.windowPointerThing->actualScreenBuffer->Width, osData.windowPointerThing->actualScreenBuffer->Height - 23);
 
                             window->showBorder = false;
                             //window->showTitleBar = false;
@@ -648,7 +648,7 @@ void RenderLoop()
                 Size size = Size(64*8, 10*16);
                 // if (usingBackupHeap)
                 //     size = Size(40*8, 8*16);
-                Position pos = Position(((GlobalRenderer->framebuffer->Width - size.width) / 2), ((GlobalRenderer->framebuffer->Height) / 5));
+                Position pos = Position(((osData.windowPointerThing->actualScreenBuffer->Width - size.width) / 2), ((osData.windowPointerThing->actualScreenBuffer->Height) / 5));
                 
                 if (msgWindow != NULL)
                 {
@@ -843,8 +843,8 @@ void boot(BootInfo* bootInfo)
         int64_t _x = 0;
         int64_t _y = 0;
 
-        _x = ((int)GlobalRenderer->framebuffer->Width - bootInfo->bootImage->width) / 2;
-        _y = ((int)GlobalRenderer->framebuffer->Height - bootInfo->bootImage->height) / 2;
+        _x = ((int)osData.windowPointerThing->actualScreenBuffer->Width - bootInfo->bootImage->width) / 2;
+        _y = ((int)osData.windowPointerThing->actualScreenBuffer->Height - bootInfo->bootImage->height) / 2;
 
         GlobalRenderer->DrawImage(bootInfo->bootImage, _x, _y, 1, 1);
         // GlobalRenderer->Println("X: {}", to_string(_x), Colors.yellow);

@@ -83,8 +83,47 @@ namespace WindowManager
         this->fps = 1;
         this->actualScreenBuffer = actualScreenBuffer;
         this->background = background;
-
+        currentActionWindow = NULL;
         this->defaultColor = Colors.red;
+
+        copyOfScreenBuffer = NULL;
+        virtualScreenBuffer = NULL;
+        copyOfVirtualBuffer = NULL;
+        taskbar = NULL;
+
+        Resize(actualScreenBuffer);
+    }
+
+    void WindowPointerBufferThing::Resize(Framebuffer* actualScreenBuffer)
+    {
+        this->actualScreenBuffer = actualScreenBuffer;
+
+        // free old stuff if its not NULL
+        if (copyOfScreenBuffer != NULL)
+        {
+            _Free(copyOfScreenBuffer->BaseAddress);
+            _Free(copyOfScreenBuffer);
+            copyOfScreenBuffer = NULL;
+        }
+        if (virtualScreenBuffer != NULL)
+        {
+            _Free(virtualScreenBuffer->BaseAddress);
+            _Free(virtualScreenBuffer);
+            virtualScreenBuffer = NULL;
+        }
+        if (copyOfVirtualBuffer != NULL)
+        {
+            _Free(copyOfVirtualBuffer->BaseAddress);
+            _Free(copyOfVirtualBuffer);
+            copyOfVirtualBuffer = NULL;
+        }
+        if (taskbar != NULL)
+        {
+            _Free(taskbar->BaseAddress);
+            _Free(taskbar);
+            taskbar = NULL;
+        }
+        
         {
             copyOfScreenBuffer = (Framebuffer*)_Malloc(sizeof(Framebuffer), "New Copy Framebuffer (struct)");
             copyOfScreenBuffer->Width = actualScreenBuffer->Width;
@@ -121,10 +160,9 @@ namespace WindowManager
             taskbar->BaseAddress = _Malloc(taskbar->BufferSize, "New Taskbar Framebuffer");
         }
 
-        currentActionWindow = NULL;
+        
 
         Clear(false);
-
     }
 
     void ClearFrameBuffer(Framebuffer* buffer, uint32_t col)
@@ -743,8 +781,32 @@ if (window != NULL)
 
     void WindowPointerBufferThing::Render()
     {
+        if (osData.currentDisplay == NULL)
+            return;
+        
         AddToStack();
         uint64_t counta = 0;
+        
+        if (actualScreenBuffer != osData.currentDisplay->framebuffer)
+        {
+            int sizeX = osData.currentDisplay->framebuffer->Width;
+            int sizeY = osData.currentDisplay->framebuffer->Height;
+            int sizePPS = osData.currentDisplay->framebuffer->PixelsPerScanLine;
+
+            if (actualScreenBuffer->Width != sizeX || 
+                actualScreenBuffer->Height != sizeY || 
+                actualScreenBuffer->PixelsPerScanLine != sizePPS)
+            {
+                // RESIZE
+                Resize(osData.currentDisplay->framebuffer);
+                Clear(true);
+                RenderWindows();
+            }
+            else
+                actualScreenBuffer = osData.currentDisplay->framebuffer;
+        }
+
+        osData.currentDisplay->StartFrame();
 
         // {
         //     uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress;
@@ -761,7 +823,7 @@ if (window != NULL)
         if (testInterlace != 1 && testInterlace != 0)
         {
             AddToStack();
-            uint64_t h = actualScreenBuffer->Height, w = actualScreenBuffer->Width;
+            int64_t h = actualScreenBuffer->Height, w = actualScreenBuffer->Width;
 
             uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress + w * testCounterY;// + testCounterX;
             uint32_t*  cPixel = (uint32_t*)  copyOfScreenBuffer->BaseAddress + w * testCounterY;// + testCounterX;
@@ -848,6 +910,7 @@ if (window != NULL)
                         {
                             *aPixel = col;
                             *cPixel = col;
+                            osData.currentDisplay->UpdatePixel(x, y);
                         }
                         vPixel++;
                         cPixel++;
@@ -875,6 +938,7 @@ if (window != NULL)
                         *aPixel = **vPixel;
                         vPixel++;
                         aPixel++;
+                         osData.currentDisplay->UpdatePixel(x, y);
                     } 
                 }
                 RemoveFromStack();
@@ -882,6 +946,8 @@ if (window != NULL)
                 RemoveFromStack();
             }
         }
+
+        osData.currentDisplay->EndFrame();
 
         AddToStack();
         //osData.debugTerminalWindow->Log("             : ################", Colors.black);
@@ -1125,6 +1191,75 @@ if (window != NULL)
         //                                              x2,   y1-1);
         // osData.windowPointerThing->UpdatePointerRect(x1-1, y2, 
         //                                              x2,   y2);
+    }
+
+    uint64_t WindowPointerBufferThing::RenderActualSquare(int _x1, int _y1, int _x2, int _y2)
+    {
+        AddToStack();
+
+        int64_t h = actualScreenBuffer->Height, w = actualScreenBuffer->Width, bpl = actualScreenBuffer->PixelsPerScanLine;
+
+
+        if (_x1 < 0)
+            _x1 = 0;
+        // if (_x2 < 0)
+        //     _x2 = 0;
+        if (_y1 < 0)
+            _y1 = 0;
+        // if (_y2 < 0)
+        //     _y2 = 0;
+
+        // if (_x1 >= w)
+        //     _x1 = w - 1;
+        if (_x2 >= w)
+            _x2 = w - 1;
+        // if (_y1 >= h)
+        //     _y1 = h - 1;
+        if (_y2 >= h)
+            _y2 = h - 1;
+
+        if (_x1 > _x2)
+        {
+            RemoveFromStack();
+            return 0;
+        }
+        if (_y1 > _y2)
+        {
+            RemoveFromStack();
+            return 0;
+        }
+
+        //
+        uint64_t counta = 0;
+        uint64_t xdiff = _x2 - _x1;
+        uint32_t** vPixel = (uint32_t**)virtualScreenBuffer->BaseAddress + _x1 + w * _y1;
+        uint32_t*  cPixel = (uint32_t*)  copyOfScreenBuffer->BaseAddress + _x1 + w * _y1;
+
+        int64_t wMinusSomeStuff = w - (xdiff+1);
+
+        // DRAW SQUARE
+        for (int64_t y1 = _y1; y1 <= _y2; y1++)
+        {
+            int64_t y1TimesBpl = y1 * bpl;
+            for (int64_t x1 = _x1; x1 <= _x2; x1++)
+            {
+                uint32_t col = **vPixel;
+                if (*cPixel != col)
+                {
+                    *cPixel = col;
+                    *(((uint32_t*) actualScreenBuffer->BaseAddress) + (x1 + y1TimesBpl)) = col; //counta + 0xff111111;
+                    counta++;
+                    osData.currentDisplay->UpdatePixel(x1, y1);
+                }
+                vPixel++;
+                cPixel++;
+            }
+            vPixel += wMinusSomeStuff;
+            cPixel += wMinusSomeStuff;
+        }
+
+        RemoveFromStack();
+        return counta;
     }
 }
 

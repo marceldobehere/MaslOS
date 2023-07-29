@@ -7,16 +7,16 @@ template <typename T> class Queue
     private:
     T* arr;
     bool freed;
-    uint64_t arrSize;
-    uint64_t count; // count
-    uint64_t head;
-    uint64_t tail;
+    int64_t arrSize;
+    int64_t count; // count
+    int64_t head;
+    int64_t tail;
     void Resize(uint64_t newSize);
 
     public:
     //bool freed;
-    uint64_t GetCount();
-    Queue<T>(uint64_t size);
+    int64_t GetCount();
+    Queue<T>(int64_t size);
     Queue<T>();
     T Dequeue();
     void Enqueue(T item);

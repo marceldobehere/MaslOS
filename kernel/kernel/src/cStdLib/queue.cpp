@@ -4,7 +4,7 @@
 
 #define DEF_SIZE 10
 
-template <typename T> Queue<T>::Queue(uint64_t yesSize)
+template <typename T> Queue<T>::Queue(int64_t yesSize)
 {
     if (yesSize < 2)
         yesSize = 2;
@@ -40,11 +40,11 @@ template <typename T> void Queue<T>::Resize(uint64_t newSize)
 {
     if (freed)
         return;
-    if (newSize < count)
+    if (newSize <= count)
         Panic("Queue Resize: New size is smaller than count!", true);
     
     T* newArr = (T*)_Malloc(sizeof(T) * newSize, "Queue Resize");
-    for (uint64_t i = 0; i < count; i++)
+    for (int64_t i = 0; i < count; i++)
         newArr[i] = arr[(head + i) % arrSize];
     
     _Free(arr);
@@ -54,7 +54,7 @@ template <typename T> void Queue<T>::Resize(uint64_t newSize)
     tail = count;
 }
 
-template <typename T> uint64_t Queue<T>::GetCount()
+template <typename T> int64_t Queue<T>::GetCount()
 {
     return count;
 }
