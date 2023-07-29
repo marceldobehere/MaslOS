@@ -87,6 +87,13 @@ Here are the [Terminal Commands](https://github.com/marceldobehere/MaslOS/wiki/T
     - Auto Partition Detection
     - Auto Filesystem Detection
   + [MRAPS/MRAFS To/From Windows FS Converter Tool](https://github.com/marceldobehere/Masl-Disk-File-Converter)
+  + Serial Manager (Allows "networking" with a client connected to serial) (WIP)
+    - Custom "Serial" (Done)
+    - Screen sharing (Basics work, WIP)
+    - Audio sharing (TODO, Though idk how good it'll be at 10KB/S)
+    - Remote Mouse/Keyboard input (TODO)
+    - Possibly TCP/UDP Networking using the client computer as a proxy (TODO)
+    - File Browser to client (TODO)
 
 
 ## How to run (Linux)
