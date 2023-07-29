@@ -49,11 +49,11 @@ void SerialManagerDisplay::EndFrame()
         SerialPixelUpdate update = pixelUpdates->Dequeue();
         uint32_t col = *(((uint32_t*)framebuffer->BaseAddress) + update.x + update.y * framebuffer->PixelsPerScanLine);
 
-        data[dataIndex++] = (uint8_t)((update.x >> 8) & 0xFF);
         data[dataIndex++] = (uint8_t)(update.x & 0xFF);
+        data[dataIndex++] = (uint8_t)((update.x >> 8) & 0xFF);
         
-        data[dataIndex++] = (uint8_t)((update.y >> 8) & 0xFF);
         data[dataIndex++] = (uint8_t)(update.y & 0xFF);
+        data[dataIndex++] = (uint8_t)((update.y >> 8) & 0xFF);
 
         // COL IS ARGB
         data[dataIndex++] = (uint8_t)((col >> 16) & 0xFF);
