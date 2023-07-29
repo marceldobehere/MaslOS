@@ -580,7 +580,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         osData.crashCount++;
         if (osData.crashCount <= 2 && !osData.booting)
         {
-            osData.debugTerminalWindow->position.x = osData.windowPointerThing->actualScreenBuffer->Width - 500;
+            osData.debugTerminalWindow->position.x = GlobalRenderer->framebuffer->Width - 500;
             osData.debugTerminalWindow->position.y = 23;
             osData.debugTerminalWindow->parentFrameBuffer = GlobalRenderer->framebuffer;
             osData.debugTerminalWindow->Render(osData.debugTerminalWindow->framebuffer, GlobalRenderer->framebuffer, osData.debugTerminalWindow->position, osData.debugTerminalWindow->size, osData.debugTerminalWindow);

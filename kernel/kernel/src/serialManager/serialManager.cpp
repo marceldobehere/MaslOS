@@ -15,6 +15,21 @@ namespace SerialManager
         _memcpy(data, this->data, len);
     }
 
+    GenericPacket::GenericPacket(PacketType type, uint16_t from, uint16_t to, int len, uint8_t* data, bool copy)
+    {
+        this->type = type;
+        this->from = from;
+        this->to = to;
+        this->len = len;
+        if (copy)
+        {
+            this->data = (char*)_Malloc(len);
+            _memcpy(data, this->data, len);
+        }
+        else
+            this->data = (char*)data;
+    }
+
     void GenericPacket::Free()
     {
         _Free(data);
@@ -25,14 +40,15 @@ namespace SerialManager
     Manager::Manager()
     {
         AddToStack();
-        packetsToBeSent = new Queue<GenericPacket*>(100);
-        packetsReceived = new List<GenericPacket*>(100);
+        packetsToBeSent = new Queue<GenericPacket*>(400);
+        packetsReceived = new List<GenericPacket*>(400);
         InInt = false;
 
         currentSendPacket = NULL;
-        sendBuffer = new Queue<char>(5000);
+        sendBuffer = new Queue<char>(100);
+        sendBufferIndex = 0;
 
-        receiveBuffer = new List<char>(100);
+        receiveBuffer = new List<char>(500);
         receiveBufferLen = 0;
 
         clientConnected = false;
@@ -78,6 +94,7 @@ namespace SerialManager
     void Manager::InitClientStuff()
     {
         AddToStack();
+        clientConnected = true;
         // write signature
         for (int i = 0; i < SignatureLen; i++)
             Serial::_Write(Signature[i]);
@@ -102,6 +119,7 @@ namespace SerialManager
             1,
             &ON
         ));
+        WindowManager::testInterlace = 1;
         osData.currentDisplay = new SerialManagerDisplay(this, osData.currentDisplay->framebuffer);
         GlobalRenderer->Clear(Colors.black);
         // osData.windowPointerThing->Clear(true);
@@ -226,28 +244,23 @@ namespace SerialManager
 
     GenericPacket* Manager::GetPacket(uint16_t to)
     {
-        AddToStack();
         for (int t = 0; t < packetsReceived->GetCount(); t++)
             if (packetsReceived->ElementAt(t)->to == to)
             {
                 GenericPacket* temp = packetsReceived->ElementAt(t);
                 packetsReceived->RemoveAt(t);
 
-                RemoveFromStack();
                 return temp;
             }
             
-        RemoveFromStack();
         return NULL;
     }
 
     bool Manager::DoSendStuff()
     {
-        AddToStack();
         if (!clientConnected)
         {
             packetsToBeSent->Clear();
-            RemoveFromStack();
             return false;
         }
 
@@ -255,13 +268,13 @@ namespace SerialManager
         {
             currentSendPacket = packetsToBeSent->Dequeue();
             sendBuffer->Clear();
+            sendBufferIndex = 0;
 
             bool canPacketBeSent = CanPacketBeSent(true, currentSendPacket);
             if (!canPacketBeSent)
             {
                 currentSendPacket->Free();
                 currentSendPacket = NULL;
-                RemoveFromStack();
                 return true;
             }
 
@@ -288,12 +301,11 @@ namespace SerialManager
                     sendBuffer->Enqueue(to[i]);
             }
 
-            for (int i = 0; i < currentSendPacket->len; i++)
-                sendBuffer->Enqueue(currentSendPacket->data[i]);
+            // for (int i = 0; i < currentSendPacket->len; i++)
+            //     sendBuffer->Enqueue(currentSendPacket->data[i]);
         }
         if (currentSendPacket == NULL)
         {
-            RemoveFromStack();
             return false;
         }
         
@@ -302,13 +314,18 @@ namespace SerialManager
             char c = sendBuffer->Dequeue();
             Serial::_Write(c);
         }
+        else if (sendBufferIndex < currentSendPacket->len)
+        {
+            Serial::_Write(currentSendPacket->data[sendBufferIndex]);
+            sendBufferIndex++;
+        }
         else
         {
             currentSendPacket->Free();
             currentSendPacket = NULL;
+            sendBufferIndex = 0;
         }
 
-        RemoveFromStack();
         return true;
     }
 
@@ -320,7 +337,7 @@ namespace SerialManager
         if (!Serial::_CanRead())
             return false;
 
-        AddToStack();
+
         char c = Serial::_Read();
         receiveBuffer->Add(c);
 
@@ -363,14 +380,14 @@ namespace SerialManager
                 receiveBuffer->Clear();
             }
 
-            RemoveFromStack();
+            
             return true;
         }
 
 
         if (receiveBuffer->GetCount() < SignatureLen + 5)
         {
-            RemoveFromStack();
+            
             return true;
         }
 
@@ -390,14 +407,14 @@ namespace SerialManager
                 tempLen = 9 + SignatureLen;
 
             receiveBufferLen = tempLen;
-            RemoveFromStack();
+           
             return true;
         }
 
 
         if (receiveBuffer->GetCount() < receiveBufferLen)
         {
-            RemoveFromStack();
+            
             return true;
         }
 
@@ -424,11 +441,11 @@ namespace SerialManager
             
             receiveBuffer->Clear();
 
-            RemoveFromStack();
+            
             return true;
         }
 
-        RemoveFromStack();
+        
         return true;
     }
 
@@ -453,31 +470,18 @@ namespace SerialManager
             return;
         }
 
-        AddToStack();
-        for (int i = 0; i < 224; i++)
-            if (!DoReceiveStuff())
-                break;
-        RemoveFromStack();
 
-        // // basically echo
-        // if (Serial::CanRead())
-        // {
-        //     char tempBuf[100];
-        //     int i = 0;
-        //     for (; i < 50 && Serial::CanRead(); i++)
-        //     {
-        //         char chr = Serial::Read();
-        //         tempBuf[i] = chr;
-        //     }
-        //     tempBuf[i] = 0;
-        //     Serial::Write(tempBuf);
-        // }
+        for (int a = 0; a < 5; a++)
+        {
+            for (int i = 0; i < 100; i++)
+                if (!DoReceiveStuff())
+                    break;
 
-        AddToStack();
-        for (int i = 0; i < 224; i++)
-            if (!DoSendStuff())
-                break;
-        RemoveFromStack();
+            for (int i = 0; i < 100; i++)
+                if (!DoSendStuff())
+                    break;
+        }
+
 
         RemoveFromStack();
 

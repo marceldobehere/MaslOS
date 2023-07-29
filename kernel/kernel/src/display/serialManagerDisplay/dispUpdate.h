@@ -13,4 +13,14 @@ public:
         this->x = x;
         this->y = y;
     }
+
+    bool operator==(SerialPixelUpdate& other)
+    {
+        return this->x == other.x && this->y == other.y;
+    }
+
+    bool operator!=(SerialPixelUpdate& other)
+    {
+        return this->x != other.x || this->y != other.y;
+    }
 };

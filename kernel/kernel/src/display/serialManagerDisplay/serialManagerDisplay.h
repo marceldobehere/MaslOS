@@ -1,12 +1,12 @@
 #pragma once
 #include "../generic/genericDisplay.h"
-#include "../../cStdLib/queue/queue_serialPixelUpdate.h"
+#include "../../cStdLib/list/list_serialPixelUpdate.h"
 #include "../../serialManager/serialManager.h"
 
 class SerialManagerDisplay : public GenericDisplay
 {
 public:
-    Queue<SerialPixelUpdate>* pixelUpdates;
+    List<SerialPixelUpdate>* pixelUpdates;
     SerialManager::Manager* manager;
     SerialManagerDisplay(SerialManager::Manager* manager, Framebuffer* framebuffer);
     void StartFrame();

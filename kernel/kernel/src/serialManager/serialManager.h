@@ -87,6 +87,7 @@ namespace SerialManager
         uint64_t timeSent; // only used for timeout on the list
 
         GenericPacket(PacketType type, uint16_t from, uint16_t to, int len, uint8_t* data); // data will be copied into the buffer, so it will need to be freed later
+        GenericPacket(PacketType type, uint16_t from, uint16_t to, int len, uint8_t* data, bool copy); 
 
         void Free();
     };
@@ -114,6 +115,7 @@ namespace SerialManager
         
         GenericPacket* currentSendPacket = NULL;
         Queue<char>* sendBuffer = NULL;
+        int sendBufferIndex = 0;
 
         List<char>* receiveBuffer = NULL;
         int receiveBufferLen = 0;

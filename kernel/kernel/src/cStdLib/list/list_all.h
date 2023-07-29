@@ -15,5 +15,5 @@
 #include "./list_window.h"
 #include "./list_guiBtn.h"
 #include "./list_serialPacket.h"
-
+#include "./list_serialPixelUpdate.h"
 

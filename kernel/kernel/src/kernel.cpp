@@ -975,6 +975,9 @@ void boot(BootInfo* bootInfo)
     MStackData::BenchmarkStackPointer1 = 0;
     MStackData::BenchmarkStackPointer2 = 0;
     MStackData::BenchmarkStackPointerSave = 0;
+
+    //osData.serialManager->InitClientStuff();
+
     RenderLoop();
 
 
