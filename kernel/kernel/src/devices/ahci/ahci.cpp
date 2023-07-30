@@ -352,11 +352,9 @@ namespace AHCI
     AHCIDriver::AHCIDriver (PCI::PCIDeviceHeader* pciBaseAddress)
     {
         this->PCIBaseAddress = pciBaseAddress;
-        osData.debugTerminalWindow->Log("AHCIDriver has been created!", Colors.orange);
+        osData.debugTerminalWindow->Log("AHCIDriver has been created! {}", ConvertHexToString((uint64_t)pciBaseAddress), Colors.orange);
 
         ABAR = (HBAMemory*)(uint64_t)((PCI::PCIHeader0*)(uint64_t)pciBaseAddress)->BAR5;
-
-        GlobalPageTableManager.MapMemory(ABAR, ABAR, false);
         ABAR->globalHostControl |= 0x80000000;
 
         ProbePorts();

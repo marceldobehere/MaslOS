@@ -578,7 +578,7 @@ void Panic(const char* panicMessage, const char* var, bool lock)
         Serial::Writeln();
 
         osData.crashCount++;
-        if (osData.crashCount <= 2 && !osData.booting)
+        if (osData.crashCount <= 2 && osData.debugTerminalWindow != NULL)//!osData.booting)
         {
             osData.debugTerminalWindow->position.x = GlobalRenderer->framebuffer->Width - 500;
             osData.debugTerminalWindow->position.y = 23;
