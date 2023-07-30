@@ -15,6 +15,14 @@ SerialManagerDisplay::SerialManagerDisplay(SerialManager::Manager* manager, Fram
     pixelUpdates = new List<SerialPixelUpdate>(5000);
 }
 
+void SerialManagerDisplay::Free()
+{
+    _Free(framebuffer->BaseAddress);
+    _Free(framebuffer);
+    pixelUpdates->Free();
+    _Free(pixelUpdates);
+}
+
 void SerialManagerDisplay::StartFrame()
 {
     pixelUpdates->Clear();

@@ -12,4 +12,5 @@ public:
     void StartFrame();
     void UpdatePixel(int x, int y);
     void EndFrame();
+    void Free();
 };

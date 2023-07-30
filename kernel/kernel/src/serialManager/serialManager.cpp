@@ -91,14 +91,51 @@ namespace SerialManager
         RemoveFromStack();
     }
 
-    void Manager::InitClientStuff()
+    void Manager::ActuallyInitClientStuff()
     {
         AddToStack();
-        clientConnected = true;
-        // write signature
-        for (int i = 0; i < SignatureLen; i++)
-            Serial::_Write(Signature[i]);
-        
+
+        if (WorkingOutClientPorts[1])
+        {
+            Serial::Write("\nConnection to MaslOS established!\n");
+        }
+
+        if (WorkingOutClientPorts[2])
+        {
+            if (osData.currentDisplay->type != DisplayType::SerialManagerType)
+            {
+                if (osData.currentDisplay != osData.fallbackOriginalDisplay)
+                {
+                    osData.currentDisplay->Free();
+                    _Free(osData.currentDisplay);
+                }
+
+                WindowManager::testInterlace = 1;
+                osData.currentDisplay = new SerialManagerDisplay(this, osData.currentDisplay->framebuffer);
+                GlobalRenderer->Clear(Colors.black);
+            }
+        }
+        else
+        {
+            if (osData.currentDisplay->type == DisplayType::SerialManagerType)
+            {
+                if (osData.currentDisplay != osData.fallbackOriginalDisplay)
+                {
+                    osData.currentDisplay->Free();
+                    _Free(osData.currentDisplay);
+                }
+                
+                osData.currentDisplay = osData.fallbackOriginalDisplay;
+            }
+        }
+
+        RemoveFromStack();
+    }
+
+    void Manager::InitServerClientStuff()
+    {
+        AddToStack();
+
         uint8_t ON = 1;
         uint8_t OFF = 0;
 
@@ -119,14 +156,27 @@ namespace SerialManager
             1,
             &ON
         ));
-        WindowManager::testInterlace = 1;
-        osData.currentDisplay = new SerialManagerDisplay(this, osData.currentDisplay->framebuffer);
-        GlobalRenderer->Clear(Colors.black);
-        // osData.windowPointerThing->Clear(true);
-        // osData.windowPointerThing->RenderWindows();
 
-        // write hoi packet
-        Serial::Write("\nConnection to MaslOS established!\n");
+        // send init client to server
+        SendPacket(new GenericPacket(
+            PacketType::INIT,
+            ReservedHostPortsEnum::InitHost,
+            ReservedOutClientPortsEnum::InitClient,
+            1,
+            &ON
+        ));
+
+        RemoveFromStack();
+    }
+
+    void Manager::InitClientStuff()
+    {
+        AddToStack();
+        clientConnected = true;
+        // write signature
+        for (int i = 0; i < SignatureLen; i++)
+            Serial::_Write(Signature[i]);
+        
         RemoveFromStack();
     }
 
@@ -155,6 +205,11 @@ namespace SerialManager
 
     bool Manager::CanPacketBeSent(bool sentOut, GenericPacket* packet)
     {
+        if (packet->type == PacketType::INIT)
+            return true;
+        if (packet->type == PacketType::STATE)
+            return true;
+
         bool canPacketBeSent = true;
         if (sentOut)
         {
@@ -175,13 +230,26 @@ namespace SerialManager
                 }
         }
 
-        return canPacketBeSent || packet->type == PacketType::STATE;
+        return canPacketBeSent;
     }
 
     void Manager::SendPacket(GenericPacket* packet)
     {
         AddToStack();
         bool hasToBeSentOut = HasPacketToBeSentOut(packet);
+
+        if (packet->type == PacketType::INIT && packet->to == ReservedHostPortsEnum::InitHost)
+        {
+            if (packet->data[0] == 0)
+                InitServerClientStuff(); // GOT INIT START
+            else
+                ActuallyInitClientStuff(); // GOT INIT BACK
+            packet->Free();
+            RemoveFromStack();
+            return;
+        }
+
+
 
         if (packet->type == PacketType::STATE)
         {
@@ -469,6 +537,7 @@ namespace SerialManager
             InInt = false;
             return;
         }
+
 
 
         for (int a = 0; a < 5; a++)

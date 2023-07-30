@@ -66,6 +66,8 @@ struct OSData
     AC97::AC97Driver* ac97Driver = NULL;
     Audio::AudioOutputDevice* pcSpeakerDev;
     SerialManager::Manager* serialManager = NULL;
+
+    GenericDisplay* fallbackOriginalDisplay = NULL;
     GenericDisplay* currentDisplay = NULL;
 
 };

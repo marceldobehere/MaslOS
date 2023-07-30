@@ -23,7 +23,7 @@ namespace SerialManager
 
     enum ReservedHostPortsEnum : uint16_t
     {
-        InitClient = 001, 
+        InitHost = 001, 
         RawSerial = 101,
         VideoHost = 201,
         AudioHost = 301,
@@ -35,7 +35,7 @@ namespace SerialManager
     #define ReservedHostPortLen 7
     static const uint16_t ReservedHostPorts[ReservedHostPortLen]
     {
-        ReservedHostPortsEnum::InitClient,
+        ReservedHostPortsEnum::InitHost,
         ReservedHostPortsEnum::RawSerial,
         ReservedHostPortsEnum::VideoHost,
         ReservedHostPortsEnum::AudioHost,
@@ -47,7 +47,7 @@ namespace SerialManager
 
     enum ReservedOutClientPortsEnum : uint16_t
     {
-        InitHost = 002,
+        InitClient = 002,
         RawSerialClient = 102,
         VideoClient = 202,
         AudioClient = 302,
@@ -59,7 +59,7 @@ namespace SerialManager
     #define ReservedOutClientPortLen 7
     static const uint16_t ReservedOutClientPorts[ReservedOutClientPortLen]
     {
-        ReservedOutClientPortsEnum::InitHost,
+        ReservedOutClientPortsEnum::InitClient,
         ReservedOutClientPortsEnum::RawSerialClient,
         ReservedOutClientPortsEnum::VideoClient,
         ReservedOutClientPortsEnum::AudioClient,
@@ -73,6 +73,7 @@ namespace SerialManager
         STATE = 10,
         PING = 20,
         DATA = 30,
+        INIT = 40,
     };
 
     class GenericPacket
@@ -138,6 +139,8 @@ namespace SerialManager
         bool DoReceiveStuff();
         
         void InitClientStuff();
+        void InitServerClientStuff();
+        void ActuallyInitClientStuff();
 
 
 
@@ -157,8 +160,8 @@ namespace SerialManager
         bool WorkingOutClientPorts[ReservedOutClientPortLen]
         {
             true,
-            true,
-            true,
+            false,
+            false,
             false,
             false,
             false,

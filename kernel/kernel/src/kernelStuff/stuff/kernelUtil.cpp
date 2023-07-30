@@ -920,7 +920,8 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     //*bleh = 5;
 
     
-    osData.currentDisplay = new NormalDisplay(GlobalRenderer->framebuffer);
+    osData.fallbackOriginalDisplay = new NormalDisplay(GlobalRenderer->framebuffer);
+    osData.currentDisplay = osData.fallbackOriginalDisplay;
 
 
     PrintMsg("> Getting Background Image");

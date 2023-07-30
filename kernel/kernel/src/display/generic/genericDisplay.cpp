@@ -25,3 +25,11 @@ void GenericDisplay::EndFrame()
     else if (type == DisplayType::SerialManagerType)
         ((SerialManagerDisplay*)this)->EndFrame();
 }
+
+void GenericDisplay::Free()
+{
+    if (type == DisplayType::NormalType)
+        ((NormalDisplay*)this)->Free();
+    else if (type == DisplayType::SerialManagerType)
+        ((SerialManagerDisplay*)this)->Free();
+}
