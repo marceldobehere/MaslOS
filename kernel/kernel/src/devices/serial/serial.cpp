@@ -43,6 +43,10 @@ namespace Serial
             // Soutb(1, 0x80);
             // io_wait(100);
         }
+        else
+        {
+
+        }
         
         // if (pciCard == 0)
         // {
@@ -116,13 +120,12 @@ namespace Serial
             io_wait(100);
         }
         
-
-        while (Sinb(5) & 1 == 1)
+        for (int i = 0; i < 5000 && Sinb(5) & 1 == 1; i++)
             Sinb(0);
-
+        
         Soutb(4, 0x1E);    // Set in loopback mode, test the serial chip
         
-        while (Sinb(5) & 1 == 1)
+        for (int i = 0; i < 5000 && Sinb(5) & 1 == 1; i++)
             Sinb(0);
         
         Soutb(0, 0xAE);    // Test serial chip (send byte 0xAE and check if serial returns same byte)
@@ -130,10 +133,13 @@ namespace Serial
         // Check if serial is faulty (i.e: not same byte as sent)
         if(Sinb(0) != 0xAE)
         {
-            if (pciCard != 0)
-                osData.debugTerminalWindow->Log("Serial PCI NO WORK :(!");
-            else
-                osData.debugTerminalWindow->Log("Serial Port NO WORK :(!");
+            if (osData.debugTerminalWindow != NULL)
+            {
+                if (pciCard != 0)
+                    osData.debugTerminalWindow->Log("Serial PCI NO WORK :(!");
+                else
+                    osData.debugTerminalWindow->Log("Serial Port NO WORK :(!");
+            }
             RemoveFromStack();
             SerialWorks = false;
             return false;
