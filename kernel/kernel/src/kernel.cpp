@@ -893,6 +893,19 @@ void boot(BootInfo* bootInfo)
     
     GlobalRenderer->Clear(Colors.black);
 
+    // %s -> string
+    // %c -> char
+    // %d/i -> int (32 bit)
+    // %D/I -> int (64 bit)
+    // %x -> hex (32 bit)
+    // %X -> hex (64 bit)
+    // %b -> byte
+    // %B -> bool
+    // %f -> float
+    // %F -> double
+    // %% -> %
+
+    
 //    while(true);
 
     //GlobalRenderer->Clear(Colors.black);
@@ -982,6 +995,14 @@ void boot(BootInfo* bootInfo)
     MStackData::BenchmarkStackPointerSave = 0;
 
     //osData.serialManager->InitClientStuff();
+
+    //Serial::Writelnf("BRO: \"%s\" smh", "test");
+    //Serial::Writelnf("BRO: %F smh", -1.4);
+    //Serial::Writelnf("BRO: %f smh", 99.8f);
+
+    // Serial::Writelnf("BRO: \"%s\", '%c', %d %D %x %X %b %B %f %F %%",
+    //     "TEST STR", 'A', 10, (uint64_t)12345, 123456, 0xFFAAFFAAFFAAFFAA, (uint8_t)123, true, 10.0f, -13.9);
+
 
     RenderLoop();
 

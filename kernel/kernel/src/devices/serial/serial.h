@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include <stddef.h>
+#include "../../kernelStuff/stuff/stdArg.h"
 
 namespace Serial
 {
@@ -26,6 +27,10 @@ namespace Serial
     void Writeln(const char* str);
     void Writeln(const char *chrs, const char *var);
     void Writeln(const char *chrs, const char *var, bool allowEscape);
+
+    void Writef(const char* str, ...);
+    void Writelnf(const char* str, ...);    
+    void _Writef(const char* str, va_list args);
 
     void Soutb(uint16_t port, uint8_t value);
     uint8_t Sinb(uint16_t port);

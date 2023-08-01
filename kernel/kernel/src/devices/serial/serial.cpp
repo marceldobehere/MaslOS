@@ -399,6 +399,116 @@ namespace Serial
         }
     }
 
+    void Writef(const char* str, ...)
+    {
+        va_list arg;
+        va_start(arg, str);
+        _Writef(str, arg);
+        va_end(arg);
+    }
+
+    void Writelnf(const char* str, ...)
+    {
+        va_list arg;
+        va_start(arg, str);
+        _Writef(str, arg);
+        va_end(arg);
+        Writeln();
+    }
+
+
+    // %s -> string
+    // %c -> char
+    // %d/i -> int (32 bit)
+    // %D/I -> int (64 bit)
+    // %x -> hex (32 bit)
+    // %X -> hex (64 bit)
+    // %b -> byte
+    // %B -> bool
+    // %f -> float
+    // %F -> double
+    // %% -> %
+
+    void _Writef(const char* str, va_list arg)
+    {
+        int len = StrLen(str);
+
+        for (int i = 0; i < len; i++)
+        {
+            if (str[i] == '%' && i + 1 < len)
+            {
+                i++;
+                if (str[i] == 's')
+                {
+                    char* argStr = va_arg(arg, char*);
+                    Write(argStr);
+                }
+                else if (str[i] == 'c')
+                {
+                    char argChar = va_arg(arg, int);
+                    Write(argChar);
+                }
+                else if (str[i] == 'd' || str[i + 1] == 'i')
+                {
+                    int argInt = va_arg(arg, int);
+                    Write(to_string(argInt));
+                }
+                else if (str[i] == 'D' || str[i + 1] == 'I')
+                {
+                    uint64_t argInt = va_arg(arg, uint64_t);
+                    Write(to_string(argInt));
+                }
+                else if (str[i] == 'x')
+                {
+                    uint32_t argInt = va_arg(arg, uint32_t);
+                    Write(ConvertHexToString(argInt));
+                }
+                else if (str[i] == 'X')
+                {
+                    uint64_t argInt = va_arg(arg, uint64_t);
+                    Write(ConvertHexToString(argInt));
+                }
+                else if (str[i] == 'b')
+                {
+                    uint8_t argInt = (uint8_t)va_arg(arg, int);
+                    Write(to_string(argInt));
+                }
+                else if (str[i] == 'B')
+                {
+                    bool argInt = (bool)va_arg(arg, int);
+                    Write(to_string(argInt));
+                }
+                else if (str[i] == 'f')
+                {
+                    // compiler be trolling me
+                    // float argFloat = va_arg(arg, float);
+                    // Write(to_string(argFloat));
+                    
+
+                    double argDouble = va_arg(arg, double);
+                    Write(to_string(argDouble));
+                }
+                else if (str[i] == 'F')
+                {
+                    double argDouble = va_arg(arg, double);
+                    Write(to_string(argDouble));
+                }
+                else if (str[i] == '%')
+                {
+                    Write('%');
+                }
+                else
+                {
+                    Write(str[i]);
+                }
+            }
+            else
+            {
+                Write(str[i]);
+            }
+        }
+    }
+
     void Soutb(uint16_t port, uint8_t value)
     {
         if (pciCard == 0)

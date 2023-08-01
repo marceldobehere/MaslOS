@@ -133,7 +133,7 @@ kernel/src/WindowStuff/WindowManager/%.o: kernel/src/WindowStuff/WindowManager/%
 	$(CC) $(CFLAGS2) -O2 -c $< -o $@	
 	
 %/rendering/BasicRenderer.o: %/rendering/BasicRenderer.cpp
-	$(CC) $(CFLAGS2) -O1 -c $< -o $@	
+	$(CC) $(CFLAGS2) -O2 -c $< -o $@	
 	
 %/rendering/VirtualRenderer.o: %/rendering/VirtualRenderer.cpp
 	$(CC) $(CFLAGS2) -O1 -c $< -o $@	

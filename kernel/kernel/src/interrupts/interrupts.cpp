@@ -171,8 +171,6 @@ __attribute__((interrupt)) void GenMathFault_handler(interrupt_frame* frame)
     Panic("General Math Fault Detected!", false);
     RemoveFromStack();
 
-
-
     SURVIVE_CRASH
 }
 
