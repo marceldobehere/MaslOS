@@ -82,7 +82,7 @@ typedef enum
 {
     DOOM_KEY_UNKNOWN = -1,
     DOOM_KEY_TAB = 9,
-    DOOM_KEY_ENTER = 13,
+    DOOM_KEY_ENTER = 10,
     DOOM_KEY_ESCAPE = 27,
     DOOM_KEY_SPACE = 32,
     DOOM_KEY_APOSTROPHE = '\'',
