@@ -15,7 +15,7 @@ namespace QWERTYKeyboard
         if (scancode == RightShift) return 0x80 + 0x36;
         if (scancode == LeftAlt) return 0x80 + 0x38;
         if (scancode == Backspace) return 127;
-        if (scancode == Enter) return 13;
+        if (scancode == Enter) return '\n';
         if (scancode == Escape) return 27;
         if (scancode == Tab) return 9;
 
