@@ -88,7 +88,7 @@ Here are the [Terminal Commands](https://github.com/marceldobehere/MaslOS/wiki/T
     - Auto Filesystem Detection
   + [MRAPS/MRAFS To/From Windows FS Converter Tool](https://github.com/marceldobehere/Masl-Disk-File-Converter)
   + Serial Manager (Allows "networking" with a client connected to serial) (WIP)
-    - [Windows Client](github.com/marceldobehere/MaslOS-CS-Serial-Client)
+    - [Windows Client](https://github.com/marceldobehere/MaslOS-CS-Serial-Client)
     - Custom "Serial"
     - Screen sharing
     - Audio sharing (TODO, Though idk how good it'll be at 10KB/S)
