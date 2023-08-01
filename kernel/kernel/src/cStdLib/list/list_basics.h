@@ -13,6 +13,9 @@ template class List<bool>;
 template class Array<uint8_t>;
 template class List<uint8_t>;
 
+template class Array<uint16_t>;
+template class List<uint16_t>;
+
 template class Array<uint64_t>;
 template class List<uint64_t>;
 

@@ -74,6 +74,7 @@ namespace SerialManager
         PING = 20,
         DATA = 30,
         INIT = 40,
+        CMD = 50
     };
 
     class GenericPacket
@@ -152,7 +153,7 @@ namespace SerialManager
             false,
             false,
             false,
-            false,
+            true,
             false
         };
 

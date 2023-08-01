@@ -236,7 +236,8 @@ void EditPartitionSetting(PartitionInterface::PartitionInfo* part, const char* p
 
 
 #include "../audio/audioDevStuff.h"
-#include "..//devices/serial/serial.h"
+#include "../devices/serial/serial.h"
+#include "../network/tcp/tcpClient.h"
 
 
 BuiltinCommand BuiltinCommandFromStr(char* i)
@@ -274,6 +275,14 @@ BuiltinCommand BuiltinCommandFromStr(char* i)
   else if (StrEquals(i, "paint")) return Command_Paint;
   else if (StrEquals(i, "heap monitor")) return Command_RamUsage;
   else if (StrEquals(i, "ram usg")) return Command_RamUsage;
+
+  else if (StrEquals(i, "tcp con")) return Command_Tcp_Connect;
+  else if (StrEquals(i, "tcp con?")) return Command_Tcp_Connected;
+  else if (StrEquals(i, "tcp dis")) return Command_Tcp_Disconnect;
+  else if (StrEquals(i, "tcp send")) return Command_Tcp_SendBytes;
+  else if (StrEquals(i, "tcp can rec")) return Command_Tcp_CanReceive;
+  else if (StrEquals(i, "tcp rec")) return Command_Tcp_Receive;
+
   else return Command_Invalid;
 }
 
@@ -547,6 +556,65 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             RemoveFromStack();
             return;
         }
+        /*
+            Command_Tcp_Connect,
+            Command_Tcp_Disconnect,
+            Command_Tcp_SendBytes,
+            Command_Tcp_CanReceive,
+            Command_Tcp_Receive
+        */
+        #define TCP_PORT 1234
+        // EITHER 8E FB 24 A3 = 2398823587
+        // OR A3 24 FB 8E =      2737109902
+        #define TCP_EXT_IP 2737109902
+        #define TCP_EXT_PORT 80
+        case Command_Tcp_Connect:
+        {
+            Println(window, "Connecting to 142.251.36.163");
+            TcpClient::ConnectPortToIp(TCP_PORT, TCP_EXT_IP, TCP_EXT_PORT);
+            RemoveFromStack();
+            return;
+        }
+        case Command_Tcp_Disconnect:
+        {
+            Println(window, "Disconnecting port");
+            TcpClient::DisconnectPort(TCP_PORT);
+            RemoveFromStack();
+            return;
+        }
+        case Command_Tcp_Connected:
+        {
+            Println(window, "Port connected: {}", to_string(TcpClient::IsPortConnected(TCP_PORT)));
+            RemoveFromStack();
+            return;
+        }
+        case Command_Tcp_CanReceive:
+        {
+            Println(window, "can read: {} bytes", to_string(TcpClient::DataAvaiableCount(TCP_PORT)));
+            RemoveFromStack();
+            return;
+        }
+        case Command_Tcp_Receive:
+        {
+            int count = TcpClient::DataAvaiableCount(TCP_PORT);
+            char* data = (char*)_Malloc(count + 1);
+            data[count] = 0;
+            TcpClient::ReadData(TCP_PORT, count, data);
+            Println(window, "Received: {}", data);
+            RemoveFromStack();
+            return;
+        }
+        case Command_Tcp_SendBytes:
+        {
+            char* txt = StrCopy("GET /.well-known/security.txt HTTP/1.1\r\nHost: www.google.com\r\n\r\n");
+            int len = StrLen(txt);
+            TcpClient::SendData(TCP_PORT, len, txt);
+            _Free(txt);
+            Println(window, "Sent data");
+            RemoveFromStack();
+            return;
+        }
+
     }
 
     StringArrData* data = SplitLine(oldInput);

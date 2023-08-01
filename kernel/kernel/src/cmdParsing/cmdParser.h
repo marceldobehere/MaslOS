@@ -44,7 +44,13 @@ enum BuiltinCommand {
     Command_ResetDefaultSpeaker,
     Command_Magnifier,
     Command_Paint,
-    Command_RamUsage
+    Command_RamUsage,
+    Command_Tcp_Connect,
+    Command_Tcp_Connected,
+    Command_Tcp_Disconnect,
+    Command_Tcp_SendBytes,
+    Command_Tcp_CanReceive,
+    Command_Tcp_Receive
 };
 BuiltinCommand BuiltinCommandFromStr(char* i);
 

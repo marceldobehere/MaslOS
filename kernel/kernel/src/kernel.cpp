@@ -874,16 +874,21 @@ void boot(BootInfo* bootInfo)
     }
     else
     {
-        GlobalRenderer->CursorPosition.x = 0;
-        GlobalRenderer->CursorPosition.y = 0;
-        
-        GlobalRenderer->color = Colors.bred;
-        GlobalRenderer->Println("ERROR: Interrupts are not working properly!");
-        GlobalRenderer->color = Colors.yellow;
-        GlobalRenderer->Println("Please reboot the system.");
+        for (int i = 0; i < 500; i++)
+        {
+            GlobalRenderer->CursorPosition.x = 0;
+            GlobalRenderer->CursorPosition.y = 0;
+            
+            GlobalRenderer->color = Colors.bred;
+            GlobalRenderer->Println("ERROR: Interrupts are not working properly!");
+            GlobalRenderer->color = Colors.yellow;
+            GlobalRenderer->Println("Please reboot the system.");
+        }
 
-        while (true)
-            asm("hlt");
+        osData.NO_INTERRUPTS = true;
+
+        // while (true)
+        //     asm("hlt");
     }
     
     GlobalRenderer->Clear(Colors.black);

@@ -833,6 +833,7 @@ BasicRenderer r = *((BasicRenderer*)NULL);
 #include "../../audio/audioDevStuff.h"
 #include "../../devices/serial/serial.h"
 #include "../../display/normalDisplay/normalDisplay.h"
+#include "../../network/tcp/tcpClient.h"
 
 
 KernelInfo InitializeKernel(BootInfo* bootInfo)
@@ -1014,6 +1015,10 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     PrintMsg("> Initing Serial Manager Thingy");
     osData.serialManager = new SerialManager::Manager();
     StepDone();
+
+    PrintMsg("> Initing TCP Client Thingy");
+    TcpClient::InitTcpClientStuff();
+    StepDone();
     
     PrintMsg("> Initing Users");
     initUsers();
@@ -1191,7 +1196,8 @@ KernelInfo InitializeKernel(BootInfo* bootInfo)
     PrintMsgEndLayer("BOOT");
 
     StepDone();
-    PIT::Sleep(200);
+    if (PIT::TicksSinceBoot != 0)
+        PIT::Sleep(200);
     PrintMsgCol("> Inited Kernel!", Colors.bgreen);
     RemoveFromStack();
     return kernelInfo;

@@ -2,6 +2,7 @@
 #include "../cStdLib/cStdLib.h"
 #include "../devices/serial/serial.h"
 #include "../display/serialManagerDisplay/serialManagerDisplay.h"
+#include "../network/tcp/tcpClient.h"
 
 namespace SerialManager
 {
@@ -156,6 +157,18 @@ namespace SerialManager
             1,
             &ON
         ));
+
+        // send enabled video
+        SendPacket(new GenericPacket(
+            PacketType::STATE,
+            ReservedHostPortsEnum::TCPHost,
+            ReservedOutClientPortsEnum::TCPClient,
+            1,
+            &ON
+        ));
+
+
+
 
         // send init client to server
         SendPacket(new GenericPacket(
@@ -538,6 +551,7 @@ namespace SerialManager
             return;
         }
 
+        TcpClient::DoStep();
 
 
         for (int a = 0; a < 5; a++)
