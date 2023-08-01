@@ -33,6 +33,9 @@ namespace TcpClient
             return;
         if (index < 0 || index >= receivedPackets->GetCount())
             return;
+    
+        SerialManager::GenericPacket* packet = receivedPackets->ElementAt(index);
+        packet->Free();
         receivedPackets->RemoveAt(index);
         receivedPacketsRemainingCount->RemoveAt(index);
     }
@@ -225,12 +228,21 @@ namespace TcpClient
                 indx++;
                 left--;
                 if (left < 1)
+                {
+                    receivedPacketsRemainingCount->Set(i, canRead - x - 1);
+
+                    if (x + 1 >= canRead)
+                        RemovePacketAt(i);
+
                     return indx;   
+                }
             }
 
             RemovePacketAt(i);
             i--;
         }
+
+        return indx;
     }
 
     bool IsPortConnected(uint16_t port)

@@ -601,6 +601,7 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
             data[count] = 0;
             TcpClient::ReadData(TCP_PORT, count, data);
             Println(window, "Received: {}", data);
+            _Free(data);
             RemoveFromStack();
             return;
         }
