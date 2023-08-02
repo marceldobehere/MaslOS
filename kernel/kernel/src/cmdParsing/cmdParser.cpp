@@ -724,22 +724,22 @@ void ParseCommand(char* input, char* oldInput, OSUser** user, Window* window)
         else if (data->len == 6) // io pci [outb, outw, outl] addr field value (6)
         {
             if (StrEquals(data->data[2], "outb"))
-                PCI::write_byte((uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[5]));
+                PCI::io_write_byte((uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[5]));
             else if (StrEquals(data->data[2], "outw"))
-                PCI::write_word((uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[4]), (uint16_t)to_int(data->data[5]));
+                PCI::io_write_word((uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[4]), (uint16_t)to_int(data->data[5]));
             else if (StrEquals(data->data[2], "outl"))
-                PCI::write_dword((uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[4]), (uint32_t)to_int(data->data[5]));
+                PCI::io_write_dword((uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[4]), (uint32_t)to_int(data->data[5]));
             else
                 LogError("Invalid IO Command!", window);
         }
         else if (data->len == 5) // io pci [inb, inw, inl] addr field (5)
         {
             if (StrEquals(data->data[2], "inb"))
-                Println(window, "INB: {}", to_string(PCI::read_byte((uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[4]))), Colors.yellow);
+                Println(window, "INB: {}", to_string(PCI::io_read_byte((uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[4]))), Colors.yellow);
             else if (StrEquals(data->data[2], "inw"))
-                Println(window, "INW: {}", to_string(PCI::read_word((uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[4]))), Colors.yellow);
+                Println(window, "INW: {}", to_string(PCI::io_read_word((uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[4]))), Colors.yellow);
             else if (StrEquals(data->data[2], "inl"))
-                Println(window, "INL: {}", to_string((uint64_t)PCI::read_dword((uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[4]))), Colors.yellow);
+                Println(window, "INL: {}", to_string((uint64_t)PCI::io_read_dword((uint8_t)to_int(data->data[4]), (uint8_t)to_int(data->data[4]))), Colors.yellow);
             else
                 LogError("Invalid IO Command!", window);
         }

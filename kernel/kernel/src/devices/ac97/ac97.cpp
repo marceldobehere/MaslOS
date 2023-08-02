@@ -182,23 +182,51 @@ namespace AC97
 
         PrintMsg("> AC97 Driver Init");
         osData.debugTerminalWindow->Log("YOOO AC97 YES");
-
+        if (osData.ac97Driver != NULL)
+        {
+            PrintMsg("> AC97 Driver NVM");
+            osData.debugTerminalWindow->Log("NVM AC97");
+        }
 
         uint64_t address = (uint64_t)PCIBaseAddress;
+
+
+        PrintMsg("> Enabled PCI IO SPACE");
+        PCI::enable_io_space(address);
+        io_wait(500);
+        PrintMsg("> Disabled PCI MEM SPACE");
+        PCI::disable_mem_space(address);
+        io_wait(500);
+
+        //Enable bus mastering and interrupts
+        io_wait(500);
+        PCI::enable_interrupt(address);
+        PrintMsg("> Enabled PCI Interrupts");
+        io_wait(500);
+        PCI::enable_bus_mastering(address);
+        PrintMsg("> Enabled PCI Bus Mastering");
+        Println();
+
+        io_wait(500);
+
+
+
         //PrintMsgCol("> PCI Address: {}", ConvertHexToString(address), Colors.yellow);
         //Println();
         //IRQHandler(PCI::read_byte(address, PCI_INTERRUPT_LINE)),
-        irqId = PCI::read_byte(address, PCI_INTERRUPT_LINE);
+        irqId = PCI::io_read_byte(address, PCI_INTERRUPT_LINE);
         //Panic("AC97 IRQ: {}", to_string(irqId), true);
         {
             IRQHandlerCallbackFuncs[irqId] = (void*)&HandleIRQ;
             IRQHandlerCallbackHelpers[irqId] = (void*)this;
         }
         
+
+
         // m_address = address;
-        m_mixer_address = PCI::read_word(address, PCI_BAR0) & ~1;
+        m_mixer_address = PCI::io_read_word(address, PCI_BAR0) & ~1;
         PrintMsgCol("> Mixer Address: {}", ConvertHexToString(m_mixer_address), Colors.yellow);
-        m_bus_address = PCI::read_word(address, PCI_BAR1) & ~1;
+        m_bus_address = PCI::io_read_word(address, PCI_BAR1) & ~1;
         PrintMsgCol("> Bus Address: {}", ConvertHexToString(m_bus_address), Colors.yellow);
         m_output_channel = m_bus_address + BusRegisters::NABM_PCM_OUT;
         PrintMsgCol("> Output Channel: {}", ConvertHexToString(m_output_channel), Colors.yellow);
@@ -224,12 +252,7 @@ namespace AC97
 
         m_output_buffer_descriptors = (BufferDescriptor*) m_output_buffer_descriptor_region;
 
-        //Enable bus mastering and interrupts
-        PCI::enable_interrupt(address);
-        PrintMsg("> Enabled PCI Interrupts");
-        PCI::enable_bus_mastering(address);
-        PrintMsg("> Enabled PCI Bus Mastering");
-        Println();
+        
 
         //Initialize the card with cold reset of bus and mixer, enable interrupts
         auto control = inl(m_bus_address + BusRegisters::GLOBAL_CONTROL);

@@ -6,8 +6,9 @@ namespace Serial
 {
     int SerialPort = 0x3F8;          // COM1
     uint64_t pciCard = 0;
+    PCI::PCI_BAR_TYPE pciType;
+    int serialPciOffset = 0;
     bool SerialWorks = false;
-    uint16_t pciIoBase = 0;
     SerialManager::GenericPacket* currentSerialReadPacket = NULL;
     int currentSerialReadPacketIndex = 0;
 
@@ -19,26 +20,27 @@ namespace Serial
         {
             osData.debugTerminalWindow->Log("Serial PCI CARD AT: 0x{}", ConvertHexToString(pciCard), Colors.yellow);
             uint64_t bar0 = ((PCI::PCIHeader0*)pciCard)->BAR0;
-            uint64_t bar1 = ((PCI::PCIHeader0*)pciCard)->BAR1;
-            uint64_t bar2 = ((PCI::PCIHeader0*)pciCard)->BAR2;
             osData.debugTerminalWindow->Log("Serial PCI CARD BAR0: {}", ConvertHexToString(bar0), Colors.yellow);
-            //osData.debugTerminalWindow->Log("Serial PCI CARD BAR2: {}", ConvertHexToString(bar2), Colors.yellow);
-            //uint32_t ret = PCI::read_word(pciCard, PCI_BAR0);
-            //osData.debugTerminalWindow->Log("Serial PCI CARD BAR0 (2): {}", ConvertHexToString(ret), Colors.yellow);
-            //ret = PCI::read_word(pciCard, PCI_BAR2);
-            //osData.debugTerminalWindow->Log("Serial PCI CARD BAR2 (2): {}", ConvertHexToString(ret), Colors.yellow);
-            pciIoBase = bar0;// & (~0x3);
+            //pciIoBase = bar0;// & (~0x3);
             //pciIoBase = bar2;// & (~0x3);
-            pciIoBase += 0xC0;
 
+
+            pciType = PCI::pci_get_bar((PCI::PCIHeader0*)pciCard, 0);
+            serialPciOffset = 0xC0;
 
             // try with membase?
             //pciIoBase = bar0 + 0x3A7;
 
             //pciIoBase += 0x08;
-            osData.debugTerminalWindow->Log("Serial PCI CARD IO BASE: {}", to_string(pciIoBase), Colors.bgreen);
+            osData.debugTerminalWindow->Log("Serial PCI CARD TYPE: {}", (pciType.type < 3 ? "MMIO" : "IO"), Colors.bgreen);
+            osData.debugTerminalWindow->Log("Serial PCI CARD IO BASE: {}", to_string(pciType.io_address), Colors.bgreen);
+            osData.debugTerminalWindow->Log("Serial PCI CARD MEM BASE: {}", ConvertHexToString(pciType.mem_address), Colors.bgreen);
+            
+            PCI::enable_io_space(pciCard);
+            PCI::disable_mem_space(pciCard);
             PCI::enable_interrupt(pciCard);
             PCI::enable_bus_mastering(pciCard);
+
 
             // Soutb(1, 0x80);
             // io_wait(100);
@@ -514,13 +516,7 @@ namespace Serial
         if (pciCard == 0)
             outb(SerialPort + port, value);
         else
-            //PCI::write_byte(pciCard, port, value);
-        {
-            if (false)
-                mOutb(pciIoBase + port, value);
-            else
-                outb(pciIoBase + port, value);
-        }
+            PCI::write_byte(pciCard, pciType, serialPciOffset + port, value);
     }
 
     uint8_t Sinb(uint16_t port)
@@ -528,12 +524,6 @@ namespace Serial
         if (pciCard == 0)
             return inb(SerialPort + port);
         else
-            //return PCI::read_byte(pciCard, port);
-        {
-            if (false)
-                return mInb(pciIoBase + port);
-            else
-                return inb(pciIoBase + port);
-        }
+            return PCI::read_byte(pciCard, pciType, serialPciOffset + port);
     }
 }

@@ -21,6 +21,9 @@ namespace SysApps
         GuiComponentStuff::TextComponent* pathText;
         GuiComponentStuff::TextComponent* timeText;
 
+        Audio::AudioBuffer* musicSwapBufferA;
+        Audio::AudioBuffer* musicSwapBufferB;
+        int currentBufferIndex;
         Audio::BasicAudioSource* musicSource;
         char* musicFileData;
         int musicFileLen;

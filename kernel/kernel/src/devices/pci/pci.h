@@ -130,18 +130,22 @@ namespace PCI
     const char* GetProgIFName(uint8_t classCode, uint8_t subclassCode, uint8_t progIFCode);
 
 
-    uint8_t read_byte(uint64_t address, uint8_t field);
-	uint16_t read_word(uint64_t address, uint8_t field);
-	uint32_t read_dword(uint64_t address, uint8_t field);
+    uint8_t io_read_byte(uint64_t address, uint8_t field);
+	uint16_t io_read_word(uint64_t address, uint8_t field);
+	uint32_t io_read_dword(uint64_t address, uint8_t field);
 
-	void write_byte(uint64_t address, uint8_t field, uint8_t value);
-	void write_word(uint64_t address, uint8_t field, uint16_t value);
-	void write_dword(uint64_t address, uint8_t field, uint32_t value);
+	void io_write_byte(uint64_t address, uint8_t field, uint8_t value);
+	void io_write_word(uint64_t address, uint8_t field, uint16_t value);
+	void io_write_dword(uint64_t address, uint8_t field, uint32_t value);
 
 	void enable_interrupt(uint64_t address);
 	void disable_interrupt(uint64_t address);
 	void enable_bus_mastering(uint64_t address);
 	void disable_bus_mastering(uint64_t address);
+    void enable_io_space(uint64_t address);
+	void disable_io_space(uint64_t address);
+    void enable_mem_space(uint64_t address);
+	void disable_mem_space(uint64_t address);
 
     // https://github.com/byteduck/duckOS/blob/master/kernel/pci/PCI.h
 
@@ -178,4 +182,32 @@ namespace PCI
     IOAddress get_address(PCIDeviceHeader* hdr, uint8_t field);
     IOAddress get_address(uint64_t addr, uint8_t field);
 
+    // https://github.com/Glowman554/MicroOS/blob/master/mckrnl/include/driver/pci/pci_bar.h
+    enum PCI_BAR_TYPE_ENUM 
+    {
+        NONE = 0,
+        MMIO64,
+        MMIO32,
+        IO
+    };
+
+    struct PCI_BAR_TYPE 
+    {
+        uint64_t mem_address;
+        uint16_t io_address;
+        PCI_BAR_TYPE_ENUM type;
+        uint16_t size;
+    };
+
+    void pci_read_bar(uint32_t* mask, uint64_t addr, uint32_t offset);
+    PCI_BAR_TYPE pci_get_bar(uint32_t* bar0, int bar_num, uint64_t addr);
+    PCI_BAR_TYPE pci_get_bar(PCIHeader0* addr, int bar_num);
+
+    uint8_t read_byte(uint64_t address, PCI_BAR_TYPE type, uint8_t field);
+	uint16_t read_word(uint64_t address, PCI_BAR_TYPE type, uint8_t field);
+	uint32_t read_dword(uint64_t address, PCI_BAR_TYPE type, uint8_t field);
+
+	void write_byte(uint64_t address, PCI_BAR_TYPE type, uint16_t field, uint8_t value);
+	void write_word(uint64_t address, PCI_BAR_TYPE type, uint16_t field, uint16_t value);
+	void write_dword(uint64_t address, PCI_BAR_TYPE type, uint16_t field, uint32_t value);
 }

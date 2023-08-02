@@ -151,82 +151,34 @@ namespace PCI
         }
         renderer->Println();
 
-        switch (pciDeviceHeader->Class)
+        if (pciDeviceHeader->Class == 0x04 && pciDeviceHeader->SubClass == 0x01 /*&& pciDeviceHeader->Prog_IF == 0x01*/)
         {
-            case 0x01:
-            {
-                switch (pciDeviceHeader->SubClass)
-                {
-                    case 0x06:
-                    {
-                        switch (pciDeviceHeader->Prog_IF)
-                        {
-                            case 0x01:
-                            {
-                                new AHCI::AHCIDriver(pciDeviceHeader);
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                }
-                break;
-            }
-            case 0x04: // AC97 CLASS
-            {
-                switch (pciDeviceHeader->SubClass)
-                {
-                    case 0x01: // AC97 SUBCLASS
-                    {
-                        new AC97::AC97Driver(pciDeviceHeader);
-                        break;
-                    }
-
-                    // case 0x03: // MAYBE AC97 SUBCLASS FOR TESTING IG
-                    // {
-                    //     new AC97::AC97Driver(pciDeviceHeader);
-                    //     break;
-                    // }
-                }
-                break;
-            }
-            case 0x07: // Serial PCI Card
-            {
-                switch (pciDeviceHeader->SubClass)
-                {
-                    case 0x00: // AC97 SUBCLASS
-                    {
-                        Serial::pciCard = (uint64_t)pciDeviceHeader;
-                        //Serial::SerialPort= 0x2F8;
-                        if (Serial::Init())
-                        {
-                            //Panic("SERIAL CARD YES", true);
-                        }
-                        else
-                        {
-                            // Serial::SerialWorks = true;
-                            // Serial::Soutb(4, 0x0F);
-                            // Serial::Writeln("TEST");
-                            Serial::pciCard = 0;
-                        }
-                        
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-
-        // check for intel integrated ac97
-        if (pciDeviceHeader->Vendor_ID == 0x8086 && pciDeviceHeader->Device_ID == 0x3A3E)
-        {
-            //Panic("YOO WE GOT THE INTEL AC97", true);
             new AC97::AC97Driver(pciDeviceHeader);
         }
-
-
-
-
+        else if (pciDeviceHeader->Vendor_ID == 0x8086 && pciDeviceHeader->Device_ID == 0x3A3E)
+        {
+            new AC97::AC97Driver(pciDeviceHeader);
+        }
+        else if (pciDeviceHeader->Class == 0x01 && pciDeviceHeader->SubClass == 0x06 && pciDeviceHeader->Prog_IF == 0x01)
+        {
+            new AHCI::AHCIDriver(pciDeviceHeader);
+        }
+        else if (pciDeviceHeader->Class == 0x07 && pciDeviceHeader->SubClass == 0x00)
+        {
+            Serial::pciCard = (uint64_t)pciDeviceHeader;
+            //Serial::SerialPort= 0x2F8;
+            if (Serial::Init())
+            {
+                //Panic("SERIAL CARD YES", true);
+            }
+            else
+            {
+                // Serial::SerialWorks = true;
+                // Serial::Soutb(4, 0x0F);
+                // Serial::Writeln("TEST");
+                Serial::pciCard = 0;
+            }
+        }
 
         RemoveFromStack();
     }
@@ -252,57 +204,182 @@ namespace PCI
         return address;
     }
 
-	uint8_t read_byte(uint64_t address, uint8_t field) {
+	uint8_t io_read_byte(uint64_t address, uint8_t field) {
 		outl(PCI_ADDRESS_PORT, get_address(address, field).value);
 		return inb(PCI_DATA_PORT + (field & 3));
 	}
 
-	uint16_t read_word(uint64_t address, uint8_t field){
+	uint16_t io_read_word(uint64_t address, uint8_t field){
 		outl(PCI_ADDRESS_PORT, get_address(address, field).value);
 		return inw(PCI_DATA_PORT + (field & 2));
 	}
 
-	uint32_t read_dword(uint64_t address, uint8_t field) {
+	uint32_t io_read_dword(uint64_t address, uint8_t field) {
 	    outl(PCI_ADDRESS_PORT, get_address(address, field).value);
 		return inl(PCI_DATA_PORT);
 	}
 
-	void write_byte(uint64_t address, uint8_t field, uint8_t value) {
+	void io_write_byte(uint64_t address, uint8_t field, uint8_t value) {
 		outl(PCI_ADDRESS_PORT, get_address(address, field).value);
 		outb(PCI_DATA_PORT + (field & 3), value);
 	}
 
-	void write_word(uint64_t address, uint8_t field, uint16_t value) {
+	void io_write_word(uint64_t address, uint8_t field, uint16_t value) {
 		outl(PCI_ADDRESS_PORT, get_address(address, field).value);
 		outw(PCI_DATA_PORT + (field & 2), value);
 	}
 
-	void write_dword(uint64_t address, uint8_t field, uint32_t value) {
+	void io_write_dword(uint64_t address, uint8_t field, uint32_t value) {
 		outl(PCI_ADDRESS_PORT, get_address(address, field).value);
 		outl(PCI_DATA_PORT, value);
 	}
 
 	void enable_interrupt(uint64_t address) {
-		Command comm = {.value = read_word(address, PCI_COMMAND)};
+		Command comm = {.value = io_read_word(address, PCI_COMMAND)};
 		comm.attrs.interrupt_disable = false;
-		write_word(address, PCI_COMMAND, comm.value);
+		io_write_word(address, PCI_COMMAND, comm.value);
 	}
 
 	void disable_interrupt(uint64_t address) {
-		Command comm = {.value = read_word(address, PCI_COMMAND)};
+		Command comm = {.value = io_read_word(address, PCI_COMMAND)};
 		comm.attrs.interrupt_disable = true;
-		write_word(address, PCI_COMMAND, comm.value);
+		io_write_word(address, PCI_COMMAND, comm.value);
 	}
 
 	void enable_bus_mastering(uint64_t address) {
-		Command comm = {.value = read_word(address, PCI_COMMAND)};
+		Command comm = {.value = io_read_word(address, PCI_COMMAND)};
 		comm.attrs.bus_master = true;
-		write_word(address, PCI_COMMAND, comm.value);
+		io_write_word(address, PCI_COMMAND, comm.value);
 	}
 
 	void disable_bus_mastering(uint64_t address) {
-		Command comm = {.value = read_word(address, PCI_COMMAND)};
+		Command comm = {.value = io_read_word(address, PCI_COMMAND)};
 		comm.attrs.bus_master = false;
-		write_word(address, PCI_COMMAND, comm.value);
+		io_write_word(address, PCI_COMMAND, comm.value);
 	}
+
+    void enable_io_space(uint64_t address)
+    {
+        Command comm = {.value = io_read_word(address, PCI_COMMAND)};
+        comm.attrs.io_space = true;
+        io_write_word(address, PCI_COMMAND, comm.value);
+    }
+	void disable_io_space(uint64_t address)
+    {
+        Command comm = {.value = io_read_word(address, PCI_COMMAND)};
+        comm.attrs.io_space = false;
+        io_write_word(address, PCI_COMMAND, comm.value);
+    }
+    void enable_mem_space(uint64_t address)
+    {
+        Command comm = {.value = io_read_word(address, PCI_COMMAND)};
+        comm.attrs.mem_space = true;
+        io_write_word(address, PCI_COMMAND, comm.value);
+    }
+	void disable_mem_space(uint64_t address)
+    {
+        Command comm = {.value = io_read_word(address, PCI_COMMAND)};
+        comm.attrs.mem_space = false;
+        io_write_word(address, PCI_COMMAND, comm.value);
+    }
+
+    void pci_read_bar(uint32_t* mask, uint64_t addr, uint32_t offset)
+    {
+        uint32_t data = io_read_dword(addr, offset);
+        io_write_dword(addr, offset, 0xffffffff);
+        *mask = io_read_dword(addr, offset);
+        io_write_dword(addr, offset, data);
+    }
+
+    PCI_BAR_TYPE pci_get_bar(uint32_t* bar0, int bar_num, uint64_t addr)
+    {
+        PCI_BAR_TYPE bar;
+        uint32_t* bar_ptr = (uint32_t*) (bar0 + bar_num * sizeof(uint32_t));
+
+        if (*bar_ptr == NULL) 
+        {
+            bar.type = NONE;
+            return bar;
+        }
+
+        uint32_t mask;
+        pci_read_bar(&mask, addr, bar_num * sizeof(uint32_t));
+
+        if (*bar_ptr & 0x04) { //64-bit mmio
+            bar.type = MMIO64;
+
+            uint32_t* bar_ptr_high = (uint32_t*) (bar0 + bar_num * sizeof(uint32_t));
+            uint32_t mask_high;
+            pci_read_bar(&mask_high, addr, (bar_num * sizeof(uint32_t)) + 0x4);
+
+            bar.mem_address = ((uint64_t) (*bar_ptr_high & ~0xf) << 32) | (*bar_ptr & ~0xf);
+            bar.size = (((uint64_t) mask_high << 32) | (mask & ~0xf)) + 1;
+        } else if (*bar_ptr & 0x01) { //IO
+            bar.type = IO;
+
+            bar.io_address = (uint16_t)(*bar_ptr & ~0x3);
+            bar.size = (uint16_t)(~(mask & ~0x3) + 1);
+        } else { //32-bit mmio
+            bar.type = MMIO32;
+
+            bar.mem_address = (uint64_t) *bar_ptr & ~0xf;
+            bar.size = ~(mask & ~0xf) + 1;
+        }
+        
+
+        return bar;
+    }
+
+    PCI_BAR_TYPE pci_get_bar(PCIHeader0* addr, int bar_num)
+    {
+        return pci_get_bar(&addr->BAR0, bar_num, (uint64_t)addr);
+    }
+
+    uint8_t read_byte(uint64_t address, PCI_BAR_TYPE type, uint8_t field)
+    {
+        if (type.type == PCI_BAR_TYPE_ENUM::MMIO32 || type.type == PCI_BAR_TYPE_ENUM::MMIO64)
+            return *(uint8_t*)(type.mem_address + field);
+        else if (type.type == PCI_BAR_TYPE_ENUM::IO)
+            return inb(type.io_address + field);
+    }
+
+	uint16_t read_word(uint64_t address, PCI_BAR_TYPE type, uint8_t field)
+    {
+        if (type.type == PCI_BAR_TYPE_ENUM::MMIO32 || type.type == PCI_BAR_TYPE_ENUM::MMIO64)
+            return *(uint16_t*)(type.mem_address + field);
+        else if (type.type == PCI_BAR_TYPE_ENUM::IO)
+            return inw(type.io_address + field);
+    }
+
+	uint32_t read_dword(uint64_t address, PCI_BAR_TYPE type, uint8_t field)
+    {
+        if (type.type == PCI_BAR_TYPE_ENUM::MMIO32 || type.type == PCI_BAR_TYPE_ENUM::MMIO64)
+            return *(uint32_t*)(type.mem_address + field);
+        else if (type.type == PCI_BAR_TYPE_ENUM::IO)
+            return inl(type.io_address + field);
+    }
+
+	void write_byte(uint64_t address, PCI_BAR_TYPE type, uint16_t field, uint8_t value)
+    {
+        if (type.type == PCI_BAR_TYPE_ENUM::MMIO32 || type.type == PCI_BAR_TYPE_ENUM::MMIO64)
+            *(uint8_t*)(type.mem_address + field) = value;
+        else if (type.type == PCI_BAR_TYPE_ENUM::IO)
+            outb(type.io_address + field, value);
+    }
+
+	void write_word(uint64_t address, PCI_BAR_TYPE type, uint16_t field, uint16_t value)
+    {
+        if (type.type == PCI_BAR_TYPE_ENUM::MMIO32 || type.type == PCI_BAR_TYPE_ENUM::MMIO64)
+            *(uint16_t*)(type.mem_address + field) = value;
+        else if (type.type == PCI_BAR_TYPE_ENUM::IO)
+            outw(type.io_address + field, value);
+    }
+
+	void write_dword(uint64_t address, PCI_BAR_TYPE type, uint16_t field, uint32_t value)
+    {
+        if (type.type == PCI_BAR_TYPE_ENUM::MMIO32 || type.type == PCI_BAR_TYPE_ENUM::MMIO64)
+            *(uint32_t*)(type.mem_address + field) = value;
+        else if (type.type == PCI_BAR_TYPE_ENUM::IO)
+            outl(type.io_address + field, value);
+    }
 }

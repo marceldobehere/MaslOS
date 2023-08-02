@@ -121,6 +121,9 @@ namespace SysApps
         RemoveFromStack();
 
         musicSource = NULL;
+        musicSwapBufferA = NULL;
+        musicSwapBufferB = NULL;
+        currentBufferIndex = 0;
         musicFileData = NULL;
         musicFileLen = 0;
         musicFilePos = 0;
@@ -185,6 +188,18 @@ namespace SysApps
         {
             musicSource->Free();
             musicSource = NULL;
+        }
+
+        if (musicSwapBufferA != NULL)
+        {
+            _Free(musicSwapBufferA);
+            musicSwapBufferA = NULL;
+        }
+
+        if (musicSwapBufferB != NULL)
+        {
+            _Free(musicSwapBufferB);
+            musicSwapBufferB = NULL;
         }
 
         if (musicFileData != NULL)
@@ -271,9 +286,20 @@ namespace SysApps
             if (musicSource == NULL)
             {
                 //Println(window, "> Creating Audiosource");
+                musicSwapBufferA = new Audio::AudioBuffer(bitsPerSample, sampleRate, channels, sampleCount);
+                musicSwapBufferB = new Audio::AudioBuffer(bitsPerSample, sampleRate, channels, sampleCount);
+                currentBufferIndex = 0;
+                
                 musicSource = (void*)new Audio::BasicAudioSource(
-                    new Audio::AudioBuffer(bitsPerSample, sampleRate, channels, sampleCount)
+                    musicSwapBufferA
                 );
+
+                if (currentBufferIndex == 0)
+                    musicSource->buffer = musicSwapBufferA;
+                else
+                    musicSource->buffer = musicSwapBufferB;
+                
+
                 //musicSource->buffer->sampleCount = sampleCount;
                 musicSource->OnFinishHelp = (void*)this;
                 musicSource->OnFinish = (void(*)(void*, Audio::BasicAudioDestination*))(void*)&OnBufferFinish;
@@ -376,19 +402,30 @@ namespace SysApps
         if (musicSource != NULL && musicFileData != NULL &&
             !paused)
         {
-           
+            // Serial::Writeln("READING");
+            // Serial::Writeln("Sample Count: {}", to_string(sampleCount));
+            // Serial::Writeln("Bytes Per Sample: {}", to_string(bytesPerSample));
+            // Serial::Writeln("Bytes To Read (1): {}", to_string(sampleCount * bytesPerSample * channelCount));
+            // Serial::Writeln("File Left: {}", to_string(fileLeft));
+            // Serial::Writeln("Bytes To Read (2): {}", to_string(bytesToRead));
+            // Serial::Writeln("File Pos: {}", to_string(musicFilePos));
+            // Serial::Writeln("File Len: {}", to_string(musicFileLen));
+            // Serial::Writeln();
 
-            //timeText->text = StrCopy(to_string(musicSource->samplesSent));
-            if (!musicSource->readyToSend)
+            for (int bufI = 0; bufI < 2; bufI++)
             {
-                //Panic("bruh", true);
-                //int sampleCount = 11025;
-                //int sampleRate = 44100;
+                Audio::AudioBuffer* curBuf = NULL;
+                if (bufI == 0)
+                    curBuf = musicSwapBufferA;
+                else
+                    curBuf = musicSwapBufferB;
 
+                if (curBuf->sampleCount != 0)
+                    continue;
 
-                int sampleCount = musicSource->buffer->totalSampleCount;
-                int bytesPerSample = musicSource->buffer->bitsPerSample / 8;
-                int channelCount = musicSource->buffer->channelCount;
+                int sampleCount = curBuf->totalSampleCount;
+                int bytesPerSample = curBuf->bitsPerSample / 8;
+                int channelCount = curBuf->channelCount;
                 int bytesToRead = sampleCount * bytesPerSample * channelCount;
                 int fileLeft = musicFileLen - musicFilePos;
                 if (fileLeft < bytesToRead)
@@ -396,38 +433,56 @@ namespace SysApps
                     bytesToRead = fileLeft;
                 }
 
-                // Serial::Writeln("READING");
-                // Serial::Writeln("Sample Count: {}", to_string(sampleCount));
-                // Serial::Writeln("Bytes Per Sample: {}", to_string(bytesPerSample));
-                // Serial::Writeln("Bytes To Read (1): {}", to_string(sampleCount * bytesPerSample * channelCount));
-                // Serial::Writeln("File Left: {}", to_string(fileLeft));
-                // Serial::Writeln("Bytes To Read (2): {}", to_string(bytesToRead));
-                // Serial::Writeln("File Pos: {}", to_string(musicFilePos));
-                // Serial::Writeln("File Len: {}", to_string(musicFileLen));
-                // Serial::Writeln();
-
 
                 if (bytesToRead == 0)
                 {
-                    paused = true;
-                    musicFilePos = 0;
+                    // check if all buffers are empty
+                    // paused = true;
+                    // musicFilePos = 0;
 
-                    _Free(playBtn->textComp->text);
-                    playBtn->textComp->text = StrCopy("Play");
+                    // _Free(playBtn->textComp->text);
+                    // playBtn->textComp->text = StrCopy("Play");
                 }
                 else
                 {
                     int samplesToRead = (bytesToRead / bytesPerSample) / channelCount;
-                    _memcpy(musicFileData + musicFilePos, musicSource->buffer->data, bytesToRead);
+                    _memcpy(musicFileData + musicFilePos, curBuf->data, bytesToRead);
 
-                    // uint16_t* arr = (uint16_t*)musicSource->buffer->data;
-                    // MusicBit16Test::FillArray(arr, 0, sampleCount, 800, sampleRate);
-                    musicSource->buffer->sampleCount = samplesToRead;
-                    musicSource->samplesSent = 0;
-                    musicSource->readyToSend = true;
+                    curBuf->sampleCount = samplesToRead;
                 }
 
                 musicFilePos += bytesToRead;
+            }
+
+
+            //timeText->text = StrCopy(to_string(musicSource->samplesSent));
+            if (!musicSource->readyToSend)
+            {
+                currentBufferIndex = (currentBufferIndex + 1) % 2;
+
+                Audio::AudioBuffer* curBuf = NULL;
+                if (currentBufferIndex == 0)
+                    curBuf = musicSwapBufferA;
+                else
+                    curBuf = musicSwapBufferB;
+
+                if (musicSwapBufferA->sampleCount == 0 && 
+                    musicSwapBufferB->sampleCount == 0 && musicFilePos >= musicFileLen)
+                {
+                    paused = true;
+                    musicFilePos = 0;
+                    currentBufferIndex = 0;
+
+                    _Free(playBtn->textComp->text);
+                    playBtn->textComp->text = StrCopy("Play");
+                }
+                else if (curBuf->sampleCount != 0)
+                {
+                    Serial::Writelnf("> Switching to buffer %d.", currentBufferIndex);
+                    musicSource->buffer = curBuf;
+                    musicSource->samplesSent = 0;
+                    musicSource->readyToSend = true;
+                }
             }
         }
     }
@@ -486,8 +541,25 @@ namespace SysApps
         RemoveFromStack();
 
         AddToStack();
+        if (musicSwapBufferA != NULL)
+        {
+            musicSwapBufferA->Free();
+            musicSwapBufferA = NULL;
+        }
+        RemoveFromStack();
+
+        AddToStack();
+        if (musicSwapBufferB != NULL)
+        {
+            musicSwapBufferB->Free();
+            musicSwapBufferB = NULL;
+        }
+        RemoveFromStack();
+
+        AddToStack();
         if (musicSource != NULL)
         {
+            musicSource->buffer = NULL;
             musicSource->Free();
             musicSource = NULL;
         }
