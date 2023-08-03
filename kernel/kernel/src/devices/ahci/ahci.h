@@ -60,7 +60,7 @@ namespace AHCI
         uint32_t biosHandoffCtrlStatus;
         uint8_t rsv0[0x74];
         uint8_t vendor[0x60];
-        HBAPort ports[1];
+        HBAPort ports[32];
     };
 
     struct HBACommandHeader

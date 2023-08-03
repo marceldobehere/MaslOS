@@ -211,33 +211,41 @@ namespace AC97
             io_wait(1000);
         }
 
-        {
-            PCI::io_write_byte(address, 0x41, 0xff);
-        }
+        // {
+        //     PCI::io_write_byte(address, 0x41, 0xff);
+        // }
 
-        {
-            uint32_t test = (uint32_t)(uint64_t)GlobalAllocator->RequestPage();
-            PCI::io_write_dword(address, 0x18, test);
-            *(((uint32_t*)&((PCI::PCIHeader0*)PCIBaseAddress)->BAR0) + 2) = test;
-            io_wait(1000);
-        }
-        {
-            uint32_t test = (uint32_t)(uint64_t)GlobalAllocator->RequestPage();
-            PCI::io_write_dword(address, 0x1C, test);
-            *(((uint32_t*)&((PCI::PCIHeader0*)PCIBaseAddress)->BAR0) + 3) = test;
-            io_wait(1000);
-        }
+        // {
+        //     uint32_t test = (uint32_t)(uint64_t)GlobalAllocator->RequestPage();
+        //     PCI::io_write_dword(address, 0x18, test);
+        //     *(((uint32_t*)&((PCI::PCIHeader0*)PCIBaseAddress)->BAR0) + 2) = test;
+        //     io_wait(1000);
+        // }
+        // {
+        //     uint32_t test = (uint32_t)(uint64_t)GlobalAllocator->RequestPage();
+        //     PCI::io_write_dword(address, 0x1C, test);
+        //     *(((uint32_t*)&((PCI::PCIHeader0*)PCIBaseAddress)->BAR0) + 3) = test;
+        //     io_wait(1000);
+        // }
 
-        {
-            PCI::io_write_byte(address, 0x41, 0x00);
-        }
+        // {
+        //     PCI::io_write_byte(address, 0x41, 0x00);
+        // }
 
-        for (int i = 0; i < 6; i++)
+        // for (int i = 0; i < 6; i++)
+        // {
+        //     uint32_t bar = PCI::io_read_dword(address, 0x10 + (i * 4));
+        //     osData.debugTerminalWindow->renderer->Print("> BAR {}: ", to_string(i), Colors.orange);
+        //     osData.debugTerminalWindow->renderer->Println("{}", ConvertHexToString(bar), Colors.orange);
+        //     io_wait(1000);
+        // }
+
+        bool driverOkay = true;
+        if (((PCI::PCIHeader0*)PCIBaseAddress)->BAR1 == NULL)
         {
-            uint32_t bar = PCI::io_read_dword(address, 0x10 + (i * 4));
-            osData.debugTerminalWindow->renderer->Print("> BAR {}: ", to_string(i), Colors.orange);
-            osData.debugTerminalWindow->renderer->Println("{}", ConvertHexToString(bar), Colors.orange);
-            io_wait(1000);
+            PrintMsg("> AC97 Driver only uses BAR0 and is not supported");
+            osData.debugTerminalWindow->Log("INVALID AC97");
+            return;
         }
 
         if (osData.ac97Driver != NULL)
