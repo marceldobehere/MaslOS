@@ -70,6 +70,7 @@ Here are the [Terminal Commands](https://github.com/marceldobehere/MaslOS/wiki/T
   - PCI
   - RS232
   - AC97
+  - PCI Serial Card
 * Other Features
   - Stack Trace
   + Crash handling
