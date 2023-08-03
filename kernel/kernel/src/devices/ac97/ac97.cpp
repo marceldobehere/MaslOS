@@ -178,25 +178,20 @@ namespace AC97
     AC97Driver::AC97Driver(PCI::PCIDeviceHeader* pciBaseAddress)
     {
         PCIBaseAddress = pciBaseAddress;
+        uint64_t address = (uint64_t)PCIBaseAddress;
         PrintMsgStartLayer("AC97Driver");
 
         PrintMsg("> AC97 Driver Init");
         osData.debugTerminalWindow->Log("YOOO AC97 YES");
-        if (osData.ac97Driver != NULL)
-        {
-            PrintMsg("> AC97 Driver NVM");
-            osData.debugTerminalWindow->Log("NVM AC97");
-        }
-
-        uint64_t address = (uint64_t)PCIBaseAddress;
 
 
-        PrintMsg("> Enabled PCI IO SPACE");
-        PCI::enable_io_space(address);
-        io_wait(500);
+
+        PrintMsg("> Disabled PCI IO SPACE");
+        PCI::disable_io_space((uint64_t)PCIBaseAddress);
+        io_wait(5000);
         PrintMsg("> Disabled PCI MEM SPACE");
-        PCI::disable_mem_space(address);
-        io_wait(500);
+        PCI::disable_mem_space((uint64_t)PCIBaseAddress);
+        io_wait(5000);
 
         //Enable bus mastering and interrupts
         io_wait(500);
@@ -206,6 +201,61 @@ namespace AC97
         PCI::enable_bus_mastering(address);
         PrintMsg("> Enabled PCI Bus Mastering");
         Println();
+        
+        osData.debugTerminalWindow->renderer->Println("> REV: {}", to_string(((PCI::PCIDeviceHeader*)PCIBaseAddress)->Revision_ID), Colors.bgreen);
+
+        for (int i = 0; i < 6; i++)
+        {
+            osData.debugTerminalWindow->renderer->Print("> BAR {}: ", to_string(i), Colors.orange);
+            osData.debugTerminalWindow->renderer->Println("{}", ConvertHexToString(*(((uint32_t*)&((PCI::PCIHeader0*)PCIBaseAddress)->BAR0) + i)), Colors.orange);
+            io_wait(1000);
+        }
+
+        {
+            PCI::io_write_byte(address, 0x41, 0xff);
+        }
+
+        {
+            uint32_t test = (uint32_t)(uint64_t)GlobalAllocator->RequestPage();
+            PCI::io_write_dword(address, 0x18, test);
+            *(((uint32_t*)&((PCI::PCIHeader0*)PCIBaseAddress)->BAR0) + 2) = test;
+            io_wait(1000);
+        }
+        {
+            uint32_t test = (uint32_t)(uint64_t)GlobalAllocator->RequestPage();
+            PCI::io_write_dword(address, 0x1C, test);
+            *(((uint32_t*)&((PCI::PCIHeader0*)PCIBaseAddress)->BAR0) + 3) = test;
+            io_wait(1000);
+        }
+
+        {
+            PCI::io_write_byte(address, 0x41, 0x00);
+        }
+
+        for (int i = 0; i < 6; i++)
+        {
+            uint32_t bar = PCI::io_read_dword(address, 0x10 + (i * 4));
+            osData.debugTerminalWindow->renderer->Print("> BAR {}: ", to_string(i), Colors.orange);
+            osData.debugTerminalWindow->renderer->Println("{}", ConvertHexToString(bar), Colors.orange);
+            io_wait(1000);
+        }
+
+        if (osData.ac97Driver != NULL)
+        {
+            PrintMsg("> AC97 Driver NVM");
+            osData.debugTerminalWindow->Log("NVM AC97");
+            return;
+        }
+
+
+        PrintMsg("> Enabled PCI IO SPACE");
+        PCI::enable_io_space(address);
+        io_wait(500);
+        PrintMsg("> Enabled PCI MEM SPACE");
+        PCI::enable_mem_space(address);
+        io_wait(500);
+
+        
 
         io_wait(500);
 
@@ -222,15 +272,38 @@ namespace AC97
         }
         
 
-
         // m_address = address;
-        m_mixer_address = PCI::io_read_word(address, PCI_BAR0) & ~1;
-        PrintMsgCol("> Mixer Address: {}", ConvertHexToString(m_mixer_address), Colors.yellow);
-        m_bus_address = PCI::io_read_word(address, PCI_BAR1) & ~1;
-        PrintMsgCol("> Bus Address: {}", ConvertHexToString(m_bus_address), Colors.yellow);
-        m_output_channel = m_bus_address + BusRegisters::NABM_PCM_OUT;
+        //m_mixer_address = PCI::io_read_word(address, PCI_BAR0) & ~1;
+        m_mixer_type = PCI::pci_get_bar((PCI::PCIHeader0*)address, 0);
+        //PrintMsgCol("> Mixer Address: {}", ConvertHexToString(m_mixer_address), Colors.yellow);
+        //PrintMsgCol("> Mixer Address (2): {}", ConvertHexToString(((PCI::PCIHeader0*)address)->BAR0), Colors.yellow);
+        if (m_mixer_type.type == PCI::PCI_BAR_TYPE_ENUM::MMIO64)
+        {
+            osData.debugTerminalWindow->Log("> BUS TYPE USING BAR2", Colors.orange);
+            m_bus_type = PCI::pci_get_bar((PCI::PCIHeader0*)address, 2);
+        }
+        else
+        {
+            osData.debugTerminalWindow->Log("> BUS TYPE USING BAR1", Colors.orange);
+            m_bus_type = PCI::pci_get_bar((PCI::PCIHeader0*)address, 1);
+        }
+        //PrintMsgCol("> Mixer Address (3): {}", ConvertHexToString(m_mixer_address), Colors.yellow);
+        
+        //PrintMsgCol("> Bus Address: {}", ConvertHexToString(m_bus_address), Colors.yellow);
+        //PrintMsgCol("> Bus Address (2): {}", ConvertHexToString(((PCI::PCIHeader0*)address)->BAR1), Colors.yellow);
+        m_output_channel = /*m_bus_address +*/ BusRegisters::NABM_PCM_OUT;
         PrintMsgCol("> Output Channel: {}", ConvertHexToString(m_output_channel), Colors.yellow);
         Println();
+
+        osData.debugTerminalWindow->Log("TYPES: NONE, M64, M32, IO ", Colors.bgreen);
+
+        osData.debugTerminalWindow->Log("AC97 MIXER TYPE: {}", to_string(m_mixer_type.type), Colors.bgreen);
+        osData.debugTerminalWindow->Log("AC97 MIXER IO BASE: {}", ConvertHexToString(m_mixer_type.io_address), Colors.bgreen);
+        osData.debugTerminalWindow->Log("AC97 MIXER MEM BASE: {}", ConvertHexToString(m_mixer_type.mem_address), Colors.bgreen);
+
+        osData.debugTerminalWindow->Log("AC97 BUS TYPE: {}", to_string(m_bus_type.type), Colors.bgreen);
+        osData.debugTerminalWindow->Log("AC97 BUS IO BASE: {}", ConvertHexToString(m_bus_type.io_address), Colors.bgreen);
+        osData.debugTerminalWindow->Log("AC97 BUS MEM BASE: {}", ConvertHexToString(m_bus_type.mem_address), Colors.bgreen);
 
         //m_output_buffer_region = MM.alloc_dma_region(0x1000 * AC97_OUTPUT_BUFFER_PAGES);
         //m_output_buffer_descriptor_region = MM.alloc_dma_region(sizeof(BufferDescriptor) * AC97_NUM_BUFFER_DESCRIPTORS);
@@ -255,11 +328,11 @@ namespace AC97
         
 
         //Initialize the card with cold reset of bus and mixer, enable interrupts
-        auto control = inl(m_bus_address + BusRegisters::GLOBAL_CONTROL);
+        int control = PCI::read_dword(address, m_bus_type, BusRegisters::GLOBAL_CONTROL);//inl(m_bus_address + BusRegisters::GLOBAL_CONTROL);
         control |= GlobalControl::COLD_RESET | GlobalControl::INTERRUPT_ENABLE;
         control &= ~(0b11 << 22);
         control |=   (0b00 << 22);
-        outl(m_bus_address + BusRegisters::GLOBAL_CONTROL, control);
+        PCI::write_dword(address, m_bus_type, BusRegisters::GLOBAL_CONTROL, control);//outl(m_bus_address + BusRegisters::GLOBAL_CONTROL, control);
         write_mixer(RESET, 1);
         PrintMsg("> Initialized Card");
         Println();
@@ -325,11 +398,11 @@ namespace AC97
     {
         lastCheckTime = PIT::TimeSinceBootMS();
         //Read the status
-        auto status_byte = inw(m_output_channel + ChannelRegisters::STATUS);
+        auto status_byte = PCI::read_word((uint64_t)PCIBaseAddress, m_bus_type, m_output_channel + ChannelRegisters::STATUS);//inw(m_output_channel + ChannelRegisters::STATUS);
         BufferStatus status = {.value = status_byte};
 
         if(status.fifo_error)
-            Panic("AC97 GOT FIFO ERROR!");//KLog::err("AC97", "Encountered FIFO error!");
+            Serial::Writeln("> AC97 GOT A FIFO ERROR!");//Panic("AC97 GOT FIFO ERROR!");//KLog::err("AC97", "Encountered FIFO error!");
 
 
 
@@ -339,15 +412,15 @@ namespace AC97
         status.completion_interrupt_status = true;
         status.last_valid_interrupt = true;
         status.fifo_error = true;
-        outw(m_output_channel + ChannelRegisters::STATUS, status.value);
+        PCI::write_word((uint64_t)PCIBaseAddress, m_bus_type, m_output_channel + ChannelRegisters::STATUS, status.value);;//outw(m_output_channel + ChannelRegisters::STATUS, status.value);
 
         // DoQuickCheck();
         // return true;
 
 
 
-        auto current_index = inb(m_output_channel + ChannelRegisters::CURRENT_INDEX);
-        auto last_valid_index = inb(m_output_channel + ChannelRegisters::LAST_VALID_INDEX);
+        auto current_index = PCI::read_byte((uint64_t)PCIBaseAddress, m_bus_type, m_output_channel + ChannelRegisters::CURRENT_INDEX);//inb(m_output_channel + ChannelRegisters::CURRENT_INDEX);
+        auto last_valid_index = PCI::read_byte((uint64_t)PCIBaseAddress, m_bus_type, m_output_channel + ChannelRegisters::LAST_VALID_INDEX);//inb(m_output_channel + ChannelRegisters::LAST_VALID_INDEX);
         
         int offset = 4;
         int beginIndex = (last_valid_index + AC97_NUM_BUFFER_DESCRIPTORS - offset) % AC97_NUM_BUFFER_DESCRIPTORS;
@@ -388,9 +461,9 @@ namespace AC97
         int timeOut = 200;
         do
         {
-            outb(m_output_channel + ChannelRegisters::CONTROL, ControlFlags::RESET_REGISTERS);
+            PCI::write_byte((uint64_t)PCIBaseAddress, m_bus_type, m_output_channel + ChannelRegisters::CONTROL, ControlFlags::RESET_REGISTERS);//outb(m_output_channel + ChannelRegisters::CONTROL, ControlFlags::RESET_REGISTERS);
             io_wait(10);
-        } while((timeOut-- > 0) && inb(m_output_channel + ChannelRegisters::CONTROL) & ControlFlags::RESET_REGISTERS);
+        } while((timeOut-- > 0) && PCI::read_byte((uint64_t)PCIBaseAddress, m_bus_type, m_output_channel + ChannelRegisters::CONTROL) & ControlFlags::RESET_REGISTERS); //inb(m_output_channel + ChannelRegisters::CONTROL)
 
         m_output_dma_enabled = false;
         m_current_buffer_descriptor = 0;
@@ -399,9 +472,9 @@ namespace AC97
 
     void AC97Driver::set_sample_rate(uint32_t sample_rate) {
         io_wait(1000);
-        outw(m_mixer_address + MixerRegisters::SAMPLE_RATE, sample_rate);
+        PCI::write_word((uint64_t)PCIBaseAddress, m_mixer_type, MixerRegisters::SAMPLE_RATE, sample_rate);//outw(m_mixer_address + MixerRegisters::SAMPLE_RATE, sample_rate);
         io_wait(1000);
-        m_sample_rate = inw(m_mixer_address + MixerRegisters::SAMPLE_RATE);
+        m_sample_rate = PCI::read_word((uint64_t)PCIBaseAddress, m_mixer_type, MixerRegisters::SAMPLE_RATE);//inw(m_mixer_address + MixerRegisters::SAMPLE_RATE);
     }
 
 
@@ -456,14 +529,14 @@ namespace AC97
             descriptor->flags = {false, true};
 
             //Set the buffer descriptor list address and last valid index in the channel registers
-            outl(m_output_channel + ChannelRegisters::BUFFER_LIST_ADDR, (uint32_t)(uint64_t)m_output_buffer_descriptor_region);//m_output_buffer_descriptor_region->object()->physical_page(0).paddr());
-            outb(m_output_channel + ChannelRegisters::LAST_VALID_INDEX, m_current_buffer_descriptor);
+            PCI::write_dword((uint64_t)PCIBaseAddress, m_bus_type, m_output_channel + ChannelRegisters::BUFFER_LIST_ADDR, (uint32_t)(uint64_t)m_output_buffer_descriptor_region);//outl(m_output_channel + ChannelRegisters::BUFFER_LIST_ADDR, (uint32_t)(uint64_t)m_output_buffer_descriptor_region);//m_output_buffer_descriptor_region->object()->physical_page(0).paddr());
+            PCI::write_byte((uint64_t)PCIBaseAddress, m_bus_type, m_output_channel + ChannelRegisters::LAST_VALID_INDEX, m_current_buffer_descriptor);//outb(m_output_channel + ChannelRegisters::LAST_VALID_INDEX, m_current_buffer_descriptor);
 
             //If the output DMA is not enabled already, enable it
             if(!m_output_dma_enabled) {
-                auto ctrl = inb(m_output_channel + ChannelRegisters::CONTROL);
+                auto ctrl = PCI::read_byte((uint64_t)PCIBaseAddress, m_bus_type, m_output_channel + ChannelRegisters::CONTROL);//inb(m_output_channel + ChannelRegisters::CONTROL);
                 ctrl |= ControlFlags::PAUSE_BUS_MASTER | ControlFlags::ERROR_INTERRUPT | ControlFlags::COMPLETION_INTERRUPT;
-                outb(m_output_channel + ChannelRegisters::CONTROL, ctrl);
+                PCI::write_byte((uint64_t)PCIBaseAddress, m_bus_type, m_output_channel + ChannelRegisters::CONTROL, ctrl);//outb(m_output_channel + ChannelRegisters::CONTROL, ctrl);
                 m_output_dma_enabled = true;
             }
 

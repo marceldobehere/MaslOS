@@ -151,11 +151,28 @@ namespace PCI
         }
         renderer->Println();
 
-        if (pciDeviceHeader->Class == 0x04 && pciDeviceHeader->SubClass == 0x01 /*&& pciDeviceHeader->Prog_IF == 0x01*/)
+        // osData.debugTerminalWindow->renderer->Println("> BARS:", Colors.yellow);
+        // for (int i = 0; i < 6; i++)
+        // {
+        //     osData.debugTerminalWindow->renderer->Print(" - BAR {}: ", to_string(i), Colors.orange);
+        //     osData.debugTerminalWindow->renderer->Println("{}", ConvertHexToString(*(((uint32_t*)&((PCI::PCIHeader0*)pciDeviceHeader)->BAR0) + i)), Colors.orange);
+        //     io_wait(1000);
+        // }
+
+
+        if (pciDeviceHeader->Class == 0x04 && pciDeviceHeader->SubClass == 0x01 && pciDeviceHeader->Prog_IF == 0x00)
         {
             new AC97::AC97Driver(pciDeviceHeader);
         }
         else if (pciDeviceHeader->Vendor_ID == 0x8086 && pciDeviceHeader->Device_ID == 0x3A3E)
+        {
+            new AC97::AC97Driver(pciDeviceHeader);
+        }
+        else if (pciDeviceHeader->Vendor_ID == 0x8086 && pciDeviceHeader->Device_ID == 0x3A6E)
+        {
+            new AC97::AC97Driver(pciDeviceHeader);
+        }
+        else if (pciDeviceHeader->Vendor_ID == 0x1022 && pciDeviceHeader->Device_ID == 0x15E3)
         {
             new AC97::AC97Driver(pciDeviceHeader);
         }
@@ -167,17 +184,8 @@ namespace PCI
         {
             Serial::pciCard = (uint64_t)pciDeviceHeader;
             //Serial::SerialPort= 0x2F8;
-            if (Serial::Init())
-            {
-                //Panic("SERIAL CARD YES", true);
-            }
-            else
-            {
-                // Serial::SerialWorks = true;
-                // Serial::Soutb(4, 0x0F);
-                // Serial::Writeln("TEST");
+            if (!Serial::Init())
                 Serial::pciCard = 0;
-            }
         }
 
         RemoveFromStack();
@@ -294,7 +302,12 @@ namespace PCI
     PCI_BAR_TYPE pci_get_bar(uint32_t* bar0, int bar_num, uint64_t addr)
     {
         PCI_BAR_TYPE bar;
-        uint32_t* bar_ptr = (uint32_t*) (bar0 + bar_num * sizeof(uint32_t));
+        bar.io_address = 0;
+        bar.size = 0;
+        bar.mem_address = 0;
+        bar.type = NONE;
+
+        uint32_t* bar_ptr = bar0 + bar_num;
 
         if (*bar_ptr == NULL) 
         {
@@ -305,21 +318,26 @@ namespace PCI
         uint32_t mask;
         pci_read_bar(&mask, addr, bar_num * sizeof(uint32_t));
 
-        if (*bar_ptr & 0x04) { //64-bit mmio
+        if (*bar_ptr & 0x04) 
+        { //64-bit mmio
             bar.type = MMIO64;
 
-            uint32_t* bar_ptr_high = (uint32_t*) (bar0 + bar_num * sizeof(uint32_t));
+            uint32_t* bar_ptr_high = bar0 + bar_num + 4;
             uint32_t mask_high;
             pci_read_bar(&mask_high, addr, (bar_num * sizeof(uint32_t)) + 0x4);
 
             bar.mem_address = ((uint64_t) (*bar_ptr_high & ~0xf) << 32) | (*bar_ptr & ~0xf);
             bar.size = (((uint64_t) mask_high << 32) | (mask & ~0xf)) + 1;
-        } else if (*bar_ptr & 0x01) { //IO
+        } 
+        else if (*bar_ptr & 0x01) 
+        { //IO
             bar.type = IO;
 
             bar.io_address = (uint16_t)(*bar_ptr & ~0x3);
             bar.size = (uint16_t)(~(mask & ~0x3) + 1);
-        } else { //32-bit mmio
+        } 
+        else 
+        { //32-bit mmio
             bar.type = MMIO32;
 
             bar.mem_address = (uint64_t) *bar_ptr & ~0xf;
@@ -332,7 +350,7 @@ namespace PCI
 
     PCI_BAR_TYPE pci_get_bar(PCIHeader0* addr, int bar_num)
     {
-        return pci_get_bar(&addr->BAR0, bar_num, (uint64_t)addr);
+        return pci_get_bar(&(addr->BAR0), bar_num, (uint64_t)addr);
     }
 
     uint8_t read_byte(uint64_t address, PCI_BAR_TYPE type, uint8_t field)

@@ -37,7 +37,7 @@ namespace Serial
             osData.debugTerminalWindow->Log("Serial PCI CARD MEM BASE: {}", ConvertHexToString(pciType.mem_address), Colors.bgreen);
             
             PCI::enable_io_space(pciCard);
-            PCI::disable_mem_space(pciCard);
+            PCI::enable_mem_space(pciCard);
             PCI::enable_interrupt(pciCard);
             PCI::enable_bus_mastering(pciCard);
 

@@ -89,7 +89,7 @@ namespace AC97
         //~AC97Driver();
 
         inline void write_mixer(MixerRegisters reg, uint16_t val) const {
-            outw(m_mixer_address + reg, val);
+            PCI::write_word((uint64_t)PCIBaseAddress, m_mixer_type, reg, val);//outw(m_mixer_address + reg, val);
             io_wait(10);
         }
 
@@ -105,7 +105,9 @@ namespace AC97
 
         PCI::PCIDeviceHeader* PCIBaseAddress;     
 
-        uint16_t m_mixer_address, m_bus_address, m_output_channel;
+        PCI::PCI_BAR_TYPE m_mixer_type, m_bus_type;
+
+        uint16_t /*m_mixer_address, m_bus_address, */m_output_channel;
         uint8_t* m_output_buffer_region; // kstd::Arc<VMRegion>
         uint8_t* m_output_buffer_descriptor_region;
         BufferDescriptor* m_output_buffer_descriptors;
