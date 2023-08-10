@@ -478,7 +478,7 @@ namespace SysApps
                 }
                 else if (curBuf->sampleCount != 0)
                 {
-                    Serial::Writelnf("> Switching to buffer %d.", currentBufferIndex);
+                    //Serial::Writelnf("> Switching to buffer %d.", currentBufferIndex);
                     musicSource->buffer = curBuf;
                     musicSource->samplesSent = 0;
                     musicSource->readyToSend = true;

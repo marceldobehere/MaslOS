@@ -75,21 +75,70 @@ namespace Audio
             // for 16/32 bits its pretty simple, just multiply/divide
             // for 8 bit stuff its a bit more pain
 
+
             long destIndex = ((destIndx * destCC + destTC) * destBPS) / 8;
+            // add src sample
+            switch (destBPS)
+            {
+                case 8:
+                    //((int8_t*)dest)[destIndex] += (int8_t)srcSample;
+                    srcSample += *((int8_t*)((uint64_t)dest + destIndex));
+                    break;
+                case 16:
+                    //((int16_t*)dest)[destIndex] += (int16_t)srcSample;
+                    srcSample += *((int16_t*)((uint64_t)dest + destIndex));
+                    break;
+                case 32:
+                    //((int32_t*)dest)[destIndex] += (int32_t)srcSample;
+                    srcSample += *((int32_t*)((uint64_t)dest + destIndex));
+                    break;
+                default:
+                    Panic("Invalid Destination BPS {}", to_string(destBPS), true);
+                    break;
+            }
+
+
+            // check for music volume overflowing and capping it
+            if (srcBPS == 8)
+            {
+                if (srcSample < -128)
+                    srcSample = -128;
+                else if (srcSample > 127)
+                    srcSample = 127;
+            }
+            else if (srcBPS == 16)
+            {
+                if (srcSample < -32768)
+                    srcSample = -32768;
+                else if (srcSample > 32767)
+                    srcSample = 32767;
+            }
+            else if (srcBPS == 32)
+            {
+                if (srcSample < -2147483648)
+                    srcSample = -2147483648;
+                else if (srcSample > 2147483647)
+                    srcSample = 2147483647;
+                // useless since int would overflow anyway
+            }
+
+
+
+            
             // convert from 32 bit to dest bps
             switch (destBPS)
             {
                 case 8:
                     //((int8_t*)dest)[destIndex] += (int8_t)srcSample;
-                    *((int8_t*)((uint64_t)dest + destIndex)) += (int8_t)srcSample;
+                    *((int8_t*)((uint64_t)dest + destIndex)) = (int8_t)srcSample;
                     break;
                 case 16:
                     //((int16_t*)dest)[destIndex] += (int16_t)srcSample;
-                    *((int16_t*)((uint64_t)dest + destIndex)) += (int16_t)srcSample;
+                    *((int16_t*)((uint64_t)dest + destIndex)) = (int16_t)srcSample;
                     break;
                 case 32:
                     //((int32_t*)dest)[destIndex] += (int32_t)srcSample;
-                    *((int32_t*)((uint64_t)dest + destIndex)) += (int32_t)srcSample;
+                    *((int32_t*)((uint64_t)dest + destIndex)) = (int32_t)srcSample;
                     break;
                 default:
                     Panic("Invalid Destination BPS {}", to_string(destBPS), true);
