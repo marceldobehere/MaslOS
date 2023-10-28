@@ -1,5 +1,5 @@
 # MaslOS
-an OS written in C++ and a bit of C.
+an OS written in C++ and a bit of C. [Here](https://youtu.be/Y8eZsNkEQIs) is a little showcase of MaslOS.
 
 The base was made following [Ponchos OS Dev Youtube Playlist](https://www.youtube.com/playlist?list=PLxN4E629pPnJxCQCLy7E0SQY_zuumOVyZ)
 
