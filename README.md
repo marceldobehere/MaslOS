@@ -1,3 +1,7 @@
+## Notice
+
+Development on MaslOS has stopped and I am currently working on [MaslOS 2](https://github.com/marceldobehere/MaslOS-2). 
+
 # MaslOS
 an OS written in C++ and a bit of C. [Here](https://youtu.be/Y8eZsNkEQIs) is a little showcase of MaslOS.
 
@@ -7,9 +11,6 @@ The OS is now using [limine](https://github.com/limine-bootloader/limine) as the
 
 ![Thumbnail](/images/thumbnail.PNG "MaslOS running with some sample apps")
 
-## Notice
-
-I am currently working on [MaslOS 2](https://github.com/marceldobehere/MaslOS-2). It's very WIP but I'll prolly be mostly working on it from now on.
 
 ## Wiki and other Pages
 
